@@ -816,6 +816,30 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionDates"><span class="badge">M</span>MsgUpdateCollectionDates</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse"><span class="badge">M</span>MsgUpdateCollectionDatesResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionPayments"><span class="badge">M</span>MsgUpdateCollectionPayments</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse"><span class="badge">M</span>MsgUpdateCollectionPaymentsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionState"><span class="badge">M</span>MsgUpdateCollectionState</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse"><span class="badge">M</span>MsgUpdateCollectionStateResponse</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.MsgWithdrawPayment"><span class="badge">M</span>MsgWithdrawPayment</a>
                 </li>
               
@@ -4834,7 +4858,7 @@ in the SETTLE stage.</p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>admin is the account address that will authorize or revoke agents and
-payments (the grantor) </p></td>
+payments (the grantor), and can update the collection </p></td>
                 </tr>
               
                 <tr>
@@ -6737,7 +6761,7 @@ saved in kvStore </p></td>
                   <td>collection_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>claimID is the unique identifier of the claim to make evaluation against </p></td>
+                  <td><p>collection_id indicates to which Collection this claim belongs </p></td>
                 </tr>
               
                 <tr>
@@ -6866,6 +6890,151 @@ use default by Collection </p></td>
         
       
         <h3 id="ixo.claims.v1beta1.MsgSubmitClaimResponse">MsgSubmitClaimResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionDates">MsgUpdateCollectionDates</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_date</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>startDate is the date after which claims may be submitted </p></td>
+                </tr>
+              
+                <tr>
+                  <td>end_date</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>endDate is the date after which no more claims may be submitted (no endDate
+is allowed) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse">MsgUpdateCollectionDatesResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionPayments">MsgUpdateCollectionPayments</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>payments</td>
+                  <td><a href="#ixo.claims.v1beta1.Payments">Payments</a></td>
+                  <td></td>
+                  <td><p>payments is the amount paid for claim submission, evaluation, approval, or
+rejection </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse">MsgUpdateCollectionPaymentsResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionState">MsgUpdateCollectionState</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>state</td>
+                  <td><a href="#ixo.claims.v1beta1.CollectionState">CollectionState</a></td>
+                  <td></td>
+                  <td><p>state is the state of this Collection (open, paused, closed) you want to
+update to </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionStateResponse">MsgUpdateCollectionStateResponse</h3>
         <p></p>
 
         
@@ -7007,6 +7176,27 @@ plus the timeout on Collection payments </p></td>
                 <td>WithdrawPayment</td>
                 <td><a href="#ixo.claims.v1beta1.MsgWithdrawPayment">MsgWithdrawPayment</a></td>
                 <td><a href="#ixo.claims.v1beta1.MsgWithdrawPaymentResponse">MsgWithdrawPaymentResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionState</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionState">MsgUpdateCollectionState</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse">MsgUpdateCollectionStateResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionDates</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionDates">MsgUpdateCollectionDates</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse">MsgUpdateCollectionDatesResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionPayments</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionPayments">MsgUpdateCollectionPayments</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse">MsgUpdateCollectionPaymentsResponse</a></td>
                 <td><p></p></td>
               </tr>
             

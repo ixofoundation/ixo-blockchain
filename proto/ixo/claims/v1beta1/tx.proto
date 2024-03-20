@@ -17,6 +17,12 @@ service Msg {
   rpc EvaluateClaim(MsgEvaluateClaim) returns (MsgEvaluateClaimResponse);
   rpc DisputeClaim(MsgDisputeClaim) returns (MsgDisputeClaimResponse);
   rpc WithdrawPayment(MsgWithdrawPayment) returns (MsgWithdrawPaymentResponse);
+  rpc UpdateCollectionState(MsgUpdateCollectionState)
+      returns (MsgUpdateCollectionStateResponse);
+  rpc UpdateCollectionDates(MsgUpdateCollectionDates)
+      returns (MsgUpdateCollectionDatesResponse);
+  rpc UpdateCollectionPayments(MsgUpdateCollectionPayments)
+      returns (MsgUpdateCollectionPaymentsResponse);
 }
 
 message MsgCreateCollection {
@@ -62,7 +68,7 @@ message MsgSubmitClaimResponse {}
 message MsgEvaluateClaim {
   // claimID is the unique identifier of the claim to make evaluation against
   string claim_id = 1;
-  // claimID is the unique identifier of the claim to make evaluation against
+  // collection_id indicates to which Collection this claim belongs
   string collection_id = 2;
   // oracle is the DID of the Oracle entity that evaluates the claim
   string oracle = 3;
@@ -142,3 +148,41 @@ message MsgWithdrawPayment {
 }
 
 message MsgWithdrawPaymentResponse {}
+
+message MsgUpdateCollectionState {
+  // collection_id indicates which Collection to update
+  string collection_id = 1;
+  // state is the state of this Collection (open, paused, closed) you want to
+  // update to
+  CollectionState state = 2;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 3;
+}
+
+message MsgUpdateCollectionStateResponse {}
+
+message MsgUpdateCollectionDates {
+  // collection_id indicates which Collection to update
+  string collection_id = 1;
+  // startDate is the date after which claims may be submitted
+  google.protobuf.Timestamp start_date = 2 [ (gogoproto.stdtime) = true ];
+  // endDate is the date after which no more claims may be submitted (no endDate
+  // is allowed)
+  google.protobuf.Timestamp end_date = 3 [ (gogoproto.stdtime) = true ];
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 4;
+}
+
+message MsgUpdateCollectionDatesResponse {}
+
+message MsgUpdateCollectionPayments {
+  // collection_id indicates which Collection to update
+  string collection_id = 1;
+  // payments is the amount paid for claim submission, evaluation, approval, or
+  // rejection
+  Payments payments = 2;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 3;
+}
+
+message MsgUpdateCollectionPaymentsResponse {}

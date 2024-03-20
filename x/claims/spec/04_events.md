@@ -18,7 +18,7 @@ The field's descriptions is as follows:
 
 ### CollectionUpdatedEvent
 
-Emitted after a successfull `MsgSubmitClaim`, `EvaluateClaim` since collection holds a count of claims
+Emitted after a successfull collection update event or `MsgSubmitClaim` and `EvaluateClaim` since collection holds a count of claims
 
 ```go
 type CollectionUpdatedEvent struct {

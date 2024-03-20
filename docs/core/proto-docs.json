@@ -4290,7 +4290,7 @@
             },
             {
               "name": "admin",
-              "description": "admin is the account address that will authorize or revoke agents and\npayments (the grantor)",
+              "description": "admin is the account address that will authorize or revoke agents and\npayments (the grantor), and can update the collection",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -6406,7 +6406,7 @@
             },
             {
               "name": "collection_id",
-              "description": "claimID is the unique identifier of the claim to make evaluation against",
+              "description": "collection_id indicates to which Collection this claim belongs",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -6601,6 +6601,195 @@
           "name": "MsgSubmitClaimResponse",
           "longName": "MsgSubmitClaimResponse",
           "fullName": "ixo.claims.v1beta1.MsgSubmitClaimResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateCollectionDates",
+          "longName": "MsgUpdateCollectionDates",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionDates",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates which Collection to update",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "start_date",
+              "description": "startDate is the date after which claims may be submitted",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "end_date",
+              "description": "endDate is the date after which no more claims may be submitted (no endDate\nis allowed)",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateCollectionDatesResponse",
+          "longName": "MsgUpdateCollectionDatesResponse",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateCollectionPayments",
+          "longName": "MsgUpdateCollectionPayments",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionPayments",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates which Collection to update",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "payments",
+              "description": "payments is the amount paid for claim submission, evaluation, approval, or\nrejection",
+              "label": "",
+              "type": "Payments",
+              "longType": "Payments",
+              "fullType": "ixo.claims.v1beta1.Payments",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateCollectionPaymentsResponse",
+          "longName": "MsgUpdateCollectionPaymentsResponse",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateCollectionState",
+          "longName": "MsgUpdateCollectionState",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionState",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates which Collection to update",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "state",
+              "description": "state is the state of this Collection (open, paused, closed) you want to\nupdate to",
+              "label": "",
+              "type": "CollectionState",
+              "longType": "CollectionState",
+              "fullType": "ixo.claims.v1beta1.CollectionState",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateCollectionStateResponse",
+          "longName": "MsgUpdateCollectionStateResponse",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionStateResponse",
           "description": "",
           "hasExtensions": false,
           "hasFields": false,
@@ -6805,6 +6994,42 @@
               "responseType": "MsgWithdrawPaymentResponse",
               "responseLongType": "MsgWithdrawPaymentResponse",
               "responseFullType": "ixo.claims.v1beta1.MsgWithdrawPaymentResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateCollectionState",
+              "description": "",
+              "requestType": "MsgUpdateCollectionState",
+              "requestLongType": "MsgUpdateCollectionState",
+              "requestFullType": "ixo.claims.v1beta1.MsgUpdateCollectionState",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateCollectionStateResponse",
+              "responseLongType": "MsgUpdateCollectionStateResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionStateResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateCollectionDates",
+              "description": "",
+              "requestType": "MsgUpdateCollectionDates",
+              "requestLongType": "MsgUpdateCollectionDates",
+              "requestFullType": "ixo.claims.v1beta1.MsgUpdateCollectionDates",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateCollectionDatesResponse",
+              "responseLongType": "MsgUpdateCollectionDatesResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateCollectionPayments",
+              "description": "",
+              "requestType": "MsgUpdateCollectionPayments",
+              "requestLongType": "MsgUpdateCollectionPayments",
+              "requestFullType": "ixo.claims.v1beta1.MsgUpdateCollectionPayments",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateCollectionPaymentsResponse",
+              "responseLongType": "MsgUpdateCollectionPaymentsResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse",
               "responseStreaming": false
             }
           ]

@@ -61,7 +61,7 @@ message Collection {
   // entity is the DID of the entity for which the claims are being created
   string entity = 2;
   // admin is the account address that will authorize or revoke agents and
-  // payments (the grantor)
+  // payments (the grantor), and can update the collection
   string admin = 3;
   // protocol is the DID of the claim protocol
   string protocol = 4;

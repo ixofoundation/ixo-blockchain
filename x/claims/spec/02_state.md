@@ -95,9 +95,9 @@ type Payment struct {
 
 The field's descriptions is as follows:
 
-- `account` - a string containing the account address from which the payment will be made (ideally a [EntityAccount](/x/entity/spec/02_state.md#entityaccount))
+- `account` - a string containing the account address from which the payment will be made (must be an [EntityAccount](/x/entity/spec/02_state.md#entityaccount) of the `Entity` field for the Collection)
 - `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount to be paid on payment
-- `contract_1155Payment` - a [Contract1155Payment](#contract1155payment)
+- `contract_1155Payment` - a [Contract1155Payment](#contract1155payment), not allowed for `Evaluation` Payment
 - `timeoutNs` - a duration containing the timeout after claim/evaluation to create authZ for payment, if 0 then immidiate direct payment is made
 
 ### Contract1155Payment

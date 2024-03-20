@@ -60,6 +60,9 @@ func (msg MsgSubmitClaim) ValidateBasic() error {
 	if ixo.IsEmpty(msg.ClaimId) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
 	}
+	if ixo.IsEmpty(msg.CollectionId) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
 
 	return nil
 }
@@ -76,7 +79,6 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
-
 	if !iidtypes.IsValidDID(msg.Oracle) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
@@ -84,7 +86,9 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 	if iidtypes.IsEmpty(msg.ClaimId) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
 	}
-
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
 	if iidtypes.IsEmpty(msg.VerificationProof) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "verification_proof cannot be empty")
 	}
@@ -108,7 +112,6 @@ func (msg MsgDisputeClaim) ValidateBasic() error {
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
-
 	if iidtypes.IsEmpty(msg.Data.Proof) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data proof cannot be empty")
 	}
@@ -152,6 +155,68 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 	}
 	if iidtypes.IsEmpty(msg.ClaimId) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim id cannot be empty")
+	}
+
+	return nil
+}
+
+// --------------------------
+// UPDATE COLLECTION STATE
+// --------------------------
+func (msg MsgUpdateCollectionState) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+
+	return nil
+}
+
+// --------------------------
+// UPDATE COLLECTION DATES
+// --------------------------
+func (msg MsgUpdateCollectionDates) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+
+	return nil
+}
+
+// --------------------------
+// UPDATE COLLECTION PAYMENTS
+// --------------------------
+func (msg MsgUpdateCollectionPayments) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+
+	if msg.Payments.Evaluation.Contract_1155Payment != nil {
+		return ErrCollectionEvalError
+	}
+
+	if err = msg.Payments.Submission.Validate(); err != nil {
+		return err
+	}
+	if err = msg.Payments.Evaluation.Validate(); err != nil {
+		return err
+	}
+	if err = msg.Payments.Approval.Validate(); err != nil {
+		return err
+	}
+	if err = msg.Payments.Rejection.Validate(); err != nil {
+		return err
 	}
 
 	return nil

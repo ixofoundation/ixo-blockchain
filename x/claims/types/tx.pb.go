@@ -301,7 +301,7 @@ var xxx_messageInfo_MsgSubmitClaimResponse proto.InternalMessageInfo
 type MsgEvaluateClaim struct {
 	// claimID is the unique identifier of the claim to make evaluation against
 	ClaimId string `protobuf:"bytes,1,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
-	// claimID is the unique identifier of the claim to make evaluation against
+	// collection_id indicates to which Collection this claim belongs
 	CollectionId string `protobuf:"bytes,2,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
 	// oracle is the DID of the Oracle entity that evaluates the claim
 	Oracle string `protobuf:"bytes,3,opt,name=oracle,proto3" json:"oracle,omitempty"`
@@ -736,6 +736,315 @@ func (m *MsgWithdrawPaymentResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgWithdrawPaymentResponse proto.InternalMessageInfo
 
+type MsgUpdateCollectionState struct {
+	// collection_id indicates which Collection to update
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// state is the state of this Collection (open, paused, closed) you want to
+	// update to
+	State CollectionState `protobuf:"varint,2,opt,name=state,proto3,enum=ixo.claims.v1beta1.CollectionState" json:"state,omitempty"`
+	// admin address used to sign this message, validated against Collection Admin
+	AdminAddress string `protobuf:"bytes,3,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
+}
+
+func (m *MsgUpdateCollectionState) Reset()         { *m = MsgUpdateCollectionState{} }
+func (m *MsgUpdateCollectionState) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionState) ProtoMessage()    {}
+func (*MsgUpdateCollectionState) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{10}
+}
+func (m *MsgUpdateCollectionState) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionState) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionState.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionState) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionState.Merge(m, src)
+}
+func (m *MsgUpdateCollectionState) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionState) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionState.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionState proto.InternalMessageInfo
+
+func (m *MsgUpdateCollectionState) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *MsgUpdateCollectionState) GetState() CollectionState {
+	if m != nil {
+		return m.State
+	}
+	return CollectionState_open
+}
+
+func (m *MsgUpdateCollectionState) GetAdminAddress() string {
+	if m != nil {
+		return m.AdminAddress
+	}
+	return ""
+}
+
+type MsgUpdateCollectionStateResponse struct {
+}
+
+func (m *MsgUpdateCollectionStateResponse) Reset()         { *m = MsgUpdateCollectionStateResponse{} }
+func (m *MsgUpdateCollectionStateResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionStateResponse) ProtoMessage()    {}
+func (*MsgUpdateCollectionStateResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{11}
+}
+func (m *MsgUpdateCollectionStateResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionStateResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionStateResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionStateResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionStateResponse.Merge(m, src)
+}
+func (m *MsgUpdateCollectionStateResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionStateResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionStateResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionStateResponse proto.InternalMessageInfo
+
+type MsgUpdateCollectionDates struct {
+	// collection_id indicates which Collection to update
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// startDate is the date after which claims may be submitted
+	StartDate *time.Time `protobuf:"bytes,2,opt,name=start_date,json=startDate,proto3,stdtime" json:"start_date,omitempty"`
+	// endDate is the date after which no more claims may be submitted (no endDate
+	// is allowed)
+	EndDate *time.Time `protobuf:"bytes,3,opt,name=end_date,json=endDate,proto3,stdtime" json:"end_date,omitempty"`
+	// admin address used to sign this message, validated against Collection Admin
+	AdminAddress string `protobuf:"bytes,4,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
+}
+
+func (m *MsgUpdateCollectionDates) Reset()         { *m = MsgUpdateCollectionDates{} }
+func (m *MsgUpdateCollectionDates) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionDates) ProtoMessage()    {}
+func (*MsgUpdateCollectionDates) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{12}
+}
+func (m *MsgUpdateCollectionDates) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionDates) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionDates.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionDates) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionDates.Merge(m, src)
+}
+func (m *MsgUpdateCollectionDates) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionDates) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionDates.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionDates proto.InternalMessageInfo
+
+func (m *MsgUpdateCollectionDates) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *MsgUpdateCollectionDates) GetStartDate() *time.Time {
+	if m != nil {
+		return m.StartDate
+	}
+	return nil
+}
+
+func (m *MsgUpdateCollectionDates) GetEndDate() *time.Time {
+	if m != nil {
+		return m.EndDate
+	}
+	return nil
+}
+
+func (m *MsgUpdateCollectionDates) GetAdminAddress() string {
+	if m != nil {
+		return m.AdminAddress
+	}
+	return ""
+}
+
+type MsgUpdateCollectionDatesResponse struct {
+}
+
+func (m *MsgUpdateCollectionDatesResponse) Reset()         { *m = MsgUpdateCollectionDatesResponse{} }
+func (m *MsgUpdateCollectionDatesResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionDatesResponse) ProtoMessage()    {}
+func (*MsgUpdateCollectionDatesResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{13}
+}
+func (m *MsgUpdateCollectionDatesResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionDatesResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionDatesResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionDatesResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionDatesResponse.Merge(m, src)
+}
+func (m *MsgUpdateCollectionDatesResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionDatesResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionDatesResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionDatesResponse proto.InternalMessageInfo
+
+type MsgUpdateCollectionPayments struct {
+	// collection_id indicates which Collection to update
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// payments is the amount paid for claim submission, evaluation, approval, or
+	// rejection
+	Payments *Payments `protobuf:"bytes,2,opt,name=payments,proto3" json:"payments,omitempty"`
+	// admin address used to sign this message, validated against Collection Admin
+	AdminAddress string `protobuf:"bytes,3,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
+}
+
+func (m *MsgUpdateCollectionPayments) Reset()         { *m = MsgUpdateCollectionPayments{} }
+func (m *MsgUpdateCollectionPayments) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionPayments) ProtoMessage()    {}
+func (*MsgUpdateCollectionPayments) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{14}
+}
+func (m *MsgUpdateCollectionPayments) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionPayments) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionPayments.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionPayments) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionPayments.Merge(m, src)
+}
+func (m *MsgUpdateCollectionPayments) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionPayments) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionPayments.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionPayments proto.InternalMessageInfo
+
+func (m *MsgUpdateCollectionPayments) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *MsgUpdateCollectionPayments) GetPayments() *Payments {
+	if m != nil {
+		return m.Payments
+	}
+	return nil
+}
+
+func (m *MsgUpdateCollectionPayments) GetAdminAddress() string {
+	if m != nil {
+		return m.AdminAddress
+	}
+	return ""
+}
+
+type MsgUpdateCollectionPaymentsResponse struct {
+}
+
+func (m *MsgUpdateCollectionPaymentsResponse) Reset()         { *m = MsgUpdateCollectionPaymentsResponse{} }
+func (m *MsgUpdateCollectionPaymentsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionPaymentsResponse) ProtoMessage()    {}
+func (*MsgUpdateCollectionPaymentsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{15}
+}
+func (m *MsgUpdateCollectionPaymentsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionPaymentsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionPaymentsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionPaymentsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionPaymentsResponse.Merge(m, src)
+}
+func (m *MsgUpdateCollectionPaymentsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionPaymentsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionPaymentsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionPaymentsResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgCreateCollection)(nil), "ixo.claims.v1beta1.MsgCreateCollection")
 	proto.RegisterType((*MsgCreateCollectionResponse)(nil), "ixo.claims.v1beta1.MsgCreateCollectionResponse")
@@ -747,80 +1056,95 @@ func init() {
 	proto.RegisterType((*MsgDisputeClaimResponse)(nil), "ixo.claims.v1beta1.MsgDisputeClaimResponse")
 	proto.RegisterType((*MsgWithdrawPayment)(nil), "ixo.claims.v1beta1.MsgWithdrawPayment")
 	proto.RegisterType((*MsgWithdrawPaymentResponse)(nil), "ixo.claims.v1beta1.MsgWithdrawPaymentResponse")
+	proto.RegisterType((*MsgUpdateCollectionState)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionState")
+	proto.RegisterType((*MsgUpdateCollectionStateResponse)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionStateResponse")
+	proto.RegisterType((*MsgUpdateCollectionDates)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionDates")
+	proto.RegisterType((*MsgUpdateCollectionDatesResponse)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse")
+	proto.RegisterType((*MsgUpdateCollectionPayments)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionPayments")
+	proto.RegisterType((*MsgUpdateCollectionPaymentsResponse)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse")
 }
 
 func init() { proto.RegisterFile("ixo/claims/v1beta1/tx.proto", fileDescriptor_e0095508349b828a) }
 
 var fileDescriptor_e0095508349b828a = []byte{
-	// 1075 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0x4f, 0x6f, 0x1b, 0x45,
-	0x14, 0xcf, 0x3a, 0xb6, 0x63, 0x3f, 0xbb, 0x69, 0x99, 0x96, 0xb0, 0xd9, 0xa6, 0xb6, 0x71, 0x2a,
-	0xb0, 0x80, 0xec, 0x36, 0xa9, 0x2a, 0x5a, 0x81, 0x84, 0xea, 0x98, 0x4a, 0x39, 0x58, 0x54, 0x9b,
-	0x4a, 0x48, 0x20, 0x64, 0xc6, 0xbb, 0x93, 0xcd, 0xb4, 0xf6, 0x8e, 0xd9, 0x99, 0x0d, 0xce, 0x19,
-	0x3e, 0x40, 0xc5, 0xc7, 0xe0, 0x93, 0xf4, 0xd8, 0x13, 0xe2, 0x94, 0xa2, 0xe4, 0xc6, 0x47, 0xe8,
-	0x05, 0x34, 0xb3, 0xe3, 0xff, 0x9b, 0x60, 0x2e, 0x3d, 0x25, 0xef, 0xbd, 0xdf, 0xef, 0xbd, 0x9d,
-	0xdf, 0x7b, 0xf3, 0xc6, 0x70, 0x9b, 0x0e, 0x99, 0xe3, 0xf5, 0x30, 0xed, 0x73, 0xe7, 0x64, 0xb7,
-	0x4b, 0x04, 0xde, 0x75, 0xc4, 0xd0, 0x1e, 0x44, 0x4c, 0x30, 0x84, 0xe8, 0x90, 0xd9, 0x49, 0xd0,
-	0xd6, 0x41, 0xeb, 0x56, 0xc0, 0x02, 0xa6, 0xc2, 0x8e, 0xfc, 0x2f, 0x41, 0x5a, 0xd5, 0x80, 0xb1,
-	0xa0, 0x47, 0x1c, 0x65, 0x75, 0xe3, 0x23, 0x47, 0xd0, 0x3e, 0xe1, 0x02, 0xf7, 0x07, 0x23, 0x40,
-	0x4a, 0x1d, 0x9d, 0x39, 0x01, 0x54, 0x3c, 0xc6, 0xfb, 0x8c, 0x3b, 0x5d, 0xcc, 0xc9, 0x04, 0xc1,
-	0x68, 0x78, 0x55, 0x02, 0x45, 0x49, 0x00, 0xf5, 0xbf, 0x33, 0x70, 0xb3, 0xcd, 0x83, 0xfd, 0x88,
-	0x60, 0x41, 0xf6, 0x59, 0xaf, 0x47, 0x3c, 0x41, 0x59, 0x88, 0x36, 0x20, 0x4f, 0x42, 0x41, 0xc5,
-	0xa9, 0x69, 0xd4, 0x8c, 0x46, 0xd1, 0xd5, 0x96, 0xf4, 0x73, 0x1a, 0x84, 0x24, 0x32, 0x33, 0x89,
-	0x3f, 0xb1, 0x90, 0x05, 0x05, 0x95, 0xd0, 0x63, 0x3d, 0x73, 0x55, 0x45, 0xc6, 0x36, 0xfa, 0x0a,
-	0x80, 0x0b, 0x1c, 0x89, 0x8e, 0x8f, 0x05, 0x31, 0xb3, 0x35, 0xa3, 0x51, 0xda, 0xb3, 0xec, 0xe4,
-	0xec, 0xf6, 0xe8, 0xec, 0xf6, 0xb3, 0xd1, 0xd9, 0x9b, 0xd9, 0x97, 0x6f, 0xaa, 0x86, 0x5b, 0x54,
-	0x9c, 0x16, 0x16, 0x04, 0x7d, 0x01, 0x05, 0x12, 0xfa, 0x09, 0x3d, 0xb7, 0x24, 0x7d, 0x8d, 0x84,
-	0xbe, 0x22, 0xdf, 0x82, 0xdc, 0x4f, 0x31, 0x13, 0xd8, 0xcc, 0xd7, 0x8c, 0x46, 0xd6, 0x4d, 0x0c,
-	0xf4, 0x08, 0x72, 0x5c, 0xc8, 0x7c, 0x6b, 0x35, 0xa3, 0xb1, 0xbe, 0xb7, 0x6d, 0x2f, 0x36, 0xcd,
-	0x9e, 0xc8, 0x71, 0x28, 0xa1, 0x6e, 0xc2, 0x40, 0x0f, 0xa1, 0x30, 0xc0, 0xa7, 0x7d, 0x12, 0x0a,
-	0x6e, 0x16, 0xd4, 0xd7, 0x6c, 0xa5, 0xb1, 0x9f, 0x6a, 0x8c, 0x3b, 0x46, 0xd7, 0xef, 0xc0, 0xed,
-	0x14, 0xad, 0x5d, 0xc2, 0x07, 0x2c, 0xe4, 0xa4, 0xfe, 0x8f, 0x01, 0xeb, 0x6d, 0x1e, 0x1c, 0xc6,
-	0xdd, 0x3e, 0x15, 0xfb, 0x32, 0x1b, 0xda, 0x86, 0x6b, 0xde, 0x18, 0xd8, 0xa1, 0xbe, 0xee, 0x46,
-	0x79, 0xe2, 0x3c, 0xf0, 0xd1, 0x26, 0x14, 0x54, 0x6d, 0x19, 0x4f, 0xba, 0xb2, 0xa6, 0xec, 0x03,
-	0x1f, 0x79, 0x50, 0xc4, 0x01, 0x09, 0x45, 0xc7, 0xa7, 0x7e, 0xd2, 0x97, 0xe6, 0x93, 0xb7, 0x67,
-	0xd5, 0x66, 0x40, 0xc5, 0x71, 0xdc, 0xb5, 0x3d, 0xd6, 0x77, 0xe8, 0x90, 0x1d, 0xb1, 0x38, 0xf4,
-	0xb1, 0xcc, 0x26, 0xad, 0x9d, 0x6e, 0x8f, 0x79, 0x2f, 0xbc, 0x63, 0x4c, 0x43, 0xe7, 0x64, 0xcf,
-	0x19, 0x3a, 0x94, 0xfa, 0x8e, 0x38, 0x1d, 0x10, 0x6e, 0xb7, 0x0e, 0x5a, 0x4f, 0x22, 0x1c, 0xc8,
-	0xd3, 0xb8, 0x05, 0x95, 0xb8, 0x45, 0x7d, 0xf9, 0x91, 0x49, 0x11, 0xec, 0xfb, 0x11, 0xe1, 0x5c,
-	0xb5, 0xb8, 0xe8, 0x96, 0x95, 0xf3, 0x71, 0xe2, 0x53, 0x20, 0xbf, 0x4f, 0xc3, 0x31, 0x28, 0xa7,
-	0x41, 0xd2, 0xa9, 0x41, 0x75, 0x13, 0x36, 0x66, 0x05, 0x18, 0x6b, 0xf3, 0x4b, 0x16, 0x6e, 0xb4,
-	0x79, 0xf0, 0xf5, 0x09, 0xee, 0xc5, 0x52, 0x3d, 0xa5, 0xce, 0xf4, 0xc1, 0x8d, 0xd9, 0x83, 0x2f,
-	0x08, 0x97, 0x49, 0x11, 0x6e, 0x03, 0xf2, 0x2c, 0xc2, 0x5e, 0x8f, 0xe8, 0x91, 0xd5, 0xd6, 0xac,
-	0x6a, 0xd9, 0x77, 0xa5, 0x5a, 0x6e, 0x19, 0xd5, 0xf2, 0x8b, 0xaa, 0xa1, 0x2f, 0x21, 0x2f, 0x27,
-	0x33, 0xe6, 0x7a, 0x98, 0xef, 0xa6, 0x8d, 0xa3, 0x56, 0x4e, 0x0f, 0x73, 0xcc, 0x5d, 0xcd, 0x91,
-	0x22, 0x44, 0x04, 0x73, 0x16, 0xaa, 0x61, 0xbe, 0xe6, 0x6a, 0x0b, 0xed, 0x00, 0x3a, 0x21, 0x11,
-	0x3d, 0xa2, 0x9e, 0x62, 0x75, 0x06, 0x11, 0x63, 0x47, 0x66, 0x51, 0xd5, 0x7f, 0x6f, 0x3a, 0xf2,
-	0x54, 0x06, 0x90, 0x07, 0x79, 0xdc, 0x67, 0x71, 0x28, 0x4c, 0xa8, 0xad, 0x36, 0x4a, 0x7b, 0x9b,
-	0xb6, 0xde, 0x33, 0x72, 0x35, 0x4d, 0x5d, 0x29, 0x1a, 0x36, 0xef, 0xbd, 0x3a, 0xab, 0xae, 0xfc,
-	0xfe, 0xa6, 0xda, 0x98, 0xd2, 0x53, 0xef, 0xb1, 0xe4, 0xcf, 0x0e, 0xf7, 0x5f, 0x68, 0xed, 0x24,
-	0x81, 0xbb, 0x3a, 0x75, 0xdd, 0x02, 0x73, 0x7e, 0x08, 0xc6, 0x13, 0xf2, 0x5b, 0x06, 0xae, 0xb7,
-	0x79, 0xd0, 0xa2, 0x7c, 0x10, 0x8f, 0x06, 0xe4, 0x0e, 0x00, 0x8f, 0xbb, 0xcf, 0x89, 0x27, 0x26,
-	0x23, 0x52, 0xd4, 0x9e, 0xf9, 0xdb, 0x91, 0x79, 0x57, 0x7d, 0x5e, 0x4d, 0xe9, 0xf3, 0x87, 0x50,
-	0xf6, 0x93, 0x0f, 0xef, 0xc8, 0x5c, 0x6a, 0xe8, 0x72, 0x6e, 0x49, 0xfb, 0x9e, 0x9d, 0x0e, 0x08,
-	0xba, 0x0f, 0x59, 0x1f, 0x0b, 0xac, 0x17, 0x60, 0x35, 0xad, 0xc7, 0xfa, 0xec, 0x2d, 0x2c, 0xb0,
-	0xab, 0xc0, 0xf5, 0x4d, 0xf8, 0x60, 0x4e, 0x93, 0xb1, 0x5e, 0x7f, 0x64, 0x01, 0xb5, 0x79, 0xf0,
-	0x2d, 0x15, 0xc7, 0x7e, 0x84, 0x7f, 0xd6, 0xeb, 0xea, 0xaa, 0x3b, 0xf5, 0x1c, 0xf2, 0x34, 0x1c,
-	0xc4, 0x82, 0x9b, 0x19, 0xdd, 0xe2, 0x94, 0x6f, 0x38, 0x90, 0x88, 0xe6, 0xe7, 0xb2, 0xc5, 0x6f,
-	0xcf, 0xaa, 0xce, 0x95, 0x2d, 0x1e, 0x3a, 0x5d, 0x1c, 0x8e, 0x3a, 0xad, 0x88, 0xae, 0xae, 0x80,
-	0x42, 0x58, 0x63, 0xb1, 0x50, 0xc5, 0x56, 0x55, 0x31, 0x2b, 0xad, 0xd8, 0x37, 0x0a, 0xd2, 0x7c,
-	0xa8, 0xab, 0xdd, 0x5b, 0xbe, 0x5a, 0xc2, 0x74, 0x47, 0x45, 0x50, 0x13, 0xca, 0x7a, 0x4d, 0x4f,
-	0x1a, 0xb0, 0x9e, 0xae, 0xb2, 0x56, 0x4a, 0x36, 0xc5, 0x2d, 0x0d, 0x26, 0x06, 0xfa, 0x1e, 0xde,
-	0xf7, 0x58, 0x28, 0x22, 0xec, 0x89, 0xce, 0xee, 0xee, 0x83, 0x07, 0x1d, 0x1d, 0xd4, 0x2d, 0xfb,
-	0x38, 0xfd, 0x8d, 0x49, 0x08, 0x12, 0xaf, 0x13, 0xbb, 0x37, 0xbd, 0x45, 0x27, 0xda, 0x82, 0xa2,
-	0x60, 0x8f, 0x67, 0xb6, 0xc0, 0xc4, 0x81, 0x6a, 0x50, 0x3a, 0x8a, 0x58, 0x7f, 0x14, 0x5f, 0x53,
-	0xf1, 0x69, 0x17, 0xda, 0x87, 0x72, 0x44, 0x7a, 0x04, 0x73, 0x92, 0xbc, 0xa3, 0x85, 0x25, 0xdf,
-	0xd1, 0x92, 0x66, 0xa9, 0xb7, 0x74, 0x61, 0x1d, 0x15, 0x53, 0x96, 0xf8, 0x16, 0x58, 0x8b, 0x73,
-	0x35, 0x1a, 0xbb, 0xbd, 0x5f, 0xb3, 0xb0, 0xda, 0xe6, 0x01, 0xea, 0xc1, 0x8d, 0x85, 0x1f, 0x1d,
-	0xa9, 0x0a, 0xa5, 0xbc, 0x98, 0x96, 0xb3, 0x24, 0x70, 0x54, 0x15, 0xfd, 0x00, 0xa5, 0xe9, 0x67,
-	0xb5, 0x7e, 0x09, 0x7f, 0x0a, 0x63, 0x7d, 0xf2, 0xdf, 0x98, 0x71, 0x7a, 0x0f, 0xae, 0xcd, 0xbe,
-	0x4c, 0x77, 0x2f, 0x21, 0xcf, 0xa0, 0xac, 0xcf, 0x96, 0x41, 0x8d, 0x8b, 0xfc, 0x08, 0xe5, 0x99,
-	0xe5, 0xb6, 0x7d, 0x09, 0x7b, 0x1a, 0x64, 0x7d, 0xba, 0x04, 0x68, 0x5c, 0x81, 0xc2, 0xf5, 0xf9,
-	0x75, 0xf0, 0xd1, 0x25, 0xfc, 0x39, 0x9c, 0x65, 0x2f, 0x87, 0x1b, 0x95, 0x6a, 0x1e, 0xbe, 0x3a,
-	0xaf, 0x18, 0xaf, 0xcf, 0x2b, 0xc6, 0x5f, 0xe7, 0x15, 0xe3, 0xe5, 0x45, 0x65, 0xe5, 0xf5, 0x45,
-	0x65, 0xe5, 0xcf, 0x8b, 0xca, 0xca, 0x77, 0x8f, 0xfe, 0xd7, 0xf6, 0xd5, 0xbf, 0x6d, 0xd5, 0xa5,
-	0xee, 0xe6, 0xd5, 0x14, 0xdf, 0xff, 0x37, 0x00, 0x00, 0xff, 0xff, 0xbf, 0x15, 0x6d, 0x60, 0x9f,
-	0x0b, 0x00, 0x00,
+	// 1223 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0x4d, 0x6f, 0xdb, 0x46,
+	0x13, 0x36, 0x25, 0x59, 0x96, 0x46, 0xce, 0xc7, 0xbb, 0xf9, 0x78, 0x19, 0x26, 0x91, 0x54, 0x39,
+	0x6d, 0x8d, 0xb6, 0x21, 0x63, 0xa7, 0x41, 0x12, 0xb4, 0x40, 0x11, 0xd9, 0x0d, 0xe0, 0x83, 0xd0,
+	0x80, 0x49, 0x51, 0xa0, 0x45, 0xa1, 0xae, 0xc8, 0x35, 0xb3, 0x89, 0xc4, 0x55, 0xb9, 0x4b, 0x57,
+	0x46, 0x8f, 0x6d, 0xef, 0x41, 0xff, 0x40, 0xd1, 0x6b, 0x7f, 0x49, 0x8e, 0x39, 0x15, 0x3d, 0x25,
+	0x85, 0x7d, 0xeb, 0x4f, 0xc8, 0xa5, 0x05, 0x97, 0x4b, 0xea, 0x8b, 0x72, 0x29, 0x14, 0xc8, 0xc9,
+	0xde, 0xd9, 0x67, 0x66, 0x76, 0x9e, 0x19, 0xce, 0x8c, 0xe0, 0x32, 0x1d, 0x31, 0xcb, 0xe9, 0x63,
+	0x3a, 0xe0, 0xd6, 0xc1, 0x56, 0x8f, 0x08, 0xbc, 0x65, 0x89, 0x91, 0x39, 0x0c, 0x98, 0x60, 0x08,
+	0xd1, 0x11, 0x33, 0xe3, 0x4b, 0x53, 0x5d, 0x1a, 0xe7, 0x3d, 0xe6, 0x31, 0x79, 0x6d, 0x45, 0xff,
+	0xc5, 0x48, 0xa3, 0xe1, 0x31, 0xe6, 0xf5, 0x89, 0x25, 0x4f, 0xbd, 0x70, 0xdf, 0x12, 0x74, 0x40,
+	0xb8, 0xc0, 0x83, 0x61, 0x02, 0xc8, 0xf0, 0xa3, 0x2c, 0xc7, 0x80, 0xba, 0xc3, 0xf8, 0x80, 0x71,
+	0xab, 0x87, 0x39, 0x19, 0x23, 0x18, 0xf5, 0x4f, 0x32, 0x20, 0x55, 0x62, 0x40, 0xeb, 0xaf, 0x02,
+	0x9c, 0xeb, 0x70, 0x6f, 0x27, 0x20, 0x58, 0x90, 0x1d, 0xd6, 0xef, 0x13, 0x47, 0x50, 0xe6, 0xa3,
+	0x8b, 0x50, 0x26, 0xbe, 0xa0, 0xe2, 0x50, 0xd7, 0x9a, 0xda, 0x66, 0xd5, 0x56, 0xa7, 0x48, 0xce,
+	0xa9, 0xe7, 0x93, 0x40, 0x2f, 0xc4, 0xf2, 0xf8, 0x84, 0x0c, 0xa8, 0x48, 0x83, 0x0e, 0xeb, 0xeb,
+	0x45, 0x79, 0x93, 0x9e, 0xd1, 0x27, 0x00, 0x5c, 0xe0, 0x40, 0x74, 0x5d, 0x2c, 0x88, 0x5e, 0x6a,
+	0x6a, 0x9b, 0xb5, 0x6d, 0xc3, 0x8c, 0x63, 0x37, 0x93, 0xd8, 0xcd, 0x47, 0x49, 0xec, 0xed, 0xd2,
+	0xb3, 0x57, 0x0d, 0xcd, 0xae, 0x4a, 0x9d, 0x5d, 0x2c, 0x08, 0xfa, 0x08, 0x2a, 0xc4, 0x77, 0x63,
+	0xf5, 0xd5, 0x9c, 0xea, 0x6b, 0xc4, 0x77, 0xa5, 0xf2, 0x79, 0x58, 0xfd, 0x36, 0x64, 0x02, 0xeb,
+	0xe5, 0xa6, 0xb6, 0x59, 0xb2, 0xe3, 0x03, 0xba, 0x0b, 0xab, 0x5c, 0x44, 0xf6, 0xd6, 0x9a, 0xda,
+	0xe6, 0xe9, 0xed, 0x0d, 0x73, 0x3e, 0x69, 0xe6, 0x98, 0x8e, 0x87, 0x11, 0xd4, 0x8e, 0x35, 0xd0,
+	0x1d, 0xa8, 0x0c, 0xf1, 0xe1, 0x80, 0xf8, 0x82, 0xeb, 0x15, 0xf9, 0x9a, 0x2b, 0x59, 0xda, 0x0f,
+	0x14, 0xc6, 0x4e, 0xd1, 0xad, 0xab, 0x70, 0x39, 0x83, 0x6b, 0x9b, 0xf0, 0x21, 0xf3, 0x39, 0x69,
+	0xfd, 0xad, 0xc1, 0xe9, 0x0e, 0xf7, 0x1e, 0x86, 0xbd, 0x01, 0x15, 0x3b, 0x91, 0x35, 0xb4, 0x01,
+	0xa7, 0x9c, 0x14, 0xd8, 0xa5, 0xae, 0xca, 0xc6, 0xfa, 0x58, 0xb8, 0xe7, 0xa2, 0x4b, 0x50, 0x91,
+	0xbe, 0xa3, 0xfb, 0x38, 0x2b, 0x6b, 0xf2, 0xbc, 0xe7, 0x22, 0x07, 0xaa, 0xd8, 0x23, 0xbe, 0xe8,
+	0xba, 0xd4, 0x8d, 0xf3, 0xd2, 0xbe, 0xff, 0xfa, 0x65, 0xa3, 0xed, 0x51, 0xf1, 0x38, 0xec, 0x99,
+	0x0e, 0x1b, 0x58, 0x74, 0xc4, 0xf6, 0x59, 0xe8, 0xbb, 0x38, 0xb2, 0x16, 0x9d, 0xae, 0xf7, 0xfa,
+	0xcc, 0x79, 0xea, 0x3c, 0xc6, 0xd4, 0xb7, 0x0e, 0xb6, 0xad, 0x91, 0x45, 0xa9, 0x6b, 0x89, 0xc3,
+	0x21, 0xe1, 0xe6, 0xee, 0xde, 0xee, 0xfd, 0x00, 0x7b, 0x51, 0x34, 0x76, 0x45, 0x1a, 0xde, 0xa5,
+	0x6e, 0xf4, 0xc8, 0xd8, 0x09, 0x76, 0xdd, 0x80, 0x70, 0x2e, 0x53, 0x5c, 0xb5, 0xd7, 0xa5, 0xf0,
+	0x5e, 0x2c, 0x93, 0x20, 0x77, 0x40, 0xfd, 0x14, 0xb4, 0xaa, 0x40, 0x91, 0x50, 0x81, 0x5a, 0x3a,
+	0x5c, 0x9c, 0x26, 0x20, 0xe5, 0xe6, 0x87, 0x12, 0x9c, 0xed, 0x70, 0xef, 0xd3, 0x03, 0xdc, 0x0f,
+	0x23, 0xf6, 0x24, 0x3b, 0x93, 0x81, 0x6b, 0xd3, 0x81, 0xcf, 0x11, 0x57, 0xc8, 0x20, 0xee, 0x22,
+	0x94, 0x59, 0x80, 0x9d, 0x3e, 0x51, 0x25, 0xab, 0x4e, 0xd3, 0xac, 0x95, 0xde, 0x14, 0x6b, 0xab,
+	0x79, 0x58, 0x2b, 0xcf, 0xb3, 0x86, 0x3e, 0x86, 0x72, 0x54, 0x99, 0x21, 0x57, 0xc5, 0x7c, 0x2d,
+	0xab, 0x1c, 0x15, 0x73, 0xaa, 0x98, 0x43, 0x6e, 0x2b, 0x9d, 0x88, 0x84, 0x80, 0x60, 0xce, 0x7c,
+	0x59, 0xcc, 0xa7, 0x6c, 0x75, 0x42, 0xd7, 0x01, 0x1d, 0x90, 0x80, 0xee, 0x53, 0x47, 0x6a, 0x75,
+	0x87, 0x01, 0x63, 0xfb, 0x7a, 0x55, 0xfa, 0xff, 0xdf, 0xe4, 0xcd, 0x83, 0xe8, 0x02, 0x39, 0x50,
+	0xc6, 0x03, 0x16, 0xfa, 0x42, 0x87, 0x66, 0x71, 0xb3, 0xb6, 0x7d, 0xc9, 0x54, 0x7d, 0x26, 0x6a,
+	0x4d, 0x13, 0x9f, 0x14, 0xf5, 0xdb, 0x37, 0x9e, 0xbf, 0x6c, 0xac, 0xfc, 0xf6, 0xaa, 0xb1, 0x39,
+	0xc1, 0xa7, 0xea, 0x63, 0xf1, 0x9f, 0xeb, 0xdc, 0x7d, 0xaa, 0xb8, 0x8b, 0x14, 0xb8, 0xad, 0x4c,
+	0xb7, 0x0c, 0xd0, 0x67, 0x8b, 0x20, 0xad, 0x90, 0x9f, 0x0b, 0x70, 0xa6, 0xc3, 0xbd, 0x5d, 0xca,
+	0x87, 0x61, 0x52, 0x20, 0x57, 0x01, 0x78, 0xd8, 0x7b, 0x42, 0x1c, 0x31, 0x2e, 0x91, 0xaa, 0x92,
+	0xcc, 0x7e, 0x1d, 0x85, 0x37, 0x95, 0xe7, 0x62, 0x46, 0x9e, 0xdf, 0x82, 0x75, 0x37, 0x7e, 0x78,
+	0x37, 0xb2, 0x25, 0x8b, 0x6e, 0xd5, 0xae, 0x29, 0xd9, 0xa3, 0xc3, 0x21, 0x41, 0x37, 0xa1, 0xe4,
+	0x62, 0x81, 0x55, 0x03, 0x6c, 0x64, 0xe5, 0x58, 0xc5, 0xbe, 0x8b, 0x05, 0xb6, 0x25, 0xb8, 0x75,
+	0x09, 0xfe, 0x3f, 0xc3, 0x49, 0xca, 0xd7, 0xef, 0x25, 0x40, 0x1d, 0xee, 0x7d, 0x41, 0xc5, 0x63,
+	0x37, 0xc0, 0xdf, 0xa9, 0x76, 0x75, 0xd2, 0x37, 0xf5, 0x04, 0xca, 0xd4, 0x1f, 0x86, 0x82, 0xeb,
+	0x05, 0x95, 0xe2, 0x8c, 0x37, 0xec, 0x45, 0x88, 0xf6, 0xed, 0x28, 0xc5, 0xaf, 0x5f, 0x36, 0xac,
+	0x13, 0x53, 0x3c, 0xb2, 0x7a, 0xd8, 0x4f, 0x32, 0x2d, 0x15, 0x6d, 0xe5, 0x01, 0xf9, 0xb0, 0xc6,
+	0x42, 0x21, 0x9d, 0x15, 0xa5, 0x33, 0x23, 0xcb, 0xd9, 0x67, 0x12, 0xd2, 0xbe, 0xa3, 0xbc, 0xdd,
+	0xc8, 0xef, 0x2d, 0xd6, 0xb4, 0x13, 0x27, 0xa8, 0x0d, 0xeb, 0xaa, 0x4d, 0x8f, 0x13, 0x70, 0x3a,
+	0x9b, 0x65, 0xc5, 0x54, 0x94, 0x14, 0xbb, 0x36, 0x1c, 0x1f, 0xd0, 0x57, 0x70, 0xc1, 0x61, 0xbe,
+	0x08, 0xb0, 0x23, 0xba, 0x5b, 0x5b, 0xb7, 0x6e, 0x75, 0xd5, 0xa5, 0x4a, 0xd9, 0xbb, 0xd9, 0x33,
+	0x26, 0x56, 0x88, 0xf0, 0xca, 0xb0, 0x7d, 0xce, 0x99, 0x17, 0xa2, 0x2b, 0x50, 0x15, 0xec, 0xde,
+	0x54, 0x17, 0x18, 0x0b, 0x50, 0x13, 0x6a, 0xfb, 0x01, 0x1b, 0x24, 0xf7, 0x6b, 0xf2, 0x7e, 0x52,
+	0x84, 0x76, 0x60, 0x3d, 0x20, 0x7d, 0x82, 0x39, 0x89, 0xe7, 0x68, 0x25, 0xe7, 0x1c, 0xad, 0x29,
+	0x2d, 0x39, 0x4b, 0xe7, 0xda, 0x51, 0x35, 0xa3, 0x89, 0x5f, 0x01, 0x63, 0xbe, 0xae, 0xd2, 0xb2,
+	0xfb, 0x45, 0x93, 0xdf, 0xf0, 0xe7, 0x43, 0x77, 0x6a, 0x08, 0xca, 0x09, 0x9b, 0x6f, 0xdc, 0xa5,
+	0xa3, 0xbb, 0xb0, 0xf4, 0xe8, 0x9e, 0x7b, 0x7f, 0x31, 0xe3, 0xfd, 0x2d, 0x68, 0x2e, 0x7a, 0x60,
+	0x1a, 0xc5, 0x51, 0x76, 0x14, 0x11, 0x49, 0x3c, 0x5f, 0x14, 0xd3, 0x4b, 0x51, 0xe1, 0xbf, 0x2d,
+	0x45, 0xc5, 0x65, 0x97, 0xa2, 0x39, 0x22, 0x4a, 0xb9, 0x89, 0x90, 0x31, 0xa6, 0x44, 0xfc, 0xaa,
+	0xc9, 0x9d, 0x66, 0x16, 0x94, 0x2c, 0x3f, 0xf9, 0xb8, 0x98, 0xdc, 0xa8, 0x0a, 0xcb, 0x6c, 0x54,
+	0xf9, 0x12, 0xfa, 0x36, 0x6c, 0x9c, 0xf0, 0xc4, 0x24, 0x94, 0xed, 0x9f, 0xd6, 0xa0, 0xd8, 0xe1,
+	0x1e, 0xea, 0xc3, 0xd9, 0xb9, 0x75, 0x38, 0xf3, 0xdb, 0xcd, 0xd8, 0xe5, 0x0c, 0x2b, 0x27, 0x30,
+	0xf1, 0x8a, 0xbe, 0x86, 0xda, 0xe4, 0xc2, 0xd7, 0x5a, 0xa0, 0x3f, 0x81, 0x31, 0xde, 0xfb, 0x77,
+	0x4c, 0x6a, 0xde, 0x81, 0x53, 0xd3, 0x3b, 0xd3, 0xb5, 0x05, 0xca, 0x53, 0x28, 0xe3, 0x83, 0x3c,
+	0xa8, 0xd4, 0xc9, 0x37, 0xb0, 0x3e, 0x35, 0x76, 0x37, 0x16, 0x68, 0x4f, 0x82, 0x8c, 0xf7, 0x73,
+	0x80, 0x52, 0x0f, 0x14, 0xce, 0xcc, 0x0e, 0xaa, 0x77, 0x16, 0xe8, 0xcf, 0xe0, 0x0c, 0x33, 0x1f,
+	0x2e, 0x75, 0xf5, 0x3d, 0x5c, 0xc8, 0x6e, 0x4e, 0x8b, 0x38, 0xc9, 0x44, 0x1b, 0x1f, 0x2e, 0x83,
+	0x3e, 0xc9, 0x79, 0xdc, 0x53, 0xf2, 0x3a, 0x97, 0xe8, 0xdc, 0xce, 0xa7, 0xbe, 0x65, 0xf4, 0xa3,
+	0x06, 0xfa, 0xc2, 0x0f, 0xd9, 0xca, 0x69, 0x32, 0x51, 0x30, 0x6e, 0x2f, 0xa9, 0x90, 0x3c, 0xa3,
+	0xfd, 0xf0, 0xf9, 0x51, 0x5d, 0x7b, 0x71, 0x54, 0xd7, 0xfe, 0x3c, 0xaa, 0x6b, 0xcf, 0x8e, 0xeb,
+	0x2b, 0x2f, 0x8e, 0xeb, 0x2b, 0x7f, 0x1c, 0xd7, 0x57, 0xbe, 0xbc, 0xbb, 0xd4, 0x62, 0xa6, 0x7e,
+	0xf6, 0xca, 0x79, 0xdf, 0x2b, 0xcb, 0x9e, 0x78, 0xf3, 0x9f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x99,
+	0xae, 0x26, 0x55, 0xba, 0x0f, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -840,6 +1164,9 @@ type MsgClient interface {
 	EvaluateClaim(ctx context.Context, in *MsgEvaluateClaim, opts ...grpc.CallOption) (*MsgEvaluateClaimResponse, error)
 	DisputeClaim(ctx context.Context, in *MsgDisputeClaim, opts ...grpc.CallOption) (*MsgDisputeClaimResponse, error)
 	WithdrawPayment(ctx context.Context, in *MsgWithdrawPayment, opts ...grpc.CallOption) (*MsgWithdrawPaymentResponse, error)
+	UpdateCollectionState(ctx context.Context, in *MsgUpdateCollectionState, opts ...grpc.CallOption) (*MsgUpdateCollectionStateResponse, error)
+	UpdateCollectionDates(ctx context.Context, in *MsgUpdateCollectionDates, opts ...grpc.CallOption) (*MsgUpdateCollectionDatesResponse, error)
+	UpdateCollectionPayments(ctx context.Context, in *MsgUpdateCollectionPayments, opts ...grpc.CallOption) (*MsgUpdateCollectionPaymentsResponse, error)
 }
 
 type msgClient struct {
@@ -895,6 +1222,33 @@ func (c *msgClient) WithdrawPayment(ctx context.Context, in *MsgWithdrawPayment,
 	return out, nil
 }
 
+func (c *msgClient) UpdateCollectionState(ctx context.Context, in *MsgUpdateCollectionState, opts ...grpc.CallOption) (*MsgUpdateCollectionStateResponse, error) {
+	out := new(MsgUpdateCollectionStateResponse)
+	err := c.cc.Invoke(ctx, "/ixo.claims.v1beta1.Msg/UpdateCollectionState", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateCollectionDates(ctx context.Context, in *MsgUpdateCollectionDates, opts ...grpc.CallOption) (*MsgUpdateCollectionDatesResponse, error) {
+	out := new(MsgUpdateCollectionDatesResponse)
+	err := c.cc.Invoke(ctx, "/ixo.claims.v1beta1.Msg/UpdateCollectionDates", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) UpdateCollectionPayments(ctx context.Context, in *MsgUpdateCollectionPayments, opts ...grpc.CallOption) (*MsgUpdateCollectionPaymentsResponse, error) {
+	out := new(MsgUpdateCollectionPaymentsResponse)
+	err := c.cc.Invoke(ctx, "/ixo.claims.v1beta1.Msg/UpdateCollectionPayments", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error)
@@ -902,6 +1256,9 @@ type MsgServer interface {
 	EvaluateClaim(context.Context, *MsgEvaluateClaim) (*MsgEvaluateClaimResponse, error)
 	DisputeClaim(context.Context, *MsgDisputeClaim) (*MsgDisputeClaimResponse, error)
 	WithdrawPayment(context.Context, *MsgWithdrawPayment) (*MsgWithdrawPaymentResponse, error)
+	UpdateCollectionState(context.Context, *MsgUpdateCollectionState) (*MsgUpdateCollectionStateResponse, error)
+	UpdateCollectionDates(context.Context, *MsgUpdateCollectionDates) (*MsgUpdateCollectionDatesResponse, error)
+	UpdateCollectionPayments(context.Context, *MsgUpdateCollectionPayments) (*MsgUpdateCollectionPaymentsResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -922,6 +1279,15 @@ func (*UnimplementedMsgServer) DisputeClaim(ctx context.Context, req *MsgDispute
 }
 func (*UnimplementedMsgServer) WithdrawPayment(ctx context.Context, req *MsgWithdrawPayment) (*MsgWithdrawPaymentResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method WithdrawPayment not implemented")
+}
+func (*UnimplementedMsgServer) UpdateCollectionState(ctx context.Context, req *MsgUpdateCollectionState) (*MsgUpdateCollectionStateResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCollectionState not implemented")
+}
+func (*UnimplementedMsgServer) UpdateCollectionDates(ctx context.Context, req *MsgUpdateCollectionDates) (*MsgUpdateCollectionDatesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCollectionDates not implemented")
+}
+func (*UnimplementedMsgServer) UpdateCollectionPayments(ctx context.Context, req *MsgUpdateCollectionPayments) (*MsgUpdateCollectionPaymentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCollectionPayments not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1018,6 +1384,60 @@ func _Msg_WithdrawPayment_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_UpdateCollectionState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateCollectionState)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateCollectionState(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.claims.v1beta1.Msg/UpdateCollectionState",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateCollectionState(ctx, req.(*MsgUpdateCollectionState))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateCollectionDates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateCollectionDates)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateCollectionDates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.claims.v1beta1.Msg/UpdateCollectionDates",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateCollectionDates(ctx, req.(*MsgUpdateCollectionDates))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_UpdateCollectionPayments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateCollectionPayments)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateCollectionPayments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.claims.v1beta1.Msg/UpdateCollectionPayments",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateCollectionPayments(ctx, req.(*MsgUpdateCollectionPayments))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ixo.claims.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -1041,6 +1461,18 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "WithdrawPayment",
 			Handler:    _Msg_WithdrawPayment_Handler,
+		},
+		{
+			MethodName: "UpdateCollectionState",
+			Handler:    _Msg_UpdateCollectionState_Handler,
+		},
+		{
+			MethodName: "UpdateCollectionDates",
+			Handler:    _Msg_UpdateCollectionDates_Handler,
+		},
+		{
+			MethodName: "UpdateCollectionPayments",
+			Handler:    _Msg_UpdateCollectionPayments_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -1569,6 +2001,223 @@ func (m *MsgWithdrawPaymentResponse) MarshalToSizedBuffer(dAtA []byte) (int, err
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgUpdateCollectionState) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionState) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.AdminAddress) > 0 {
+		i -= len(m.AdminAddress)
+		copy(dAtA[i:], m.AdminAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AdminAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.State != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.State))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCollectionStateResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionStateResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionStateResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCollectionDates) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionDates) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionDates) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.AdminAddress) > 0 {
+		i -= len(m.AdminAddress)
+		copy(dAtA[i:], m.AdminAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AdminAddress)))
+		i--
+		dAtA[i] = 0x22
+	}
+	if m.EndDate != nil {
+		n7, err7 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate):])
+		if err7 != nil {
+			return 0, err7
+		}
+		i -= n7
+		i = encodeVarintTx(dAtA, i, uint64(n7))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.StartDate != nil {
+		n8, err8 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate):])
+		if err8 != nil {
+			return 0, err8
+		}
+		i -= n8
+		i = encodeVarintTx(dAtA, i, uint64(n8))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCollectionDatesResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionDatesResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionDatesResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCollectionPayments) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionPayments) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionPayments) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.AdminAddress) > 0 {
+		i -= len(m.AdminAddress)
+		copy(dAtA[i:], m.AdminAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AdminAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Payments != nil {
+		{
+			size, err := m.Payments.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintTx(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCollectionPaymentsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionPaymentsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionPaymentsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -1810,6 +2459,99 @@ func (m *MsgWithdrawPayment) Size() (n int) {
 }
 
 func (m *MsgWithdrawPaymentResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateCollectionState) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.State != 0 {
+		n += 1 + sovTx(uint64(m.State))
+	}
+	l = len(m.AdminAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateCollectionStateResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateCollectionDates) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.StartDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate)
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.EndDate != nil {
+		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate)
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.AdminAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateCollectionDatesResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgUpdateCollectionPayments) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Payments != nil {
+		l = m.Payments.Size()
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.AdminAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateCollectionPaymentsResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -3437,6 +4179,625 @@ func (m *MsgWithdrawPaymentResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgWithdrawPaymentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionState) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionState: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionState: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field State", wireType)
+			}
+			m.State = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.State |= CollectionState(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdminAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionStateResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionStateResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionStateResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionDates) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionDates: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionDates: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field StartDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.StartDate == nil {
+				m.StartDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndDate", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.EndDate == nil {
+				m.EndDate = new(time.Time)
+			}
+			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdminAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionDatesResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionDatesResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionDatesResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionPayments) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionPayments: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionPayments: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Payments", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Payments == nil {
+				m.Payments = &Payments{}
+			}
+			if err := m.Payments.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdminAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionPaymentsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionPaymentsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionPaymentsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

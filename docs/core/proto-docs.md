@@ -159,6 +159,12 @@
     - [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse)
     - [MsgSubmitClaim](#ixo.claims.v1beta1.MsgSubmitClaim)
     - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
+    - [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates)
+    - [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse)
+    - [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments)
+    - [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse)
+    - [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState)
+    - [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse)
     - [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment)
     - [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse)
   
@@ -1758,7 +1764,7 @@ Msg defines the bonds Msg service.
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  | collection id is the incremented internal id for the collection of claims |
 | entity | [string](#string) |  | entity is the DID of the entity for which the claims are being created |
-| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor) |
+| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor), and can update the collection |
 | protocol | [string](#string) |  | protocol is the DID of the claim protocol |
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |
@@ -2633,7 +2639,7 @@ Collection entity, or have authz cap, aka is agent
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim to make evaluation against |
-| collection_id | [string](#string) |  | claimID is the unique identifier of the claim to make evaluation against |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
 | oracle | [string](#string) |  | oracle is the DID of the Oracle entity that evaluates the claim |
 | agent_did | [string](#string) |  | agent is the DID of the agent that submits the evaluation |
 | agent_address | [string](#string) |  |  |
@@ -2680,6 +2686,88 @@ Collection entity, or have authz cap, aka is agent
 <a name="ixo.claims.v1beta1.MsgSubmitClaimResponse"></a>
 
 ### MsgSubmitClaimResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionDates"></a>
+
+### MsgUpdateCollectionDates
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
+| end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse"></a>
+
+### MsgUpdateCollectionDatesResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionPayments"></a>
+
+### MsgUpdateCollectionPayments
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse"></a>
+
+### MsgUpdateCollectionPaymentsResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionState"></a>
+
+### MsgUpdateCollectionState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the state of this Collection (open, paused, closed) you want to update to |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionStateResponse"></a>
+
+### MsgUpdateCollectionStateResponse
 
 
 
@@ -2738,6 +2826,9 @@ Msg defines the Msg service.
 | EvaluateClaim | [MsgEvaluateClaim](#ixo.claims.v1beta1.MsgEvaluateClaim) | [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse) |  |
 | DisputeClaim | [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim) | [MsgDisputeClaimResponse](#ixo.claims.v1beta1.MsgDisputeClaimResponse) |  |
 | WithdrawPayment | [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment) | [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse) |  |
+| UpdateCollectionState | [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState) | [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse) |  |
+| UpdateCollectionDates | [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates) | [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse) |  |
+| UpdateCollectionPayments | [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments) | [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse) |  |
 
  
 

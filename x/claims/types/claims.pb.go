@@ -223,7 +223,7 @@ type Collection struct {
 	// entity is the DID of the entity for which the claims are being created
 	Entity string `protobuf:"bytes,2,opt,name=entity,proto3" json:"entity,omitempty"`
 	// admin is the account address that will authorize or revoke agents and
-	// payments (the grantor)
+	// payments (the grantor), and can update the collection
 	Admin string `protobuf:"bytes,3,opt,name=admin,proto3" json:"admin,omitempty"`
 	// protocol is the DID of the claim protocol
 	Protocol string `protobuf:"bytes,4,opt,name=protocol,proto3" json:"protocol,omitempty"`
