@@ -70,7 +70,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 			}
 			relayerAddr, err := relayerDidDoc.GetVerificationMethodBlockchainAddress(entity.RelayerNode)
 			if err != nil {
-				return sdkerrors.Wrapf(err, "address not found in iid doc for %s", entity.RelayerNode)
+				return sdkerrors.Wrapf(err, "did not found in iid doc verification methods for %s", entity.RelayerNode)
 			}
 
 			// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
@@ -95,18 +95,28 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 
 			// Calculate list of outputs and calculate the total output to payees based
 			// on the calculated wallet distributions
-			distributions := recipients.GetDistributionsFor(payment.Amount)
+			distributions, err := recipients.GetDistributionsFor(payment.Amount)
+			if err != nil {
+				return err
+			}
+
+			var countOutputs sdk.Coins
 			for i, share := range distributions {
 				// Get integer output
 				outputAmt, _ := share.TruncateDecimal()
+				address, err := recipients[i].GetAddress()
+				if err != nil {
+					return err
+				}
 
-				// If amount not zero, add as output
-				if !outputAmt.IsZero() {
-					address, err := recipients[i].GetAddress()
-					if err != nil {
-						return err
-					}
+				// If receiver address(last address in the distribution), then add the remainder to the receiver
+				if address.Equals(receiver) {
+					outputAmt = payment.Amount.Sub(countOutputs)
 					outputs = append(outputs, banktypes.NewOutput(address, outputAmt))
+				} else if !outputAmt.IsZero() {
+					// If amount not zero, add as output, for network and node
+					outputs = append(outputs, banktypes.NewOutput(address, outputAmt))
+					countOutputs = countOutputs.Sort().Add(outputAmt.Sort()...)
 				}
 			}
 		} else {

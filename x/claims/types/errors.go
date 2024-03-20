@@ -27,4 +27,5 @@ var (
 
 	ErrPaymentPresetPercentagesOverflow = sdkerrors.Register(ModuleName, 1400, "preset fee percentages for node and network overflows 100%")
 	ErrPaymentWithdrawFailed            = sdkerrors.Register(ModuleName, 1401, "payment withdrawal failed")
+	ErrDistributionFailed               = sdkerrors.Register(ModuleName, 1402, "distribution calculations failed")
 )
