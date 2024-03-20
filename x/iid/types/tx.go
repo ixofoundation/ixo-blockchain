@@ -66,7 +66,6 @@ func (MsgCreateIidDocument) Type() string {
 }
 
 func (msg MsgCreateIidDocument) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -74,7 +73,7 @@ func (msg MsgCreateIidDocument) GetSignBytes() []byte {
 func (msg MsgCreateIidDocument) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -95,7 +94,6 @@ func (MsgUpdateIidDocument) Type() string {
 }
 
 func (msg MsgUpdateIidDocument) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -103,7 +101,7 @@ func (msg MsgUpdateIidDocument) GetSignBytes() []byte {
 func (msg MsgUpdateIidDocument) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -137,7 +135,6 @@ func (MsgAddVerification) Type() string {
 }
 
 func (msg MsgAddVerification) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -145,7 +142,7 @@ func (msg MsgAddVerification) GetSignBytes() []byte {
 func (msg MsgAddVerification) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -179,7 +176,6 @@ func (MsgRevokeVerification) Type() string {
 }
 
 func (msg MsgRevokeVerification) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -187,7 +183,7 @@ func (msg MsgRevokeVerification) GetSignBytes() []byte {
 func (msg MsgRevokeVerification) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -222,7 +218,6 @@ func (MsgSetVerificationRelationships) Type() string {
 }
 
 func (msg MsgSetVerificationRelationships) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -230,7 +225,7 @@ func (msg MsgSetVerificationRelationships) GetSignBytes() []byte {
 func (msg MsgSetVerificationRelationships) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -264,7 +259,6 @@ func (MsgAddService) Type() string {
 }
 
 func (msg MsgAddService) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -272,7 +266,7 @@ func (msg MsgAddService) GetSignBytes() []byte {
 func (msg MsgAddService) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -305,7 +299,6 @@ func (MsgAddLinkedResource) Type() string {
 }
 
 func (msg MsgAddLinkedResource) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -313,7 +306,7 @@ func (msg MsgAddLinkedResource) GetSignBytes() []byte {
 func (msg MsgAddLinkedResource) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -346,7 +339,6 @@ func (MsgAddLinkedClaim) Type() string {
 }
 
 func (msg MsgAddLinkedClaim) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -354,7 +346,7 @@ func (msg MsgAddLinkedClaim) GetSignBytes() []byte {
 func (msg MsgAddLinkedClaim) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -387,14 +379,13 @@ func (MsgAddLinkedEntity) Type() string {
 }
 
 func (msg MsgAddLinkedEntity) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgAddLinkedEntity) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -427,7 +418,6 @@ func (MsgDeleteService) Type() string {
 }
 
 func (msg MsgDeleteService) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -435,7 +425,7 @@ func (msg MsgDeleteService) GetSignBytes() []byte {
 func (msg MsgDeleteService) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -467,7 +457,6 @@ func (MsgDeleteLinkedResource) Type() string {
 }
 
 func (msg MsgDeleteLinkedResource) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -475,7 +464,7 @@ func (msg MsgDeleteLinkedResource) GetSignBytes() []byte {
 func (msg MsgDeleteLinkedResource) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -507,7 +496,6 @@ func (MsgDeleteLinkedClaim) Type() string {
 }
 
 func (msg MsgDeleteLinkedClaim) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -515,7 +503,7 @@ func (msg MsgDeleteLinkedClaim) GetSignBytes() []byte {
 func (msg MsgDeleteLinkedClaim) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -547,14 +535,13 @@ func (MsgDeleteLinkedEntity) Type() string {
 }
 
 func (msg MsgDeleteLinkedEntity) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgDeleteLinkedEntity) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -588,7 +575,6 @@ func (MsgAddAccordedRight) Type() string {
 }
 
 func (msg MsgAddAccordedRight) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -596,7 +582,7 @@ func (msg MsgAddAccordedRight) GetSignBytes() []byte {
 func (msg MsgAddAccordedRight) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -629,7 +615,6 @@ func (MsgDeleteAccordedRight) Type() string {
 }
 
 func (msg MsgDeleteAccordedRight) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -637,7 +622,7 @@ func (msg MsgDeleteAccordedRight) GetSignBytes() []byte {
 func (msg MsgDeleteAccordedRight) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -670,7 +655,6 @@ func (MsgAddController) Type() string {
 }
 
 func (msg MsgAddController) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -678,7 +662,7 @@ func (msg MsgAddController) GetSignBytes() []byte {
 func (msg MsgAddController) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -711,7 +695,6 @@ func (MsgDeleteController) Type() string {
 }
 
 func (msg MsgDeleteController) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -719,7 +702,7 @@ func (msg MsgDeleteController) GetSignBytes() []byte {
 func (msg MsgDeleteController) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -753,7 +736,6 @@ func (MsgAddIidContext) Type() string {
 }
 
 func (msg MsgAddIidContext) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -761,7 +743,7 @@ func (msg MsgAddIidContext) GetSignBytes() []byte {
 func (msg MsgAddIidContext) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -794,7 +776,6 @@ func (MsgDeleteIidContext) Type() string {
 }
 
 func (msg MsgDeleteIidContext) GetSignBytes() []byte {
-	// panic("IBC messages do not support amino")
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
 }
 
@@ -802,7 +783,7 @@ func (msg MsgDeleteIidContext) GetSignBytes() []byte {
 func (msg MsgDeleteIidContext) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
@@ -841,7 +822,7 @@ func (msg MsgDeactivateIID) GetSignBytes() []byte {
 func (msg MsgDeactivateIID) GetSigners() []sdk.AccAddress {
 	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		panic(err)
+		return []sdk.AccAddress{}
 	}
 	return []sdk.AccAddress{accAddr}
 }
