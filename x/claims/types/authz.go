@@ -199,10 +199,10 @@ func (a EvaluateClaimAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.
 
 		// if reaches here it means there is a matching constraint for the specific batch
 		matched = true
-		// subtract quota by one (if eval status is not invalid) and if not 0 re-add to constraints
-		if constraint.AgentQuota > 1 || mEval.Status == EvaluationStatus_invalid {
-			// if evaluation status is invalid then dont subtract quota
-			if mEval.Status != EvaluationStatus_invalid {
+		// subtract quota by one (if eval status is not invalidated) and if not 0 re-add to constraints
+		if constraint.AgentQuota > 1 || mEval.Status == EvaluationStatus_invalidated {
+			// if evaluation status is invalidated then dont subtract quota
+			if mEval.Status != EvaluationStatus_invalidated {
 				constraint.AgentQuota--
 			}
 
