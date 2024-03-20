@@ -4016,6 +4016,11 @@
               "name": "DISPUTED",
               "number": "3",
               "description": ""
+            },
+            {
+              "name": "INVALIDATED",
+              "number": "4",
+              "description": ""
             }
           ]
         },
@@ -4434,6 +4439,18 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "invalidated",
+              "description": "invalidated is the number of claims that have been evaluated as invalid\n(internally calculated)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7735,7 +7752,7 @@
             },
             {
               "name": "relayer_node",
-              "description": "Address of the operator through which the Entity was created",
+              "description": "Did of the operator through which the Entity was created",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -10744,7 +10761,7 @@
             },
             {
               "name": "relayer_node",
-              "description": "Address of the operator through which the Entity was created",
+              "description": "Did of the operator through which the Entity was created",
               "label": "",
               "type": "string",
               "longType": "string",

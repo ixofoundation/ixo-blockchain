@@ -1771,6 +1771,7 @@ Msg defines the bonds Msg service.
 | state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
 | signer | [string](#string) |  | signer address |
+| invalidated | [uint64](#uint64) |  | invalidated is the number of claims that have been evaluated as invalid (internally calculated) |
 
 
 
@@ -1933,6 +1934,7 @@ Msg defines the bonds Msg service.
 | APPROVED | 1 |  |
 | REJECTED | 2 |  |
 | DISPUTED | 3 |  |
+| INVALIDATED | 4 |  |
 
 
 
@@ -3009,7 +3011,7 @@ relationship entity account
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Start Date of the Entity as defined by the implementer and interpreted by Client applications |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
 | status | [int32](#int32) |  | Status of the Entity as defined by the implementer and interpreted by Client applications |
-| relayer_node | [string](#string) |  | Address of the operator through which the Entity was created |
+| relayer_node | [string](#string) |  | Did of the operator through which the Entity was created |
 | credentials | [string](#string) | repeated | Credentials of the enitity to be verified |
 | entity_verified | [bool](#bool) |  | Used as check whether the credentials of entity is verified |
 | metadata | [EntityMetadata](#ixo.entity.v1beta1.EntityMetadata) |  | Metadata concerning the Entity such as versionId, created, updated and deactivated |
@@ -4143,7 +4145,7 @@ Msg defines the identity Msg service.
 | linked_entity | [ixo.iid.v1beta1.LinkedEntity](#ixo.iid.v1beta1.LinkedEntity) | repeated | DID of a linked Entity and its relationship with the Subject |
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Start Date of the Entity as defined by the implementer and interpreted by Client applications |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
-| relayer_node | [string](#string) |  | Address of the operator through which the Entity was created |
+| relayer_node | [string](#string) |  | Did of the operator through which the Entity was created |
 | credentials | [string](#string) | repeated | Content ID or Hash of public Verifiable Credentials associated with the subject |
 | owner_did | [string](#string) |  | Owner of the Entity NFT | The ownersdid used to sign this transaction. |
 | owner_address | [string](#string) |  | The ownersdid address used to sign this transaction. |

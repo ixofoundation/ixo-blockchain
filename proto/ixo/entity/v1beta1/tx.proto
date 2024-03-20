@@ -63,7 +63,7 @@ message MsgCreateEntity {
   // End Date of the Entity as defined by the implementer and interpreted by
   // Client applications
   google.protobuf.Timestamp end_date = 11 [ (gogoproto.stdtime) = true ];
-  // Address of the operator through which the Entity was created
+  // Did of the operator through which the Entity was created
   string relayer_node = 12;
   // Content ID or Hash of public Verifiable Credentials associated with the
   // subject

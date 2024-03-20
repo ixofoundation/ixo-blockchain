@@ -32,6 +32,7 @@ enum EvaluationStatus {
   APPROVED = 1 [ (gogoproto.enumvalue_customname) = "approved" ];
   REJECTED = 2 [ (gogoproto.enumvalue_customname) = "rejected" ];
   DISPUTED = 3 [ (gogoproto.enumvalue_customname) = "disputed" ];
+  INVALIDATED = 4 [ (gogoproto.enumvalue_customname) = "invalidated" ];
 }
 
 enum PaymentType {
@@ -92,6 +93,9 @@ message Collection {
   Payments payments = 14;
   // signer address
   string signer = 15;
+  // invalidated is the number of claims that have been evaluated as invalid
+  // (internally calculated)
+  uint64 invalidated = 16;
 }
 
 message Payments {

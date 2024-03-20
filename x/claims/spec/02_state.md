@@ -24,20 +24,21 @@ A Dispute is stored in the state and is accessed by the SubjectId of the dispute
 
 ```go
 type Collection struct {
-	Id         string
-	Entity     string
-	Admin      string
-	Protocol   string
-	StartDate  *time.Time
-	EndDate    *time.Time
-	Quota      uint64
-	Count      uint64
-	Evaluated  uint64
-	Approved   uint64
-	Rejected   uint64
-	Disputed   uint64
-	State      CollectionState
-	Payments  *Payments
+	Id           string
+	Entity       string
+	Admin        string
+	Protocol     string
+	StartDate    *time.Time
+	EndDate      *time.Time
+	Quota        uint64
+	Count        uint64
+	Evaluated    uint64
+	Approved     uint64
+	Rejected     uint64
+	Disputed     uint64
+	Invalidated  uint64
+	State        CollectionState
+	Payments     *Payments
 }
 ```
 
@@ -55,6 +56,7 @@ The field's descriptions is as follows:
 - `approved` - a integer containing the number of claims that have been evaluated and approved (internally calculated)
 - `rejected` - a integer containing the number of claims that have been evaluated and rejected (internally calculated)
 - `disputed` - a integer containing the number of claims that have disputed status (internally calculated)
+- `invalidated` - a integer containing the number of claims that have invalidated status (internally calculated)
 - `state` - a [CollectionState](#collectionstate)
 - `payments` - a [Payments](#payments)
 
@@ -256,6 +258,7 @@ var EvaluationStatus_name = map[int32]string{
 	1: "APPROVED",
 	2: "REJECTED",
 	3: "DISPUTED",
+  4: "INVALIDATED"
 }
 ```
 
@@ -401,6 +404,6 @@ The field's descriptions is as follows:
 
 - `claimIds` - a list of strings containing all the id's of the claimsthe grantee is allowed to evaluate, can be an empty list to allow any claim
 - `collectionId` - a string containing the Collection `id` the constraints is for
-- `agentQuota` - a integer containing the quota for amount of time the grantee can execute the given authorization(authz)
+- `agentQuota` - a integer containing the quota for amount of time the grantee can execute the given authorization(authz), note: it won't subtract one on evaluation if agent evaluates claim with status `invalidated`
 - `beforeDate` - a timestamp of the date after which the grantee can't execute this authz anymore, a cut off date
 - `MaxCustomAmount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount that indicates the maximum the evaluator is allowed to change the `APPROVED` payout to, since claims can be made for specific amount an evaluator is allowed to change the `APPROVED` payout amount.

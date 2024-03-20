@@ -252,13 +252,17 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	claim.Evaluation = &evaluation
 	s.Keeper.SetClaim(ctx, claim)
 
-	// start payout process for evaluation submission
-	if err = processPayment(ctx, s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
-		return nil, err
+	// start payout process for evaluation submission, if evaluation has status invalid, dont run evaluation payout process
+	if msg.Status != types.EvaluationStatus_invalid {
+		if err = processPayment(ctx, s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
+			return nil, err
+		}
+
+		// update evaluated count for collection
+		collection.Evaluated++
 	}
 
 	// update amounts for collection, make payouts and persist
-	collection.Evaluated++
 	if msg.Status == types.EvaluationStatus_approved {
 		collection.Approved++
 		// payout process for evaluation approval to claim agent
@@ -278,6 +282,9 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		collection.Disputed++
 		// update payment status to disputed
 		updatePaymentStatus(ctx, s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_disputed)
+	} else if msg.Status == types.EvaluationStatus_invalid {
+		// no payment for invalid
+		collection.Invalid++
 	}
 	s.Keeper.SetCollection(ctx, collection)
 

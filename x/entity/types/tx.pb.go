@@ -56,7 +56,7 @@ type MsgCreateEntity struct {
 	// End Date of the Entity as defined by the implementer and interpreted by
 	// Client applications
 	EndDate *time.Time `protobuf:"bytes,11,opt,name=end_date,json=endDate,proto3,stdtime" json:"end_date,omitempty"`
-	// Address of the operator through which the Entity was created
+	// Did of the operator through which the Entity was created
 	RelayerNode string `protobuf:"bytes,12,opt,name=relayer_node,json=relayerNode,proto3" json:"relayer_node,omitempty"`
 	// Content ID or Hash of public Verifiable Credentials associated with the
 	// subject

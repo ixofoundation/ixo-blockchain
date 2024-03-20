@@ -29,7 +29,7 @@ message Entity {
   // Status of the Entity as defined by the implementer and interpreted by
   // Client applications
   int32 status = 5;
-  // Address of the operator through which the Entity was created
+  // Did of the operator through which the Entity was created
   string relayer_node = 6;
   // Credentials of the enitity to be verified
   repeated string credentials = 7;
