@@ -32,6 +32,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/v2/app/keepers"
 	"github.com/ixofoundation/ixo-blockchain/v2/app/upgrades"
 	v2 "github.com/ixofoundation/ixo-blockchain/v2/app/upgrades/v2"
+	v3 "github.com/ixofoundation/ixo-blockchain/v2/app/upgrades/v3"
 	"github.com/ixofoundation/ixo-blockchain/v2/lib/ixo"
 	"github.com/rakyll/statik/fs"
 	"github.com/spf13/cast"
@@ -52,7 +53,7 @@ var (
 	DefaultNodeHome = os.ExpandEnv("$HOME/.ixod")
 
 	// scheduled upgrades and forks
-	Upgrades = []upgrades.Upgrade{v2.Upgrade}
+	Upgrades = []upgrades.Upgrade{v2.Upgrade, v3.Upgrade}
 	Forks    = []upgrades.Fork{}
 
 	// If EnableSpecificWasmProposals is "", and this is "true", then enable all x/wasm proposals.
