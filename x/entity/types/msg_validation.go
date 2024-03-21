@@ -20,6 +20,10 @@ func (msg MsgCreateEntity) ValidateBasic() error {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RelayerNode)
 	}
 
+	if !iidtypes.IsValidDID(msg.OwnerDid.Did()) {
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.OwnerDid.String())
+	}
+
 	if msg.Verification == nil || len(msg.Verification) == 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "verifications are required")
 	}
@@ -60,6 +64,9 @@ func (msg MsgUpdateEntity) ValidateBasic() error {
 	if !iidtypes.IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
+	if !iidtypes.IsValidDID(msg.ControllerDid.Did()) {
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.ControllerDid.String())
+	}
 	return nil
 }
 
@@ -74,7 +81,7 @@ func (msg MsgUpdateEntityVerified) ValidateBasic() error {
 	if !iidtypes.IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
-	if !iidtypes.IsValidDID(string(msg.RelayerNodeDid)) {
+	if !iidtypes.IsValidDID(msg.RelayerNodeDid.Did()) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RelayerNodeDid.String())
 	}
 	return nil
@@ -92,10 +99,10 @@ func (msg MsgTransferEntity) ValidateBasic() error {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
 	if !iidtypes.IsValidDID(msg.OwnerDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.OwnerDid.Did())
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.OwnerDid.String())
 	}
 	if !iidtypes.IsValidDID(msg.RecipientDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RecipientDid.Did())
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RecipientDid.String())
 	}
 	return nil
 }

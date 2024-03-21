@@ -1,6 +1,7 @@
 package types
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
@@ -9,6 +10,11 @@ import (
 // --------------------------
 // ValidateBasic performs a basic check of the MsgCreateDidDocument fields.
 func (msg MsgCreateIidDocument) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -46,6 +52,11 @@ func (msg MsgCreateIidDocument) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgUpdateDidDocument fields.
 func (msg MsgUpdateIidDocument) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -83,6 +94,11 @@ func (msg MsgUpdateIidDocument) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgAddVerification fields.
 func (msg MsgAddVerification) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -95,6 +111,11 @@ func (msg MsgAddVerification) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgRevokeVerification fields.
 func (msg MsgRevokeVerification) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -110,6 +131,11 @@ func (msg MsgRevokeVerification) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgSetVerificationRelationships fields.
 func (msg MsgSetVerificationRelationships) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -131,17 +157,15 @@ func (msg MsgSetVerificationRelationships) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgAddService fields.
 func (msg MsgAddService) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
 	return ValidateService(msg.ServiceData)
-}
-
-func (msg MsgAddAccordedRight) ValidateBasic() error {
-	if !IsValidDID(msg.Id) {
-		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
-	}
-	return nil
 }
 
 // --------------------------
@@ -149,6 +173,11 @@ func (msg MsgAddAccordedRight) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgDeleteService fields.
 func (msg MsgDeleteService) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -168,6 +197,11 @@ func (msg MsgDeleteService) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgAddService fields.
 func (msg MsgAddController) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -184,6 +218,11 @@ func (msg MsgAddController) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgDeleteService fields.
 func (msg MsgDeleteController) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -200,6 +239,15 @@ func (msg MsgDeleteController) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgAddService fields.
 func (msg MsgAddLinkedResource) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
+	if msg.LinkedResource == nil {
+		return sdkerrors.Wrap(ErrInvalidInput, "linked resource cannot be nil")
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -211,6 +259,11 @@ func (msg MsgAddLinkedResource) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgDeleteService fields.
 func (msg MsgDeleteLinkedResource) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -226,6 +279,15 @@ func (msg MsgDeleteLinkedResource) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgAddService fields.
 func (msg MsgAddLinkedClaim) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
+	if msg.LinkedClaim == nil {
+		return sdkerrors.Wrap(ErrInvalidInput, "linked claim cannot be nil")
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -237,6 +299,11 @@ func (msg MsgAddLinkedClaim) ValidateBasic() error {
 // --------------------------
 // ValidateBasic performs a basic check of the MsgDeleteService fields.
 func (msg MsgDeleteLinkedClaim) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -251,6 +318,15 @@ func (msg MsgDeleteLinkedClaim) ValidateBasic() error {
 // ADD LINKED ENTITY
 // --------------------------
 func (msg MsgAddLinkedEntity) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
+	if msg.LinkedEntity == nil {
+		return sdkerrors.Wrap(ErrInvalidInput, "linked entity cannot be nil")
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -261,6 +337,11 @@ func (msg MsgAddLinkedEntity) ValidateBasic() error {
 // DELETE LINKED ENTITY
 // --------------------------
 func (msg MsgDeleteLinkedEntity) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -272,9 +353,33 @@ func (msg MsgDeleteLinkedEntity) ValidateBasic() error {
 }
 
 // --------------------------
+// ADD RIGHT
+// --------------------------
+func (msg MsgAddAccordedRight) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
+	if msg.AccordedRight == nil {
+		return sdkerrors.Wrap(ErrInvalidInput, "accordede right cannot be nil")
+	}
+
+	if !IsValidDID(msg.Id) {
+		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
+	}
+	return nil
+}
+
+// --------------------------
 // DELETE RIGHT
 // --------------------------
 func (msg MsgDeleteAccordedRight) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -289,6 +394,15 @@ func (msg MsgDeleteAccordedRight) ValidateBasic() error {
 // ADD CONTEXT
 // --------------------------
 func (msg MsgAddIidContext) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
+	if msg.Context == nil {
+		return sdkerrors.Wrap(ErrInvalidInput, "context cannot be nil")
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -299,6 +413,11 @@ func (msg MsgAddIidContext) ValidateBasic() error {
 // DELETE CONTEXT
 // --------------------------
 func (msg MsgDeleteIidContext) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
@@ -313,6 +432,11 @@ func (msg MsgDeleteIidContext) ValidateBasic() error {
 // DEACTIVATE IID
 // --------------------------
 func (msg MsgDeactivateIID) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Signer)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+	}
+
 	if !IsValidDID(msg.Id) {
 		return sdkerrors.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}

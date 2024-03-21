@@ -1,6 +1,8 @@
 package ixo
 
-import "strings"
+import (
+	"strings"
+)
 
 const IxoNativeToken = "uixo"
 
@@ -30,4 +32,9 @@ func RemoveOrdered[T any](slice []T, s int) []T {
 // check if trimmed input is empty
 func IsEmpty(input string) bool {
 	return strings.TrimSpace(input) == ""
+}
+
+func IsEnumValueValid(nameMap map[int32]string, value int32) bool {
+	_, ok := nameMap[value]
+	return ok
 }

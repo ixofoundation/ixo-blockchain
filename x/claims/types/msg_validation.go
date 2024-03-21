@@ -24,21 +24,12 @@ func (msg MsgCreateCollection) ValidateBasic() error {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Protocol)
 	}
 
-	if msg.Payments.Evaluation.Contract_1155Payment != nil {
-		return ErrCollectionEvalError
+	if err = msg.Payments.Validate(); err != nil {
+		return err
 	}
 
-	if err = msg.Payments.Submission.Validate(); err != nil {
-		return err
-	}
-	if err = msg.Payments.Evaluation.Validate(); err != nil {
-		return err
-	}
-	if err = msg.Payments.Approval.Validate(); err != nil {
-		return err
-	}
-	if err = msg.Payments.Rejection.Validate(); err != nil {
-		return err
+	if !ixo.IsEnumValueValid(CollectionState_name, int32(msg.State)) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for state")
 	}
 
 	return nil
@@ -49,6 +40,10 @@ func (msg MsgCreateCollection) ValidateBasic() error {
 // --------------------------
 func (msg MsgSubmitClaim) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	_, err = sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
@@ -75,12 +70,16 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
+	_, err = sdk.AccAddressFromBech32(msg.AgentAddress)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
+	}
 
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
 	if !iidtypes.IsValidDID(msg.Oracle) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Oracle)
 	}
 
 	if iidtypes.IsEmpty(msg.ClaimId) {
@@ -95,6 +94,14 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 
 	if msg.Status == EvaluationStatus_pending {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "evaluation status can't be pending")
+	}
+
+	if !ixo.IsEnumValueValid(EvaluationStatus_name, int32(msg.Status)) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for status")
+	}
+
+	if msg.Amount.IsAnyNegative() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "amount must be positive")
 	}
 
 	return nil
@@ -112,11 +119,17 @@ func (msg MsgDisputeClaim) ValidateBasic() error {
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
 		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
+	if iidtypes.IsEmpty(msg.SubjectId) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "subject id cannot be empty")
+	}
 	if iidtypes.IsEmpty(msg.Data.Proof) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data proof cannot be empty")
 	}
 	if iidtypes.IsEmpty(msg.Data.Uri) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data uri cannot be empty")
+	}
+	if iidtypes.IsEmpty(msg.Data.Type) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data type cannot be empty")
 	}
 
 	return nil
@@ -138,21 +151,15 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
 	}
-	if msg.Contract_1155Payment != nil {
-		_, err = sdk.AccAddressFromBech32(msg.Contract_1155Payment.Address)
-		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract address (%s)", err)
-		}
-		if iidtypes.IsEmpty(msg.Contract_1155Payment.TokenId) {
-			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token id cannot be empty")
-		}
-		// if msg.Contract_1155Payment.Amount == 0 {
-		// 	return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token amount cannot be 0")
-		// }
+
+	if err = msg.Contract_1155Payment.Validate(); err != nil {
+		return err
 	}
-	if iidtypes.IsEmpty(msg.PaymentType.String()) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "payment type cannot be empty")
+
+	if !ixo.IsEnumValueValid(PaymentType_name, int32(msg.PaymentType)) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for payment type")
 	}
+
 	if iidtypes.IsEmpty(msg.ClaimId) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim id cannot be empty")
 	}
@@ -170,6 +177,9 @@ func (msg MsgUpdateCollectionState) ValidateBasic() error {
 	}
 	if iidtypes.IsEmpty(msg.CollectionId) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+	if !ixo.IsEnumValueValid(CollectionState_name, int32(msg.State)) {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for state")
 	}
 
 	return nil
@@ -202,20 +212,7 @@ func (msg MsgUpdateCollectionPayments) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
 	}
 
-	if msg.Payments.Evaluation.Contract_1155Payment != nil {
-		return ErrCollectionEvalError
-	}
-
-	if err = msg.Payments.Submission.Validate(); err != nil {
-		return err
-	}
-	if err = msg.Payments.Evaluation.Validate(); err != nil {
-		return err
-	}
-	if err = msg.Payments.Approval.Validate(); err != nil {
-		return err
-	}
-	if err = msg.Payments.Rejection.Validate(); err != nil {
+	if err = msg.Payments.Validate(); err != nil {
 		return err
 	}
 

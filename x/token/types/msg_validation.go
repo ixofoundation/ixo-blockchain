@@ -17,7 +17,7 @@ func (msg MsgCreateToken) ValidateBasic() error {
 	}
 
 	if !iidtypes.IsValidDID(msg.Class.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Class.Did())
+		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Class.String())
 	}
 
 	if !iidtypes.IsValidRFC3986Uri(msg.Image) {
@@ -51,7 +51,9 @@ func (msg MsgMintToken) ValidateBasic() error {
 		if iidtypes.IsEmpty(batch.Name) {
 			return sdkerrors.Wrap(ErrTokenNameIncorrect, "token name is empty for a batch")
 		}
-
+		if iidtypes.IsEmpty(batch.Index) {
+			return sdkerrors.Wrap(ErrTokenNameIncorrect, "token index is empty for a batch")
+		}
 		if batch.Amount.IsZero() {
 			return sdkerrors.Wrap(ErrTokenAmountIncorrect, "token amount must be bigger than 0, cannot mint 0")
 		}
@@ -79,7 +81,6 @@ func (msg MsgTransferToken) ValidateBasic() error {
 		if iidtypes.IsEmpty(batch.Id) {
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token id is empty for a batch")
 		}
-
 		if batch.Amount.IsZero() {
 			return sdkerrors.Wrap(ErrTokenAmountIncorrect, "token amount must be bigger than 0, cannot transfer 0")
 		}
@@ -106,7 +107,6 @@ func (msg MsgRetireToken) ValidateBasic() error {
 		if iidtypes.IsEmpty(batch.Id) {
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token id is empty for a batch")
 		}
-
 		if batch.Amount.IsZero() {
 			return sdkerrors.Wrap(ErrTokenAmountIncorrect, "token amount must be bigger than 0")
 		}
@@ -129,7 +129,6 @@ func (msg MsgCancelToken) ValidateBasic() error {
 		if iidtypes.IsEmpty(batch.Id) {
 			return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "token id is empty for a batch")
 		}
-
 		if batch.Amount.IsZero() {
 			return sdkerrors.Wrap(ErrTokenAmountIncorrect, "token amount must be bigger than 0")
 		}
