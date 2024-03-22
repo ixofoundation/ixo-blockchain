@@ -79,15 +79,17 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
 
    - Claims are organized under a [Collection](02_state.md#collection), where each collection contains claims submitted under a specific protocol for a distinct entity. Collections are identified by an `id` which is the [CollectionSequence](05_params.md).
    - Every claim has a unique `id`, which is typically the CID, doubling as its cryptographic proof.
-   - Claims have a default `status` of `1`, indicating they've been `submitted`. Enum is [EvaluationStatus](02_state.md#evaluationstatus)
+   - Claims have a default `status` of `0`, indicating they've been `submitted`. Enum is [EvaluationStatus](02_state.md#evaluationstatus)
    - After evaluation, a claim's status can change to:
-     - `approved` (=2)
-     - `rejected` (=3)
-     - `disputed` (=4)
+     - `approved` (=1)
+     - `rejected` (=2)
+     - `disputed` (=3)
+     - `invalidated` (=4)
 
 4. **Payment Authorization:**
 
    - Payments can be authorized to agents or evaluators' `account` upon various claim activities like submission, evaluation, approval, or when disputes arise.
+   - For claim evaluations with status `invalidated` no evaluation payment will be made.
 
 5. **Recording Counter-Claims Evidence:**
    - In case of disputes, evidence for counter-claims can be recorded, facilitating transparency and conflict resolution.

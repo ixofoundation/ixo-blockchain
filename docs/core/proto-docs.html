@@ -816,6 +816,30 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionDates"><span class="badge">M</span>MsgUpdateCollectionDates</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse"><span class="badge">M</span>MsgUpdateCollectionDatesResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionPayments"><span class="badge">M</span>MsgUpdateCollectionPayments</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse"><span class="badge">M</span>MsgUpdateCollectionPaymentsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionState"><span class="badge">M</span>MsgUpdateCollectionState</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse"><span class="badge">M</span>MsgUpdateCollectionStateResponse</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.MsgWithdrawPayment"><span class="badge">M</span>MsgWithdrawPayment</a>
                 </li>
               
@@ -940,6 +964,10 @@
               
                 <li>
                   <a href="#ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent"><span class="badge">M</span>EntityAccountAuthzCreatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.EntityAccountAuthzRevokedEvent"><span class="badge">M</span>EntityAccountAuthzRevokedEvent</a>
                 </li>
               
                 <li>
@@ -1267,6 +1295,14 @@
               
                 <li>
                   <a href="#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse"><span class="badge">M</span>MsgGrantEntityAccountAuthzResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz"><span class="badge">M</span>MsgRevokeEntityAccountAuthz</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse"><span class="badge">M</span>MsgRevokeEntityAccountAuthzResponse</a>
                 </li>
               
                 <li>
@@ -4822,7 +4858,7 @@ in the SETTLE stage.</p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>admin is the account address that will authorize or revoke agents and
-payments (the grantor) </p></td>
+payments (the grantor), and can update the collection </p></td>
                 </tr>
               
                 <tr>
@@ -4913,6 +4949,14 @@ rejection </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>signer address </p></td>
+                </tr>
+              
+                <tr>
+                  <td>invalidated</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>invalidated is the number of claims that have been evaluated as invalid
+(internally calculated) </p></td>
                 </tr>
               
             </tbody>
@@ -5331,6 +5375,12 @@ immidiate direct payment </p></td>
               <tr>
                 <td>DISPUTED</td>
                 <td>3</td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>INVALIDATED</td>
+                <td>4</td>
                 <td><p></p></td>
               </tr>
             
@@ -6711,7 +6761,7 @@ saved in kvStore </p></td>
                   <td>collection_id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>claimID is the unique identifier of the claim to make evaluation against </p></td>
+                  <td><p>collection_id indicates to which Collection this claim belongs </p></td>
                 </tr>
               
                 <tr>
@@ -6840,6 +6890,151 @@ use default by Collection </p></td>
         
       
         <h3 id="ixo.claims.v1beta1.MsgSubmitClaimResponse">MsgSubmitClaimResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionDates">MsgUpdateCollectionDates</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_date</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>startDate is the date after which claims may be submitted </p></td>
+                </tr>
+              
+                <tr>
+                  <td>end_date</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>endDate is the date after which no more claims may be submitted (no endDate
+is allowed) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse">MsgUpdateCollectionDatesResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionPayments">MsgUpdateCollectionPayments</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>payments</td>
+                  <td><a href="#ixo.claims.v1beta1.Payments">Payments</a></td>
+                  <td></td>
+                  <td><p>payments is the amount paid for claim submission, evaluation, approval, or
+rejection </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse">MsgUpdateCollectionPaymentsResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionState">MsgUpdateCollectionState</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>state</td>
+                  <td><a href="#ixo.claims.v1beta1.CollectionState">CollectionState</a></td>
+                  <td></td>
+                  <td><p>state is the state of this Collection (open, paused, closed) you want to
+update to </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionStateResponse">MsgUpdateCollectionStateResponse</h3>
         <p></p>
 
         
@@ -6981,6 +7176,27 @@ plus the timeout on Collection payments </p></td>
                 <td>WithdrawPayment</td>
                 <td><a href="#ixo.claims.v1beta1.MsgWithdrawPayment">MsgWithdrawPayment</a></td>
                 <td><a href="#ixo.claims.v1beta1.MsgWithdrawPaymentResponse">MsgWithdrawPaymentResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionState</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionState">MsgUpdateCollectionState</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse">MsgUpdateCollectionStateResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionDates</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionDates">MsgUpdateCollectionDates</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse">MsgUpdateCollectionDatesResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionPayments</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionPayments">MsgUpdateCollectionPayments</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse">MsgUpdateCollectionPaymentsResponse</a></td>
                 <td><p></p></td>
               </tr>
             
@@ -7684,7 +7900,7 @@ Client applications </p></td>
                   <td>relayer_node</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Address of the operator through which the Entity was created </p></td>
+                  <td><p>Did of the operator through which the Entity was created </p></td>
                 </tr>
               
                 <tr>
@@ -7845,7 +8061,7 @@ deactivated </p></td>
 
       
         <h3 id="ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent">EntityAccountAuthzCreatedEvent</h3>
-        <p>EntityAccountCreatedEvent is an event triggered on a entity account creation</p>
+        <p>EntityAccountCreatedEvent is an event triggered on a entity account authz</p><p>creation</p>
 
         
           <table class="field-table">
@@ -7892,6 +8108,65 @@ deactivated </p></td>
                 <tr>
                   <td>grant</td>
                   <td><a href="#ixo.entity.v1beta1.Grant">Grant</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.EntityAccountAuthzRevokedEvent">EntityAccountAuthzRevokedEvent</h3>
+        <p>EntityAccountAuthzRevokedEvent is an event triggered on a entity account</p><p>authz revocation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>signer</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>account_name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>granter</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grantee</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>msg_type_url</td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -9943,7 +10218,7 @@ Client applications </p></td>
                   <td>relayer_node</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>Address of the operator through which the Entity was created </p></td>
+                  <td><p>Did of the operator through which the Entity was created </p></td>
                 </tr>
               
                 <tr>
@@ -9997,7 +10272,7 @@ subject </p></td>
         
       
         <h3 id="ixo.entity.v1beta1.MsgCreateEntityAccount">MsgCreateEntityAccount</h3>
-        <p>create a module account for an entity, account details will be added as a</p><p>linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name</p>
+        <p>create a module account for an entity</p>
 
         
           <table class="field-table">
@@ -10110,7 +10385,7 @@ subject </p></td>
                   <td>id</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>entity id (did) to create account for </p></td>
+                  <td><p>entity id (did) which has the account </p></td>
                 </tr>
               
                 <tr>
@@ -10149,6 +10424,65 @@ subject </p></td>
         
       
         <h3 id="ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse">MsgGrantEntityAccountAuthzResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz">MsgRevokeEntityAccountAuthz</h3>
+        <p>Revoke an existing authz grant from entity account (as grantor) to recipient</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>entity id (did) which has the account </p></td>
+                </tr>
+              
+                <tr>
+                  <td>name</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>name of account </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grantee_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the grantee address for which the authz grant will be revoked </p></td>
+                </tr>
+              
+                <tr>
+                  <td>msg_type_url</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the msg type url of the grant to be revoked for the specific grantee </p></td>
+                </tr>
+              
+                <tr>
+                  <td>owner_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the owner_address used to sign this transaction. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse">MsgRevokeEntityAccountAuthzResponse</h3>
         <p></p>
 
         
@@ -10389,7 +10723,14 @@ subject </p></td>
                 <td>GrantEntityAccountAuthz</td>
                 <td><a href="#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz">MsgGrantEntityAccountAuthz</a></td>
                 <td><a href="#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse">MsgGrantEntityAccountAuthzResponse</a></td>
-                <td><p>Create a authz grant from entity account</p></td>
+                <td><p>Create an authz grant from entity account</p></td>
+              </tr>
+            
+              <tr>
+                <td>RevokeEntityAccountAuthz</td>
+                <td><a href="#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz">MsgRevokeEntityAccountAuthz</a></td>
+                <td><a href="#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse">MsgRevokeEntityAccountAuthzResponse</a></td>
+                <td><p>Revoke an authz grant from entity account</p></td>
               </tr>
             
           </tbody>
@@ -10730,7 +11071,7 @@ subject </p></td>
                   <td>contract_address</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>generated on token intiation through MsgSetupMinter </p></td>
+                  <td><p>generated on token initiation </p></td>
                 </tr>
               
                 <tr>

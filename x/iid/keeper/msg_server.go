@@ -358,7 +358,8 @@ func (k msgServer) DeleteController(goCtx context.Context, msg *types.MsgDeleteC
 	if err := ExecuteOnDidWithRelationships(
 		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
-		msg.Id, msg.Signer, func(didDoc *types.IidDocument) error {
+		msg.Id, msg.Signer,
+		func(didDoc *types.IidDocument) error {
 			return didDoc.DeleteControllers(msg.ControllerDid)
 		}); err != nil {
 		return nil, err

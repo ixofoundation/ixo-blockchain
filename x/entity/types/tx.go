@@ -292,3 +292,40 @@ func (msg MsgGrantEntityAccountAuthz) GetSignBytes() []byte {
 }
 
 func (msg MsgGrantEntityAccountAuthz) Route() string { return RouterKey }
+
+// --------------------------
+// REVOKE ENTITY ACCOUNT AUTHZ
+// --------------------------
+const TypeMsgRevokeEntityAccountAuthz = "revoke_entity_account_authz"
+
+var _ sdk.Msg = &MsgRevokeEntityAccountAuthz{}
+
+func NewMsgRevokeEntityAccountAuthz(
+	id, name, ownerAddress, granteeAddress, msgTypeUrl string,
+) *MsgRevokeEntityAccountAuthz {
+	return &MsgRevokeEntityAccountAuthz{
+		Id:             id,
+		Name:           name,
+		OwnerAddress:   ownerAddress,
+		GranteeAddress: granteeAddress,
+		MsgTypeUrl:     msgTypeUrl,
+	}
+}
+
+func (msg MsgRevokeEntityAccountAuthz) Type() string {
+	return TypeMsgRevokeEntityAccountAuthz
+}
+
+func (msg MsgRevokeEntityAccountAuthz) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgRevokeEntityAccountAuthz) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgRevokeEntityAccountAuthz) Route() string { return RouterKey }

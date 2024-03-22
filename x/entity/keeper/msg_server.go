@@ -461,3 +461,69 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 
 	return &types.MsgGrantEntityAccountAuthzResponse{}, nil
 }
+
+// --------------------------
+// REVOKE ENTITY ACCOUNT AUTHZ
+// --------------------------
+func (s msgServer) RevokeEntityAccountAuthz(goCtx context.Context, msg *types.MsgRevokeEntityAccountAuthz) (*types.MsgRevokeEntityAccountAuthzResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// get entity doc
+	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that owner is entity owner
+	err = s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(err, "unauthorized")
+	}
+
+	// get entity account with same name
+	var account *types.EntityAccount
+	for _, acc := range entity.Accounts {
+		if account != nil {
+			break
+		}
+		if acc.Name == msg.Name {
+			account = acc
+		}
+	}
+
+	// if no account with name throw
+	if account == nil {
+		return nil, sdkerrors.Wrapf(types.ErrAccountNotFound, "name %s", msg.Name)
+	}
+
+	// get addresses
+	grantee, err := sdk.AccAddressFromBech32(msg.GranteeAddress)
+	if err != nil {
+		return nil, err
+	}
+	granter, err := sdk.AccAddressFromBech32(account.Address)
+	if err != nil {
+		return nil, err
+	}
+
+	// remove grant
+	if err := s.Keeper.AuthzKeeper.DeleteGrant(ctx, grantee, granter, msg.MsgTypeUrl); err != nil {
+		return nil, err
+	}
+
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.EntityAccountAuthzRevokedEvent{
+			Id:          entity.Id,
+			Signer:      msg.OwnerAddress,
+			AccountName: msg.Name,
+			Granter:     granter.String(),
+			Grantee:     grantee.String(),
+			MsgTypeUrl:  msg.MsgTypeUrl,
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgRevokeEntityAccountAuthzResponse{}, nil
+}

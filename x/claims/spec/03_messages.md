@@ -30,6 +30,62 @@ The field's descriptions is as follows:
 - `state` - a [CollectionState](02_state.md#collectionstate)
 - `payments` - a [Payments](02_state.md#payments)
 
+## MsgUpdateCollectionState
+
+A `MsgUpdateCollectionState` updates a Collection's `state` field.
+
+```go
+type MsgUpdateCollectionState struct {
+	CollectionId string
+	State CollectionState
+	AdminAddress string
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` to make the update to
+- `state` - a [CollectionState](02_state.md#collectionstate)
+- `adminAddress` - a string containing the account address of the private key signing the transaction, must be same as [Collection](02_state.md#collection) admin field
+
+## MsgUpdateCollectionDates
+
+A `MsgUpdateCollectionDates` updates a Collection's `startDate` and `endDate` fields.
+
+```go
+type MsgUpdateCollectionDates struct {
+	CollectionId string
+  StartDate *time.Time
+  EndDate *time.Time
+	AdminAddress string
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` to make the update to
+- `startDate` - a timestamp of the start date for the collection, after which claims may be submitted
+- `endDate` - a timestamp of the end date for the collection, after which no more claims may be submitted (no endDate is allowed)
+- `adminAddress` - a string containing the account address of the private key signing the transaction, must be same as [Collection](02_state.md#collection) admin field
+
+## MsgUpdateCollectionPayments
+
+A `MsgUpdateCollectionPayments` updates a Collection's `state` field.
+
+```go
+type MsgUpdateCollectionPayments struct {
+	CollectionId string
+	Payments *Payments
+	AdminAddress string
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` to make the update to
+- `payments` - a [Payments](02_state.md#payments)
+- `adminAddress` - a string containing the account address of the private key signing the transaction, must be same as [Collection](02_state.md#collection) admin field
+
 ## MsgSubmitClaim
 
 A `MsgSubmitClaim` creates and stores a new Claim made towards a `Collection`. On Submission of claim `SUBMISSION` payments will be made if there is any defined in the [Collection](02_state.md#collection) `Payments`.
@@ -53,7 +109,7 @@ The field's descriptions is as follows:
 
 ## MsgEvaluateClaim
 
-A `MsgEvaluateClaim` updates the `Evaluation` for a claim. On evaluation payments will be made for both the evaluation of the claim (towards the agent or oracle) as well as if the claim was `APPROVED` then the claim submitter will also get a payment, which will the preset amount defined on th [Collection](02_state.md#collection) `Payments` field or the evaluator can also define a custom `Amount` that can be paid out on approval.
+A `MsgEvaluateClaim` updates the `Evaluation` for a claim. On evaluation payments will be made for both the evaluation of the claim (towards the agent or oracle) as well as if the claim was `APPROVED` then the claim submitter will also get a payment, which will the preset amount defined on th [Collection](02_state.md#collection) `Payments` field or the evaluator can also define a custom `Amount` that can be paid out on approval. Note: no payments will be made if agent evaluates claim with status `invalidated`
 
 ```go
 type MsgEvaluateClaim struct {

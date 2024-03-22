@@ -102,7 +102,7 @@ type Entity struct {
 	// Status of the Entity as defined by the implementer and interpreted by
 	// Client applications
 	Status int32 `protobuf:"varint,5,opt,name=status,proto3" json:"status,omitempty"`
-	// Address of the operator through which the Entity was created
+	// Did of the operator through which the Entity was created
 	RelayerNode string `protobuf:"bytes,6,opt,name=relayer_node,json=relayerNode,proto3" json:"relayer_node,omitempty"`
 	// Credentials of the enitity to be verified
 	Credentials []string `protobuf:"bytes,7,rep,name=credentials,proto3" json:"credentials,omitempty"`

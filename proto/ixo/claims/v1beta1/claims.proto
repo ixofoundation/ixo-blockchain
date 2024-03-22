@@ -32,6 +32,7 @@ enum EvaluationStatus {
   APPROVED = 1 [ (gogoproto.enumvalue_customname) = "approved" ];
   REJECTED = 2 [ (gogoproto.enumvalue_customname) = "rejected" ];
   DISPUTED = 3 [ (gogoproto.enumvalue_customname) = "disputed" ];
+  INVALIDATED = 4 [ (gogoproto.enumvalue_customname) = "invalidated" ];
 }
 
 enum PaymentType {
@@ -60,7 +61,7 @@ message Collection {
   // entity is the DID of the entity for which the claims are being created
   string entity = 2;
   // admin is the account address that will authorize or revoke agents and
-  // payments (the grantor)
+  // payments (the grantor), and can update the collection
   string admin = 3;
   // protocol is the DID of the claim protocol
   string protocol = 4;
@@ -92,6 +93,9 @@ message Collection {
   Payments payments = 14;
   // signer address
   string signer = 15;
+  // invalidated is the number of claims that have been evaluated as invalid
+  // (internally calculated)
+  uint64 invalidated = 16;
 }
 
 message Payments {
