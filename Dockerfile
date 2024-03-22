@@ -1,7 +1,7 @@
 # echo $(git describe --tags) | sed 's/^v//'
-ARG GIT_VERSION="2.0.0-rc.0"
+ARG GIT_VERSION="v3.0.0"
 # git log -1 --format='%H'
-ARG GIT_COMMIT="ca9e64cf2f8c29b8bb001281abcdcb942dc9fa01"
+ARG GIT_COMMIT="75a366e5e652b4f48b12cdb8a3f0b64e5aefe374"
 
 # --------------------------------------------------------
 # Builder
@@ -23,7 +23,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 
 # RUN ARCH=$(uname -m)
 # Cosmwasm - Download correct libwasmvm version
-RUN ARCH=x86_64 WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | sed 's/.* //') && wget \
+RUN ARCH=x86_64 && WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | sed 's/.* //') && wget \
   https://github.com/CosmWasm/wasmvm/releases/download/$WASMVM_VERSION/libwasmvm_muslc.$ARCH.a \
   -O /lib/libwasmvm_muslc.a && wget https://github.com/CosmWasm/wasmvm/releases/download/$WASMVM_VERSION/checksums.txt \
   -O /tmp/checksums.txt && sha256sum /lib/libwasmvm_muslc.a | grep $(cat /tmp/checksums.txt | grep libwasmvm_muslc.$ARCH | cut -d ' ' -f 1)
