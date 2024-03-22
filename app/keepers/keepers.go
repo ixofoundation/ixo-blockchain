@@ -74,19 +74,19 @@ import (
 	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 
 	// Local
-	wasmbinding "github.com/ixofoundation/ixo-blockchain/v2/wasmbinding"
-	bondskeeper "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/keeper"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
-	claimsmodulekeeper "github.com/ixofoundation/ixo-blockchain/v2/x/claims/keeper"
-	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v2/x/claims/types"
-	entitymodule "github.com/ixofoundation/ixo-blockchain/v2/x/entity"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v2/x/entity/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
-	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/v2/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
-	tokenmodule "github.com/ixofoundation/ixo-blockchain/v2/x/token"
-	tokenkeeper "github.com/ixofoundation/ixo-blockchain/v2/x/token/keeper"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/v2/x/token/types"
+	wasmbinding "github.com/ixofoundation/ixo-blockchain/v3/wasmbinding"
+	bondskeeper "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/keeper"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	claimsmodulekeeper "github.com/ixofoundation/ixo-blockchain/v3/x/claims/keeper"
+	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
+	entitymodule "github.com/ixofoundation/ixo-blockchain/v3/x/entity"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	tokenmodule "github.com/ixofoundation/ixo-blockchain/v3/x/token"
+	tokenkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/token/keeper"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
 )
 
 type AppKeepers struct {

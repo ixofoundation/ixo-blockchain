@@ -4,8 +4,8 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v2/x/entity/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 )
 
 type BlockNftContractTransferForEntityDecorator struct {

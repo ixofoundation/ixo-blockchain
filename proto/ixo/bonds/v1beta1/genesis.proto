@@ -4,7 +4,7 @@ package ixo.bonds.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/bonds/v1beta1/bonds.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types";
 
 // GenesisState defines the bonds module's genesis state.
 message GenesisState {

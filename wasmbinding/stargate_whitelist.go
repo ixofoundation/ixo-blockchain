@@ -14,11 +14,11 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
 
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
-	claimstypes "github.com/ixofoundation/ixo-blockchain/v2/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/v2/x/token/types"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	claimstypes "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
 )
 
 // stargateResponsePools keeps whitelist and its deterministic

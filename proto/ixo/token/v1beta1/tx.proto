@@ -6,7 +6,7 @@ import "ixo/iid/v1beta1/iid.proto";
 import "ixo/token/v1beta1/token.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/token/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/token/types";
 
 // Msg defines the project Msg service.
 service Msg {
@@ -25,7 +25,7 @@ message MsgCreateToken {
   // class is the token protocol entity DID (validated)
   string class = 2 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
   ];
   // name is the token name, which must be unique (namespace)
   string name = 3;

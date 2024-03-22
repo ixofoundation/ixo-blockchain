@@ -8,8 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v2/x/iid/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/token/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
 

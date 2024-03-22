@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/token/types/contracts/ixo1155"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/ixo1155"
 )
 
 var (

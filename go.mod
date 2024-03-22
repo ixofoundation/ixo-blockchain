@@ -1,4 +1,4 @@
-module github.com/ixofoundation/ixo-blockchain/v2
+module github.com/ixofoundation/ixo-blockchain/v3
 
 go 1.19
 

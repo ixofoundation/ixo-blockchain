@@ -8,10 +8,10 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	ibcante "github.com/cosmos/ibc-go/v4/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v4/modules/core/keeper"
-	entityante "github.com/ixofoundation/ixo-blockchain/v2/x/entity/ante"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v2/x/entity/keeper"
-	iidante "github.com/ixofoundation/ixo-blockchain/v2/x/iid/ante"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v2/x/iid/keeper"
+	entityante "github.com/ixofoundation/ixo-blockchain/v3/x/entity/ante"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
+	iidante "github.com/ixofoundation/ixo-blockchain/v3/x/iid/ante"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.

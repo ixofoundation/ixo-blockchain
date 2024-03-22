@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
 // UnmarshalFn is a generic function to unmarshal bytes

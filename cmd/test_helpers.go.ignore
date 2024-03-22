@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/CosmWasm/wasmd/x/wasm/types"
-	"github.com/ixofoundation/ixo-blockchain/v2/app"
+	"github.com/ixofoundation/ixo-blockchain/v3/app"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	abci "github.com/tendermint/tendermint/abci/types"

@@ -4,7 +4,7 @@ package ixo.entity.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/entity/v1beta1/entity.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types";
 
 // GenesisState defines the project module's genesis state.
 message GenesisState {

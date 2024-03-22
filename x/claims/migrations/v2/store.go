@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 )
 
 // MigrateStore performs in-place store migrations from ConsensusVersion 1 to 2.

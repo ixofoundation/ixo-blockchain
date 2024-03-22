@@ -2,8 +2,8 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v2/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v3/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
 var (
