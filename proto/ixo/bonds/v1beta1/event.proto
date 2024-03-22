@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ixo.bonds.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types";
 
 import "gogoproto/gogo.proto";
 import "ixo/bonds/v1beta1/bonds.proto";

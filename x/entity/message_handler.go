@@ -3,8 +3,8 @@ package entity
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 )
 
 func NewHandler(k keeper.Keeper) sdk.Handler {

@@ -6,7 +6,7 @@ import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "ixo/claims/v1beta1/claims.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types";
 
 // Query defines the gRPC querier service.
 service Query {

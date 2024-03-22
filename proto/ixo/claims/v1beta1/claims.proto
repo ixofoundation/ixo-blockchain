@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/duration.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types";
 
 message Params {
   uint64 collection_sequence = 1;

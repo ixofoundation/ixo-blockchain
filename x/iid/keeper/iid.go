@@ -4,7 +4,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
 func (k Keeper) SetDidDocument(ctx sdk.Context, key []byte, document types.IidDocument) {

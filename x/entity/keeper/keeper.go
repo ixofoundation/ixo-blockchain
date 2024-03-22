@@ -10,8 +10,8 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v2/x/iid/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
 	"github.com/tendermint/tendermint/libs/log"
 )
 

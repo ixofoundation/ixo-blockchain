@@ -9,8 +9,8 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v2/x/iid/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
 	"github.com/tendermint/tendermint/libs/log"
 )
 

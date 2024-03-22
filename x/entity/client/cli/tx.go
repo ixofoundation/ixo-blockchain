@@ -11,8 +11,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 	"github.com/spf13/cobra"
 )
 

@@ -13,11 +13,11 @@ import (
 	auth "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/client/cli"
 
-	// "github.com/ixofoundation/ixo-blockchain/v2/x/bonds/client/rest"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v2/x/bonds/types"
+	// "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/client/rest"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 )

@@ -9,7 +9,7 @@ import "ixo/entity/v1beta1/entity.proto";
 import "ixo/entity/v1beta1/cosmos.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v2/x/entity/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types";
 
 // Msg defines the project Msg service.
 service Msg {
@@ -70,7 +70,7 @@ message MsgCreateEntity {
   repeated string credentials = 13;
   string owner_did = 14 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
   ]; // Owner of the Entity NFT | The ownersdid used to sign this transaction.
   string owner_address =
       15; // The ownersdid address used to sign this transaction.
@@ -106,7 +106,7 @@ message MsgUpdateEntity {
   repeated string credentials = 5;
   string controller_did = 6 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
   ]; // The controllerDid used to sign this transaction.
   string controller_address =
       7; // The controllerAddress used to sign this transaction.
@@ -122,7 +122,7 @@ message MsgUpdateEntityVerified {
   bool entity_verified = 2;
   string relayer_node_did = 3 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
   ]; // The relayer node's did used to sign this transaction.
   string relayer_node_address =
       4; // The relayer node's address used to sign this transaction.
@@ -135,13 +135,13 @@ message MsgTransferEntity {
   // The owner_did used to sign this transaction.
   string owner_did = 2 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
   ];
   // The owner_address used to sign this transaction.
   string owner_address = 3;
   string recipient_did = 4 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v2/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
   ];
 }
 

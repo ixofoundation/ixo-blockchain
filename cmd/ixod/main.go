@@ -3,12 +3,12 @@ package main
 import (
 	"os"
 
-	"github.com/ixofoundation/ixo-blockchain/v2/app/params"
-	"github.com/ixofoundation/ixo-blockchain/v2/cmd/ixod/cmd"
+	"github.com/ixofoundation/ixo-blockchain/v3/app/params"
+	"github.com/ixofoundation/ixo-blockchain/v3/cmd/ixod/cmd"
 
 	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/ixofoundation/ixo-blockchain/v2/app"
+	"github.com/ixofoundation/ixo-blockchain/v3/app"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/ixofoundation/ixo-blockchain/v2/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
 func (suite *KeeperTestSuite) TestGRPCQueryDidDocuments() {
