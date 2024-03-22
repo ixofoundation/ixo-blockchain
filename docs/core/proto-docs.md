@@ -159,6 +159,12 @@
     - [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse)
     - [MsgSubmitClaim](#ixo.claims.v1beta1.MsgSubmitClaim)
     - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
+    - [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates)
+    - [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse)
+    - [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments)
+    - [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse)
+    - [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState)
+    - [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse)
     - [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment)
     - [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse)
   
@@ -188,6 +194,7 @@
   
 - [ixo/entity/v1beta1/event.proto](#ixo/entity/v1beta1/event.proto)
     - [EntityAccountAuthzCreatedEvent](#ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent)
+    - [EntityAccountAuthzRevokedEvent](#ixo.entity.v1beta1.EntityAccountAuthzRevokedEvent)
     - [EntityAccountCreatedEvent](#ixo.entity.v1beta1.EntityAccountCreatedEvent)
     - [EntityCreatedEvent](#ixo.entity.v1beta1.EntityCreatedEvent)
     - [EntityTransferredEvent](#ixo.entity.v1beta1.EntityTransferredEvent)
@@ -268,6 +275,8 @@
     - [MsgCreateEntityResponse](#ixo.entity.v1beta1.MsgCreateEntityResponse)
     - [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz)
     - [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse)
+    - [MsgRevokeEntityAccountAuthz](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz)
+    - [MsgRevokeEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse)
     - [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity)
     - [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse)
     - [MsgUpdateEntity](#ixo.entity.v1beta1.MsgUpdateEntity)
@@ -1755,7 +1764,7 @@ Msg defines the bonds Msg service.
 | ----- | ---- | ----- | ----------- |
 | id | [string](#string) |  | collection id is the incremented internal id for the collection of claims |
 | entity | [string](#string) |  | entity is the DID of the entity for which the claims are being created |
-| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor) |
+| admin | [string](#string) |  | admin is the account address that will authorize or revoke agents and payments (the grantor), and can update the collection |
 | protocol | [string](#string) |  | protocol is the DID of the claim protocol |
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |
@@ -1768,6 +1777,7 @@ Msg defines the bonds Msg service.
 | state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
 | signer | [string](#string) |  | signer address |
+| invalidated | [uint64](#uint64) |  | invalidated is the number of claims that have been evaluated as invalid (internally calculated) |
 
 
 
@@ -1930,6 +1940,7 @@ Msg defines the bonds Msg service.
 | APPROVED | 1 |  |
 | REJECTED | 2 |  |
 | DISPUTED | 3 |  |
+| INVALIDATED | 4 |  |
 
 
 
@@ -2628,7 +2639,7 @@ Collection entity, or have authz cap, aka is agent
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim to make evaluation against |
-| collection_id | [string](#string) |  | claimID is the unique identifier of the claim to make evaluation against |
+| collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
 | oracle | [string](#string) |  | oracle is the DID of the Oracle entity that evaluates the claim |
 | agent_did | [string](#string) |  | agent is the DID of the agent that submits the evaluation |
 | agent_address | [string](#string) |  |  |
@@ -2675,6 +2686,88 @@ Collection entity, or have authz cap, aka is agent
 <a name="ixo.claims.v1beta1.MsgSubmitClaimResponse"></a>
 
 ### MsgSubmitClaimResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionDates"></a>
+
+### MsgUpdateCollectionDates
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | startDate is the date after which claims may be submitted |
+| end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | endDate is the date after which no more claims may be submitted (no endDate is allowed) |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse"></a>
+
+### MsgUpdateCollectionDatesResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionPayments"></a>
+
+### MsgUpdateCollectionPayments
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse"></a>
+
+### MsgUpdateCollectionPaymentsResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionState"></a>
+
+### MsgUpdateCollectionState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the state of this Collection (open, paused, closed) you want to update to |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionStateResponse"></a>
+
+### MsgUpdateCollectionStateResponse
 
 
 
@@ -2733,6 +2826,9 @@ Msg defines the Msg service.
 | EvaluateClaim | [MsgEvaluateClaim](#ixo.claims.v1beta1.MsgEvaluateClaim) | [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse) |  |
 | DisputeClaim | [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim) | [MsgDisputeClaimResponse](#ixo.claims.v1beta1.MsgDisputeClaimResponse) |  |
 | WithdrawPayment | [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment) | [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse) |  |
+| UpdateCollectionState | [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState) | [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse) |  |
+| UpdateCollectionDates | [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates) | [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse) |  |
+| UpdateCollectionPayments | [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments) | [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse) |  |
 
  
 
@@ -3006,7 +3102,7 @@ relationship entity account
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Start Date of the Entity as defined by the implementer and interpreted by Client applications |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
 | status | [int32](#int32) |  | Status of the Entity as defined by the implementer and interpreted by Client applications |
-| relayer_node | [string](#string) |  | Address of the operator through which the Entity was created |
+| relayer_node | [string](#string) |  | Did of the operator through which the Entity was created |
 | credentials | [string](#string) | repeated | Credentials of the enitity to be verified |
 | entity_verified | [bool](#bool) |  | Used as check whether the credentials of entity is verified |
 | metadata | [EntityMetadata](#ixo.entity.v1beta1.EntityMetadata) |  | Metadata concerning the Entity such as versionId, created, updated and deactivated |
@@ -3086,7 +3182,8 @@ EntityMetadata defines metadata associated to a entity
 <a name="ixo.entity.v1beta1.EntityAccountAuthzCreatedEvent"></a>
 
 ### EntityAccountAuthzCreatedEvent
-EntityAccountCreatedEvent is an event triggered on a entity account creation
+EntityAccountCreatedEvent is an event triggered on a entity account authz
+creation
 
 
 | Field | Type | Label | Description |
@@ -3097,6 +3194,27 @@ EntityAccountCreatedEvent is an event triggered on a entity account creation
 | granter | [string](#string) |  |  |
 | grantee | [string](#string) |  |  |
 | grant | [Grant](#ixo.entity.v1beta1.Grant) |  |  |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.EntityAccountAuthzRevokedEvent"></a>
+
+### EntityAccountAuthzRevokedEvent
+EntityAccountAuthzRevokedEvent is an event triggered on a entity account
+authz revocation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| signer | [string](#string) |  |  |
+| account_name | [string](#string) |  |  |
+| granter | [string](#string) |  |  |
+| grantee | [string](#string) |  |  |
+| msg_type_url | [string](#string) |  |  |
 
 
 
@@ -4118,7 +4236,7 @@ Msg defines the identity Msg service.
 | linked_entity | [ixo.iid.v1beta1.LinkedEntity](#ixo.iid.v1beta1.LinkedEntity) | repeated | DID of a linked Entity and its relationship with the Subject |
 | start_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Start Date of the Entity as defined by the implementer and interpreted by Client applications |
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
-| relayer_node | [string](#string) |  | Address of the operator through which the Entity was created |
+| relayer_node | [string](#string) |  | Did of the operator through which the Entity was created |
 | credentials | [string](#string) | repeated | Content ID or Hash of public Verifiable Credentials associated with the subject |
 | owner_did | [string](#string) |  | Owner of the Entity NFT | The ownersdid used to sign this transaction. |
 | owner_address | [string](#string) |  | The ownersdid address used to sign this transaction. |
@@ -4134,8 +4252,7 @@ Msg defines the identity Msg service.
 <a name="ixo.entity.v1beta1.MsgCreateEntityAccount"></a>
 
 ### MsgCreateEntityAccount
-create a module account for an entity, account details will be added as a
-linkedEntity on entity iid doc where linkedEntity id is didfragment: did#name
+create a module account for an entity
 
 
 | Field | Type | Label | Description |
@@ -4190,7 +4307,7 @@ grantee for the specific authorization
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id | [string](#string) |  | entity id (did) to create account for |
+| id | [string](#string) |  | entity id (did) which has the account |
 | name | [string](#string) |  | name of account |
 | grantee_address | [string](#string) |  | the grantee address that will be able to execute the authz authorization |
 | grant | [Grant](#ixo.entity.v1beta1.Grant) |  | grant to be Authorized in authz grant |
@@ -4204,6 +4321,35 @@ grantee for the specific authorization
 <a name="ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse"></a>
 
 ### MsgGrantEntityAccountAuthzResponse
+
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz"></a>
+
+### MsgRevokeEntityAccountAuthz
+Revoke an existing authz grant from entity account (as grantor) to recipient
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | entity id (did) which has the account |
+| name | [string](#string) |  | name of account |
+| grantee_address | [string](#string) |  | the grantee address for which the authz grant will be revoked |
+| msg_type_url | [string](#string) |  | the msg type url of the grant to be revoked for the specific grantee |
+| owner_address | [string](#string) |  | the owner_address used to sign this transaction. |
+
+
+
+
+
+
+<a name="ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse"></a>
+
+### MsgRevokeEntityAccountAuthzResponse
 
 
 
@@ -4317,7 +4463,8 @@ Msg defines the project Msg service.
 | UpdateEntityVerified | [MsgUpdateEntityVerified](#ixo.entity.v1beta1.MsgUpdateEntityVerified) | [MsgUpdateEntityVerifiedResponse](#ixo.entity.v1beta1.MsgUpdateEntityVerifiedResponse) | UpdateEntityVerified defines a method for updating if an entity is verified |
 | TransferEntity | [MsgTransferEntity](#ixo.entity.v1beta1.MsgTransferEntity) | [MsgTransferEntityResponse](#ixo.entity.v1beta1.MsgTransferEntityResponse) | Transfers an entity and its nft to the recipient |
 | CreateEntityAccount | [MsgCreateEntityAccount](#ixo.entity.v1beta1.MsgCreateEntityAccount) | [MsgCreateEntityAccountResponse](#ixo.entity.v1beta1.MsgCreateEntityAccountResponse) | Create a module account for an entity, |
-| GrantEntityAccountAuthz | [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz) | [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse) | Create a authz grant from entity account |
+| GrantEntityAccountAuthz | [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz) | [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse) | Create an authz grant from entity account |
+| RevokeEntityAccountAuthz | [MsgRevokeEntityAccountAuthz](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz) | [MsgRevokeEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse) | Revoke an authz grant from entity account |
 
  
 
@@ -4519,7 +4666,7 @@ Query defines the gRPC querier service.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | minter | [string](#string) |  | address of minter |
-| contract_address | [string](#string) |  | generated on token intiation through MsgSetupMinter |
+| contract_address | [string](#string) |  | generated on token initiation |
 | class | [string](#string) |  | class is the token protocol entity DID (validated) |
 | name | [string](#string) |  | name is the token name, which must be unique (namespace) |
 | description | [string](#string) |  | description is any arbitrary description |

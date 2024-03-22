@@ -66,20 +66,21 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	var collection types.Collection
 	collectionId := fmt.Sprint(params.CollectionSequence)
 	collection = types.Collection{
-		Id:        collectionId,
-		Entity:    msg.Entity,
-		Admin:     admin.Address,
-		Protocol:  msg.Protocol,
-		StartDate: msg.StartDate,
-		EndDate:   msg.EndDate,
-		Quota:     msg.Quota,
-		Count:     0,
-		Evaluated: 0,
-		Approved:  0,
-		Rejected:  0,
-		Disputed:  0,
-		State:     msg.State,
-		Payments:  msg.Payments,
+		Id:          collectionId,
+		Entity:      msg.Entity,
+		Admin:       admin.Address,
+		Protocol:    msg.Protocol,
+		StartDate:   msg.StartDate,
+		EndDate:     msg.EndDate,
+		Quota:       msg.Quota,
+		Count:       0,
+		Evaluated:   0,
+		Approved:    0,
+		Rejected:    0,
+		Disputed:    0,
+		Invalidated: 0,
+		State:       msg.State,
+		Payments:    msg.Payments,
 	}
 
 	s.Keeper.SetCollection(ctx, collection)
@@ -252,13 +253,17 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	claim.Evaluation = &evaluation
 	s.Keeper.SetClaim(ctx, claim)
 
-	// start payout process for evaluation submission
-	if err = processPayment(ctx, s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
-		return nil, err
+	// start payout process for evaluation submission, if evaluation has status invalidated, dont run evaluation payout process
+	if msg.Status != types.EvaluationStatus_invalidated {
+		if err = processPayment(ctx, s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
+			return nil, err
+		}
+
+		// update evaluated count for collection
+		collection.Evaluated++
 	}
 
 	// update amounts for collection, make payouts and persist
-	collection.Evaluated++
 	if msg.Status == types.EvaluationStatus_approved {
 		collection.Approved++
 		// payout process for evaluation approval to claim agent
@@ -278,6 +283,9 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		collection.Disputed++
 		// update payment status to disputed
 		updatePaymentStatus(ctx, s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_disputed)
+	} else if msg.Status == types.EvaluationStatus_invalidated {
+		// no payment for invalidated
+		collection.Invalidated++
 	}
 	s.Keeper.SetCollection(ctx, collection)
 
@@ -430,4 +438,126 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 		return nil, err
 	}
 	return &types.MsgWithdrawPaymentResponse{}, nil
+}
+
+// --------------------------
+// UPDATE COLLECTION STATE
+// --------------------------
+func (s msgServer) UpdateCollectionState(goCtx context.Context, msg *types.MsgUpdateCollectionState) (*types.MsgUpdateCollectionStateResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	// update state
+	collection.State = msg.State
+
+	// persist the Collection
+	s.Keeper.SetCollection(ctx, collection)
+
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.CollectionUpdatedEvent{
+			Collection: &collection,
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateCollectionStateResponse{}, nil
+}
+
+// --------------------------
+// UPDATE COLLECTION DATES
+// --------------------------
+func (s msgServer) UpdateCollectionDates(goCtx context.Context, msg *types.MsgUpdateCollectionDates) (*types.MsgUpdateCollectionDatesResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	// update state
+	collection.StartDate = msg.StartDate
+	collection.EndDate = msg.EndDate
+
+	// persist the Collection
+	s.Keeper.SetCollection(ctx, collection)
+
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.CollectionUpdatedEvent{
+			Collection: &collection,
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateCollectionDatesResponse{}, nil
+}
+
+// --------------------------
+// UPDATE COLLECTION PAYMENTS
+// --------------------------
+func (s msgServer) UpdateCollectionPayments(goCtx context.Context, msg *types.MsgUpdateCollectionPayments) (*types.MsgUpdateCollectionPaymentsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	// check that entity exists
+	_, entity, err := s.Keeper.EntityKeeper.ResolveEntity(ctx, collection.Entity)
+	if err != nil {
+		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
+	}
+
+	// check that Evaluation Payment does not have 1155 payment
+	if msg.Payments.Evaluation.Contract_1155Payment != nil {
+		return nil, types.ErrCollectionEvalError
+	}
+
+	// check that all payments accounts is part of entity module accounts
+	if !msg.Payments.AccountsIsEntityAccounts(entity) {
+		return nil, types.ErrCollNotEntityAcc
+	}
+
+	// update state
+	collection.Payments = msg.Payments
+
+	// persist the Collection
+	s.Keeper.SetCollection(ctx, collection)
+
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.CollectionUpdatedEvent{
+			Collection: &collection,
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateCollectionPaymentsResponse{}, nil
 }

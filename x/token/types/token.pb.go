@@ -71,7 +71,7 @@ func (m *Params) GetIxo1155ContractCode() uint64 {
 type Token struct {
 	// address of minter
 	Minter string `protobuf:"bytes,1,opt,name=minter,proto3" json:"minter,omitempty"`
-	// generated on token intiation through MsgSetupMinter
+	// generated on token initiation
 	ContractAddress string `protobuf:"bytes,2,opt,name=contract_address,json=contractAddress,proto3" json:"contract_address,omitempty"`
 	// class is the token protocol entity DID (validated)
 	Class string `protobuf:"bytes,3,opt,name=class,proto3" json:"class,omitempty"`

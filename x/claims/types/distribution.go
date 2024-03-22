@@ -2,6 +2,7 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 type DistributionShare struct {
@@ -17,30 +18,7 @@ func NewDistribution(shares ...DistributionShare) Distribution {
 	return Distribution(shares)
 }
 
-// func (d Distribution) Validate() error {
-// 	// Shares must add up to 100% (no shares means 0%)
-// 	if len(d) == 0 {
-// 		return ErrDistributionPercentagesNot100
-// 	}
-
-// 	// Validate shares and calculate total
-// 	total := sdk.ZeroDec()
-// 	for _, share := range d {
-// 		total = total.Add(share.Percentage)
-// 		if err := share.Validate(); err != nil {
-// 			return err
-// 		}
-// 	}
-
-// 	// Shares must add up to 100%
-// 	if !total.Equal(sdk.NewDec(100)) {
-// 		return ErrDistributionPercentagesNot100
-// 	}
-
-// 	return nil
-// }
-
-func (d Distribution) GetDistributionsFor(amount sdk.Coins) []sdk.DecCoins {
+func (d Distribution) GetDistributionsFor(amount sdk.Coins) ([]sdk.DecCoins, error) {
 	decAmount := sdk.NewDecCoinsFromCoins(amount...)
 	distributions := make([]sdk.DecCoins, len(d))
 
@@ -53,10 +31,10 @@ func (d Distribution) GetDistributionsFor(amount sdk.Coins) []sdk.DecCoins {
 
 	// Distributed amount should equal original amount
 	if !distributed.IsEqual(decAmount) {
-		panic("distributing more or less than original amount")
+		return nil, sdkerrors.Wrap(ErrDistributionFailed, "distributing more or less than original amount")
 	}
 
-	return distributions
+	return distributions, nil
 }
 
 func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) DistributionShare {
@@ -65,23 +43,6 @@ func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) Distributi
 		percentage: percentage,
 	}
 }
-
-func NewFullDistributionShare(address sdk.AccAddress) DistributionShare {
-	return DistributionShare{
-		address:    address.String(),
-		percentage: sdk.NewDec(100),
-	}
-}
-
-// func (d DistributionShare) Validate() error {
-// 	if !d.Percentage.IsPositive() {
-// 		return sdkerrors.Wrap(ErrNegativeSharePercentage, "")
-// 	} else if strings.TrimSpace(d.Address) == "" {
-// 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "empty distribution share address")
-// 	}
-
-// 	return nil
-// }
 
 func (d DistributionShare) GetShareOf(amount sdk.DecCoins) sdk.DecCoins {
 	return amount.MulDec(d.percentage.Quo(OneHundred))

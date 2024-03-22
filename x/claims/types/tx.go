@@ -132,3 +132,72 @@ func (msg MsgWithdrawPayment) GetSignBytes() []byte {
 func (msg MsgWithdrawPayment) Type() string { return TypeMsgWithdrawPayment }
 
 func (msg MsgWithdrawPayment) Route() string { return RouterKey }
+
+// --------------------------
+// UPDATE COLLECTION STATE
+// --------------------------
+const TypeMsgUpdateCollectionState = "update_collection_state"
+
+var _ sdk.Msg = &MsgUpdateCollectionState{}
+
+func (msg MsgUpdateCollectionState) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgUpdateCollectionState) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgUpdateCollectionState) Type() string { return TypeMsgUpdateCollectionState }
+
+func (msg MsgUpdateCollectionState) Route() string { return RouterKey }
+
+// --------------------------
+// UPDATE COLLECTION DATES
+// --------------------------
+const TypeMsgUpdateCollectionDates = "update_collection_dates"
+
+var _ sdk.Msg = &MsgUpdateCollectionDates{}
+
+func (msg MsgUpdateCollectionDates) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgUpdateCollectionDates) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgUpdateCollectionDates) Type() string { return TypeMsgUpdateCollectionDates }
+
+func (msg MsgUpdateCollectionDates) Route() string { return RouterKey }
+
+// --------------------------
+// UPDATE COLLECTION STATE
+// --------------------------
+const TypeMsgUpdateCollectionPayments = "update_collection_payments"
+
+var _ sdk.Msg = &MsgUpdateCollectionPayments{}
+
+func (msg MsgUpdateCollectionPayments) GetSigners() []sdk.AccAddress {
+	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return []sdk.AccAddress{}
+	}
+	return []sdk.AccAddress{address}
+}
+
+func (msg MsgUpdateCollectionPayments) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+func (msg MsgUpdateCollectionPayments) Type() string { return TypeMsgUpdateCollectionPayments }
+
+func (msg MsgUpdateCollectionPayments) Route() string { return RouterKey }

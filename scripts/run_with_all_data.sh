@@ -52,6 +52,12 @@ FROM="\"reserved_bond_tokens\": \[\]"
 TO="\"reserved_bond_tokens\": \[$RESERVED_BOND_TOKENS\]"
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
+# Set bank denom metadata
+DENOM_METADATA="\{\"base\":\"uixo\",\"denom_units\":\[\{\"aliases\":\[\"microixo\"\],\"denom\":\"uixo\",\"exponent\":0\},\{\"aliases\":\[\"milliixo\"\],\"denom\":\"mixo\",\"exponent\":3\},\{\"aliases\":\[\],\"denom\":\"ixo\",\"exponent\":6\}\],\"description\":\"The native staking token of ixo.\",\"display\":\"ixo\",\"name\":\"ixo\",\"symbol\":\"ixo\"\}"
+FROM="\"denom_metadata\": \[\]"
+TO="\"denom_metadata\": \[$DENOM_METADATA\]"
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+
 # Set min-gas-prices (using fee token)
 FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""

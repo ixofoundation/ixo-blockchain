@@ -73,18 +73,13 @@ func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.Ac
 	return true
 }
 
-func (p Payment) Validate() error {
-	_, err := sdk.AccAddressFromBech32(p.Account)
-	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
-	}
-
-	if p.Contract_1155Payment != nil {
-		_, err := sdk.AccAddressFromBech32(p.Contract_1155Payment.Address)
+func (p *Contract1155Payment) Validate() error {
+	if p != nil {
+		_, err := sdk.AccAddressFromBech32(p.Address)
 		if err != nil {
 			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
 		}
-		if iidtypes.IsEmpty(p.Contract_1155Payment.TokenId) {
+		if iidtypes.IsEmpty(p.TokenId) {
 			return fmt.Errorf("token id cannot be empty")
 		}
 		// if p.Contract_1155Payment.Amount == 0 {
@@ -95,9 +90,47 @@ func (p Payment) Validate() error {
 	return nil
 }
 
+func (p Payment) Validate() error {
+	_, err := sdk.AccAddressFromBech32(p.Account)
+	if err != nil {
+		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
+	}
+
+	if err = p.Contract_1155Payment.Validate(); err != nil {
+		return err
+	}
+
+	if p.Amount.IsAnyNegative() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "payment amount must be positive")
+	}
+
+	return nil
+}
+
 func (p Payments) AccountsIsEntityAccounts(entity entitytypes.Entity) bool {
 	if !entity.ContainsAccountAddress(p.Approval.Account) || !entity.ContainsAccountAddress(p.Submission.Account) || !entity.ContainsAccountAddress(p.Rejection.Account) || !entity.ContainsAccountAddress(p.Evaluation.Account) {
 		return false
 	}
 	return true
+}
+
+func (p Payments) Validate() error {
+	if p.Evaluation.Contract_1155Payment != nil {
+		return ErrCollectionEvalError
+	}
+
+	if err := p.Submission.Validate(); err != nil {
+		return err
+	}
+	if err := p.Evaluation.Validate(); err != nil {
+		return err
+	}
+	if err := p.Approval.Validate(); err != nil {
+		return err
+	}
+	if err := p.Rejection.Validate(); err != nil {
+		return err
+	}
+
+	return nil
 }

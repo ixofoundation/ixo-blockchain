@@ -15,6 +15,9 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgEvaluateClaim{}, "claims/EvaluateClaim", nil)
 	cdc.RegisterConcrete(&MsgDisputeClaim{}, "claims/DisputeClaim", nil)
 	cdc.RegisterConcrete(&MsgWithdrawPayment{}, "claims/WithdrawPayment", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollectionState{}, "claims/UpdateCollectionState", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollectionDates{}, "claims/UpdateCollectionDates", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollectionPayments{}, "claims/UpdateCollectionPayments", nil)
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
@@ -24,6 +27,9 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgEvaluateClaim{},
 		&MsgDisputeClaim{},
 		&MsgWithdrawPayment{},
+		&MsgUpdateCollectionState{},
+		&MsgUpdateCollectionDates{},
+		&MsgUpdateCollectionPayments{},
 	)
 
 	registry.RegisterImplementations(

@@ -2,6 +2,6 @@
 
 The bonds module contains the following parameter:
 
-| Key                | Type       | Example  |
-|--------------------|------------|----------|
-| ReservedBondTokens | []string   | "tokenA" |
+| **Key**            | **Type**   | **Description**                                              |
+| :----------------- | :--------- | :----------------------------------------------------------- |
+| ReservedBondTokens | `[]string` | A list of tokens that is reserved and can't be used by users |

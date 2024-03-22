@@ -1312,28 +1312,32 @@ func intersection(a, b []string) []string {
 
 // distinct remove duplicates and sorts from a list of strings
 func distinct(a []string) []string {
-	m := make(map[string]struct{})
+	m := make(map[string]bool) // Use bool for readability; struct{} is traditionally used to signal intent of set.
+	var d []string
+
+	// Remove duplicates and collect unique items.
 	for _, item := range a {
-		m[item] = struct{}{}
+		if _, exists := m[item]; !exists {
+			d = append(d, item)
+			m[item] = true
+		}
 	}
-	d := make([]string, 0, len(m))
-	for k := range m {
-		d = append(d, k)
-	}
+
+	// Sort the unique items.
 	sort.Strings(d)
 	return d
 }
 
 // subtraction remove set b from a
 func subtraction(a, b []string) []string {
-	m := make(map[string]struct{})
-	for _, item := range a {
-		m[item] = struct{}{}
+	m := make(map[string]bool)
+	for _, item := range b {
+		m[item] = true // Create a map to identify items in b for quick lookup.
 	}
 	var s []string
-	for _, item := range distinct(b) {
-		if _, ok := m[item]; !ok {
-			s = append(s, item)
+	for _, item := range a {
+		if !m[item] {
+			s = append(s, item) // Append items not found in b to the slice s.
 		}
 	}
 	sort.Strings(s)
