@@ -53,7 +53,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Runner
 # --------------------------------------------------------
 
-FROM ubuntu:20.04 as runner
+FROM ubuntu:24.04 as runner
 # FROM gcr.io/distroless/base-debian11 as run
 
 COPY --from=builder /ixo/build/ixod /bin/ixod
