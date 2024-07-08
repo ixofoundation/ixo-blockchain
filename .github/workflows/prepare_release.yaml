@@ -53,7 +53,7 @@ jobs:
           - test:
               enabled: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install Npm Dependencies
         run: npm install --ignore-scripts
       - name: Run Test
@@ -109,7 +109,7 @@ jobs:
               enabled: false
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Set up Docker Buildx
         if: matrix.build.outputs.type == 'image'
@@ -184,7 +184,7 @@ jobs:
           - test:
               enabled: false
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Download artifact
         uses: actions/download-artifact@v2
         with:
