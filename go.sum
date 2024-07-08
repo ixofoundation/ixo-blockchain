@@ -240,8 +240,8 @@ github.com/cosmos/gorocksdb v1.2.0 h1:d0l3jJG8M4hBouIZq0mDUHZ+zjOx044J3nGRskwTb4
 github.com/cosmos/gorocksdb v1.2.0/go.mod h1:aaKvKItm514hKfNJpUJXnnOWeBnk2GL4+Qw9NHizILw=
 github.com/cosmos/iavl v0.19.5 h1:rGA3hOrgNxgRM5wYcSCxgQBap7fW82WZgY78V9po/iY=
 github.com/cosmos/iavl v0.19.5/go.mod h1:X9PKD3J0iFxdmgNLa7b2LYWdsGd90ToV5cAONApkEPw=
-github.com/cosmos/ibc-apps/modules/async-icq/v4 v4.0.0-20230524151648-c02fa46c2860 h1:25/KpA4WJqdFjKFsa3VEL0ctWRovkEsqIn2phCAi9v0=
-github.com/cosmos/ibc-apps/modules/async-icq/v4 v4.0.0-20230524151648-c02fa46c2860/go.mod h1:X/dLZ6QxTImzno7qvD6huLhh6ZZBcRt2URn4YCLcXFY=
+github.com/cosmos/ibc-apps/modules/async-icq/v4 v4.1.0 h1:1iQ8/rJwkeGJe81fKyZC/ASSajoJP0jEi6IJFiKIr7Y=
+github.com/cosmos/ibc-apps/modules/async-icq/v4 v4.1.0/go.mod h1:X/dLZ6QxTImzno7qvD6huLhh6ZZBcRt2URn4YCLcXFY=
 github.com/cosmos/ibc-go/v4 v4.4.1 h1:pHPLEpQStGuHZe5J17WvG7w0VGwTmfsoAHrs45+vPfw=
 github.com/cosmos/ibc-go/v4 v4.4.1/go.mod h1:UkKEQAPWckLuomhqG8XzeE5nWQPdiEYF8EIDWXBKSXA=
 github.com/cosmos/interchain-accounts v0.2.6 h1:TV2M2g1/Rb9MCNw1YePdBKE0rcEczNj1RGHT+2iRYas=

@@ -8,7 +8,7 @@ require (
 	github.com/CosmWasm/wasmvm v1.2.4
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cosmos/cosmos-sdk v0.45.16
-	github.com/cosmos/ibc-apps/modules/async-icq/v4 v4.0.0-20230524151648-c02fa46c2860
+	github.com/cosmos/ibc-apps/modules/async-icq/v4 v4.1.0
 	github.com/cosmos/ibc-go/v4 v4.4.1
 	github.com/cosmos/interchain-accounts v0.2.6
 	github.com/gogo/protobuf v1.3.3
