@@ -3,28 +3,31 @@ package keeper
 import (
 	"fmt"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 type Keeper struct {
 	cdc        codec.BinaryCodec
-	storeKey   sdk.StoreKey
-	memKey     sdk.StoreKey
-	IidKeeper  iidkeeper.Keeper
-	WasmKeeper wasmtypes.ContractOpsKeeper
+	storeKey   storetypes.StoreKey
+	memKey     storetypes.StoreKey
+	IidKeeper  types.IidKeeper
+	WasmKeeper types.WasmKeeper
 	ParamSpace paramstypes.Subspace
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key, memKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
-	paramSpace paramstypes.Subspace) Keeper {
-
+func NewKeeper(
+	cdc codec.BinaryCodec,
+	key,
+	memKey storetypes.StoreKey,
+	iidKeeper types.IidKeeper,
+	wasmKeeper types.WasmKeeper,
+	paramSpace paramstypes.Subspace,
+) Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
@@ -34,7 +37,7 @@ func NewKeeper(cdc codec.BinaryCodec, key, memKey sdk.StoreKey, iidKeeper iidkee
 		storeKey:   key,
 		memKey:     memKey,
 		IidKeeper:  iidKeeper,
-		WasmKeeper: wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
+		WasmKeeper: wasmKeeper,
 		ParamSpace: paramSpace,
 	}
 }
@@ -98,11 +101,12 @@ func (k Keeper) Get(
 func (k Keeper) GetAll(
 	ctx sdk.Context,
 	prefix []byte,
-) sdk.Iterator {
+) storetypes.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, prefix)
+	return storetypes.KVStorePrefixIterator(store, prefix)
 }
 
+// nolint:staticcheck
 // Unmarshal unmarshal a byte slice to a struct, return false in case of errors
 func (k Keeper) Unmarshal(data []byte, val codec.ProtoMarshaler) bool {
 	if len(data) == 0 {

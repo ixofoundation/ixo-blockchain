@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -14,7 +13,7 @@ import (
 func GetQueryCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
+		Short:                      "Querying commands for the claims module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -99,9 +98,6 @@ func CmdShowClaim() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			argId := args[0]
@@ -167,9 +163,6 @@ func CmdShowDispute() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			argId := args[0]
@@ -235,9 +228,6 @@ func CmdShowCollection() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			argId := args[0]

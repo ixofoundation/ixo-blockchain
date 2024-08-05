@@ -3,15 +3,19 @@ package types
 import (
 	fmt "fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	types "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
+const (
+	ProposalTypeInitializeNftContract = "InitializeNftContract"
+)
+
 var (
-	ProposalTypeInitializeNftContract                  = "InitializeNftContract"
-	_                                 govtypes.Content = &InitializeNftContract{}
+	_ govtypesv1.Content = &InitializeNftContract{}
 )
 
 func NftModuleAddress() string { return fmt.Sprintf("%s-minter", types.ModuleName) }
@@ -24,25 +28,24 @@ func NewInitializeNftContract(nftContractCodeId uint64, nftminteraddress string)
 }
 
 func (p *InitializeNftContract) GetDescription() string {
-	return "update entity paramaters"
+	return "Initialize new NFT contract for entity module"
 }
 
 func (p *InitializeNftContract) GetTitle() string {
-	return "update entity paramaters"
+	return "Update entity parameters"
 }
 
-func (sup *InitializeNftContract) ProposalRoute() string { return RouterKey }
-func (sup *InitializeNftContract) ProposalType() string  { return ProposalTypeInitializeNftContract }
+func (p *InitializeNftContract) ProposalRoute() string { return RouterKey }
+func (p *InitializeNftContract) ProposalType() string  { return ProposalTypeInitializeNftContract }
 
-func (sup *InitializeNftContract) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(sup.NftMinterAddress)
+func (p *InitializeNftContract) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(p.NftMinterAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid minter address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid minter address (%s)", err)
 	}
 	return nil
 }
 
 func init() {
-	govtypes.RegisterProposalType(ProposalTypeInitializeNftContract)
-	govtypes.RegisterProposalTypeCodec(&InitializeNftContract{}, "entity.ixo.entity.v1beta1.InitializeNftContract")
+	govtypesv1.RegisterProposalType(ProposalTypeInitializeNftContract)
 }

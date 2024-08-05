@@ -98,7 +98,7 @@ The field's descriptions is as follows:
 - `account` - a string containing the account address from which the payment will be made (must be an [EntityAccount](/x/entity/spec/02_state.md#entityaccount) of the `Entity` field for the Collection)
 - `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount to be paid on payment
 - `contract_1155Payment` - a [Contract1155Payment](#contract1155payment), not allowed for `Evaluation` Payment
-- `timeoutNs` - a duration containing the timeout after claim/evaluation to create authZ for payment, if 0 then immidiate direct payment is made
+- `timeoutNs` - a duration containing the timeout after claim/evaluation to create authZ for payment, if 0 then immediate direct payment is made
 
 ### Contract1155Payment
 
@@ -114,8 +114,8 @@ type Contract1155Payment struct {
 
 The field's descriptions is as follows:
 
-- `address` - a string containing the smart contract address where the tokens can be transfered on (the cw1155 smart contract)
-- `amount` - a integer indicating how many tokens must transfered for the payment
+- `address` - a string containing the smart contract address where the tokens can be transferred on (the cw1155 smart contract)
+- `amount` - a integer indicating how many tokens must transferred for the payment
 - `tokenId` - a string containing the `id` of the token on the cw1155 smart contract to transfer
 
 ### Claim
@@ -284,7 +284,7 @@ var PaymentStatus_name = map[int32]string{
 	0: "NO_PAYMENT",
 	1: "PROMISED",
 	2: "AUTHORIZED",
-	3: "GAURANTEED",
+	3: "GUARANTEED",
 	4: "PAID",
 	5: "FAILED",
 	6: "DISPUTED",

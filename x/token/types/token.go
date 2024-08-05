@@ -3,6 +3,7 @@ package types
 import (
 	fmt "fmt"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
@@ -87,7 +88,7 @@ type MintBatchData struct {
 	Uri        string
 	Name       string
 	Index      string
-	Amount     sdk.Uint
+	Amount     math.Uint
 	Collection string
 	TokenData  []*TokenData
 }

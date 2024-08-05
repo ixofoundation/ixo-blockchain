@@ -3,6 +3,8 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/client"
@@ -74,7 +76,7 @@ func (q Querier) Bond(c context.Context, req *types.QueryBondRequest) (*types.Qu
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	return &types.QueryBondResponse{Bond: &bond}, nil
@@ -90,7 +92,7 @@ func (q Querier) Batch(c context.Context, req *types.QueryBatchRequest) (*types.
 	bondDid := req.BondDid
 
 	if !q.Keeper.BatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "batch for '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "batch for '%s' does not exist", bondDid)
 	}
 
 	batch := q.Keeper.MustGetBatch(ctx, bondDid)
@@ -108,7 +110,7 @@ func (q Querier) LastBatch(c context.Context, req *types.QueryLastBatchRequest) 
 	bondDid := req.BondDid
 
 	if !q.Keeper.LastBatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for '%s' does not exist", bondDid)
 	}
 
 	batch := q.Keeper.MustGetLastBatch(ctx, bondDid)
@@ -127,7 +129,7 @@ func (q Querier) CurrentPrice(c context.Context, req *types.QueryCurrentPriceReq
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	reserveBalances := q.Keeper.GetReserveBalances(ctx, bondDid)
@@ -151,7 +153,7 @@ func (q Querier) CurrentReserve(c context.Context, req *types.QueryCurrentReserv
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
@@ -170,7 +172,7 @@ func (q Querier) AvailableReserve(c context.Context, req *types.QueryAvailableRe
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	availableReserve := zeroReserveTokensIfEmpty(bond.AvailableReserve, bond)
@@ -190,7 +192,7 @@ func (q Querier) CustomPrice(c context.Context, req *types.QueryCustomPriceReque
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
@@ -219,13 +221,12 @@ func (q Querier) BuyPrice(c context.Context, req *types.QueryBuyPriceRequest) (*
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err != nil {
 		return nil, err
-
 	}
 
 	// Max supply cannot be less than supply (max supply >= supply)
@@ -263,7 +264,7 @@ func (q Querier) SellReturn(c context.Context, req *types.QuerySellReturnRequest
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
@@ -297,7 +298,7 @@ func (q Querier) SellReturn(c context.Context, req *types.QuerySellReturnRequest
 		Returns:        zeroReserveTokensIfEmpty(reserveReturnsRounded, bond),
 		TxFees:         zeroReserveTokensIfEmpty(txFees, bond),
 		ExitFees:       zeroReserveTokensIfEmpty(exitFees, bond),
-		TotalReturns:   zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond),
+		TotalReturns:   zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees...), bond),
 		TotalFees:      zeroReserveTokensIfEmpty(totalFees, bond),
 	}, nil
 }
@@ -318,7 +319,7 @@ func (q Querier) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+		return nil, errorsmod.Wrapf(types.ErrBondDoesNotExist, bondDid)
 	}
 
 	reserveBalances := q.Keeper.GetReserveBalances(ctx, bondDid)
@@ -328,7 +329,7 @@ func (q Querier) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest
 	}
 
 	if reserveReturns.Empty() {
-		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: sdk.ZeroInt()}}
+		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: math.ZeroInt()}}
 	}
 
 	return &types.QuerySwapReturnResponse{
@@ -348,23 +349,23 @@ func (q Querier) AlphaMaximums(c context.Context, req *types.QueryAlphaMaximumsR
 
 	bond, found := q.Keeper.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+		return nil, errorsmod.Wrapf(types.ErrBondDoesNotExist, bondDid)
 	}
 
 	if bond.FunctionType != types.AugmentedFunction {
-		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
+		return nil, errorsmod.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
 	} else if !bond.AlphaBond {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
+		return nil, errorsmod.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
 	}
 
-	var maxSystemAlphaIncrease, maxSystemAlpha sdk.Dec
+	var maxSystemAlphaIncrease, maxSystemAlpha math.LegacyDec
 	if len(bond.CurrentReserve) == 0 {
-		maxSystemAlphaIncrease = sdk.ZeroDec()
-		maxSystemAlpha = sdk.ZeroDec()
+		maxSystemAlphaIncrease = math.LegacyZeroDec()
+		maxSystemAlpha = math.LegacyZeroDec()
 	} else {
 		R := bond.CurrentReserve[0].Amount // common reserve balance
 		C := bond.OutcomePayment
-		maxSystemAlphaIncrease = sdk.NewDecFromInt(R).QuoInt(C)
+		maxSystemAlphaIncrease = math.LegacyNewDecFromInt(R).QuoInt(C)
 
 		paramsMap := bond.FunctionParameters.AsMap()
 		I := paramsMap["I0"]
@@ -390,9 +391,9 @@ func (q Querier) Params(c context.Context, req *types.QueryParamsRequest) (*type
 
 func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins {
 	if reserveCoins.IsZero() {
-		zeroes, _ := bond.GetNewReserveDecCoins(sdk.OneDec()).TruncateDecimal()
+		zeroes, _ := bond.GetNewReserveDecCoins(math.LegacyOneDec()).TruncateDecimal()
 		for i := range zeroes {
-			zeroes[i].Amount = sdk.ZeroInt()
+			zeroes[i].Amount = math.ZeroInt()
 		}
 		reserveCoins = zeroes
 	}
@@ -401,9 +402,9 @@ func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins
 
 func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk.DecCoins {
 	if reserveCoins.IsZero() {
-		zeroes := bond.GetNewReserveDecCoins(sdk.OneDec())
+		zeroes := bond.GetNewReserveDecCoins(math.LegacyOneDec())
 		for i := range zeroes {
-			zeroes[i].Amount = sdk.ZeroDec()
+			zeroes[i].Amount = math.LegacyZeroDec()
 		}
 		reserveCoins = zeroes
 	}

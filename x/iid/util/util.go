@@ -3,11 +3,11 @@ package util
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
-func GetAccountForVerificationMethod(ctx sdk.Context, accountKeeper authante.AccountKeeper, iidDoc iidtypes.IidDocument, methodId string) (authtypes.AccountI, error) {
+// nolint:deprecated
+func GetAccountForVerificationMethod(ctx sdk.Context, accountKeeper authante.AccountKeeper, iidDoc iidtypes.IidDocument, methodId string) (sdk.AccountI, error) {
 	addr, err := iidDoc.GetVerificationMethodBlockchainAddress(iidDoc.Id)
 	if err != nil {
 		return nil, err

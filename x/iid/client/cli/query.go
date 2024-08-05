@@ -2,7 +2,6 @@ package cli
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -16,13 +15,12 @@ func GetQueryCmd(queryRoute string) *cobra.Command {
 	// Group did queries under a subcommand
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      fmt.Sprintf("Querying commands for the %s module", types.ModuleName),
+		Short:                      "Querying commands for the iid module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
 	}
 
-	// this line is used by starport scaffolding # 1
 	cmd.AddCommand(
 		GetCmdQueryIdentifers(),
 		GetCmdQueryIdentifer(),
@@ -42,9 +40,6 @@ func GetCmdQueryIdentifers() *cobra.Command {
 				return err
 			}
 			queryClient := types.NewQueryClient(clientCtx)
-			if err != nil {
-				return err
-			}
 
 			result, err := queryClient.IidDocuments(
 				context.Background(),

@@ -6,9 +6,11 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
+// RegisterCodec registers the necessary x/entity interfaces and concrete types on the provided
+// LegacyAmino codec. These types are used for Amino JSON serialization.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateEntity{}, "entity/CreateEntity", nil)
 	cdc.RegisterConcrete(&MsgUpdateEntity{}, "entity/UpdateEntity", nil)
@@ -17,8 +19,12 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateEntityAccount{}, "entity/CreateEntityAccount", nil)
 	cdc.RegisterConcrete(&MsgGrantEntityAccountAuthz{}, "entity/GrantEntityAccountAuthz", nil)
 	cdc.RegisterConcrete(&MsgRevokeEntityAccountAuthz{}, "entity/RevokeEntityAccountAuthz", nil)
+
+	// gov proposals
+	cdc.RegisterConcrete(&InitializeNftContract{}, "entity/InitializeNftContract", nil)
 }
 
+// RegisterInterfaces registers interfaces and implementations of the x/entity module.
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateEntity{},
@@ -31,7 +37,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	)
 
 	registry.RegisterImplementations(
-		(*govtypes.Content)(nil),
+		(*govtypesv1.Content)(nil),
 		&InitializeNftContract{},
 	)
 
@@ -39,15 +45,8 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 var (
-	amino = codec.NewLegacyAmino()
-
-	// ModuleCdc references the global x/gov module codec. Note, the codec should
-	// ONLY be used in certain instances of tests and for JSON encoding as Amino is
-	// still used for that purpose.
-	//
-	// The actual codec used for serialization should be provided to x/gov and
-	// defined at the application level.
-	ModuleCdc = codec.NewAminoCodec(amino)
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewProtoCodec(types.NewInterfaceRegistry())
 )
 
 func init() {

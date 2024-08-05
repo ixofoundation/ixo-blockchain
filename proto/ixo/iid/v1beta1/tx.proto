@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "ixo/iid/v1beta1/iid.proto";
 import "ixo/iid/v1beta1/types.proto";
+import "cosmos/msg/v1/msg.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types";
 
@@ -81,6 +82,7 @@ message Verification {
 message MsgCreateIidDocument {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;                   // the did
   repeated string controllers = 2; // the list of controller DIDs
@@ -103,6 +105,7 @@ message MsgCreateIidDocumentResponse {}
 message MsgUpdateIidDocument {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;                   // the did
   repeated string controllers = 2; // the list of controller DIDs
@@ -127,6 +130,7 @@ message MsgUpdateIidDocumentResponse {}
 message MsgAddVerification {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;                 // the did
   Verification verification = 2; // the verification to add
@@ -138,6 +142,7 @@ message MsgAddVerificationResponse {}
 message MsgSetVerificationRelationships {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;                     // the did
   string method_id = 2;              // the verification method id
@@ -150,6 +155,7 @@ message MsgSetVerificationRelationshipsResponse {}
 message MsgRevokeVerification {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;        // the did
   string method_id = 2; // the verification method id
@@ -165,6 +171,7 @@ message MsgRevokeVerificationResponse {}
 message MsgAddService {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;            // the did
   Service service_data = 2; // the service data to add
@@ -176,6 +183,7 @@ message MsgAddServiceResponse {}
 message MsgDeleteService {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;         // the did
   string service_id = 2; // the service id
@@ -191,6 +199,7 @@ message MsgDeleteServiceResponse {}
 message MsgAddController {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1; // the did of the document
   string controller_did =
@@ -203,6 +212,7 @@ message MsgAddControllerResponse {}
 message MsgDeleteController {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1; // the did of the document
   string controller_did =
@@ -219,6 +229,7 @@ message MsgDeleteControllerResponse {}
 message MsgAddLinkedResource {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;                     // the did
   LinkedResource linkedResource = 2; // the verification to add
@@ -228,6 +239,7 @@ message MsgAddLinkedResource {
 message MsgDeleteLinkedResource {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;          // the did
   string resource_id = 2; // the service id
@@ -237,6 +249,7 @@ message MsgDeleteLinkedResource {
 message MsgAddLinkedClaim {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;               // the did
   LinkedClaim linkedClaim = 2; // the claim to add
@@ -246,6 +259,7 @@ message MsgAddLinkedClaim {
 message MsgDeleteLinkedClaim {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;       // the did
   string claim_id = 2; // the claim id
@@ -255,6 +269,7 @@ message MsgDeleteLinkedClaim {
 message MsgAddLinkedEntity {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;                 // the iid
   LinkedEntity linkedEntity = 2; // the entity to add
@@ -264,6 +279,7 @@ message MsgAddLinkedEntity {
 message MsgDeleteLinkedEntity {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;        // the iid
   string entity_id = 2; // the entity id
@@ -273,6 +289,7 @@ message MsgDeleteLinkedEntity {
 message MsgAddAccordedRight {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;                   // the did
   AccordedRight accordedRight = 2; // the Accorded right to add
@@ -282,6 +299,7 @@ message MsgAddAccordedRight {
 message MsgDeleteAccordedRight {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;       // the did
   string right_id = 2; // the Accorded right id
@@ -291,6 +309,7 @@ message MsgDeleteAccordedRight {
 message MsgAddIidContext {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;       // the did
   Context context = 2; // the context to add
@@ -300,6 +319,7 @@ message MsgAddIidContext {
 message MsgDeactivateIID {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1; // the did
   bool state = 2;
@@ -309,6 +329,7 @@ message MsgDeactivateIID {
 message MsgDeleteIidContext {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
+  option (cosmos.msg.v1.signer) = "signer";
 
   string id = 1;         // the did
   string contextKey = 2; // the context key

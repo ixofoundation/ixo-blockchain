@@ -16,7 +16,7 @@ import (
 func GetTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      fmt.Sprintf("%s transactions subcommands", types.ModuleName),
+		Short:                      "Iid transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -79,7 +79,7 @@ func NewCreateIidDocumentCmd() *cobra.Command {
 				return err
 			}
 
-			// Manually gnerate verifications based of json values
+			// Manually generate verifications based of json values
 			verifications, err := types.GenerateVerificationsFromJson(verJson)
 			if err != nil {
 				return err
@@ -160,7 +160,7 @@ func NewAddVerificationCmd() *cobra.Command {
 				return err
 			}
 
-			// Manually gnerate verifications based of json values
+			// Manually generate verifications based of json values
 			verifications, err := types.GenerateVerificationsFromJson(verJson)
 			if err != nil {
 				return err

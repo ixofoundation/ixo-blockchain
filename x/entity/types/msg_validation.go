@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ixo "github.com/ixofoundation/ixo-blockchain/v3/lib/ixo"
@@ -13,19 +14,19 @@ import (
 func (msg MsgCreateEntity) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 
 	if !iidtypes.IsValidDID(msg.RelayerNode) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RelayerNode)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RelayerNode)
 	}
 
 	if !iidtypes.IsValidDID(msg.OwnerDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.OwnerDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.OwnerDid.String())
 	}
 
 	if msg.Verification == nil || len(msg.Verification) == 0 {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "verifications are required")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "verifications are required")
 	}
 
 	for _, v := range msg.Verification {
@@ -46,7 +47,7 @@ func (msg MsgCreateEntity) ValidateBasic() error {
 	// if controllers,  must be compliant
 	for _, c := range msg.Controller {
 		if !iidtypes.IsValidDID(c) {
-			return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, "controller validation error")
+			return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, "controller validation error")
 		}
 	}
 
@@ -59,13 +60,13 @@ func (msg MsgCreateEntity) ValidateBasic() error {
 func (msg MsgUpdateEntity) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid controller address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid controller address (%s)", err)
 	}
 	if !iidtypes.IsValidDID(msg.Id) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
 	if !iidtypes.IsValidDID(msg.ControllerDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.ControllerDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.ControllerDid.String())
 	}
 	return nil
 }
@@ -76,13 +77,13 @@ func (msg MsgUpdateEntity) ValidateBasic() error {
 func (msg MsgUpdateEntityVerified) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.RelayerNodeAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid relayer node address %s", msg.RelayerNodeAddress)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid relayer node address %s", msg.RelayerNodeAddress)
 	}
 	if !iidtypes.IsValidDID(msg.Id) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
 	if !iidtypes.IsValidDID(msg.RelayerNodeDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RelayerNodeDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RelayerNodeDid.String())
 	}
 	return nil
 }
@@ -93,16 +94,16 @@ func (msg MsgUpdateEntityVerified) ValidateBasic() error {
 func (msg MsgTransferEntity) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	if !iidtypes.IsValidDID(msg.Id) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
 	if !iidtypes.IsValidDID(msg.OwnerDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.OwnerDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.OwnerDid.String())
 	}
 	if !iidtypes.IsValidDID(msg.RecipientDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RecipientDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.RecipientDid.String())
 	}
 	return nil
 }
@@ -113,13 +114,13 @@ func (msg MsgTransferEntity) ValidateBasic() error {
 func (msg MsgCreateEntityAccount) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	if !iidtypes.IsValidDID(msg.Id) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
 	if ixo.IsEmpty(msg.Name) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
 	}
 	return nil
 }
@@ -130,19 +131,19 @@ func (msg MsgCreateEntityAccount) ValidateBasic() error {
 func (msg MsgGrantEntityAccountAuthz) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	_, err = sdk.AccAddressFromBech32(msg.GranteeAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid grantee address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid grantee address (%s)", err)
 	}
 	if !iidtypes.IsValidDID(msg.Id) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
 	if ixo.IsEmpty(msg.Name) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
 	}
-	// Cant run this here as Grant Authorization (Any) needs to be cached using Grant.UnpackInterfaces()
+	// Can't run this here as Grant Authorization (Any) needs to be cached using Grant.UnpackInterfaces()
 	// return msg.Grant.ValidateBasic()
 	return nil
 }
@@ -153,20 +154,20 @@ func (msg MsgGrantEntityAccountAuthz) ValidateBasic() error {
 func (msg MsgRevokeEntityAccountAuthz) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
 	}
 	_, err = sdk.AccAddressFromBech32(msg.GranteeAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid grantee address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid grantee address (%s)", err)
 	}
 	if !iidtypes.IsValidDID(msg.Id) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Id)
 	}
 	if ixo.IsEmpty(msg.Name) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "name cannot be empty")
 	}
 	if ixo.IsEmpty(msg.MsgTypeUrl) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "msgTypeUrl cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "msgTypeUrl cannot be empty")
 	}
 	return nil
 }

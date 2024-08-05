@@ -3,19 +3,18 @@ package types
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"regexp"
 	"sort"
 	"strings"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/btcsuite/btcutil/base58"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 type VerificationRelationship int
@@ -75,7 +74,7 @@ func parseRelationshipLabels(relNames ...string) (vrs []VerificationRelationship
 	for i, vrn := range distinct(relNames) {
 		vr, validName := VerificationRelationships[vrn]
 		if !validName {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "unsupported verification relationship %s", vrn)
+			err = errorsmod.Wrapf(ErrInvalidInput, "unsupported verification relationship %s", vrn)
 			return
 		}
 		vrs[i] = vr
@@ -125,11 +124,11 @@ func NewChainDID(chainName, didID string) DID {
 	return DID(fmt.Sprint(DidChainPrefix, chainName, ":", didID))
 }
 
-func UnmarshalMetadata(meta []byte) IidMetadata {
-	var metadata IidMetadata
-	json.Unmarshal(meta, &metadata)
-	return metadata
-}
+// func UnmarshalMetadata(meta []byte) IidMetadata {
+// 	var metadata IidMetadata
+// 	json.Unmarshal(meta, &metadata)
+// 	return metadata
+// }
 
 // String return the string representation of the did
 func (did DID) String() string {
@@ -217,103 +216,103 @@ func IsValidDIDMetadata(didMeta *IidMetadata) bool {
 // XXX: this pattern creates a ambiguous semantic (but maybe is not too severe (use WithCredentials and array of credentials))
 func ValidateVerification(v *Verification, allowedControllers ...string) (err error) {
 	if v == nil {
-		err = sdkerrors.Wrap(ErrInvalidInput, "verification is not defined")
-		return
+		err = errorsmod.Wrap(ErrInvalidInput, "verification is not defined")
+		return err
 	}
 	// verify that the method id is correct
 	if !IsValidDIDURL(v.Method.Id) {
-		err = sdkerrors.Wrapf(ErrInvalidDIDURLFormat, "verification method id: %v", v.Method.Id)
-		return
+		err = errorsmod.Wrapf(ErrInvalidDIDURLFormat, "verification method id: %v", v.Method.Id)
+		return err
 	}
 
 	// if the controller is not set return error
 	if !IsValidDID(v.Method.Controller) {
-		err = sdkerrors.Wrapf(ErrInvalidDIDFormat, "verification method controller %v", v.Method.Controller)
-		return
+		err = errorsmod.Wrapf(ErrInvalidDIDFormat, "verification method controller %v", v.Method.Controller)
+		return err
 	}
 
 	// check for empty method type
 	if IsEmpty(v.Method.Type) {
-		err = sdkerrors.Wrapf(ErrInvalidInput, "verification method type not set for verification method %s", v.Method.Id)
-		return
+		err = errorsmod.Wrapf(ErrInvalidInput, "verification method type not set for verification method %s", v.Method.Id)
+		return err
 	}
 
 	// check the verification material
 	switch x := v.Method.VerificationMaterial.(type) {
 	case *VerificationMethod_BlockchainAccountID:
 		if IsEmpty(x.BlockchainAccountID) {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "verification material blockchain account id invalid for verification method %s", v.Method.Id)
-			return
+			err = errorsmod.Wrapf(ErrInvalidInput, "verification material blockchain account id invalid for verification method %s", v.Method.Id)
+			return err
 		}
 	case *VerificationMethod_PublicKeyMultibase:
 		if IsEmpty(x.PublicKeyMultibase) {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "verification material multibase pubkey invalid for verification method %s", v.Method.Id)
-			return
+			err = errorsmod.Wrapf(ErrInvalidInput, "verification material multibase pubkey invalid for verification method %s", v.Method.Id)
+			return err
 		}
 	case *VerificationMethod_PublicKeyHex:
 		if IsEmpty(x.PublicKeyHex) {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "verification material pubkey invalid for verification method %s", v.Method.Id)
-			return
+			err = errorsmod.Wrapf(ErrInvalidInput, "verification material pubkey invalid for verification method %s", v.Method.Id)
+			return err
 		}
 	case *VerificationMethod_PublicKeyBase58:
 		if IsEmpty(x.PublicKeyBase58) {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "verification material pubkey invalid for verification method %s", v.Method.Id)
-			return
+			err = errorsmod.Wrapf(ErrInvalidInput, "verification material pubkey invalid for verification method %s", v.Method.Id)
+			return err
 		}
 	default:
-		err = sdkerrors.Wrapf(ErrInvalidInput, "verification material %s not set for verification method %s", x, v.Method.Id)
-		return
+		err = errorsmod.Wrapf(ErrInvalidInput, "verification material %s not set for verification method %s", x, v.Method.Id)
+		return err
 	}
 
 	// check for empty publickey
 	if v.Method.VerificationMaterial.Size() == 0 {
-		err = sdkerrors.Wrapf(ErrInvalidInput, "verification material not set for verification method %s", v.Method.Id)
-		return
+		err = errorsmod.Wrapf(ErrInvalidInput, "verification material not set for verification method %s", v.Method.Id)
+		return err
 	}
 
 	// check that there is at least a relationship
 	if len(v.Relationships) == 0 {
-		err = sdkerrors.Wrap(ErrEmptyRelationships, "at least a verification relationship is required")
-		return
+		err = errorsmod.Wrap(ErrEmptyRelationships, "at least a verification relationship is required")
+		return err
 	}
-	return
+	return nil
 }
 
 // ValidateService performs basic on a service struct
 func ValidateService(s *Service) (err error) {
 	if s == nil {
-		err = sdkerrors.Wrap(ErrInvalidInput, "service is not defined")
-		return
+		err = errorsmod.Wrap(ErrInvalidInput, "service is not defined")
+		return err
 	}
 	// verify that the id is not empty and is a valid url (according to RFC3986)
 	if IsEmpty(s.Id) {
-		err = sdkerrors.Wrap(ErrInvalidInput, "service id cannot be empty")
-		return
+		err = errorsmod.Wrap(ErrInvalidInput, "service id cannot be empty")
+		return err
 	}
 
 	if !IsValidRFC3986Uri(s.Id) {
-		err = sdkerrors.Wrapf(ErrInvalidRFC3986UriFormat, "service id %s is not a valid RFC3986 uri", s.Id)
-		return
+		err = errorsmod.Wrapf(ErrInvalidRFC3986UriFormat, "service id %s is not a valid RFC3986 uri", s.Id)
+		return err
 	}
 
 	// verify that the endpoint is not empty and is a valid url (according to RFC3986)
 	if IsEmpty(s.ServiceEndpoint) {
-		err = sdkerrors.Wrap(ErrInvalidInput, "service endpoint cannot be empty;")
-		return
+		err = errorsmod.Wrap(ErrInvalidInput, "service endpoint cannot be empty;")
+		return err
 	}
 
 	if !IsValidRFC3986Uri(s.ServiceEndpoint) {
-		err = sdkerrors.Wrapf(ErrInvalidRFC3986UriFormat, "service endpoint %s is not a valid RFC3986 uri", s.ServiceEndpoint)
-		return
+		err = errorsmod.Wrapf(ErrInvalidRFC3986UriFormat, "service endpoint %s is not a valid RFC3986 uri", s.ServiceEndpoint)
+		return err
 	}
 
 	// check that the service type is not empty
 	if IsEmpty(s.Type) {
-		err = sdkerrors.Wrap(ErrInvalidInput, "service type cannot be empty")
-		return
+		err = errorsmod.Wrap(ErrInvalidInput, "service type cannot be empty")
+		return err
 	}
 
-	return
+	return nil
 }
 
 // IsEmpty tells if the trimmed input is empty
@@ -389,7 +388,7 @@ func WithContexts(contexts ...*Context) DidDocumentOption {
 // NewDidDocument constructs a new DidDocument
 func NewDidDocument(ctx sdk.Context, id string, options ...DidDocumentOption) (did IidDocument, err error) {
 	if !IsValidDID(id) {
-		err = sdkerrors.Wrapf(ErrInvalidDIDFormat, "did %s", id)
+		err = errorsmod.Wrapf(ErrInvalidDIDFormat, "did %s", id)
 		return
 	}
 
@@ -422,10 +421,10 @@ func (didDoc *IidDocument) AddControllers(controllers ...string) error {
 	dc := distinct(append(didDoc.Controller, controllers...))
 	for _, c := range dc {
 		if !IsValidDID(c) {
-			return sdkerrors.Wrapf(ErrInvalidDIDFormat, "did document controller validation error '%s'", c)
+			return errorsmod.Wrapf(ErrInvalidDIDFormat, "did document controller validation error '%s'", c)
 		}
 		if !IsValidIIDKeyFormat(c) {
-			return sdkerrors.Wrapf(ErrInvalidInput, "did document controller '%s' must be of type key", c)
+			return errorsmod.Wrapf(ErrInvalidInput, "did document controller '%s' must be of type key", c)
 		}
 	}
 
@@ -442,7 +441,7 @@ func (didDoc *IidDocument) DeleteControllers(controllers ...string) error {
 	dc := distinct(controllers)
 	for _, c := range dc {
 		if !IsValidDID(c) {
-			return sdkerrors.Wrapf(ErrInvalidDIDFormat, "did document controller validation error '%s'", c)
+			return errorsmod.Wrapf(ErrInvalidDIDFormat, "did document controller validation error '%s'", c)
 		}
 	}
 	// remove existing
@@ -469,13 +468,13 @@ func (didDoc *IidDocument) AddVerifications(verifications ...*Verification) (err
 	for _, v := range verifications {
 		// perform base validation checks
 		if err = ValidateVerification(v); err != nil {
-			return
+			return err
 		}
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[v.Method.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated verification method id %s", v.Method.Id)
-			return
+			err = errorsmod.Wrapf(ErrInvalidInput, "duplicated verification method id %s", v.Method.Id)
+			return err
 		}
 		index[v.Method.Id] = struct{}{}
 
@@ -489,7 +488,7 @@ func (didDoc *IidDocument) AddVerifications(verifications ...*Verification) (err
 		}
 		didDoc.setRelationships(v.Method.Id, vrs...)
 	}
-	return
+	return nil
 }
 
 // RevokeVerification revoke a verification method
@@ -518,14 +517,14 @@ func (didDoc *IidDocument) RevokeVerification(methodID string) error {
 			return nil
 		}
 	}
-	return sdkerrors.Wrapf(ErrVerificationMethodNotFound, "verification method id: %v", methodID)
+	return errorsmod.Wrapf(ErrVerificationMethodNotFound, "verification method id: %v", methodID)
 }
 
 // SetVerificationRelationships for a did document
 func (didDoc *IidDocument) SetVerificationRelationships(methodID string, relationships ...string) error {
 	// verify that the method id is correct
 	if !IsValidDIDURL(methodID) {
-		return sdkerrors.Wrapf(ErrInvalidDIDURLFormat, "verification method id: %v", methodID)
+		return errorsmod.Wrapf(ErrInvalidDIDURLFormat, "verification method id: %v", methodID)
 	}
 	// check that the methodID exists
 	hasVM := false
@@ -536,11 +535,11 @@ func (didDoc *IidDocument) SetVerificationRelationships(methodID string, relatio
 		}
 	}
 	if !hasVM {
-		return sdkerrors.Wrapf(ErrVerificationMethodNotFound, "verification method %v not found", methodID)
+		return errorsmod.Wrapf(ErrVerificationMethodNotFound, "verification method %v not found", methodID)
 	}
 	// check that there is at least a relationship
 	if len(relationships) == 0 {
-		return sdkerrors.Wrap(ErrEmptyRelationships, "at least a verification relationship is required")
+		return errorsmod.Wrap(ErrEmptyRelationships, "at least a verification relationship is required")
 	}
 	// check that the provided relationships are valid
 	vrs, err := parseRelationshipLabels(relationships...)
@@ -554,7 +553,6 @@ func (didDoc *IidDocument) SetVerificationRelationships(methodID string, relatio
 
 // setRelationships overwrite relationships for a did document
 func (didDoc *IidDocument) setRelationships(methodID string, relationships ...VerificationRelationship) {
-
 	// first remove existing relationships
 	for _, vr := range VerificationRelationships {
 		vrs := didDoc.getRelationships(vr)
@@ -755,7 +753,7 @@ func (didDoc *IidDocument) AddServices(services ...*Service) (err error) {
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated service id %s", s.Id)
+			err = errorsmod.Wrapf(ErrInvalidInput, "duplicated service id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -786,7 +784,7 @@ func (didDoc *IidDocument) AddLinkedResource(linkedResources ...*LinkedResource)
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated resource id %s", s.Id)
+			err = errorsmod.Wrapf(ErrInvalidInput, "duplicated resource id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -817,7 +815,7 @@ func (didDoc *IidDocument) AddLinkedClaim(linkedClaims ...*LinkedClaim) (err err
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated Claim id %s", s.Id)
+			err = errorsmod.Wrapf(ErrInvalidInput, "duplicated Claim id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -892,7 +890,7 @@ func (didDoc *IidDocument) AddLinkedEntity(linkedEntities ...*LinkedEntity) (err
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated linked entity id %s", s.Id)
+			err = errorsmod.Wrapf(ErrInvalidInput, "duplicated linked entity id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -945,7 +943,7 @@ func (didDoc *IidDocument) AddAccordedRight(accordedRights ...*AccordedRight) (e
 
 		// verify that there are no duplicates in method ids
 		if _, found := index[s.Id]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated accorded right id %s", s.Id)
+			err = errorsmod.Wrapf(ErrInvalidInput, "duplicated accorded right id %s", s.Id)
 			return
 		}
 		index[s.Id] = struct{}{}
@@ -993,7 +991,7 @@ func (didDoc *IidDocument) AddDidContext(contexts ...*Context) (err error) {
 	// resources must be unique
 	for _, c := range contexts {
 		if _, found := index[c.Key]; found {
-			err = sdkerrors.Wrapf(ErrInvalidInput, "duplicated context key found %s", c.Key)
+			err = errorsmod.Wrapf(ErrInvalidInput, "duplicated context key found %s", c.Key)
 			return
 		}
 		index[c.Key] = struct{}{}
@@ -1052,8 +1050,8 @@ func (didDoc IidDocument) GetBytes() []byte {
 	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&didDoc))
 }
 
-func (did IidDocument) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&did))
+func (didDoc IidDocument) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&didDoc))
 }
 
 // Verifications is a list of verification
@@ -1272,6 +1270,7 @@ func toEd25519AddressFromBase58(base58Key string) (addr string, err error) {
 	return
 }
 
+// nolint:unused
 // union perform union, distinct amd sort operation between two slices
 // duplicated element in list a are
 func union(a, b []string) []string {

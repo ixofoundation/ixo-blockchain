@@ -1,6 +1,7 @@
 package ante
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -30,7 +31,7 @@ func (dec BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context
 		dec.entityKeeper.ParamSpace.GetParamSetIfExists(ctx, &params)
 
 		if wasmMsg.Contract == params.NftContractAddress {
-			return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot execute contract set as the entity nft contract address")
+			return ctx, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "cannot execute contract set as the entity nft contract address")
 		}
 	}
 

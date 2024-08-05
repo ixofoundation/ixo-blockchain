@@ -3,6 +3,8 @@ package keeper
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
@@ -91,8 +93,8 @@ func (k Keeper) AddSwapOrder(ctx sdk.Context, bondDid string, so types.SwapOrder
 func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch types.Batch) (buyPricesPT, sellPricesPT sdk.DecCoins, err error) {
 	bond := k.MustGetBond(ctx, bondDid)
 
-	buyAmountDec := batch.TotalBuyAmount.Amount.ToDec()
-	sellAmountDec := batch.TotalSellAmount.Amount.ToDec()
+	buyAmountDec := batch.TotalBuyAmount.Amount.ToLegacyDec()
+	sellAmountDec := batch.TotalSellAmount.Amount.ToLegacyDec()
 
 	reserveBalances := k.GetReserveBalances(ctx, bondDid)
 	currentPricesPT, err := bond.GetCurrentPricesPT(reserveBalances)
@@ -103,7 +105,7 @@ func (k Keeper) GetBatchBuySellPrices(ctx sdk.Context, bondDid string, batch typ
 	// Get (amount of) matched and (actual) curve-calculated value for the remaining amount
 	// - The matched amount is the least of the buys and sells (i.e. greatest common amount)
 	// - The curved values are the prices/returns for the extra unmatched buys/sells
-	var matchedAmount sdk.Dec
+	var matchedAmount math.LegacyDec
 	var curvedValues sdk.DecCoins
 	if batch.EqualBuysAndSells() {
 		// Since equal, both prices are current prices
@@ -163,8 +165,8 @@ func (k Keeper) GetUpdatedBatchPricesAfterBuy(ctx sdk.Context, bondDid string, b
 	if bond.FunctionType == types.AugmentedFunction &&
 		bond.State == types.HatchState.String() {
 		args := bond.FunctionParameters.AsMap()
-		if adjustedSupplyWithBuy.Amount.ToDec().GT(args["S0"].Ceil()) {
-			return nil, nil, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins,
+		if adjustedSupplyWithBuy.Amount.ToLegacyDec().GT(args["S0"].Ceil()) {
+			return nil, nil, errorsmod.Wrap(sdkerrors.ErrInvalidCoins,
 				"Buy exceeds initial supply S0. Consider buying less tokens.")
 		}
 	}
@@ -241,13 +243,13 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 	totalPrices := reservePricesRounded.Add(txFees...)
 
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
-		return sdkerrors.Wrapf(types.ErrMaxPriceExceeded,
+		return errorsmod.Wrapf(types.ErrMaxPriceExceeded,
 			"actual prices %s exceed max prices %s",
 			totalPrices.String(), bo.MaxPrices.String())
 	}
 
 	var coinsToFundingPool sdk.Coins
-	var toInitialReserve sdk.Int
+	var toInitialReserve math.Int
 	// Add new reserve to reserve (reservePricesRounded should never be zero)
 	// TODO: investigate possibility of zero reservePricesRounded
 	if bond.FunctionType == types.AugmentedFunction &&
@@ -256,9 +258,9 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 		theta := args["theta"]
 
 		// Get current reserve
-		var currentReserve sdk.Int
+		var currentReserve math.Int
 		if bond.CurrentReserve.Empty() {
-			currentReserve = sdk.ZeroInt()
+			currentReserve = math.ZeroInt()
 		} else {
 			// Reserve balances should all be equal given that we are always
 			// applying the same additions/subtractions to all reserve balances.
@@ -268,9 +270,9 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 
 		// Calculate expected new reserve (as fraction 1-theta of new total raise)
 		newSupply := bond.CurrentSupply.Add(bo.BaseOrder.Amount).Amount
-		newTotalRaise := args["p0"].Mul(newSupply.ToDec())
+		newTotalRaise := args["p0"].Mul(newSupply.ToLegacyDec())
 		newReserve := newTotalRaise.Mul(
-			sdk.OneDec().Sub(theta)).Ceil().TruncateInt()
+			math.LegacyOneDec().Sub(theta)).Ceil().TruncateInt()
 
 		// Calculate amount that should go into initial reserve
 		toInitialReserve = newReserve.Sub(currentReserve)
@@ -279,10 +281,10 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 			return types.ErrInsufficientReserveToBuy
 		}
 		coinsToInitialReserve, _ := bond.GetNewReserveDecCoins(
-			toInitialReserve.ToDec()).TruncateDecimal()
+			toInitialReserve.ToLegacyDec()).TruncateDecimal()
 
 		// Calculate amount that should go into funding pool
-		coinsToFundingPool = reservePricesRounded.Sub(coinsToInitialReserve)
+		coinsToFundingPool = reservePricesRounded.Sub(coinsToInitialReserve...)
 
 		// Send reserve tokens to initial reserve
 		err = k.DepositReserveFromModule(ctx, bond.BondDid,
@@ -297,7 +299,6 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 		if err != nil {
 			return err
 		}
-
 	} else {
 		err = k.DepositReserveFromModule(
 			ctx, bond.BondDid, types.BatchesIntermediaryAccount, reservePricesRounded)
@@ -316,7 +317,7 @@ func (k Keeper) PerformBuyAtPrice(ctx sdk.Context, bondDid string, bo types.BuyO
 	}
 
 	// Add remainder to buyer address
-	returnToBuyer := bo.MaxPrices.Sub(totalPrices)
+	returnToBuyer := bo.MaxPrices.Sub(totalPrices...)
 	if !returnToBuyer.IsZero() {
 		err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
 			types.BatchesIntermediaryAccount, buyerAddr, returnToBuyer)
@@ -359,11 +360,11 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid string, so types.Sel
 	// Get seller address
 	sellerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid.Did()))
 	if !exists {
-		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found")
+		return errorsmod.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found")
 	}
 	sellerAddr, err := sellerDidDoc.GetVerificationMethodBlockchainAddress(so.BaseOrder.AccountDid.String())
 	if err != nil {
-		return sdkerrors.Wrap(err, "Address not found")
+		return errorsmod.Wrap(err, "Address not found")
 	}
 
 	reserveReturns := types.MultiplyDecCoinsByInt(prices, so.BaseOrder.Amount.Amount)
@@ -372,7 +373,7 @@ func (k Keeper) PerformSellAtPrice(ctx sdk.Context, bondDid string, so types.Sel
 	exitFees := bond.GetExitFees(reserveReturns)
 
 	totalFees := types.AdjustFees(txFees.Add(exitFees...), reserveReturnsRounded) // calculate actual total fees
-	totalReturns := reserveReturnsRounded.Sub(totalFees)                          // calculate actual reserveReturns
+	totalReturns := reserveReturnsRounded.Sub(totalFees...)                       // calculate actual reserveReturns
 
 	// Send total returns to seller (totalReturns should never be zero)
 	// TODO: investigate possibility of zero totalReturns
@@ -427,11 +428,11 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid string, so types.SwapOrder)
 	// Get swapper address
 	swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid.Did()))
 	if !exists {
-		return sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"), true
+		return errorsmod.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"), true
 	}
 	swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(so.BaseOrder.AccountDid.String())
 	if err != nil {
-		return sdkerrors.Wrap(err, "Address not found"), true
+		return errorsmod.Wrap(err, "Address not found"), true
 	}
 
 	// Get return for swap
@@ -443,7 +444,7 @@ func (k Keeper) PerformSwap(ctx sdk.Context, bondDid string, so types.SwapOrder)
 	adjustedInput := so.BaseOrder.Amount.Sub(txFee) // same as during GetReturnsForSwap
 
 	// Check if new rates violate sanity rate
-	newReserveBalances := reserveBalances.Add(sdk.Coins{adjustedInput}...).Sub(reserveReturns)
+	newReserveBalances := reserveBalances.Add(sdk.Coins{adjustedInput}...).Sub(reserveReturns...)
 	if bond.ReservesViolateSanityRate(newReserveBalances) {
 		return types.ErrValuesViolateSanityRate, true
 	}
@@ -553,11 +554,11 @@ func (k Keeper) PerformSwapOrders(ctx sdk.Context, bondDid string) {
 					// Return from amount to swapper
 					swapperDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(so.BaseOrder.AccountDid.Did()))
 					if !exists {
-						panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
+						panic(errorsmod.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
 					}
 					swapperAddr, err := swapperDidDoc.GetVerificationMethodBlockchainAddress(so.BaseOrder.String())
 					if err != nil {
-						panic(sdkerrors.Wrap(err, "Address not found"))
+						panic(errorsmod.Wrap(err, "Address not found"))
 					}
 					err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
 						types.BatchesIntermediaryAccount, swapperAddr, sdk.Coins{so.BaseOrder.Amount})
@@ -593,7 +594,7 @@ func (k Keeper) CheckIfBuyOrderFulfillableAtPrice(ctx sdk.Context, bondDid strin
 
 	// Check that max prices not exceeded
 	if totalPrices.IsAnyGT(bo.MaxPrices) {
-		return sdkerrors.Wrapf(types.ErrMaxPriceExceeded,
+		return errorsmod.Wrapf(types.ErrMaxPriceExceeded,
 			"actual prices %s exceed max prices %s",
 			totalPrices.String(), bo.MaxPrices.String())
 	}
@@ -620,21 +621,24 @@ func (k Keeper) CancelUnfulfillableBuys(ctx sdk.Context, bondDid string) (cancel
 				logger.Debug(fmt.Sprintf("cancellation reason: %s", err.Error()))
 
 				// emit the events
-				ctx.EventManager().EmitTypedEvents(
+				err = ctx.EventManager().EmitTypedEvents(
 					&types.BondBuyOrderCancelledEvent{
 						BondDid: bondDid,
 						Order:   &batch.Buys[i],
 					},
 				)
+				if err != nil {
+					panic(err)
+				}
 
 				// Return reserve to buyer
 				buyerDidDoc, exists := k.iidKeeper.GetDidDocument(ctx, []byte(bo.BaseOrder.AccountDid.Did()))
 				if !exists {
-					panic(sdkerrors.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
+					panic(errorsmod.Wrap(iidtypes.ErrDidDocumentNotFound, "Did document not found"))
 				}
 				buyerAddr, err := buyerDidDoc.GetVerificationMethodBlockchainAddress(bo.BaseOrder.AccountDid.String())
 				if err != nil {
-					panic(sdkerrors.Wrap(err, "Address not found"))
+					panic(errorsmod.Wrap(err, "Address not found"))
 				}
 				err = k.BankKeeper.SendCoinsFromModuleToAccount(ctx,
 					types.BatchesIntermediaryAccount, buyerAddr, bo.MaxPrices)
@@ -678,48 +682,60 @@ func (k Keeper) HandleBondingFunctionAlphaUpdate(ctx sdk.Context, bondDid string
 	bond := k.MustGetBond(ctx, bondDid)
 	batch := k.MustGetBatch(ctx, bondDid)
 	newPublicAlpha := batch.NextPublicAlpha
-	nextPublicAlphaDelta := sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(5), 1)
+	nextPublicAlphaDelta := math.LegacyNewDecFromIntWithPrec(math.NewIntFromUint64(5), 1)
 
 	var algo types.AugmentedBondRevision1
 	if err := algo.Init(bond); err != nil {
-		ctx.EventManager().EmitTypedEvents(
+		err = ctx.EventManager().EmitTypedEvents(
 			&types.BondEditAlphaFailedEvent{
 				BondDid:      bond.BondDid,
 				Token:        bond.Token,
 				CancelReason: err.Error(),
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 
 	valueOrError := types.RightFlatMap(types.FromError(newPublicAlpha.Float64()), func(ap float64) types.Either[error, bool] {
 		return types.RightFlatMap(types.FromError(nextPublicAlphaDelta.Float64()), func(delta float64) types.Either[error, bool] {
-			algo.UpdateAlpha(ap, delta)
+			err := algo.UpdateAlpha(ap, delta)
+			if err != nil {
+				panic(err)
+			}
 			return types.Right[error](true)
 		})
 	})
 
 	if !valueOrError.IsRight() {
-		ctx.EventManager().EmitTypedEvents(
+		err := ctx.EventManager().EmitTypedEvents(
 			&types.BondEditAlphaFailedEvent{
 				BondDid:      bond.BondDid,
 				Token:        bond.Token,
 				CancelReason: valueOrError.Left().Error(),
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 
 	// Get batch to reset alpha
 	batch = k.MustGetBatch(ctx, bond.BondDid)
-	batch.NextPublicAlpha = sdk.OneDec().Neg()
+	batch.NextPublicAlpha = math.LegacyOneDec().Neg()
 	k.SetBatch(ctx, bond.BondDid, batch)
 
 	// Set new function parameters
-	algo.ExportToBond(&bond)
+	err := algo.ExportToBond(&bond)
+	if err != nil {
+		panic(err)
+	}
 	k.SetBond(ctx, bond.BondDid, bond)
 
-	ctx.EventManager().EmitTypedEvents(
+	err = ctx.EventManager().EmitTypedEvents(
 		&types.BondEditAlphaSuccessEvent{
 			BondDid:     bond.BondDid,
 			Token:       bond.Token,
@@ -727,6 +743,9 @@ func (k Keeper) HandleBondingFunctionAlphaUpdate(ctx sdk.Context, bondDid string
 			// SystemAlpha:  newSystemAlpha.String(),
 		},
 	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
@@ -735,8 +754,8 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 	newPublicAlpha := batch.NextPublicAlpha
 
 	// Get supply, reserve, outcome payment
-	S := bond.CurrentSupply.Amount.ToDec()
-	R := bond.CurrentReserve[0].Amount.ToDec()
+	S := bond.CurrentSupply.Amount.ToLegacyDec()
+	R := bond.CurrentReserve[0].Amount.ToLegacyDec()
 	C := bond.OutcomePayment
 
 	// Get current parameters
@@ -748,16 +767,19 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 	deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
 	//fmt.Println("deltaPublicAlpha: ", deltaPublicAlpha)
 	temp, err := types.ApproxPower(
-		prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
-		sdk.MustNewDecFromStr("2"))
+		prevPublicAlpha.Mul(math.LegacyOneDec().Sub(types.StartingPublicAlpha)),
+		math.LegacyMustNewDecFromStr("2"))
 	if err != nil {
-		ctx.EventManager().EmitTypedEvents(
+		err := ctx.EventManager().EmitTypedEvents(
 			&types.BondEditAlphaFailedEvent{
 				BondDid:      bond.BondDid,
 				Token:        bond.Token,
 				CancelReason: err.Error(),
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	//fmt.Println("temp: ", temp)
@@ -768,19 +790,19 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 	// Calculate new system alpha
 	prevSystemAlpha := paramsMap["systemAlpha"]
 	//fmt.Println("prevSystemAlpha: ", prevSystemAlpha)
-	var newSystemAlpha sdk.Dec
+	var newSystemAlpha math.LegacyDec
 	if deltaPublicAlpha.IsPositive() {
 		//fmt.Println("deltaPublicAlpha is positive")
 		// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
-		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+		temp1 := math.LegacyOneDec().Sub(scaledDeltaPublicAlpha)
 		//fmt.Println("temp1: ", temp1)
-		temp2 := sdk.OneDec().Sub(prevSystemAlpha)
+		temp2 := math.LegacyOneDec().Sub(prevSystemAlpha)
 		//fmt.Println("temp2: ", temp2)
-		newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
+		newSystemAlpha = math.LegacyOneDec().Sub(temp1.Mul(temp2))
 	} else {
 		//fmt.Println("deltaPublicAlpha is negative")
 		// (1 - scaled_delta_public_alpha) * (previous_alpha)
-		temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+		temp1 := math.LegacyOneDec().Sub(scaledDeltaPublicAlpha)
 		//fmt.Println("temp1: ", temp1)
 		temp2 := prevSystemAlpha
 		//fmt.Println("temp2: ", temp2)
@@ -790,35 +812,44 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 
 	// Check 1 (newSystemAlpha != prevSystemAlpha)
 	if newSystemAlpha.Equal(prevSystemAlpha) {
-		ctx.EventManager().EmitTypedEvents(
+		err := ctx.EventManager().EmitTypedEvents(
 			&types.BondEditAlphaFailedEvent{
 				BondDid:      bond.BondDid,
 				Token:        bond.Token,
 				CancelReason: "resultant system alpha based on public alpha is unchanged",
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	// Check 2 (I > C * newSystemAlpha)
 	if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
-		ctx.EventManager().EmitTypedEvents(
+		err := ctx.EventManager().EmitTypedEvents(
 			&types.BondEditAlphaFailedEvent{
 				BondDid:      bond.BondDid,
 				Token:        bond.Token,
 				CancelReason: "cannot change alpha to that value due to violated restriction [1]",
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
 	if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
-		ctx.EventManager().EmitTypedEvents(
+		err := ctx.EventManager().EmitTypedEvents(
 			&types.BondEditAlphaFailedEvent{
 				BondDid:      bond.BondDid,
 				Token:        bond.Token,
 				CancelReason: "cannot change alpha to that value due to violated restriction [2]",
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 
@@ -830,19 +861,22 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 	newV0, err := types.Invariant(R, S, newKappa)
 	//fmt.Println("newV0: ", newV0)
 	if err != nil {
-		ctx.EventManager().EmitTypedEvents(
+		err := ctx.EventManager().EmitTypedEvents(
 			&types.BondEditAlphaFailedEvent{
 				BondDid:      bond.BondDid,
 				Token:        bond.Token,
 				CancelReason: err.Error(),
 			},
 		)
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 
 	// Get batch to reset alpha
 	batch = k.MustGetBatch(ctx, bond.BondDid)
-	batch.NextPublicAlpha = sdk.OneDec().Neg()
+	batch.NextPublicAlpha = math.LegacyOneDec().Neg()
 	k.SetBatch(ctx, bond.BondDid, batch)
 
 	// Set new function parameters
@@ -853,7 +887,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 	k.SetBond(ctx, bond.BondDid, bond)
 
 	// emit the events
-	ctx.EventManager().EmitTypedEvents(
+	err = ctx.EventManager().EmitTypedEvents(
 		&types.BondEditAlphaSuccessEvent{
 			BondDid:     bond.BondDid,
 			Token:       bond.Token,
@@ -861,4 +895,7 @@ func (k Keeper) UpdateAlpha(ctx sdk.Context, bondDid string) {
 			SystemAlpha: newSystemAlpha.String(),
 		},
 	)
+	if err != nil {
+		panic(err)
+	}
 }

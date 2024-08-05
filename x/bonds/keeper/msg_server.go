@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"golang.org/x/exp/slices"
-
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	"golang.org/x/exp/slices"
 )
 
 type msgServer struct {
@@ -31,11 +32,11 @@ func augmentedFunctionBuilder(msg *types.MsgCreateBond) error {
 	theta := paramsMap["theta"]
 	kappa := paramsMap["kappa"]
 
-	R0 := d0.Mul(sdk.OneDec().Sub(theta))
+	R0 := d0.Mul(math.LegacyOneDec().Sub(theta))
 	S0 := d0.Quo(p0)
 	V0, err := types.Invariant(R0, S0, kappa)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	msg.FunctionParameters = msg.FunctionParameters.AddParams(
@@ -47,10 +48,10 @@ func augmentedFunctionBuilder(msg *types.MsgCreateBond) error {
 
 	if msg.AlphaBond {
 		publicAlpha := types.StartingPublicAlpha
-		systemAlpha := types.SystemAlpha(publicAlpha, sdk.OneInt(),
-			sdk.OneInt(), R0.TruncateInt(), msg.OutcomePayment)
+		systemAlpha := types.SystemAlpha(publicAlpha, math.OneInt(),
+			math.OneInt(), R0.TruncateInt(), msg.OutcomePayment)
 
-		I0 := types.InvariantI(msg.OutcomePayment, systemAlpha, sdk.ZeroInt())
+		I0 := types.InvariantI(msg.OutcomePayment, systemAlpha, math.ZeroInt())
 
 		msg.FunctionParameters = msg.FunctionParameters.AddParams(
 			types.FunctionParams{
@@ -62,15 +63,14 @@ func augmentedFunctionBuilder(msg *types.MsgCreateBond) error {
 	return nil
 }
 
-// This is where you would add the default initial function paramaters
-func augmentedFunction2Builder(msg *types.MsgCreateBond) error {
+// This is where you would add the default initial function parameters
+func augmentedFunction2Builder(msg *types.MsgCreateBond) {
 	// if msg.AlphaBond {
 	publicAlpha := types.StartingPublicAlpha
 	msg.FunctionParameters = msg.FunctionParameters.AddParams(
 		types.FunctionParams{
 			types.NewFunctionParam("INITIAL_PUBLIC_ALPHA", publicAlpha),
 		})
-	return nil
 }
 
 func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (*types.MsgCreateBondResponse, error) {
@@ -87,15 +87,21 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 	}
 
 	if k.BankKeeper.BlockedAddr(feeAddr) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.FeeAddress)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.FeeAddress)
 	}
 
 	// Check that bond and bond DID do not already exist
 	if k.BondExists(ctx, msg.BondDid) {
-		return nil, sdkerrors.Wrap(types.ErrBondAlreadyExists, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondAlreadyExists, msg.BondDid)
 	} else if k.BondDidExists(ctx, msg.Token) {
-		return nil, sdkerrors.Wrap(types.ErrBondTokenIsTaken, msg.Token)
-	} else if msg.Token == k.StakingKeeper.GetParams(ctx).BondDenom {
+		return nil, errorsmod.Wrap(types.ErrBondTokenIsTaken, msg.Token)
+	}
+
+	stakingParams, err := k.StakingKeeper.GetParams(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if msg.Token == stakingParams.BondDenom {
 		return nil, types.ErrBondTokenCannotBeStakingToken
 	}
 
@@ -112,7 +118,10 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 
 	switch msg.FunctionType {
 	case types.AugmentedFunction:
-		augmentedFunctionBuilder(msg)
+		err := augmentedFunctionBuilder(msg)
+		if err != nil {
+			panic(err)
+		}
 		// The starting state for augmented bonding curves is the Hatch state.
 		// Note that we can never start with OpenState since S0>0 (S0=d0/p0 and d0>0).
 		state = types.HatchState
@@ -153,11 +162,11 @@ func (k msgServer) EditBond(goCtx context.Context, msg *types.MsgEditBond) (*typ
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	if bond.CreatorDid != msg.EditorDid {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized,
 			"editor must be the creator of the bond")
 	}
 
@@ -177,22 +186,22 @@ func (k msgServer) EditBond(goCtx context.Context, msg *types.MsgEditBond) (*typ
 	}
 
 	if msg.SanityRate != types.DoNotModifyField {
-		var sanityRate, sanityMarginPercentage sdk.Dec
+		var sanityRate, sanityMarginPercentage math.LegacyDec
 		if msg.SanityRate == "" {
-			sanityRate = sdk.ZeroDec()
-			sanityMarginPercentage = sdk.ZeroDec()
+			sanityRate = math.LegacyZeroDec()
+			sanityMarginPercentage = math.LegacyZeroDec()
 		} else {
-			parsedSanityRate, err := sdk.NewDecFromStr(msg.SanityRate)
+			parsedSanityRate, err := math.LegacyNewDecFromStr(msg.SanityRate)
 			if err != nil {
-				return nil, sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "sanity rate")
+				return nil, errorsmod.Wrap(types.ErrArgumentMissingOrNonFloat, "sanity rate")
 			} else if parsedSanityRate.IsNegative() {
-				return nil, sdkerrors.Wrap(types.ErrArgumentCannotBeNegative, "sanity rate")
+				return nil, errorsmod.Wrap(types.ErrArgumentCannotBeNegative, "sanity rate")
 			}
-			parsedSanityMarginPercentage, err := sdk.NewDecFromStr(msg.SanityMarginPercentage)
+			parsedSanityMarginPercentage, err := math.LegacyNewDecFromStr(msg.SanityMarginPercentage)
 			if err != nil {
-				return nil, sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "sanity margin percentage")
+				return nil, errorsmod.Wrap(types.ErrArgumentMissingOrNonFloat, "sanity margin percentage")
 			} else if parsedSanityMarginPercentage.IsNegative() {
-				return nil, sdkerrors.Wrap(types.ErrArgumentCannotBeNegative, "sanity margin percentage")
+				return nil, errorsmod.Wrap(types.ErrArgumentCannotBeNegative, "sanity margin percentage")
 			}
 			sanityRate = parsedSanityRate
 			sanityMarginPercentage = parsedSanityMarginPercentage
@@ -223,7 +232,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	newPublicAlpha := msg.Alpha
@@ -231,13 +240,13 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 	supportedFunctionTypes := []string{types.AugmentedFunction, types.BondingFunction}
 	switch {
 	case !slices.Contains(supportedFunctionTypes, bond.FunctionType):
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an augmented bonding curve")
+		return nil, errorsmod.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an augmented bonding curve")
 	case !bond.AlphaBond:
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
+		return nil, errorsmod.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
 	case bond.State != types.OpenState.String():
 		return nil, types.ErrInvalidStateForAction
 	case bond.OracleDid.Did() != msg.OracleDid.Did():
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "editor must be the controller of the bond")
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "editor must be the controller of the bond")
 	}
 
 	if bond.FunctionType == types.AugmentedFunction {
@@ -256,7 +265,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 
 		// Check (newPublicAlpha != publicAlpha)
 		if newPublicAlpha.Equal(paramsMap["publicAlpha"]) {
-			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			return nil, errorsmod.Wrap(types.ErrInvalidAlpha,
 				"cannot change public alpha to the current value of public alpha")
 		}
 
@@ -264,8 +273,8 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 		prevPublicAlpha := paramsMap["publicAlpha"]
 		deltaPublicAlpha := newPublicAlpha.Sub(prevPublicAlpha)
 		temp, err := types.ApproxPower(
-			prevPublicAlpha.Mul(sdk.OneDec().Sub(types.StartingPublicAlpha)),
-			sdk.MustNewDecFromStr("2"))
+			prevPublicAlpha.Mul(math.LegacyOneDec().Sub(types.StartingPublicAlpha)),
+			math.LegacyMustNewDecFromStr("2"))
 		if err != nil {
 			return nil, err
 		}
@@ -273,38 +282,38 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 
 		// Calculate new system alpha
 		prevSystemAlpha := paramsMap["systemAlpha"]
-		var newSystemAlpha sdk.Dec
+		var newSystemAlpha math.LegacyDec
 		if deltaPublicAlpha.IsPositive() {
 			// 1 - (1 - scaled_delta_public_alpha) * (1 - previous_alpha)
-			temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
-			temp2 := sdk.OneDec().Sub(prevSystemAlpha)
-			newSystemAlpha = sdk.OneDec().Sub(temp1.Mul(temp2))
+			temp1 := math.LegacyOneDec().Sub(scaledDeltaPublicAlpha)
+			temp2 := math.LegacyOneDec().Sub(prevSystemAlpha)
+			newSystemAlpha = math.LegacyOneDec().Sub(temp1.Mul(temp2))
 		} else {
 			// (1 - scaled_delta_public_alpha) * (previous_alpha)
-			temp1 := sdk.OneDec().Sub(scaledDeltaPublicAlpha)
+			temp1 := math.LegacyOneDec().Sub(scaledDeltaPublicAlpha)
 			temp2 := prevSystemAlpha
 			newSystemAlpha = temp1.Mul(temp2)
 		}
 
 		// Check 1 (newSystemAlpha != prevSystemAlpha)
 		if newSystemAlpha.Equal(prevSystemAlpha) {
-			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			return nil, errorsmod.Wrap(types.ErrInvalidAlpha,
 				"resultant system alpha based on public alpha is unchanged")
 		}
 		// Check 2 (I > C * newSystemAlpha)
 		if paramsMap["I0"].LTE(newSystemAlpha.MulInt(C)) {
-			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			return nil, errorsmod.Wrap(types.ErrInvalidAlpha,
 				"cannot change alpha to that value due to violated restriction [1]")
 		}
 		// Check 3 (R / C > newSystemAlpha - prevSystemAlpha)
 		if R.QuoInt(C).LTE(newSystemAlpha.Sub(prevSystemAlpha)) {
-			return nil, sdkerrors.Wrap(types.ErrInvalidAlpha,
+			return nil, errorsmod.Wrap(types.ErrInvalidAlpha,
 				"cannot change alpha to that value due to violated restriction [2]")
 		}
 
 		// Recalculate kappa and V0 using new alpha
 		newKappa := types.Kappa(paramsMap["I0"], C, newSystemAlpha)
-		_, err = types.Invariant(R, S.ToDec(), newKappa)
+		_, err = types.Invariant(R, S.ToLegacyDec(), newKappa)
 		if err != nil {
 			return nil, err
 		}
@@ -338,7 +347,7 @@ func (k msgServer) SetNextAlpha(goCtx context.Context, msg *types.MsgSetNextAlph
 		}
 		batch := k.MustGetBatch(ctx, bond.BondDid)
 		batch.NextPublicAlpha = newPublicAlpha
-		// batch.NextPublicAlphaDelta = sdk.NewDecFromIntWithPrec(sdk.NewIntFromUint64(5), 1)
+		// batch.NextPublicAlphaDelta = math.NewDecFromIntWithPrec(math.NewIntFromUint64(5), 1)
 		k.SetBatch(ctx, bond.BondDid, batch)
 	}
 
@@ -364,7 +373,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 	batch := k.MustGetBatch(ctx, msg.BondDid)
 
@@ -375,7 +384,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 	} // Also, next state must be SETTLE or FAILED -- checked by ValidateBasic
 
 	if bond.ControllerDid != msg.EditorDid {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized,
 			"editor must be the controller of the bond")
 	}
 
@@ -384,7 +393,7 @@ func (k msgServer) UpdateBondState(goCtx context.Context, msg *types.MsgUpdateBo
 	// reserve balance to available reserve balance.
 	if msg.State == types.SettleState.String() || msg.State == types.FailedState.String() {
 		if !batch.Empty() {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+			return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized,
 				"cannot update bond state to SETTLE/FAILED while there are orders in the batch")
 		}
 		k.MoveOutcomePaymentToReserve(ctx, bond.BondDid)
@@ -406,16 +415,16 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	buyerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid.Did()))
 	if !exists {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(msg.BuyerDid.String())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		return nil, errorsmod.Wrap(err, "Address not found in iid doc")
 	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Check that bond token used belongs to this bond
@@ -427,7 +436,7 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 	if bond.State != types.OpenState.String() && bond.State != types.HatchState.String() {
 		return nil, types.ErrInvalidStateForAction
 	} else if !bond.ReserveDenomsEqualTo(msg.MaxPrices) {
-		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, msg.MaxPrices.String())
+		return nil, errorsmod.Wrap(types.ErrReserveDenomsMismatch, msg.MaxPrices.String())
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
 		return nil, types.ErrOrderQuantityLimitExceeded
 	}
@@ -477,17 +486,17 @@ func (k msgServer) Buy(goCtx context.Context, msg *types.MsgBuy) (*types.MsgBuyR
 func performFirstSwapperFunctionBuy(ctx sdk.Context, keeper Keeper, msg types.MsgBuy) (*types.MsgBuyResponse, error) {
 	buyerDid, exists := keeper.iidKeeper.GetDidDocument(ctx, []byte(msg.BuyerDid.Did()))
 	if !exists {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	buyerAddr, err := buyerDid.GetVerificationMethodBlockchainAddress(msg.BuyerDid.String())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		return nil, errorsmod.Wrap(err, "Address not found in iid doc")
 	}
 	// TODO: investigate effect that a high amount has on future buyers' ability to buy.
 
 	bond, found := keeper.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Check that bond token used belongs to this bond
@@ -531,21 +540,21 @@ func (k msgServer) Sell(goCtx context.Context, msg *types.MsgSell) (*types.MsgSe
 
 	sellerDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SellerDid.Did()))
 	if !exists {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	sellerAddr, err := sellerDid.GetVerificationMethodBlockchainAddress(msg.SellerDid.String())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		return nil, errorsmod.Wrap(err, "Address not found in iid doc")
 	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Check sells allowed, current state is OPEN, and order limits not exceeded
 	if !bond.AllowSells {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotAllowSelling, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotAllowSelling, msg.BondDid)
 	} else if bond.State != types.OpenState.String() {
 		return nil, types.ErrInvalidStateForAction
 	} else if bond.AnyOrderQuantityLimitsExceeded(sdk.Coins{msg.Amount}) {
@@ -603,16 +612,16 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	swapperDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SwapperDid.Did()))
 	if !exists {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	swapperAddr, err := swapperDid.GetVerificationMethodBlockchainAddress(msg.SwapperDid.String())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		return nil, errorsmod.Wrap(err, "Address not found in iid doc")
 	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrap(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Confirm that function type is swapper_function and state is OPEN
@@ -623,10 +632,10 @@ func (k msgServer) Swap(goCtx context.Context, msg *types.MsgSwap) (*types.MsgSw
 	}
 
 	// Check that from and to use reserve token names
-	fromAndTo := sdk.NewCoins(msg.From, sdk.NewCoin(msg.ToToken, sdk.OneInt()))
+	fromAndTo := sdk.NewCoins(msg.From, sdk.NewCoin(msg.ToToken, math.OneInt()))
 	fromAndToDenoms := msg.From.Denom + "," + msg.ToToken
 	if !bond.ReserveDenomsEqualTo(fromAndTo) {
-		return nil, sdkerrors.Wrap(types.ErrReserveDenomsMismatch, fromAndToDenoms)
+		return nil, errorsmod.Wrap(types.ErrReserveDenomsMismatch, fromAndToDenoms)
 	}
 
 	// Check if order quantity limit exceeded
@@ -667,16 +676,16 @@ func (k msgServer) MakeOutcomePayment(goCtx context.Context, msg *types.MsgMakeO
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	senderDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.SenderDid.Did()))
 	if !exists {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	senderAddr, err := senderDid.GetVerificationMethodBlockchainAddress(msg.SenderDid.String())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		return nil, errorsmod.Wrap(err, "Address not found in iid doc")
 	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Confirm that state is OPEN and that outcome payment is not nil
@@ -710,16 +719,16 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	recipientDid, exists := k.iidKeeper.GetDidDocument(ctx, []byte(msg.RecipientDid.Did()))
 	if !exists {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "signer must be payment contract payer")
 	}
 	recipientAddr, err := recipientDid.GetVerificationMethodBlockchainAddress(msg.RecipientDid.String())
 	if err != nil {
-		return nil, sdkerrors.Wrap(err, "Address not found in iid doc")
+		return nil, errorsmod.Wrap(err, "Address not found in iid doc")
 	}
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	// Check that state is SETTLE or FAILED
@@ -750,7 +759,7 @@ func (k msgServer) WithdrawShare(goCtx context.Context, msg *types.MsgWithdrawSh
 
 	// Calculate amount owned
 	remainingReserve := k.GetReserveBalances(ctx, bond.BondDid)
-	bondTokensShare := bondTokensOwnedAmount.ToDec().QuoInt(bond.CurrentSupply.Amount)
+	bondTokensShare := bondTokensOwnedAmount.ToLegacyDec().QuoInt(bond.CurrentSupply.Amount)
 	reserveOwedDec := sdk.NewDecCoinsFromCoins(remainingReserve...).MulDec(bondTokensShare)
 	reserveOwed, _ := reserveOwedDec.TruncateDecimal()
 
@@ -783,7 +792,7 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 
 	bond, found := k.GetBond(ctx, msg.BondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
+		return nil, errorsmod.Wrapf(types.ErrBondDoesNotExist, msg.BondDid)
 	}
 
 	reserveWithdrawalAddress, err := sdk.AccAddressFromBech32(bond.ReserveWithdrawalAddress)
@@ -793,28 +802,28 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 
 	// Confirm that function type is an alpha bond and state is OPEN
 	if bond.FunctionType != types.AugmentedFunction {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
+		return nil, errorsmod.Wrap(types.ErrFunctionNotAvailableForFunctionType,
 			"bond is not an augmented bonding curve")
 	} else if !bond.AlphaBond {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType,
+		return nil, errorsmod.Wrap(types.ErrFunctionNotAvailableForFunctionType,
 			"bond is not an alpha bond")
 	} else if bond.State != types.OpenState.String() {
 		return nil, types.ErrInvalidStateForAction
 	}
 
 	if !bond.AllowReserveWithdrawals {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized,
 			"bond does not allow reserve withdrawals")
 	}
 
 	if bond.ControllerDid != msg.WithdrawerDid {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized,
+		return nil, errorsmod.Wrap(sdkerrors.ErrUnauthorized,
 			"withdrawer must be the controller of the bond")
 	}
 
 	// Check that amount is available
 	if !msg.Amount.IsAllLTE(bond.AvailableReserve) {
-		return nil, sdkerrors.Wrapf(types.ErrInsufficientReserveForWithdraw,
+		return nil, errorsmod.Wrapf(types.ErrInsufficientReserveForWithdraw,
 			"available reserve: %s", bond.AvailableReserve.String())
 	}
 
@@ -828,7 +837,7 @@ func (k msgServer) WithdrawReserve(goCtx context.Context, msg *types.MsgWithdraw
 	// Update total amount withdrawn from reserve. We do not use the WithdrawReserve
 	// function here since we only want the available reserve to be updated. The
 	// CurrentReserve (virtual reserve) reported by the bond will be unchanged.
-	k.setAvailableReserve(ctx, bond.BondDid, bond.AvailableReserve.Sub(msg.Amount))
+	k.setAvailableReserve(ctx, bond.BondDid, bond.AvailableReserve.Sub(msg.Amount...))
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(

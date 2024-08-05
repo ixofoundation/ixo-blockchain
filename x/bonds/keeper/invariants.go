@@ -128,7 +128,6 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 
 func AvailableReserveInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-
 		// Get actual available reserve
 		// reservePool := k.accountKeeper.GetModuleAddress(types.BondsReserveAccount)
 		// actualAvailableReserve := k.BankKeeper.GetAllBalances(ctx, reservePool)

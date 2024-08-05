@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ixo "github.com/ixofoundation/ixo-blockchain/v3/lib/ixo"
@@ -13,15 +14,15 @@ import (
 func (msg MsgCreateCollection) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Signer)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid signer address (%s)", err)
 	}
 
 	if !iidtypes.IsValidDID(msg.Entity) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Entity)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Entity)
 	}
 
 	if !iidtypes.IsValidDID(msg.Protocol) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Protocol)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Protocol)
 	}
 
 	if err = msg.Payments.Validate(); err != nil {
@@ -29,7 +30,7 @@ func (msg MsgCreateCollection) ValidateBasic() error {
 	}
 
 	if !ixo.IsEnumValueValid(CollectionState_name, int32(msg.State)) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for state")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for state")
 	}
 
 	return nil
@@ -41,22 +42,22 @@ func (msg MsgCreateCollection) ValidateBasic() error {
 func (msg MsgSubmitClaim) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 	_, err = sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
 
 	if ixo.IsEmpty(msg.ClaimId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
 	}
 	if ixo.IsEmpty(msg.CollectionId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
 	}
 
 	return nil
@@ -68,40 +69,40 @@ func (msg MsgSubmitClaim) ValidateBasic() error {
 func (msg MsgEvaluateClaim) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 	_, err = sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
 	}
 
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
 	if !iidtypes.IsValidDID(msg.Oracle) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Oracle)
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.Oracle)
 	}
 
 	if iidtypes.IsEmpty(msg.ClaimId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "claim_id cannot be empty")
 	}
 	if iidtypes.IsEmpty(msg.CollectionId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
 	}
 	if iidtypes.IsEmpty(msg.VerificationProof) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "verification_proof cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "verification_proof cannot be empty")
 	}
 
 	if msg.Status == EvaluationStatus_pending {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "evaluation status can't be pending")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "evaluation status can't be pending")
 	}
 
 	if !ixo.IsEnumValueValid(EvaluationStatus_name, int32(msg.Status)) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for status")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for status")
 	}
 
 	if msg.Amount.IsAnyNegative() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "amount must be positive")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "amount must be positive")
 	}
 
 	return nil
@@ -113,23 +114,23 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 func (msg MsgDisputeClaim) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
 	}
 
 	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
-		return sdkerrors.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
 	}
 	if iidtypes.IsEmpty(msg.SubjectId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "subject id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "subject id cannot be empty")
 	}
 	if iidtypes.IsEmpty(msg.Data.Proof) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data proof cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "dispute data proof cannot be empty")
 	}
 	if iidtypes.IsEmpty(msg.Data.Uri) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data uri cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "dispute data uri cannot be empty")
 	}
 	if iidtypes.IsEmpty(msg.Data.Type) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "dispute data type cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "dispute data type cannot be empty")
 	}
 
 	return nil
@@ -141,15 +142,15 @@ func (msg MsgDisputeClaim) ValidateBasic() error {
 func (msg MsgWithdrawPayment) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 	_, err = sdk.AccAddressFromBech32(msg.FromAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid from address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid from address (%s)", err)
 	}
 	_, err = sdk.AccAddressFromBech32(msg.ToAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
 	}
 
 	if err = msg.Contract_1155Payment.Validate(); err != nil {
@@ -157,11 +158,11 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 	}
 
 	if !ixo.IsEnumValueValid(PaymentType_name, int32(msg.PaymentType)) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for payment type")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for payment type")
 	}
 
 	if iidtypes.IsEmpty(msg.ClaimId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "claim id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "claim id cannot be empty")
 	}
 
 	return nil
@@ -173,13 +174,13 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 func (msg MsgUpdateCollectionState) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 	if iidtypes.IsEmpty(msg.CollectionId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
 	}
 	if !ixo.IsEnumValueValid(CollectionState_name, int32(msg.State)) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for state")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for state")
 	}
 
 	return nil
@@ -191,10 +192,10 @@ func (msg MsgUpdateCollectionState) ValidateBasic() error {
 func (msg MsgUpdateCollectionDates) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 	if iidtypes.IsEmpty(msg.CollectionId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
 	}
 
 	return nil
@@ -206,10 +207,10 @@ func (msg MsgUpdateCollectionDates) ValidateBasic() error {
 func (msg MsgUpdateCollectionPayments) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 	if iidtypes.IsEmpty(msg.CollectionId) {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
 	}
 
 	if err = msg.Payments.Validate(); err != nil {

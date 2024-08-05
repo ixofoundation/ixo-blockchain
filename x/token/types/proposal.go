@@ -1,12 +1,15 @@
 package types
 
 import (
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+)
+
+const (
+	ProposalTypeSetTokenContractCodes = "SetTokenContractCodes"
 )
 
 var (
-	ProposalTypeSetTokenContractCodes                  = "SetTokenContractCodes"
-	_                                 govtypes.Content = &SetTokenContractCodes{}
+	_ govtypesv1.Content = &SetTokenContractCodes{}
 )
 
 func NewSetTokenContract(ixo1155Code uint64) SetTokenContractCodes {
@@ -16,19 +19,19 @@ func NewSetTokenContract(ixo1155Code uint64) SetTokenContractCodes {
 }
 
 func (p *SetTokenContractCodes) GetDescription() string {
-	return "update token contract codes"
+	return "Update token contract codes"
 }
 
 func (p *SetTokenContractCodes) GetTitle() string {
-	return "set token contract codes"
+	return "Set token contract codes"
 }
 
-func (sup *SetTokenContractCodes) ProposalRoute() string { return RouterKey }
-func (sup *SetTokenContractCodes) ProposalType() string  { return ProposalTypeSetTokenContractCodes }
+func (p *SetTokenContractCodes) ProposalRoute() string { return RouterKey }
+func (p *SetTokenContractCodes) ProposalType() string  { return ProposalTypeSetTokenContractCodes }
 
-func (sup *SetTokenContractCodes) ValidateBasic() error { return nil }
+// TODO add validation
+func (p *SetTokenContractCodes) ValidateBasic() error { return nil }
 
 func init() {
-	govtypes.RegisterProposalType(ProposalTypeSetTokenContractCodes)
-	govtypes.RegisterProposalTypeCodec(&SetTokenContractCodes{}, "token.ixo.token.v1beta1.SetTokenContractCodes")
+	govtypesv1.RegisterProposalType(ProposalTypeSetTokenContractCodes)
 }

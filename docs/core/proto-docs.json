@@ -2528,7 +2528,7 @@
             },
             {
               "name": "Params",
-              "description": "Params queries the paramaters of x/bonds module.",
+              "description": "Params queries the parameters of x/bonds module.",
               "requestType": "QueryParamsRequest",
               "requestLongType": "QueryParamsRequest",
               "requestFullType": "ixo.bonds.v1beta1.QueryParamsRequest",
@@ -4046,7 +4046,7 @@
               "description": "authz set up, no guarantee"
             },
             {
-              "name": "GAURANTEED",
+              "name": "GUARANTEED",
               "number": "3",
               "description": "escrow set up with funds blocked"
             },
@@ -4061,7 +4061,7 @@
               "description": ""
             },
             {
-              "name": "DISPUTED",
+              "name": "DISPUTED_PAYMENT",
               "number": "6",
               "description": ""
             }
@@ -4854,7 +4854,7 @@
             },
             {
               "name": "timeout_ns",
-              "description": "timeout after claim/evaluation to create authZ for payment, if 0 then\nimmidiate direct payment",
+              "description": "timeout after claim/evaluation to create authZ for payment, if 0 then\nimmediate direct payment",
               "label": "",
               "type": "Duration",
               "longType": "google.protobuf.Duration",
@@ -4919,92 +4919,6 @@
               "type": "Payment",
               "longType": "Payment",
               "fullType": "ixo.claims.v1beta1.Payment",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        }
-      ],
-      "services": []
-    },
-    {
-      "name": "ixo/claims/v1beta1/cosmos.proto",
-      "description": "",
-      "package": "ixo.claims.v1beta1",
-      "hasEnums": false,
-      "hasExtensions": false,
-      "hasMessages": true,
-      "hasServices": false,
-      "enums": [],
-      "extensions": [],
-      "messages": [
-        {
-          "name": "Input",
-          "longName": "Input",
-          "fullName": "ixo.claims.v1beta1.Input",
-          "description": "Input models transaction input.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "address",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "coins",
-              "description": "",
-              "label": "repeated",
-              "type": "Coin",
-              "longType": "cosmos.base.v1beta1.Coin",
-              "fullType": "cosmos.base.v1beta1.Coin",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "Output",
-          "longName": "Output",
-          "fullName": "ixo.claims.v1beta1.Output",
-          "description": "Output models transaction outputs.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "address",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "coins",
-              "description": "",
-              "label": "repeated",
-              "type": "Coin",
-              "longType": "cosmos.base.v1beta1.Coin",
-              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5269,8 +5183,8 @@
               "description": "Inputs to the multisend tx to run to withdraw payment",
               "label": "repeated",
               "type": "Input",
-              "longType": "Input",
-              "fullType": "ixo.claims.v1beta1.Input",
+              "longType": "cosmos.bank.v1beta1.Input",
+              "fullType": "cosmos.bank.v1beta1.Input",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5281,8 +5195,8 @@
               "description": "Outputs for the multisend tx to run to withdraw payment",
               "label": "repeated",
               "type": "Output",
-              "longType": "Output",
-              "fullType": "ixo.claims.v1beta1.Output",
+              "longType": "cosmos.bank.v1beta1.Output",
+              "fullType": "cosmos.bank.v1beta1.Output",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6323,7 +6237,7 @@
             },
             {
               "name": "agent_did",
-              "description": "agent is the DID of the agent disputing the claim, agent detials wont be\nsaved in kvStore",
+              "description": "agent is the DID of the agent disputing the claim, agent details won't be\nsaved in kvStore",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -6824,8 +6738,8 @@
               "description": "Inputs to the multisend tx to run to withdraw payment",
               "label": "repeated",
               "type": "Input",
-              "longType": "Input",
-              "fullType": "ixo.claims.v1beta1.Input",
+              "longType": "cosmos.bank.v1beta1.Input",
+              "fullType": "cosmos.bank.v1beta1.Input",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6836,8 +6750,8 @@
               "description": "Outputs for the multisend tx to run to withdraw payment",
               "label": "repeated",
               "type": "Output",
-              "longType": "Output",
-              "fullType": "ixo.claims.v1beta1.Output",
+              "longType": "cosmos.bank.v1beta1.Output",
+              "fullType": "cosmos.bank.v1beta1.Output",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7035,56 +6949,6 @@
           ]
         }
       ]
-    },
-    {
-      "name": "ixo/entity/v1beta1/cosmos.proto",
-      "description": "",
-      "package": "ixo.entity.v1beta1",
-      "hasEnums": false,
-      "hasExtensions": false,
-      "hasMessages": true,
-      "hasServices": false,
-      "enums": [],
-      "extensions": [],
-      "messages": [
-        {
-          "name": "Grant",
-          "longName": "Grant",
-          "fullName": "ixo.entity.v1beta1.Grant",
-          "description": "Grant gives permissions to execute\nthe provide method with expiration time.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "authorization",
-              "description": "",
-              "label": "",
-              "type": "Any",
-              "longType": "google.protobuf.Any",
-              "fullType": "google.protobuf.Any",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "expiration",
-              "description": "",
-              "label": "",
-              "type": "Timestamp",
-              "longType": "google.protobuf.Timestamp",
-              "fullType": "google.protobuf.Timestamp",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        }
-      ],
-      "services": []
     },
     {
       "name": "ixo/iid/v1beta1/types.proto",
@@ -7989,7 +7853,7 @@
             },
             {
               "name": "credentials",
-              "description": "Credentials of the enitity to be verified",
+              "description": "Credentials of the entity to be verified",
               "label": "repeated",
               "type": "string",
               "longType": "string",
@@ -8258,8 +8122,8 @@
               "description": "",
               "label": "",
               "type": "Grant",
-              "longType": "Grant",
-              "fullType": "ixo.entity.v1beta1.Grant",
+              "longType": "cosmos.authz.v1beta1.Grant",
+              "fullType": "cosmos.authz.v1beta1.Grant",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -11034,7 +10898,7 @@
             },
             {
               "name": "data",
-              "description": "Extention data",
+              "description": "Extension data",
               "label": "",
               "type": "bytes",
               "longType": "bytes",
@@ -11241,8 +11105,8 @@
               "description": "grant to be Authorized in authz grant",
               "label": "",
               "type": "Grant",
-              "longType": "Grant",
-              "fullType": "ixo.entity.v1beta1.Grant",
+              "longType": "cosmos.authz.v1beta1.Grant",
+              "fullType": "cosmos.authz.v1beta1.Grant",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

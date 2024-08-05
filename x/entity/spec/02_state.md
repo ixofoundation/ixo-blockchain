@@ -33,7 +33,7 @@ The field's descriptions is as follows:
 - `endDate` - a timestamp of the end date for the entity, as defined by the implementer and interpreted by client applications
 - `status` - a integer representing the status of the entity, as defined by the implementer and interpreted by client applications
 - `relayerNode` - a string representing the did id of the operator through which the entity was created
-- `credentials` - a list of string representing the credentials of the enitity to be verified
+- `credentials` - a list of string representing the credentials of the entity to be verified
 - `entityVerified` - a boolean used as check whether the credentials of entity is verified
 - `accounts` - a list of [EntityAccount](#entityaccount)
 - `metadata` - a [EntityMetadata](#entitymetadata)

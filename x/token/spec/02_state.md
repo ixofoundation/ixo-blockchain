@@ -47,8 +47,8 @@ The field's descriptions is as follows:
 - `type` - a string containing the token type eg. ixo1155
 - `cap` - a integer containing the maximum number of tokens with this name that can be minted, 0 is unlimited
 - `supply` - a integer containing how much has already been minted for this Token name
-- `paused` - a boolean indicating wheter to stop allowance of token minting temporarily
-- `stopped` - a boolean indicating wheter to stop allowance of token minting permanently
+- `paused` - a boolean indicating whether to stop allowance of token minting temporarily
+- `stopped` - a boolean indicating whether to stop allowance of token minting permanently
 - `retired` - a list of [EntityAccount](#entityaccount)
 - `cancelled` - a list of [EntityAccount](#entityaccount)
 

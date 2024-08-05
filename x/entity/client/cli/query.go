@@ -12,7 +12,7 @@ import (
 func GetQueryCmd() *cobra.Command {
 	entityQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "entity query sub commands",
+		Short:                      "Querying commands for the entity module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -20,7 +20,7 @@ func GetQueryCmd() *cobra.Command {
 
 	entityQueryCmd.AddCommand(
 		CmdQueryParams(),
-		CmdListEntity(),
+		// CmdListEntity(),
 		CmdShowEntity(),
 		CmdShowEntityMetadata(),
 		CmdShowEntityIidDocument(),
@@ -97,9 +97,6 @@ func CmdShowEntity() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			argId := args[0]
@@ -129,9 +126,6 @@ func CmdShowEntityMetadata() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			argId := args[0]
@@ -161,9 +155,6 @@ func CmdShowEntityIidDocument() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			argId := args[0]
@@ -193,9 +184,6 @@ func CmdShowEntityVerified() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 			argId := args[0]

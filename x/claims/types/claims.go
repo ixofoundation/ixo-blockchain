@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
@@ -77,7 +78,7 @@ func (p *Contract1155Payment) Validate() error {
 	if p != nil {
 		_, err := sdk.AccAddressFromBech32(p.Address)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
 		}
 		if iidtypes.IsEmpty(p.TokenId) {
 			return fmt.Errorf("token id cannot be empty")
@@ -93,7 +94,7 @@ func (p *Contract1155Payment) Validate() error {
 func (p Payment) Validate() error {
 	_, err := sdk.AccAddressFromBech32(p.Account)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
 	}
 
 	if err = p.Contract_1155Payment.Validate(); err != nil {
@@ -101,7 +102,7 @@ func (p Payment) Validate() error {
 	}
 
 	if p.Amount.IsAnyNegative() {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "payment amount must be positive")
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "payment amount must be positive")
 	}
 
 	return nil

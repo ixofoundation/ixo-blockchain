@@ -7,7 +7,8 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "ixo/claims/v1beta1/claims.proto";
 import "cosmos/base/v1beta1/coin.proto";
-import "ixo/claims/v1beta1/cosmos.proto";
+import "cosmos/bank/v1beta1/bank.proto";
+import "cosmos/msg/v1/msg.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -26,6 +27,8 @@ service Msg {
 }
 
 message MsgCreateCollection {
+  option (cosmos.msg.v1.signer) = "signer";
+
   // entity is the DID of the entity for which the claims are being created
   string entity = 1;
   // signer address
@@ -49,6 +52,8 @@ message MsgCreateCollection {
 message MsgCreateCollectionResponse {}
 
 message MsgSubmitClaim {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
   // collection_id indicates to which Collection this claim belongs
   string collection_id = 1;
   // claimID is the unique identifier of the claim in the cid hash format
@@ -66,6 +71,8 @@ message MsgSubmitClaim {
 message MsgSubmitClaimResponse {}
 
 message MsgEvaluateClaim {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
   // claimID is the unique identifier of the claim to make evaluation against
   string claim_id = 1;
   // collection_id indicates to which Collection this claim belongs
@@ -101,10 +108,12 @@ message MsgEvaluateClaimResponse {}
 // Agent laying dispute must be admin for Collection, or controller on
 // Collection entity, or have authz cap, aka is agent
 message MsgDisputeClaim {
+  option (cosmos.msg.v1.signer) = "agent_address";
+
   // subject_id for which this dispute is against, for now can only lay disputes
   // against claims
   string subject_id = 1;
-  // agent is the DID of the agent disputing the claim, agent detials wont be
+  // agent is the DID of the agent disputing the claim, agent details won't be
   // saved in kvStore
   string agent_did = 2 [
     (gogoproto.casttype) =
@@ -119,18 +128,16 @@ message MsgDisputeClaim {
 message MsgDisputeClaimResponse {}
 
 message MsgWithdrawPayment {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
   // claim_id the withdrawal is for
   string claim_id = 1;
   // Inputs to the multisend tx to run to withdraw payment
-  repeated Input inputs = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Input"
-  ];
+  repeated cosmos.bank.v1beta1.Input inputs = 2
+      [ (gogoproto.nullable) = false ];
   // Outputs for the multisend tx to run to withdraw payment
-  repeated Output outputs = 3 [
-    (gogoproto.nullable) = false,
-    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Output"
-  ];
+  repeated cosmos.bank.v1beta1.Output outputs = 3
+      [ (gogoproto.nullable) = false ];
   // payment type to keep track what payment is for and mark claim payment
   // accordingly
   PaymentType payment_type = 4;
@@ -150,6 +157,8 @@ message MsgWithdrawPayment {
 message MsgWithdrawPaymentResponse {}
 
 message MsgUpdateCollectionState {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
   // collection_id indicates which Collection to update
   string collection_id = 1;
   // state is the state of this Collection (open, paused, closed) you want to
@@ -162,6 +171,8 @@ message MsgUpdateCollectionState {
 message MsgUpdateCollectionStateResponse {}
 
 message MsgUpdateCollectionDates {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
   // collection_id indicates which Collection to update
   string collection_id = 1;
   // startDate is the date after which claims may be submitted
@@ -176,6 +187,8 @@ message MsgUpdateCollectionDates {
 message MsgUpdateCollectionDatesResponse {}
 
 message MsgUpdateCollectionPayments {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
   // collection_id indicates which Collection to update
   string collection_id = 1;
   // payments is the amount paid for claim submission, evaluation, approval, or

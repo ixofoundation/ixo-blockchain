@@ -107,10 +107,6 @@
     - [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus)
     - [PaymentType](#ixo.claims.v1beta1.PaymentType)
   
-- [ixo/claims/v1beta1/cosmos.proto](#ixo/claims/v1beta1/cosmos.proto)
-    - [Input](#ixo.claims.v1beta1.Input)
-    - [Output](#ixo.claims.v1beta1.Output)
-  
 - [ixo/claims/v1beta1/authz.proto](#ixo/claims/v1beta1/authz.proto)
     - [EvaluateClaimAuthorization](#ixo.claims.v1beta1.EvaluateClaimAuthorization)
     - [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints)
@@ -169,9 +165,6 @@
     - [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse)
   
     - [Msg](#ixo.claims.v1beta1.Msg)
-  
-- [ixo/entity/v1beta1/cosmos.proto](#ixo/entity/v1beta1/cosmos.proto)
-    - [Grant](#ixo.entity.v1beta1.Grant)
   
 - [ixo/iid/v1beta1/types.proto](#ixo/iid/v1beta1/types.proto)
     - [AccordedRight](#ixo.iid.v1beta1.AccordedRight)
@@ -1346,7 +1339,7 @@ Query defines the gRPC querier service.
 | ----------- | ------------ | ------------- | ------------|
 | Bonds | [QueryBondsRequest](#ixo.bonds.v1beta1.QueryBondsRequest) | [QueryBondsResponse](#ixo.bonds.v1beta1.QueryBondsResponse) | Bonds returns all existing bonds. |
 | BondsDetailed | [QueryBondsDetailedRequest](#ixo.bonds.v1beta1.QueryBondsDetailedRequest) | [QueryBondsDetailedResponse](#ixo.bonds.v1beta1.QueryBondsDetailedResponse) | BondsDetailed returns a list of all existing bonds with some details about their current state. |
-| Params | [QueryParamsRequest](#ixo.bonds.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.bonds.v1beta1.QueryParamsResponse) | Params queries the paramaters of x/bonds module. |
+| Params | [QueryParamsRequest](#ixo.bonds.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.bonds.v1beta1.QueryParamsResponse) | Params queries the parameters of x/bonds module. |
 | Bond | [QueryBondRequest](#ixo.bonds.v1beta1.QueryBondRequest) | [QueryBondResponse](#ixo.bonds.v1beta1.QueryBondResponse) | Bond queries info of a specific bond. |
 | Batch | [QueryBatchRequest](#ixo.bonds.v1beta1.QueryBatchRequest) | [QueryBatchResponse](#ixo.bonds.v1beta1.QueryBatchResponse) | Batch queries info of a specific bond&#39;s current batch. |
 | LastBatch | [QueryLastBatchRequest](#ixo.bonds.v1beta1.QueryLastBatchRequest) | [QueryLastBatchResponse](#ixo.bonds.v1beta1.QueryLastBatchResponse) | LastBatch queries info of a specific bond&#39;s last batch. |
@@ -1889,7 +1882,7 @@ Msg defines the bonds Msg service.
 | account | [string](#string) |  | account is the entity account address from which the payment will be made |
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment, not allowed for Evaluation Payment |
-| timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immidiate direct payment |
+| timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immediate direct payment |
 
 
 
@@ -1954,10 +1947,10 @@ Msg defines the bonds Msg service.
 | NO_PAYMENT | 0 |  |
 | PROMISED | 1 | agent is contracted to receive payment |
 | AUTHORIZED | 2 | authz set up, no guarantee |
-| GAURANTEED | 3 | escrow set up with funds blocked |
+| GUARANTEED | 3 | escrow set up with funds blocked |
 | PAID | 4 |  |
 | FAILED | 5 |  |
-| DISPUTED | 6 |  |
+| DISPUTED_PAYMENT | 6 |  |
 
 
 
@@ -1973,54 +1966,6 @@ Msg defines the bonds Msg service.
 | EVALUATION | 2 |  |
 | REJECTION | 3 |  |
 
-
- 
-
- 
-
- 
-
-
-
-<a name="ixo/claims/v1beta1/cosmos.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/claims/v1beta1/cosmos.proto
-
-
-
-<a name="ixo.claims.v1beta1.Input"></a>
-
-### Input
-Input models transaction input.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  |  |
-| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.Output"></a>
-
-### Output
-Output models transaction outputs.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  |  |
-| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-
-
-
-
-
- 
 
  
 
@@ -2129,8 +2074,8 @@ Output models transaction outputs.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | claim_id | [string](#string) |  | claim_id the withdrawal is for |
-| inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
-| outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
+| inputs | [cosmos.bank.v1beta1.Input](#cosmos.bank.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
+| outputs | [cosmos.bank.v1beta1.Output](#cosmos.bank.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
 | toAddress | [string](#string) |  | for contract payment |
@@ -2610,7 +2555,7 @@ Collection entity, or have authz cap, aka is agent
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | subject_id | [string](#string) |  | subject_id for which this dispute is against, for now can only lay disputes against claims |
-| agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim, agent detials wont be saved in kvStore |
+| agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim, agent details won&#39;t be saved in kvStore |
 | agent_address | [string](#string) |  |  |
 | dispute_type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
 | data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
@@ -2784,8 +2729,8 @@ Collection entity, or have authz cap, aka is agent
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | claim_id | [string](#string) |  | claim_id the withdrawal is for |
-| inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
-| outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
+| inputs | [cosmos.bank.v1beta1.Input](#cosmos.bank.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
+| outputs | [cosmos.bank.v1beta1.Output](#cosmos.bank.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
 | toAddress | [string](#string) |  | for contract payment |
@@ -2829,39 +2774,6 @@ Msg defines the Msg service.
 | UpdateCollectionState | [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState) | [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse) |  |
 | UpdateCollectionDates | [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates) | [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse) |  |
 | UpdateCollectionPayments | [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments) | [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse) |  |
-
- 
-
-
-
-<a name="ixo/entity/v1beta1/cosmos.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/entity/v1beta1/cosmos.proto
-
-
-
-<a name="ixo.entity.v1beta1.Grant"></a>
-
-### Grant
-Grant gives permissions to execute
-the provide method with expiration time.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| authorization | [google.protobuf.Any](#google.protobuf.Any) |  |  |
-| expiration | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-
-
-
-
-
- 
-
- 
-
- 
 
  
 
@@ -3103,7 +3015,7 @@ relationship entity account
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
 | status | [int32](#int32) |  | Status of the Entity as defined by the implementer and interpreted by Client applications |
 | relayer_node | [string](#string) |  | Did of the operator through which the Entity was created |
-| credentials | [string](#string) | repeated | Credentials of the enitity to be verified |
+| credentials | [string](#string) | repeated | Credentials of the entity to be verified |
 | entity_verified | [bool](#bool) |  | Used as check whether the credentials of entity is verified |
 | metadata | [EntityMetadata](#ixo.entity.v1beta1.EntityMetadata) |  | Metadata concerning the Entity such as versionId, created, updated and deactivated |
 | accounts | [EntityAccount](#ixo.entity.v1beta1.EntityAccount) | repeated | module accounts created for entity |
@@ -3193,7 +3105,7 @@ creation
 | account_name | [string](#string) |  |  |
 | granter | [string](#string) |  |  |
 | grantee | [string](#string) |  |  |
-| grant | [Grant](#ixo.entity.v1beta1.Grant) |  |  |
+| grant | [cosmos.authz.v1beta1.Grant](#cosmos.authz.v1beta1.Grant) |  |  |
 
 
 
@@ -4240,7 +4152,7 @@ Msg defines the identity Msg service.
 | credentials | [string](#string) | repeated | Content ID or Hash of public Verifiable Credentials associated with the subject |
 | owner_did | [string](#string) |  | Owner of the Entity NFT | The ownersdid used to sign this transaction. |
 | owner_address | [string](#string) |  | The ownersdid address used to sign this transaction. |
-| data | [bytes](#bytes) |  | Extention data |
+| data | [bytes](#bytes) |  | Extension data |
 | alsoKnownAs | [string](#string) |  |  |
 | linked_claim | [ixo.iid.v1beta1.LinkedClaim](#ixo.iid.v1beta1.LinkedClaim) | repeated | Digital claims associated with the Subject |
 
@@ -4310,7 +4222,7 @@ grantee for the specific authorization
 | id | [string](#string) |  | entity id (did) which has the account |
 | name | [string](#string) |  | name of account |
 | grantee_address | [string](#string) |  | the grantee address that will be able to execute the authz authorization |
-| grant | [Grant](#ixo.entity.v1beta1.Grant) |  | grant to be Authorized in authz grant |
+| grant | [cosmos.authz.v1beta1.Grant](#cosmos.authz.v1beta1.Grant) |  | grant to be Authorized in authz grant |
 | owner_address | [string](#string) |  | the owner_address used to sign this transaction. |
 
 

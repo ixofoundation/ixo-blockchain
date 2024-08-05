@@ -40,7 +40,7 @@ The primary minter has the authority to delegate minting capabilities to other e
 
 ### 3. Batch Operations
 
-Tokens can be minted, transfered and retired in batches, allowing for efficient bulk operations while maintaining the unique attributes of each individual token.
+Tokens can be minted, transferred and retired in batches, allowing for efficient bulk operations while maintaining the unique attributes of each individual token.
 
 ### 4. Token Uniqueness and Fungibility
 

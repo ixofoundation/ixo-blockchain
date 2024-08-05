@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
@@ -37,7 +39,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 	// Not sure if needed as authz can still be created even if sender has no fees
 	// check that sender has enough tokens to make the payment
 	// if !types.HasBalances(ctx, k.BankKeeper, payerAddress, payment.Amount) {
-	// 	return sdkerrors.Wrapf(sdkerrors.ErrInsufficientFunds, "sender has insufficient funds")
+	// 	return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, "sender has insufficient funds")
 	// }
 
 	// get claim and collection payment is for
@@ -62,15 +64,15 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 			// Get node address
 			entity, exists := k.EntityKeeper.GetEntity(ctx, []byte(collection.Entity))
 			if !exists {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "entity did doesn't exist for did %s", collection.Entity)
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "entity did doesn't exist for did %s", collection.Entity)
 			}
 			relayerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(entity.RelayerNode))
 			if !exists {
-				return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "relayer node did doesn't exist for did %s", entity.RelayerNode)
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "relayer node did doesn't exist for did %s", entity.RelayerNode)
 			}
 			relayerAddr, err := relayerDidDoc.GetVerificationMethodBlockchainAddress(entity.RelayerNode)
 			if err != nil {
-				return sdkerrors.Wrapf(err, "did not found in iid doc verification methods for %s", entity.RelayerNode)
+				return errorsmod.Wrapf(err, "did not found in iid doc verification methods for %s", entity.RelayerNode)
 			}
 
 			// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
@@ -111,7 +113,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 
 				// If receiver address(last address in the distribution), then add the remainder to the receiver
 				if address.Equals(receiver) {
-					outputAmt = payment.Amount.Sub(countOutputs)
+					outputAmt = payment.Amount.Sub(countOutputs...)
 					outputs = append(outputs, banktypes.NewOutput(address, outputAmt))
 				} else if !outputAmt.IsZero() {
 					// If amount not zero, add as output, for network and node
@@ -127,7 +129,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 		inputs = append(inputs, banktypes.NewInput(payerAddress, payment.Amount))
 	}
 
-	// if no timeout in payment make payout immidiately
+	// if no timeout in payment make payout immediately
 	if payment.TimeoutNs == 0 {
 		if err := payout(ctx, k, inputs, outputs, paymentType, claimId, &time.Time{}, payment.Contract_1155Payment, payerAddress, receiver); err != nil {
 			return err
@@ -139,7 +141,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 			return err
 		}
 
-		// else create authz WithdrawPaymentAuthorization for receiver to execute to receive payout once timout has passed
+		// else create authz WithdrawPaymentAuthorization for receiver to execute to receive payout once timeout has passed
 		if err := createAuthz(ctx, k, receiver, adminAddress, inputs, outputs, paymentType, claimId, payment.TimeoutNs, payment.Contract_1155Payment, payerAddress, receiver); err != nil {
 			return err
 		}
@@ -175,8 +177,8 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 
 	// distribute the payment according to the outputs for Cosmos Coins if has inputs and outputs
 	if len(inputs) != 0 && len(outputs) != 0 {
-		if err := k.BankKeeper.InputOutputCoins(ctx, inputs, outputs); err != nil {
-			return sdkerrors.Wrapf(types.ErrPaymentWithdrawFailed, "%s", err)
+		if err := k.BankKeeper.InputOutputCoins(ctx, inputs[0], outputs); err != nil {
+			return errorsmod.Wrapf(types.ErrPaymentWithdrawFailed, "%s", err)
 		}
 	}
 
@@ -204,7 +206,7 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 			contractAddress,
 			fromAddress,
 			encodedTransferMessage,
-			sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())),
+			sdk.NewCoins(sdk.NewCoin("uixo", math.ZeroInt())),
 		)
 		if err != nil {
 			return err
@@ -212,7 +214,9 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 	}
 
 	// update payment status to success
-	updatePaymentStatus(ctx, k, paymentType, claimId, types.PaymentStatus_paid)
+	if err := updatePaymentStatus(ctx, k, paymentType, claimId, types.PaymentStatus_paid); err != nil {
+		return err
+	}
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
@@ -237,10 +241,8 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claimId string, timeoutNs time.Duration, payment1155 *types.Contract1155Payment, fromAddress, toAddress sdk.AccAddress) error {
 	// get users current WithdrawPaymentAuthorization authorization
 	authzMsgType := sdk.MsgTypeURL(&types.MsgWithdrawPayment{})
-	auth, _ := k.AuthzKeeper.GetCleanAuthorization(ctx, receiver, admin, authzMsgType)
+	auth, _ := k.AuthzKeeper.GetAuthorization(ctx, receiver, admin, authzMsgType)
 
-	// making expiration date for authz grant one year from now (until indefinite time fix for cosmos version)
-	expiration := ctx.BlockTime().Add(time.Hour * 24 * 365)
 	releaseDate := ctx.BlockTime().Add(timeoutNs)
 	var constraints []*types.WithdrawPaymentConstraints
 	constraint := types.WithdrawPaymentConstraints{
@@ -254,7 +256,7 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 		ToAddress:            toAddress.String(),
 	}
 
-	// if have a WithdrawPaymentAuthorization authz use current constaints to append new one to
+	// if have a WithdrawPaymentAuthorization authz use current constraints to append new one to
 	if auth != nil {
 		switch k := auth.(type) {
 		case *types.WithdrawPaymentAuthorization:
@@ -266,12 +268,14 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	constraints = append(constraints, &constraint)
 
 	// persist new grant
-	if err := k.AuthzKeeper.SaveGrant(ctx, receiver, admin, types.NewWithdrawPaymentAuthorization(admin.String(), constraints), expiration); err != nil {
+	if err := k.AuthzKeeper.SaveGrant(ctx, receiver, admin, types.NewWithdrawPaymentAuthorization(admin.String(), constraints), nil); err != nil {
 		return err
 	}
 
 	// update payment status to authorized
-	updatePaymentStatus(ctx, k, paymentType, claimId, types.PaymentStatus_authorized)
+	if err := updatePaymentStatus(ctx, k, paymentType, claimId, types.PaymentStatus_authorized); err != nil {
+		return err
+	}
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(

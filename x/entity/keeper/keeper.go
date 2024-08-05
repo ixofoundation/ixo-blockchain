@@ -3,16 +3,12 @@ package keeper
 import (
 	"fmt"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 // UnmarshalFn is a generic function to unmarshal bytes
@@ -23,19 +19,28 @@ type MarshalFn func(value interface{}) []byte
 
 type Keeper struct {
 	cdc            codec.BinaryCodec
-	storeKey       sdk.StoreKey
-	memStoreKey    sdk.StoreKey
-	IidKeeper      iidkeeper.Keeper
-	WasmKeeper     wasmtypes.ContractOpsKeeper
-	WasmViewKeeper wasmtypes.ViewKeeper
+	storeKey       storetypes.StoreKey
+	memStoreKey    storetypes.StoreKey
+	IidKeeper      types.IidKeeper
+	WasmKeeper     types.WasmKeeper
+	WasmViewKeeper types.WasmViewKeeper
 	ParamSpace     paramstypes.Subspace
-	AccountKeeper  authkeeper.AccountKeeper
-	AuthzKeeper    authzkeeper.Keeper
+	AccountKeeper  types.AccountKeeper
+	AuthzKeeper    types.AuthzKeeper
 }
 
-func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey, iidKeeper iidkeeper.Keeper, wasmKeeper wasmkeeper.Keeper,
-	paramSpace paramstypes.Subspace, accountKeeper authkeeper.AccountKeeper, authzKeeper authzkeeper.Keeper) Keeper {
-
+// TODO: resolve wasm keeper passed
+func NewKeeper(
+	cdc codec.BinaryCodec,
+	key storetypes.StoreKey,
+	memStoreKey storetypes.StoreKey,
+	iidKeeper types.IidKeeper,
+	wasmKeeper types.WasmKeeper,
+	wasViewKeeper types.WasmViewKeeper,
+	paramSpace paramstypes.Subspace,
+	accountKeeper types.AccountKeeper,
+	authzKeeper types.AuthzKeeper,
+) Keeper {
 	if !paramSpace.HasKeyTable() {
 		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
 	}
@@ -45,11 +50,11 @@ func NewKeeper(cdc codec.BinaryCodec, key sdk.StoreKey, memStoreKey sdk.StoreKey
 		storeKey:       key,
 		memStoreKey:    memStoreKey,
 		IidKeeper:      iidKeeper,
-		WasmKeeper:     wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
+		WasmKeeper:     wasmKeeper,
 		ParamSpace:     paramSpace,
 		AccountKeeper:  accountKeeper,
 		AuthzKeeper:    authzKeeper,
-		WasmViewKeeper: wasmKeeper,
+		WasmViewKeeper: wasViewKeeper,
 	}
 }
 
@@ -112,7 +117,7 @@ func (k Keeper) Get(
 func (k Keeper) GetAll(
 	ctx sdk.Context,
 	prefix []byte,
-) sdk.Iterator {
+) storetypes.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, prefix)
+	return storetypes.KVStorePrefixIterator(store, prefix)
 }

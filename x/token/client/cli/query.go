@@ -12,7 +12,7 @@ import (
 func GetQueryCmd() *cobra.Command {
 	tokenQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "token query sub commands",
+		Short:                      "Querying commands for the token module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -96,9 +96,6 @@ func CmdShowToken() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-			if err != nil {
-				return err
-			}
 
 			queryClient := types.NewQueryClient(clientCtx)
 

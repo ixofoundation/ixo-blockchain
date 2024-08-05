@@ -12,6 +12,6 @@ echo "Moving new genesis file to $HOME/.ixod/config/genesis.json..."
 mv genesis.json "$HOME"/.ixod/config/genesis.json
 
 ixod tendermint unsafe-reset-all
-ixod validate-genesis
+ixod genesis validate-genesis
 
 ixod start --pruning "nothing"

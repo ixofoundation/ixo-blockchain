@@ -40,7 +40,7 @@ Each IID is associated with an IID Document, which contains all the data needed 
 Applications using this module will enable assets on Cosmos networks to be interoperable with the systems and tooling for Decentralised Identifiers (DIDs), which conform with the [W3C DID Core](https://w3c.github.io/did-core/) and related family of specifications.
 The types of assets for which this is relevant includes Non-Fungible Tokens (NFTs), Fungible Tokens, Wallets Accounts, Self-sovereign Digital Identifiers, Name Records, or any other uniquely identifiable asset type.
 
-Any module which perfoms IID registry functions may implement the same methods as the IID module. Or application modules may use the services of the IID Module to perform these functions.
+Any module which performs IID registry functions may implement the same methods as the IID module. Or application modules may use the services of the IID Module to performs these functions.
 
 Integrating IID registry functions within application-specific modules has the advantage of reducing redundancies by having the application module as a context.
 

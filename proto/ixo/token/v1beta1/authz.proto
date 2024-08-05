@@ -9,7 +9,8 @@ import "cosmos_proto/cosmos.proto";
 option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/token/types";
 
 message MintAuthorization {
-  option (cosmos_proto.implements_interface) = "Authorization";
+  option (cosmos_proto.implements_interface) =
+      "cosmos.authz.v1beta1.Authorization";
 
   // address of minter
   string minter = 1;
@@ -19,7 +20,8 @@ message MintAuthorization {
 message MintConstraints {
   string contract_address = 1;
   string amount = 2 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (cosmos_proto.scalar) = "cosmos.Uint",
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
     (gogoproto.nullable) = false
   ];
   // name is the token name, which must be unique (namespace), will be verified

@@ -6,8 +6,9 @@ import "ixo/iid/v1beta1/iid.proto";
 import "ixo/iid/v1beta1/tx.proto";
 import "ixo/iid/v1beta1/types.proto";
 import "ixo/entity/v1beta1/entity.proto";
-import "ixo/entity/v1beta1/cosmos.proto";
 import "google/protobuf/timestamp.proto";
+import "cosmos/authz/v1beta1/authz.proto";
+import "cosmos/msg/v1/msg.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types";
 
@@ -40,6 +41,8 @@ service Msg {
 }
 
 message MsgCreateEntity {
+  option (cosmos.msg.v1.signer) = "owner_address";
+
   // An Entity Type as defined by the implementer
   string entity_type = 1;
   // Status of the Entity as defined by the implementer and interpreted by
@@ -75,7 +78,7 @@ message MsgCreateEntity {
   string owner_address =
       15; // The ownersdid address used to sign this transaction.
   bytes data = 16
-      [ (gogoproto.casttype) = "encoding/json.RawMessage" ]; // Extention data
+      [ (gogoproto.casttype) = "encoding/json.RawMessage" ]; // Extension data
   string alsoKnownAs = 17;
   repeated ixo.iid.v1beta1.LinkedClaim linked_claim =
       18; // Digital claims associated with the Subject
@@ -90,6 +93,8 @@ message MsgCreateEntityResponse {
 // Updates the entity with all the fields, so if field empty will be updated
 // with default go type, aka never null
 message MsgUpdateEntity {
+  option (cosmos.msg.v1.signer) = "controller_address";
+
   // Id of entity to be updated
   string id = 1;
   // Status of the Entity as defined by the implementer and interpreted by
@@ -116,6 +121,8 @@ message MsgUpdateEntityResponse {}
 
 // Only relayer nodes can update entity field 'entityVerified'
 message MsgUpdateEntityVerified {
+  option (cosmos.msg.v1.signer) = "relayer_node_address";
+
   // Id of entity to be updated
   string id = 1;
   // Whether entity is verified or not based on credentials
@@ -131,6 +138,8 @@ message MsgUpdateEntityVerified {
 message MsgUpdateEntityVerifiedResponse {}
 
 message MsgTransferEntity {
+  option (cosmos.msg.v1.signer) = "owner_address";
+
   string id = 1;
   // The owner_did used to sign this transaction.
   string owner_did = 2 [
@@ -149,6 +158,8 @@ message MsgTransferEntityResponse {}
 
 // create a module account for an entity
 message MsgCreateEntityAccount {
+  option (cosmos.msg.v1.signer) = "owner_address";
+
   // entity id (did) to create account for
   string id = 1;
   // name of account
@@ -165,6 +176,8 @@ message MsgCreateEntityAccountResponse {
 // Create a authz grant from entity account (as grantor) to recipient in msg as
 // grantee for the specific authorization
 message MsgGrantEntityAccountAuthz {
+  option (cosmos.msg.v1.signer) = "owner_address";
+
   // entity id (did) which has the account
   string id = 1;
   // name of account
@@ -172,10 +185,7 @@ message MsgGrantEntityAccountAuthz {
   // the grantee address that will be able to execute the authz authorization
   string grantee_address = 3;
   // grant to be Authorized in authz grant
-  Grant grant = 4 [
-    (gogoproto.nullable) = false,
-    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/authz.Grant"
-  ];
+  cosmos.authz.v1beta1.Grant grant = 4 [ (gogoproto.nullable) = false ];
   // the owner_address used to sign this transaction.
   string owner_address = 5;
 }
@@ -184,6 +194,8 @@ message MsgGrantEntityAccountAuthzResponse {}
 
 // Revoke an existing authz grant from entity account (as grantor) to recipient
 message MsgRevokeEntityAccountAuthz {
+  option (cosmos.msg.v1.signer) = "owner_address";
+
   // entity id (did) which has the account
   string id = 1;
   // name of account

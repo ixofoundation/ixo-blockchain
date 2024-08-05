@@ -14,7 +14,7 @@ import (
 func GetQueryCmd() *cobra.Command {
 	bondsQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "Bonds querying subcommands",
+		Short:                      "Querying commands for the bonds module",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,

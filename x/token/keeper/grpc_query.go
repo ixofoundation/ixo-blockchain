@@ -12,16 +12,17 @@ import (
 
 var _ types.QueryServer = Querier{}
 
-// Querier defines a wrapper around the x/token keeper providing gRPC method
-// handlers.
+// Querier defines a wrapper around the x/token keeper providing gRPC method handlers.
 type Querier struct {
 	Keeper
 }
 
+// NewQuerier creates a new Querier struct.
 func NewQuerier(k Keeper) Querier {
 	return Querier{Keeper: k}
 }
 
+// TODO look into Params and any related changes
 func (q Querier) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

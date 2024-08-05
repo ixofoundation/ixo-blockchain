@@ -1,10 +1,10 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 )
 
@@ -15,9 +15,13 @@ func (k Keeper) SetCollection(ctx sdk.Context, data types.Collection) {
 func (k Keeper) GetCollection(ctx sdk.Context, id string) (types.Collection, error) {
 	val, found := k.Get(ctx, []byte(id), types.CollectionKey, k.UnmarshalCollection)
 	if !found {
-		return types.Collection{}, sdkerrors.Wrapf(types.ErrCollectionNotFound, "for %s", id)
+		return types.Collection{}, errorsmod.Wrapf(types.ErrCollectionNotFound, "for %s", id)
 	}
-	return val.(types.Collection), nil
+	collection, ok := val.(types.Collection)
+	if !ok {
+		return types.Collection{}, errorsmod.Wrapf(types.ErrCollectionNotFound, "for %s", id)
+	}
+	return collection, nil
 }
 
 func (k Keeper) UnmarshalCollection(value []byte) (interface{}, bool) {
@@ -38,6 +42,7 @@ func (k Keeper) Marshal(value interface{}) (bytes []byte) {
 	return
 }
 
+// nolint:staticcheck
 // Unmarshal unmarshal a byte slice to a struct, return false in case of errors
 func (k Keeper) Unmarshal(data []byte, val codec.ProtoMarshaler) bool {
 	if len(data) == 0 {
@@ -56,9 +61,13 @@ func (k Keeper) SetClaim(ctx sdk.Context, data types.Claim) {
 func (k Keeper) GetClaim(ctx sdk.Context, id string) (types.Claim, error) {
 	val, found := k.Get(ctx, []byte(id), types.ClaimKey, k.UnmarshalClaim)
 	if !found {
-		return types.Claim{}, sdkerrors.Wrapf(types.ErrClaimNotFound, "for %s", id)
+		return types.Claim{}, errorsmod.Wrapf(types.ErrClaimNotFound, "for %s", id)
 	}
-	return val.(types.Claim), nil
+	claim, ok := val.(types.Claim)
+	if !ok {
+		return types.Claim{}, errorsmod.Wrapf(types.ErrClaimNotFound, "for %s", id)
+	}
+	return claim, nil
 }
 
 func (k Keeper) UnmarshalClaim(value []byte) (interface{}, bool) {
@@ -74,9 +83,13 @@ func (k Keeper) SetDispute(ctx sdk.Context, data types.Dispute) {
 func (k Keeper) GetDispute(ctx sdk.Context, proof string) (types.Dispute, error) {
 	val, found := k.Get(ctx, []byte(proof), types.DisputeKey, k.UnmarshalDispute)
 	if !found {
-		return types.Dispute{}, sdkerrors.Wrapf(types.ErrDisputeNotFound, "for proof %s", proof)
+		return types.Dispute{}, errorsmod.Wrapf(types.ErrDisputeNotFound, "for proof %s", proof)
 	}
-	return val.(types.Dispute), nil
+	dispute, ok := val.(types.Dispute)
+	if !ok {
+		return types.Dispute{}, errorsmod.Wrapf(types.ErrDisputeNotFound, "for proof %s", proof)
+	}
+	return dispute, nil
 }
 
 func (k Keeper) UnmarshalDispute(value []byte) (interface{}, bool) {
@@ -85,7 +98,7 @@ func (k Keeper) UnmarshalDispute(value []byte) (interface{}, bool) {
 	return data, types.IsValidDispute(&data)
 }
 
-func (k Keeper) GetCollectionsIterator(ctx sdk.Context) sdk.Iterator {
+func (k Keeper) GetCollectionsIterator(ctx sdk.Context) storetypes.Iterator {
 	return k.GetAll(ctx, types.CollectionKey)
 }
 
@@ -102,7 +115,7 @@ func (k Keeper) GetCollections(ctx sdk.Context) []types.Collection {
 	return collections
 }
 
-func (k Keeper) GetClaimsIterator(ctx sdk.Context) sdk.Iterator {
+func (k Keeper) GetClaimsIterator(ctx sdk.Context) storetypes.Iterator {
 	return k.GetAll(ctx, types.ClaimKey)
 }
 
@@ -119,7 +132,7 @@ func (k Keeper) GetClaims(ctx sdk.Context) []types.Claim {
 	return claims
 }
 
-func (k Keeper) GetDisputesIterator(ctx sdk.Context) sdk.Iterator {
+func (k Keeper) GetDisputesIterator(ctx sdk.Context) storetypes.Iterator {
 	return k.GetAll(ctx, types.DisputeKey)
 }
 

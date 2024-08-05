@@ -65,19 +65,6 @@ func (MsgCreateIidDocument) Type() string {
 	return TypeMsgCreateDidDocument
 }
 
-func (msg MsgCreateIidDocument) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgCreateIidDocument) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // UPDATE IDENTIFIER
 // --------------------------
@@ -91,19 +78,6 @@ func (MsgUpdateIidDocument) Route() string {
 // Type implements sdk.Msg
 func (MsgUpdateIidDocument) Type() string {
 	return TypeMsgUpdateDidDocument
-}
-
-func (msg MsgUpdateIidDocument) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgUpdateIidDocument) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -134,19 +108,6 @@ func (MsgAddVerification) Type() string {
 	return TypeMsgAddVerification
 }
 
-func (msg MsgAddVerification) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgAddVerification) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // REVOKE VERIFICATION
 // --------------------------
@@ -173,19 +134,6 @@ func (MsgRevokeVerification) Route() string {
 // Type implements sdk.Msg
 func (MsgRevokeVerification) Type() string {
 	return TypeMsgRevokeVerification
-}
-
-func (msg MsgRevokeVerification) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgRevokeVerification) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -217,19 +165,6 @@ func (MsgSetVerificationRelationships) Type() string {
 	return TypeMsgSetVerificationRelationships
 }
 
-func (msg MsgSetVerificationRelationships) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgSetVerificationRelationships) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // ADD SERVICE
 // --------------------------
@@ -256,19 +191,6 @@ func (MsgAddService) Route() string {
 // Type implements sdk.Msg
 func (MsgAddService) Type() string {
 	return TypeMsgAddService
-}
-
-func (msg MsgAddService) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgAddService) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -298,19 +220,6 @@ func (MsgAddLinkedResource) Type() string {
 	return TypeMsgAddLinkedResource
 }
 
-func (msg MsgAddLinkedResource) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgAddLinkedResource) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // ADD LINKED CLAIM
 // --------------------------
@@ -336,19 +245,6 @@ func (MsgAddLinkedClaim) Route() string {
 // Type implements sdk.Msg
 func (MsgAddLinkedClaim) Type() string {
 	return TypeMsgAddLinkedClaim
-}
-
-func (msg MsgAddLinkedClaim) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgAddLinkedClaim) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -378,18 +274,6 @@ func (MsgAddLinkedEntity) Type() string {
 	return TypeMsgAddLinkedEntity
 }
 
-func (msg MsgAddLinkedEntity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-func (msg MsgAddLinkedEntity) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // DELETE SERVICE
 // --------------------------
@@ -415,19 +299,6 @@ func (MsgDeleteService) Route() string {
 // Type implements sdk.Msg
 func (MsgDeleteService) Type() string {
 	return TypeMsgDeleteService
-}
-
-func (msg MsgDeleteService) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgDeleteService) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -456,19 +327,6 @@ func (MsgDeleteLinkedResource) Type() string {
 	return TypeMsgDeleteLinkedResource
 }
 
-func (msg MsgDeleteLinkedResource) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgDeleteLinkedResource) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // DELETE LINKED CLAIM
 // --------------------------
@@ -495,19 +353,6 @@ func (MsgDeleteLinkedClaim) Type() string {
 	return TypeMsgDeleteLinkedClaim
 }
 
-func (msg MsgDeleteLinkedClaim) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgDeleteLinkedClaim) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // DELETE LINKED ENTITY
 // --------------------------
@@ -532,18 +377,6 @@ func (MsgDeleteLinkedEntity) Route() string {
 // Type implements sdk.Msg
 func (MsgDeleteLinkedEntity) Type() string {
 	return TypeMsgDeleteLinkedEntity
-}
-
-func (msg MsgDeleteLinkedEntity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-func (msg MsgDeleteLinkedEntity) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -574,19 +407,6 @@ func (MsgAddAccordedRight) Type() string {
 	return TypeMsgAddRight
 }
 
-func (msg MsgAddAccordedRight) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgAddAccordedRight) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // DELETE RIGHT
 // --------------------------
@@ -612,19 +432,6 @@ func (MsgDeleteAccordedRight) Route() string {
 // Type implements sdk.Msg
 func (MsgDeleteAccordedRight) Type() string {
 	return TypeMsgDeleteAccordedRight
-}
-
-func (msg MsgDeleteAccordedRight) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgDeleteAccordedRight) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -654,19 +461,6 @@ func (MsgAddController) Type() string {
 	return TypeMsgAddController
 }
 
-func (msg MsgAddController) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgAddController) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // DELETE CONTROLLER
 // --------------------------
@@ -692,19 +486,6 @@ func (MsgDeleteController) Route() string {
 // Type implements sdk.Msg
 func (MsgDeleteController) Type() string {
 	return TypeMsgDeleteController
-}
-
-func (msg MsgDeleteController) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgDeleteController) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }
 
 // --------------------------
@@ -735,19 +516,6 @@ func (MsgAddIidContext) Type() string {
 	return TypeMsgAddContext
 }
 
-func (msg MsgAddIidContext) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgAddIidContext) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // DELETE CONTEXT
 // --------------------------
@@ -775,19 +543,6 @@ func (MsgDeleteIidContext) Type() string {
 	return TypeMsgDeleteDidContext
 }
 
-func (msg MsgDeleteIidContext) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgDeleteIidContext) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
-}
-
 // --------------------------
 // DEACTIVATE DID
 // --------------------------
@@ -812,17 +567,4 @@ func (MsgDeactivateIID) Route() string {
 
 func (MsgDeactivateIID) Type() string {
 	return TypeMsgDeactivateDid
-}
-
-func (msg MsgDeactivateIID) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleAminoCdc.MustMarshalJSON(&msg))
-}
-
-// GetSigners implements sdk.Msg
-func (msg MsgDeactivateIID) GetSigners() []sdk.AccAddress {
-	accAddr, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{accAddr}
 }

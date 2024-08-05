@@ -4,22 +4,22 @@ import (
 	"context"
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v3/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
 type msgServer struct {
-	Keeper
+	Keeper *Keeper
 }
 
 var _ types.MsgServer = msgServer{}
 
 // NewMsgServerImpl returns an implementation of the MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
+func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
@@ -33,17 +33,17 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	// check that entity exists
 	_, entity, err := s.Keeper.EntityKeeper.ResolveEntity(ctx, msg.Entity)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", msg.Entity)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", msg.Entity)
 	}
 
 	// check that protocol exists
 	if _, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.Protocol)); !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for protocol %s", msg.Protocol)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for protocol %s", msg.Protocol)
 	}
 
 	// check that signer is nft owner
 	if err = s.Keeper.EntityKeeper.CheckIfOwner(ctx, msg.Entity, msg.Signer); err != nil {
-		return nil, sdkerrors.Wrapf(err, "unauthorized")
+		return nil, errorsmod.Wrapf(err, "unauthorized")
 	}
 
 	// check that Evaluation Payment does not have 1155 payment
@@ -59,7 +59,7 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	// get entity admin account
 	admin, err := entity.GetAdminAccount()
 	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "for admin")
+		return nil, errorsmod.Wrapf(err, "for admin")
 	}
 
 	// create and persist the Collection
@@ -110,7 +110,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 	// Make sure claim does not exist already
 	_, err := s.Keeper.GetClaim(ctx, msg.ClaimId)
 	if err == nil {
-		return nil, sdkerrors.Wrapf(types.ErrClaimDuplicate, "id %s", msg.ClaimId)
+		return nil, errorsmod.Wrapf(types.ErrClaimDuplicate, "id %s", msg.ClaimId)
 	}
 
 	// Get Collection for claim
@@ -127,12 +127,12 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// check that collection is in open state
 	if collection.State != types.CollectionState_open {
-		return nil, sdkerrors.Wrapf(types.ErrCollectionNotOpen, "state %s", collection.State)
+		return nil, errorsmod.Wrapf(types.ErrCollectionNotOpen, "state %s", collection.State)
 	}
 
 	// check that collection has already started and has not ended yet
@@ -184,7 +184,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 	}
 
 	// start payout process for claim submission
-	if err = processPayment(ctx, s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, msg.ClaimId); err != nil {
+	if err = processPayment(ctx, *s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, msg.ClaimId); err != nil {
 		return nil, err
 	}
 
@@ -205,12 +205,12 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 
 	// check that collectionId in message corresponds to claims collection
 	if claim.CollectionId != msg.CollectionId {
-		return nil, sdkerrors.Wrapf(types.ErrEvaluateWrongCollection, "claim collection %s vs message collection %s", claim.CollectionId, msg.CollectionId)
+		return nil, errorsmod.Wrapf(types.ErrEvaluateWrongCollection, "claim collection %s vs message collection %s", claim.CollectionId, msg.CollectionId)
 	}
 
 	// check that claim was not evaluated already
 	if claim.Evaluation != nil {
-		return nil, sdkerrors.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
+		return nil, errorsmod.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
 	}
 
 	// get Collection for claim
@@ -221,7 +221,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// Get evaluation agent address
@@ -255,7 +255,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 
 	// start payout process for evaluation submission, if evaluation has status invalidated, dont run evaluation payout process
 	if msg.Status != types.EvaluationStatus_invalidated {
-		if err = processPayment(ctx, s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
+		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
 			return nil, err
 		}
 
@@ -272,7 +272,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		if !msg.Amount.IsZero() {
 			approvedPayment.Amount = msg.Amount
 		}
-		if err = processPayment(ctx, s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, msg.ClaimId); err != nil {
+		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, msg.ClaimId); err != nil {
 			return nil, err
 		}
 	} else if msg.Status == types.EvaluationStatus_rejected {
@@ -282,7 +282,10 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		// no payment for disputed
 		collection.Disputed++
 		// update payment status to disputed
-		updatePaymentStatus(ctx, s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_disputed)
+		err := updatePaymentStatus(ctx, *s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_disputed)
+		if err != nil {
+			return nil, err
+		}
 	} else if msg.Status == types.EvaluationStatus_invalidated {
 		// no payment for invalidated
 		collection.Invalidated++
@@ -315,7 +318,7 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 	// Make sure dispute with proof does not exist already
 	_, err := s.Keeper.GetDispute(ctx, msg.Data.Proof)
 	if err == nil {
-		return nil, sdkerrors.Wrapf(types.ErrDisputeDuplicate, "proof %s", msg.Data.Proof)
+		return nil, errorsmod.Wrapf(types.ErrDisputeDuplicate, "proof %s", msg.Data.Proof)
 	}
 
 	// get Claim for dispute
@@ -332,7 +335,7 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 
 	entity, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(collection.Entity))
 	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
 	}
 
 	// check if user authorized to lay claim,
@@ -350,7 +353,10 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 		}
 
 		// get users current authorization to see if user is agent for claim/collection
-		authorizations := s.Keeper.AuthzKeeper.GetAuthorizations(ctx, grantee, granter)
+		authorizations, err := s.Keeper.AuthzKeeper.GetAuthorizations(ctx, grantee, granter)
+		if err != nil {
+			return nil, types.ErrDisputeUnauthorized
+		}
 
 		for _, auth := range authorizations {
 			if isAuthorized {
@@ -418,7 +424,7 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// get from address
@@ -433,7 +439,7 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 	}
 
 	// make payout
-	err = payout(ctx, s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate, msg.Contract_1155Payment, fromAddress, toAddress)
+	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate, msg.Contract_1155Payment, fromAddress, toAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -454,7 +460,7 @@ func (s msgServer) UpdateCollectionState(goCtx context.Context, msg *types.MsgUp
 
 	// check that signer is collection admin
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// update state
@@ -489,7 +495,7 @@ func (s msgServer) UpdateCollectionDates(goCtx context.Context, msg *types.MsgUp
 
 	// check that signer is collection admin
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// update state
@@ -525,13 +531,13 @@ func (s msgServer) UpdateCollectionPayments(goCtx context.Context, msg *types.Ms
 
 	// check that signer is collection admin
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// check that entity exists
 	_, entity, err := s.Keeper.EntityKeeper.ResolveEntity(ctx, collection.Entity)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
 	}
 
 	// check that Evaluation Payment does not have 1155 payment

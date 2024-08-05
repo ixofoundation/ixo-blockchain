@@ -38,7 +38,6 @@ var (
 )
 
 func init() {
-
 	fsBondCreate.String(FlagToken, "", "The bond's token")
 	fsBondCreate.String(FlagName, "", "The bond's name")
 	fsBondCreate.String(FlagDescription, "", "The bond's description")

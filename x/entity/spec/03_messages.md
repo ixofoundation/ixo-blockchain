@@ -48,7 +48,7 @@ The field's descriptions is as follows:
 - `startDate` - a timestamp of the start date for the entity, as defined by the implementer and interpreted by client applications
 - `endDate` - a timestamp of the end date for the entity, as defined by the implementer and interpreted by client applications
 - `relayerNode` - a string representing the did id of the operator through which the entity was created
-- `credentials` - a list of string representing the credentials of the enitity to be verified
+- `credentials` - a list of string representing the credentials of the entity to be verified
 
 ## MsgUpdateEntity
 
@@ -72,7 +72,7 @@ The field's descriptions is as follows:
 - `entityStatus` - a integer representing the status of the entity, as defined by the implementer and interpreted by client applications
 - `startDate` - a timestamp of the start date for the entity, as defined by the implementer and interpreted by client applications
 - `endDate` - a timestamp of the end date for the entity, as defined by the implementer and interpreted by client applications
-- `credentials` - a list of string representing the credentials of the enitity to be verified
+- `credentials` - a list of string representing the credentials of the entity to be verified
 - `ControllerAddress` - a string containing the cosmos address of the private key signing the transaction
 - `ControllerDid` - a string containing the signers IidDocument Id. Must be in the IidDocument's controllers list to allow update and the `ControllerAddress` must be authorized to sign on behalf of the `ControllerDid`
 

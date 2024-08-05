@@ -597,25 +597,6 @@
         
           
           <li>
-            <a href="#ixo%2fclaims%2fv1beta1%2fcosmos.proto">ixo/claims/v1beta1/cosmos.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#ixo.claims.v1beta1.Input"><span class="badge">M</span>Input</a>
-                </li>
-              
-                <li>
-                  <a href="#ixo.claims.v1beta1.Output"><span class="badge">M</span>Output</a>
-                </li>
-              
-              
-              
-              
-            </ul>
-          </li>
-        
-          
-          <li>
             <a href="#ixo%2fclaims%2fv1beta1%2fauthz.proto">ixo/claims/v1beta1/authz.proto</a>
             <ul>
               
@@ -853,21 +834,6 @@
                 <li>
                   <a href="#ixo.claims.v1beta1.Msg"><span class="badge">S</span>Msg</a>
                 </li>
-              
-            </ul>
-          </li>
-        
-          
-          <li>
-            <a href="#ixo%2fentity%2fv1beta1%2fcosmos.proto">ixo/entity/v1beta1/cosmos.proto</a>
-            <ul>
-              
-                <li>
-                  <a href="#ixo.entity.v1beta1.Grant"><span class="badge">M</span>Grant</a>
-                </li>
-              
-              
-              
               
             </ul>
           </li>
@@ -3662,7 +3628,7 @@ their current state.</p></td>
                 <td>Params</td>
                 <td><a href="#ixo.bonds.v1beta1.QueryParamsRequest">QueryParamsRequest</a></td>
                 <td><a href="#ixo.bonds.v1beta1.QueryParamsResponse">QueryParamsResponse</a></td>
-                <td><p>Params queries the paramaters of x/bonds module.</p></td>
+                <td><p>Params queries the parameters of x/bonds module.</p></td>
               </tr>
             
               <tr>
@@ -5260,7 +5226,7 @@ use default by Collection </p></td>
                   <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
                   <td></td>
                   <td><p>timeout after claim/evaluation to create authZ for payment, if 0 then
-immidiate direct payment </p></td>
+immediate direct payment </p></td>
                 </tr>
               
             </tbody>
@@ -5414,7 +5380,7 @@ immidiate direct payment </p></td>
               </tr>
             
               <tr>
-                <td>GAURANTEED</td>
+                <td>GUARANTEED</td>
                 <td>3</td>
                 <td><p>escrow set up with funds blocked</p></td>
               </tr>
@@ -5432,7 +5398,7 @@ immidiate direct payment </p></td>
               </tr>
             
               <tr>
-                <td>DISPUTED</td>
+                <td>DISPUTED_PAYMENT</td>
                 <td>6</td>
                 <td><p></p></td>
               </tr>
@@ -5474,82 +5440,6 @@ immidiate direct payment </p></td>
             
           </tbody>
         </table>
-      
-
-      
-
-      
-    
-      
-      <div class="file-heading">
-        <h2 id="ixo/claims/v1beta1/cosmos.proto">ixo/claims/v1beta1/cosmos.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="ixo.claims.v1beta1.Input">Input</h3>
-        <p>Input models transaction input.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>coins</td>
-                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-        <h3 id="ixo.claims.v1beta1.Output">Output</h3>
-        <p>Output models transaction outputs.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>address</td>
-                  <td><a href="#string">string</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>coins</td>
-                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
-                  <td>repeated</td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
       
 
       
@@ -5759,14 +5649,14 @@ defined in Token payments </p></td>
               
                 <tr>
                   <td>inputs</td>
-                  <td><a href="#ixo.claims.v1beta1.Input">Input</a></td>
+                  <td><a href="#cosmos.bank.v1beta1.Input">cosmos.bank.v1beta1.Input</a></td>
                   <td>repeated</td>
                   <td><p>Inputs to the multisend tx to run to withdraw payment </p></td>
                 </tr>
               
                 <tr>
                   <td>outputs</td>
-                  <td><a href="#ixo.claims.v1beta1.Output">Output</a></td>
+                  <td><a href="#cosmos.bank.v1beta1.Output">cosmos.bank.v1beta1.Output</a></td>
                   <td>repeated</td>
                   <td><p>Outputs for the multisend tx to run to withdraw payment </p></td>
                 </tr>
@@ -6701,7 +6591,7 @@ against claims </p></td>
                   <td>agent_did</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>agent is the DID of the agent disputing the claim, agent detials wont be
+                  <td><p>agent is the DID of the agent disputing the claim, agent details won&#39;t be
 saved in kvStore </p></td>
                 </tr>
               
@@ -7060,14 +6950,14 @@ update to </p></td>
               
                 <tr>
                   <td>inputs</td>
-                  <td><a href="#ixo.claims.v1beta1.Input">Input</a></td>
+                  <td><a href="#cosmos.bank.v1beta1.Input">cosmos.bank.v1beta1.Input</a></td>
                   <td>repeated</td>
                   <td><p>Inputs to the multisend tx to run to withdraw payment </p></td>
                 </tr>
               
                 <tr>
                   <td>outputs</td>
-                  <td><a href="#ixo.claims.v1beta1.Output">Output</a></td>
+                  <td><a href="#cosmos.bank.v1beta1.Output">cosmos.bank.v1beta1.Output</a></td>
                   <td>repeated</td>
                   <td><p>Outputs for the multisend tx to run to withdraw payment </p></td>
                 </tr>
@@ -7204,51 +7094,6 @@ plus the timeout on Collection payments </p></td>
         </table>
 
         
-    
-      
-      <div class="file-heading">
-        <h2 id="ixo/entity/v1beta1/cosmos.proto">ixo/entity/v1beta1/cosmos.proto</h2><a href="#title">Top</a>
-      </div>
-      <p></p>
-
-      
-        <h3 id="ixo.entity.v1beta1.Grant">Grant</h3>
-        <p>Grant gives permissions to execute</p><p>the provide method with expiration time.</p>
-
-        
-          <table class="field-table">
-            <thead>
-              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
-            </thead>
-            <tbody>
-              
-                <tr>
-                  <td>authorization</td>
-                  <td><a href="#google.protobuf.Any">google.protobuf.Any</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-                <tr>
-                  <td>expiration</td>
-                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
-                  <td></td>
-                  <td><p> </p></td>
-                </tr>
-              
-            </tbody>
-          </table>
-
-          
-
-        
-      
-
-      
-
-      
-
-      
     
       
       <div class="file-heading">
@@ -7907,7 +7752,7 @@ Client applications </p></td>
                   <td>credentials</td>
                   <td><a href="#string">string</a></td>
                   <td>repeated</td>
-                  <td><p>Credentials of the enitity to be verified </p></td>
+                  <td><p>Credentials of the entity to be verified </p></td>
                 </tr>
               
                 <tr>
@@ -8107,7 +7952,7 @@ deactivated </p></td>
               
                 <tr>
                   <td>grant</td>
-                  <td><a href="#ixo.entity.v1beta1.Grant">Grant</a></td>
+                  <td><a href="#cosmos.authz.v1beta1.Grant">cosmos.authz.v1beta1.Grant</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -10247,7 +10092,7 @@ subject </p></td>
                   <td>data</td>
                   <td><a href="#bytes">bytes</a></td>
                   <td></td>
-                  <td><p>Extention data </p></td>
+                  <td><p>Extension data </p></td>
                 </tr>
               
                 <tr>
@@ -10404,7 +10249,7 @@ subject </p></td>
               
                 <tr>
                   <td>grant</td>
-                  <td><a href="#ixo.entity.v1beta1.Grant">Grant</a></td>
+                  <td><a href="#cosmos.authz.v1beta1.Grant">cosmos.authz.v1beta1.Grant</a></td>
                   <td></td>
                   <td><p>grant to be Authorized in authz grant </p></td>
                 </tr>

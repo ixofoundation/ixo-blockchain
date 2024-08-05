@@ -1,3 +1,3 @@
 # Parameters
 
-The iid module contains no module paramters.
+The iid module contains no module parameters.

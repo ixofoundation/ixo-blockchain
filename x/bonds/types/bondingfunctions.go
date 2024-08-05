@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	sdk_math "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -12,13 +13,13 @@ import (
 // "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
 func toPercentage(f float64) float64 { return f / 100 }
 
-func ConvertFloat64ToDec(f float64) (sdk.Dec, error) {
+func ConvertFloat64ToDec(f float64) (sdk_math.LegacyDec, error) {
 	s := fmt.Sprintf("%.18f", f)
 	fmt.Println(f)
-	dec, err := sdk.NewDecFromStr(s)
+	dec, err := sdk_math.LegacyNewDecFromStr(s)
 	if err != nil {
 		fmt.Println(err)
-		return sdk.Dec{}, err
+		return sdk_math.LegacyDec{}, err
 	}
 	return dec, nil
 }
@@ -62,11 +63,11 @@ type AugmentedBondRevision1 struct {
 	_a0  float64 // Initial System Alpha
 	_g   float64 // System Gamma
 	_ap  float64 // System Alpha Public
-	_ap0 float64 // Intial Alpha Public
+	_ap0 float64 // Initial Alpha Public
 	_t   float64 // Time
 
 	_r float64 // Discounting rate
-	// _p1 sdk.Dec // Maximum Price
+	// _p1 math.LegacyDec // Maximum Price
 
 	_Pmin float64 // Minimum Price
 	_Pavg float64 // Average Price
@@ -130,9 +131,8 @@ func (algo *AugmentedBondRevision1) ExportToMap() map[string]float64 {
 }
 
 func (algo *AugmentedBondRevision1) ExportToBond(bond *Bond) error {
-
-	valueOrError := RightFlatMap(FromError(ConvertFloat64ToDec(algo._ap)), func(ap sdk.Dec) Either[error, bool] {
-		return RightFlatMap(FromError(ConvertFloat64ToDec(algo._a)), func(a sdk.Dec) Either[error, bool] {
+	valueOrError := RightFlatMap(FromError(ConvertFloat64ToDec(algo._ap)), func(ap sdk_math.LegacyDec) Either[error, bool] {
+		return RightFlatMap(FromError(ConvertFloat64ToDec(algo._a)), func(a sdk_math.LegacyDec) Either[error, bool] {
 			bond.FunctionParameters.ReplaceParam("PUBLIC_ALPHA", ap)
 			bond.FunctionParameters.ReplaceParam("SYSTEM_ALPHA", a)
 			return Right[error](true)
@@ -150,7 +150,7 @@ func (algo *AugmentedBondRevision1) Revision() int64 { return 1 }
 
 func (algo *AugmentedBondRevision1) Init(bond Bond) error {
 	params := bond.FunctionParameters.AsMap()
-	bondReserve := func() (total sdk.Int) {
+	bondReserve := func() (total sdk_math.Int) {
 		// for _, coin := range bond.CurrentReserve {
 		// 	total.Add(coin.Amount)
 		// }
@@ -164,10 +164,10 @@ func (algo *AugmentedBondRevision1) Init(bond Bond) error {
 		return fmt.Errorf("REVISION in bond function parameters is not %d", algo.Revision())
 	}
 
-	var valueOrError Either[error, bool] = RightFlatMap(FromError(bond.CurrentSupply.Amount.ToDec().Float64()), func(_m float64) Either[error, bool] {
-		return RightFlatMap(FromError(bond.MaxSupply.Amount.ToDec().Float64()), func(_M float64) Either[error, bool] {
-			return RightFlatMap(FromError(bond.OutcomePayment.ToDec().Float64()), func(_C float64) Either[error, bool] {
-				return RightFlatMap(FromError(bondReserve().ToDec().Float64()), func(_R float64) Either[error, bool] {
+	var valueOrError = RightFlatMap(FromError(bond.CurrentSupply.Amount.ToLegacyDec().Float64()), func(_m float64) Either[error, bool] {
+		return RightFlatMap(FromError(bond.MaxSupply.Amount.ToLegacyDec().Float64()), func(_M float64) Either[error, bool] {
+			return RightFlatMap(FromError(bond.OutcomePayment.ToLegacyDec().Float64()), func(_C float64) Either[error, bool] {
+				return RightFlatMap(FromError(bondReserve().ToLegacyDec().Float64()), func(_R float64) Either[error, bool] {
 					return RightFlatMap(FromError(params["Funding_Target"].Float64()), func(_F float64) Either[error, bool] {
 						return RightFlatMap(FromError(params["Hatch_Supply"].Float64()), func(_Mh float64) Either[error, bool] {
 							return RightFlatMap(FromError(params["Hatch_Price"].Float64()), func(_Ph float64) Either[error, bool] {
@@ -247,7 +247,6 @@ func (algo *AugmentedBondRevision1) Init(bond Bond) error {
 }
 
 func (algo *AugmentedBondRevision1) UpdateAlpha(_ap, _delta float64) error {
-
 	if _ap < 0 {
 		return fmt.Errorf("alpha is smaller than 0 and must be greater than or equal to 0 and smaller than or equal to 1")
 	}
@@ -275,20 +274,18 @@ func (algo *AugmentedBondRevision1) CalculatePriceForTokens(price sdk.Coin) (sdk
 	// }
 
 	_mh := float64(0)
-	// _dm, _ := price.Amount.ToDec().Float64()
+	// _dm, _ := price.Amount.ToLegacyDec().Float64()
 	calc := (algo._Mh - _mh)
 	dec, _ := ConvertFloat64ToDec(calc)
 	return sdk.NewDecCoinFromDec(price.Denom, dec), nil
-
 }
 
 func (algo *AugmentedBondRevision1) CalculateTokensForPrice(price sdk.Coin) (sdk.DecCoin, error) {
-
 	// if !bond.AlphaBond {
 	// 	// return types.Price{}, errors.New("not an alpha bond")
 	// }
 
-	_dm, _ := price.Amount.ToDec().Float64()
+	_dm, _ := price.Amount.ToLegacyDec().Float64()
 	calc := (_dm * algo._Pmin) + (((algo._Mi * (algo._Pmax - algo._Pmin)) / (algo._B + 1)) * (math.Pow(((algo._m+_dm)/algo._Mi), (algo._B+1)) - math.Pow((algo._m/algo._M), (algo._B+1))))
 	dec, _ := ConvertFloat64ToDec(calc)
 	return sdk.NewDecCoinFromDec(price.Denom, dec), nil

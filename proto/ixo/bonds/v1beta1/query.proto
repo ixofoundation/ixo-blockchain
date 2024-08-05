@@ -4,6 +4,7 @@ package ixo.bonds.v1beta1;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
 import "ixo/bonds/v1beta1/bonds.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types";
@@ -22,7 +23,7 @@ service Query {
     option (google.api.http).get = "/ixo/bonds/bonds_detailed";
   }
 
-  // Params queries the paramaters of x/bonds module.
+  // Params queries the parameters of x/bonds module.
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/ixo/bonds/params";
   }
@@ -279,11 +280,13 @@ message QueryAlphaMaximumsRequest { string bond_did = 1; }
 // RPC method.
 message QueryAlphaMaximumsResponse {
   string max_system_alpha_increase = 1 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
   string max_system_alpha = 2 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 }

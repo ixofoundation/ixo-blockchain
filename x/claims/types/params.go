@@ -3,6 +3,7 @@ package types
 import (
 	fmt "fmt"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
@@ -23,7 +24,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 
 // NewParams creates a new Params instance
 func NewParams(collectionSequence uint64, ixoAccount string,
-	networkFeePercentage, nodeFeePercentage sdk.Dec) Params {
+	networkFeePercentage, nodeFeePercentage math.LegacyDec) Params {
 	return Params{
 		CollectionSequence:   collectionSequence,
 		IxoAccount:           ixoAccount,
@@ -35,7 +36,7 @@ func NewParams(collectionSequence uint64, ixoAccount string,
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
 	defaultIxoAccount := "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
-	tenPercentFee := sdk.NewDec(10)
+	tenPercentFee := math.LegacyNewDec(10)
 
 	return NewParams(1, defaultIxoAccount, tenPercentFee, tenPercentFee)
 }
@@ -65,14 +66,14 @@ func validateIxoAccount(i interface{}) error {
 }
 
 func validateFeePercentage(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	if v.LT(sdk.ZeroDec()) {
+	if v.LT(math.LegacyZeroDec()) {
 		return fmt.Errorf("invalid parameter fee percentage; should be >= 0.0, is %s ", v.String())
-	} else if v.GT(sdk.NewDec(100)) {
+	} else if v.GT(math.LegacyNewDec(100)) {
 		return fmt.Errorf("invalid parameter fee percentage; should be <= 100, is %s ", v.String())
 	}
 

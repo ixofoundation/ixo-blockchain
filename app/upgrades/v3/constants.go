@@ -1,7 +1,7 @@
 package v3
 
 import (
-	store "github.com/cosmos/cosmos-sdk/store/types"
+	store "cosmossdk.io/store/types"
 
 	"github.com/ixofoundation/ixo-blockchain/v3/app/upgrades"
 )
