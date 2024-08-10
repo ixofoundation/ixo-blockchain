@@ -79,8 +79,7 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 
 // GetQueryCmd returns the root query command for the module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return cli.GetQueryCmd()
-	// return nil
+	return nil
 }
 
 // ----------------------------------------------------------------------------

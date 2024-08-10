@@ -27,6 +27,7 @@ func (dec BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context
 			continue
 		}
 
+		// Can get only the NftContractAddress param for performance
 		var params entitytypes.Params
 		dec.entityKeeper.ParamSpace.GetParamSetIfExists(ctx, &params)
 

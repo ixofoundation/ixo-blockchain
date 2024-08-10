@@ -45,6 +45,8 @@ import (
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
 	icq "github.com/cosmos/ibc-apps/modules/async-icq/v8"
 	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v8/types"
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
 	"github.com/cosmos/ibc-go/modules/capability"
 	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
 	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
@@ -65,6 +67,8 @@ import (
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/v3/x/iid"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	smartaccount "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
 	tokenmodule "github.com/ixofoundation/ixo-blockchain/v3/x/token"
 	tokenclient "github.com/ixofoundation/ixo-blockchain/v3/x/token/client"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
@@ -89,6 +93,7 @@ var moduleAccountPermissions = map[string][]string{
 	bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
 	bondstypes.BatchesIntermediaryAccount: nil,
 	bondstypes.BondsReserveAccount:        nil,
+	smartaccounttypes.ModuleName:          nil,
 }
 
 // appModules return modules to initialize module manager.
@@ -100,12 +105,7 @@ func appModules(
 ) []module.AppModule {
 	return []module.AppModule{
 		// Standard Cosmos AppModules
-		genutil.NewAppModule(
-			app.AccountKeeper,
-			app.StakingKeeper,
-			app.BaseApp,
-			txConfig,
-		),
+		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app.BaseApp, txConfig),
 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
@@ -120,16 +120,17 @@ func appModules(
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
-		ibctm.NewAppModule(), // TODO: check if needed
+		ibctm.NewAppModule(),
 		sdkparams.NewAppModule(app.ParamsKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
-		wasm.NewAppModule(appCodec, &app.AppKeepers.WasmKeeper, app.AppKeepers.StakingKeeper, app.AppKeepers.AccountKeeper, app.AppKeepers.BankKeeper, app.BaseApp.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.BaseApp.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		icq.NewAppModule(app.ICQKeeper, app.GetSubspace(icqtypes.ModuleName)),
 		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
 		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
 		transfer.NewAppModule(app.TransferKeeper),
+		ibchooks.NewAppModule(app.AccountKeeper),
 
 		// Custom ixo AppModules
 		iidmodule.NewAppModule(app.appCodec, app.IidKeeper),
@@ -137,6 +138,7 @@ func appModules(
 		entitymodule.NewAppModule(app.EntityKeeper),
 		tokenmodule.NewAppModule(app.TokenKeeper),
 		claimsmodule.NewAppModule(app.ClaimsKeeper),
+		smartaccount.NewAppModule(appCodec, *app.SmartAccountKeeper),
 	}
 }
 
@@ -153,12 +155,6 @@ func newBasicManagerFromManager(app *IxoApp) module.BasicManager {
 					paramsclient.ProposalHandler,
 					entityclient.ProposalHandler,
 					tokenclient.ProposalHandler,
-					// Leave below in case need to add back, as it should be done with new v1 gov props
-					// upgradeclient.LegacyProposalHandler,
-					// upgradeclient.LegacyCancelProposalHandler,
-					// ibcclientclient.UpdateClientProposalHandler,
-					// ibcclientclient.UpgradeProposalHandler,
-					// wasmclient.ProposalHandlers,
 				},
 			),
 		})
@@ -192,48 +188,9 @@ func newBasicManagerFromManager(app *IxoApp) module.BasicManager {
 // 		evidence.NewAppModule(app.EvidenceKeeper),
 // 		ibc.NewAppModule(app.IBCKeeper),
 // 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-// 		transfer.NewAppModule(app.AppKeepers.TransferKeeper),
+// 		transfer.NewAppModule(app.TransferKeeper),
 // 	}
 // }
-
-// OrderPreBlockers returns the order of PreBlocker, by module name.
-func OrderPreBlockers() []string {
-	// upgrade module is required to be prioritized
-	return []string{
-		upgradetypes.ModuleName,
-
-		minttypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-		evidencetypes.ModuleName,
-		stakingtypes.ModuleName,
-		ibchost.ModuleName,
-		banktypes.ModuleName,
-		genutiltypes.ModuleName,
-		crisistypes.ModuleName,
-		paramstypes.ModuleName,
-		authtypes.ModuleName,
-		capabilitytypes.ModuleName,
-		govtypes.ModuleName,
-		ibctransfertypes.ModuleName,
-		vestingtypes.ModuleName,
-		authz.ModuleName,
-		feegrant.ModuleName,
-		icatypes.ModuleName,
-		ibcfeetypes.ModuleName,
-		wasmtypes.ModuleName,
-		packetforwardtypes.ModuleName,
-		icqtypes.ModuleName,
-		consensusparamtypes.ModuleName,
-
-		// Custom ixo modules
-		bondstypes.ModuleName,
-		iidtypes.ModuleName,
-		entitytypes.ModuleName,
-		tokentypes.ModuleName,
-		claimsmoduletypes.ModuleName,
-	}
-}
 
 // OrderBeginBlockers returns the order of BeginBlockers, by module name.
 func OrderBeginBlockers() []string {
@@ -268,8 +225,10 @@ func OrderBeginBlockers() []string {
 		packetforwardtypes.ModuleName,
 		icqtypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		smartaccounttypes.ModuleName,
 		bondstypes.ModuleName,
 		iidtypes.ModuleName,
 		entitytypes.ModuleName,
@@ -308,8 +267,10 @@ func OrderEndBlockers() []string {
 		packetforwardtypes.ModuleName,
 		icqtypes.ModuleName,
 		consensusparamtypes.ModuleName,
+		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		smartaccounttypes.ModuleName,
 		iidtypes.ModuleName,
 		entitytypes.ModuleName,
 		tokentypes.ModuleName,
@@ -354,8 +315,10 @@ func OrderInitGenesis() []string {
 		wasmtypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		smartaccounttypes.ModuleName,
 		iidtypes.ModuleName,
 		bondstypes.ModuleName,
 		tokentypes.ModuleName,

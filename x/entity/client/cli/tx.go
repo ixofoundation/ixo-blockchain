@@ -30,6 +30,7 @@ func NewTxCmd() *cobra.Command {
 		NewCmdUpdateEntity(),
 		NewCmdUpdateEntityVerified(),
 		NewCmdTransferEntity(),
+		NewCmdCreateEntityAccount(),
 	)
 
 	return entityTxCmd

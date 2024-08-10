@@ -302,10 +302,6 @@
     - [TokensCancelled](#ixo.token.v1beta1.TokensCancelled)
     - [TokensRetired](#ixo.token.v1beta1.TokensRetired)
   
-- [ixo/token/v1beta1/authz.proto](#ixo/token/v1beta1/authz.proto)
-    - [MintAuthorization](#ixo.token.v1beta1.MintAuthorization)
-    - [MintConstraints](#ixo.token.v1beta1.MintConstraints)
-  
 - [ixo/token/v1beta1/tx.proto](#ixo/token/v1beta1/tx.proto)
     - [MintBatch](#ixo.token.v1beta1.MintBatch)
     - [MsgCancelToken](#ixo.token.v1beta1.MsgCancelToken)
@@ -325,6 +321,46 @@
     - [TokenBatch](#ixo.token.v1beta1.TokenBatch)
   
     - [Msg](#ixo.token.v1beta1.Msg)
+  
+- [ixo/smartaccount/v1beta1/event.proto](#ixo/smartaccount/v1beta1/event.proto)
+    - [AuthenticatorAddedEvent](#ixo.smartaccount.v1beta1.AuthenticatorAddedEvent)
+    - [AuthenticatorRemovedEvent](#ixo.smartaccount.v1beta1.AuthenticatorRemovedEvent)
+    - [AuthenticatorSetActiveStateEvent](#ixo.smartaccount.v1beta1.AuthenticatorSetActiveStateEvent)
+  
+- [ixo/smartaccount/v1beta1/params.proto](#ixo/smartaccount/v1beta1/params.proto)
+    - [Params](#ixo.smartaccount.v1beta1.Params)
+  
+- [ixo/smartaccount/v1beta1/models.proto](#ixo/smartaccount/v1beta1/models.proto)
+    - [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator)
+  
+- [ixo/smartaccount/v1beta1/genesis.proto](#ixo/smartaccount/v1beta1/genesis.proto)
+    - [AuthenticatorData](#ixo.smartaccount.v1beta1.AuthenticatorData)
+    - [GenesisState](#ixo.smartaccount.v1beta1.GenesisState)
+  
+- [ixo/smartaccount/v1beta1/query.proto](#ixo/smartaccount/v1beta1/query.proto)
+    - [GetAuthenticatorRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorRequest)
+    - [GetAuthenticatorResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorResponse)
+    - [GetAuthenticatorsRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorsRequest)
+    - [GetAuthenticatorsResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorsResponse)
+    - [QueryParamsRequest](#ixo.smartaccount.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.smartaccount.v1beta1.QueryParamsResponse)
+  
+    - [Query](#ixo.smartaccount.v1beta1.Query)
+  
+- [ixo/smartaccount/v1beta1/tx.proto](#ixo/smartaccount/v1beta1/tx.proto)
+    - [MsgAddAuthenticator](#ixo.smartaccount.v1beta1.MsgAddAuthenticator)
+    - [MsgAddAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse)
+    - [MsgRemoveAuthenticator](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticator)
+    - [MsgRemoveAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse)
+    - [MsgSetActiveState](#ixo.smartaccount.v1beta1.MsgSetActiveState)
+    - [MsgSetActiveStateResponse](#ixo.smartaccount.v1beta1.MsgSetActiveStateResponse)
+    - [TxExtension](#ixo.smartaccount.v1beta1.TxExtension)
+  
+    - [Msg](#ixo.smartaccount.v1beta1.Msg)
+  
+- [ixo/token/v1beta1/authz.proto](#ixo/token/v1beta1/authz.proto)
+    - [MintAuthorization](#ixo.token.v1beta1.MintAuthorization)
+    - [MintConstraints](#ixo.token.v1beta1.MintConstraints)
   
 - [ixo/token/v1beta1/event.proto](#ixo/token/v1beta1/event.proto)
     - [TokenCancelledEvent](#ixo.token.v1beta1.TokenCancelledEvent)
@@ -4682,58 +4718,6 @@ credential link ***.ipfs |
 
 
 
-<a name="ixo/token/v1beta1/authz.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/token/v1beta1/authz.proto
-
-
-
-<a name="ixo.token.v1beta1.MintAuthorization"></a>
-
-### MintAuthorization
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| minter | [string](#string) |  | address of minter |
-| constraints | [MintConstraints](#ixo.token.v1beta1.MintConstraints) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MintConstraints"></a>
-
-### MintConstraints
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| contract_address | [string](#string) |  |  |
-| amount | [string](#string) |  |  |
-| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
-| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
-| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
-| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
-
-
-
-
-
- 
-
- 
-
- 
-
- 
-
-
-
 <a name="ixo/token/v1beta1/tx.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -4990,6 +4974,492 @@ Msg defines the project Msg service.
 | CancelToken | [MsgCancelToken](#ixo.token.v1beta1.MsgCancelToken) | [MsgCancelTokenResponse](#ixo.token.v1beta1.MsgCancelTokenResponse) |  |
 | PauseToken | [MsgPauseToken](#ixo.token.v1beta1.MsgPauseToken) | [MsgPauseTokenResponse](#ixo.token.v1beta1.MsgPauseTokenResponse) |  |
 | StopToken | [MsgStopToken](#ixo.token.v1beta1.MsgStopToken) | [MsgStopTokenResponse](#ixo.token.v1beta1.MsgStopTokenResponse) |  |
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/event.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorAddedEvent"></a>
+
+### AuthenticatorAddedEvent
+AuthenticatorAddedEvent is an event triggered on Authenticator addition
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  | sender is the address of the account that added the authenticator |
+| authenticator_type | [string](#string) |  | authenticator_type is the type of the authenticator that was added |
+| authenticator_id | [string](#string) |  | authenticator_id is the id of the authenticator that was added |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorRemovedEvent"></a>
+
+### AuthenticatorRemovedEvent
+AuthenticatorRemovedEvent is an event triggered on Authenticator removal
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  | sender is the address of the account that removed the authenticator |
+| authenticator_id | [string](#string) |  | authenticator_id is the id of the authenticator that was removed |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorSetActiveStateEvent"></a>
+
+### AuthenticatorSetActiveStateEvent
+AuthenticatorSetActiveStateEvent is an event triggered on Authenticator
+active state change
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  | sender is the address of the account that changed the active state |
+| is_smart_account_active | [bool](#bool) |  | active is the new active state |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/params.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/params.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.Params"></a>
+
+### Params
+Params defines the parameters for the module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| maximum_unauthenticated_gas | [uint64](#uint64) |  | MaximumUnauthenticatedGas defines the maximum amount of gas that can be used to authenticate a transaction in ante handler without having fee payer authenticated. |
+| is_smart_account_active | [bool](#bool) |  | IsSmartAccountActive defines the state of the authenticator. If set to false, the authenticator module will not be used and the classic cosmos sdk authentication will be used instead. |
+| circuit_breaker_controllers | [string](#string) | repeated | CircuitBreakerControllers defines list of addresses that are allowed to set is_smart_account_active without going through governance. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/models.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/models.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.AccountAuthenticator"></a>
+
+### AccountAuthenticator
+AccountAuthenticator represents a foundational model for all authenticators.
+It provides extensibility by allowing concrete types to interpret and
+validate transactions based on the encapsulated data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint64](#uint64) |  | ID uniquely identifies the authenticator instance. |
+| type | [string](#string) |  | Type specifies the category of the AccountAuthenticator. This type information is essential for differentiating authenticators and ensuring precise data retrieval from the storage layer. |
+| config | [bytes](#bytes) |  | Config is a versatile field used in conjunction with the specific type of account authenticator to facilitate complex authentication processes. The interpretation of this field is overloaded, enabling multiple authenticators to utilize it for their respective purposes. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/genesis.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorData"></a>
+
+### AuthenticatorData
+AuthenticatorData represents a genesis exported account with Authenticators.
+The address is used as the key, and the account authenticators are stored in
+the authenticators field.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  | address is an account address, one address can have many authenticators |
+| authenticators | [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator) | repeated | authenticators are the account&#39;s authenticators, these can be multiple types including SignatureVerification, AllOfs, CosmWasmAuthenticators, etc |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the authenticator module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.smartaccount.v1beta1.Params) |  | params define the parameters for the authenticator module. |
+| next_authenticator_id | [uint64](#uint64) |  | next_authenticator_id is the next available authenticator ID. |
+| authenticator_data | [AuthenticatorData](#ixo.smartaccount.v1beta1.AuthenticatorData) | repeated | authenticator_data contains the data for multiple accounts, each with their authenticators. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/query.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorRequest"></a>
+
+### GetAuthenticatorRequest
+MsgGetAuthenticatorRequest defines the Msg/GetAuthenticator request type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account | [string](#string) |  |  |
+| authenticator_id | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorResponse"></a>
+
+### GetAuthenticatorResponse
+MsgGetAuthenticatorResponse defines the Msg/GetAuthenticator response type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account_authenticator | [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorsRequest"></a>
+
+### GetAuthenticatorsRequest
+MsgGetAuthenticatorsRequest defines the Msg/GetAuthenticators request type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorsResponse"></a>
+
+### GetAuthenticatorsResponse
+MsgGetAuthenticatorsResponse defines the Msg/GetAuthenticators response type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account_authenticators | [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is request type for the Query/Params RPC method.
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is response type for the Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.smartaccount.v1beta1.Params) |  | params holds all the parameters of this module. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.smartaccount.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.smartaccount.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.smartaccount.v1beta1.QueryParamsResponse) | Parameters queries the parameters of the module. |
+| GetAuthenticator | [GetAuthenticatorRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorRequest) | [GetAuthenticatorResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorResponse) |  |
+| GetAuthenticators | [GetAuthenticatorsRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorsRequest) | [GetAuthenticatorsResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorsResponse) |  |
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/tx.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgAddAuthenticator"></a>
+
+### MsgAddAuthenticator
+MsgAddAuthenticatorRequest defines the Msg/AddAuthenticator request type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  |  |
+| authenticator_type | [string](#string) |  |  |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse"></a>
+
+### MsgAddAuthenticatorResponse
+MsgAddAuthenticatorResponse defines the Msg/AddAuthenticator response type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgRemoveAuthenticator"></a>
+
+### MsgRemoveAuthenticator
+MsgRemoveAuthenticatorRequest defines the Msg/RemoveAuthenticator request
+type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  |  |
+| id | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse"></a>
+
+### MsgRemoveAuthenticatorResponse
+MsgRemoveAuthenticatorResponse defines the Msg/RemoveAuthenticator response
+type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgSetActiveState"></a>
+
+### MsgSetActiveState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  |  |
+| active | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgSetActiveStateResponse"></a>
+
+### MsgSetActiveStateResponse
+
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.TxExtension"></a>
+
+### TxExtension
+TxExtension allows for additional authenticator-specific data in
+transactions.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| selected_authenticators | [uint64](#uint64) | repeated | selected_authenticators holds the authenticator_id for the chosen authenticator per message. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.smartaccount.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the Msg service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| AddAuthenticator | [MsgAddAuthenticator](#ixo.smartaccount.v1beta1.MsgAddAuthenticator) | [MsgAddAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse) |  |
+| RemoveAuthenticator | [MsgRemoveAuthenticator](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticator) | [MsgRemoveAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse) |  |
+| SetActiveState | [MsgSetActiveState](#ixo.smartaccount.v1beta1.MsgSetActiveState) | [MsgSetActiveStateResponse](#ixo.smartaccount.v1beta1.MsgSetActiveStateResponse) | SetActiveState sets the active state of the authenticator. Primarily used for circuit breaking. |
+
+ 
+
+
+
+<a name="ixo/token/v1beta1/authz.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/token/v1beta1/authz.proto
+
+
+
+<a name="ixo.token.v1beta1.MintAuthorization"></a>
+
+### MintAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+| constraints | [MintConstraints](#ixo.token.v1beta1.MintConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MintConstraints"></a>
+
+### MintConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| contract_address | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
+| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
+| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
+
+
+
+
+
+ 
+
+ 
+
+ 
 
  
 

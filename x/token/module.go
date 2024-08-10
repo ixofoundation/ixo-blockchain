@@ -82,7 +82,7 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 
 // GetQueryCmd returns the root query command for the module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return cli.GetQueryCmd()
+	return nil
 }
 
 // ----------------------------------------------------------------------------
@@ -114,6 +114,7 @@ func (am AppModule) Name() string {
 	return am.AppModuleBasic.Name()
 }
 
+// TODO: remove all QuerierRoute
 // QuerierRoute returns the module's querier route name.
 func (AppModule) QuerierRoute() string {
 	return types.QuerierRoute

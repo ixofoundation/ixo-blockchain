@@ -1,0 +1,36 @@
+syntax = "proto3";
+package ixo.smartaccount.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types";
+
+import "ixo/token/v1beta1/token.proto";
+import "ixo/token/v1beta1/tx.proto";
+import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
+
+// AuthenticatorAddedEvent is an event triggered on Authenticator addition
+message AuthenticatorAddedEvent {
+  // sender is the address of the account that added the authenticator
+  string sender = 1;
+  // authenticator_type is the type of the authenticator that was added
+  string authenticator_type = 2;
+  // authenticator_id is the id of the authenticator that was added
+  string authenticator_id = 3;
+}
+
+// AuthenticatorRemovedEvent is an event triggered on Authenticator removal
+message AuthenticatorRemovedEvent {
+  // sender is the address of the account that removed the authenticator
+  string sender = 1;
+  // authenticator_id is the id of the authenticator that was removed
+  string authenticator_id = 2;
+}
+
+// AuthenticatorSetActiveStateEvent is an event triggered on Authenticator
+// active state change
+message AuthenticatorSetActiveStateEvent {
+  // sender is the address of the account that changed the active state
+  string sender = 1;
+  // active is the new active state
+  bool is_smart_account_active = 2;
+}

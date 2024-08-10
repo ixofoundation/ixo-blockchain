@@ -221,7 +221,6 @@ func initRootCmd(rootCmd *cobra.Command,
 		keys.Commands(),
 	)
 
-	// TODO: check into rosetta
 	// add rosetta
 	rootCmd.AddCommand(rosettaCmd.RosettaCommand(interfaceRegistry, cdc))
 }

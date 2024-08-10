@@ -11,14 +11,13 @@ import (
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-
 	"github.com/cosmos/gogoproto/proto"
-
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
 	claimstypes "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
 )
 
@@ -110,6 +109,11 @@ func init() {
 	// token
 	setWhitelistedQuery("/ixo.token.v1beta1.Query/Params", &tokentypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.token.v1beta1.Query/TokenMetadata", &tokentypes.QueryTokenMetadataResponse{})
+
+	// smartaccount
+	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/Params", &smartaccounttypes.QueryParamsResponse{})
+	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/GetAuthenticator", &smartaccounttypes.GetAuthenticatorResponse{})
+	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/GetAuthenticators", &smartaccounttypes.GetAuthenticatorsResponse{})
 }
 
 // IsWhitelistedQuery returns if the query is not whitelisted.

@@ -40,7 +40,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
-	"github.com/cosmos/cosmos-sdk/x/auth/posthandler"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
@@ -165,6 +164,7 @@ func NewIxoApp(
 
 	app.AppKeepers = keepers.NewAppKeepers(
 		appCodec,
+		interfaceRegistry,
 		legacyAmino,
 		bApp,
 		maccPerms,
@@ -215,7 +215,7 @@ func NewIxoApp(
 	app.txConfig = txConfig
 
 	// Tell the app's module manager how to set the order of PreBlockers, which are run before BeginBLocker of every block..
-	app.ModuleManager.SetOrderPreBlockers(OrderPreBlockers()...)
+	app.ModuleManager.SetOrderPreBlockers(upgradetypes.ModuleName)
 	// Tell the app's module manager how to set the order of BeginBlockers, which are run at the beginning of every block.
 	app.ModuleManager.SetOrderBeginBlockers(OrderBeginBlockers()...)
 	// Tell the app's module manager how to set the order of EndBlockers, which are run at the end of every block.
@@ -252,16 +252,20 @@ func NewIxoApp(
 			SignModeHandler: txConfig.SignModeHandler(),
 			SigGasConsumer:  ixo.IxoSigVerificationGasConsumer,
 		},
-		IidKeeper:         app.IidKeeper,
-		EntityKeeper:      app.EntityKeeper,
-		WasmConfig:        wasmConfig,
-		IBCKeeper:         app.IBCKeeper,
-		TxCounterStoreKey: runtime.NewKVStoreService(app.GetKey(wasmtypes.StoreKey)),
+		IidKeeper:          app.IidKeeper,
+		EntityKeeper:       app.EntityKeeper,
+		WasmConfig:         wasmConfig,
+		IBCKeeper:          app.IBCKeeper,
+		TxCounterStoreKey:  runtime.NewKVStoreService(app.GetKey(wasmtypes.StoreKey)),
+		appCodec:           app.appCodec,
+		smartAccountKeeper: app.SmartAccountKeeper,
 	})
+
+	posthandler := NewPostHandler(appCodec, app.SmartAccountKeeper, app.AccountKeeper, encodingConfig.TxConfig.SignModeHandler())
 
 	// initialize BaseApp
 	app.SetAnteHandler(antihandler)
-	app.setPostHandler()
+	app.SetPostHandler(posthandler)
 	app.SetInitChainer(app.InitChainer)
 	app.SetPreBlocker(app.PreBlocker)
 	app.SetBeginBlocker(app.BeginBlocker)
@@ -321,17 +325,6 @@ func getReflectionService() *runtimeservices.ReflectionService {
 	}
 	cachedReflectionService = reflectionSvc
 	return reflectionSvc
-}
-
-func (app *IxoApp) setPostHandler() {
-	postHandler, err := posthandler.NewPostHandler(
-		posthandler.HandlerOptions{},
-	)
-	if err != nil {
-		panic(err)
-	}
-
-	app.SetPostHandler(postHandler)
 }
 
 //------------------------------------------------------------------------------

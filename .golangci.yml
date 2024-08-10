@@ -71,3 +71,4 @@ issues:
   # Exclude files with the extension ".pb.gw.go"
   exclude-files:
     - '.*\.pb\.gw\.go$'
+    - "node_modules/**"

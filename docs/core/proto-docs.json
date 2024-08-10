@@ -12323,140 +12323,6 @@
       "services": []
     },
     {
-      "name": "ixo/token/v1beta1/authz.proto",
-      "description": "",
-      "package": "ixo.token.v1beta1",
-      "hasEnums": false,
-      "hasExtensions": false,
-      "hasMessages": true,
-      "hasServices": false,
-      "enums": [],
-      "extensions": [],
-      "messages": [
-        {
-          "name": "MintAuthorization",
-          "longName": "MintAuthorization",
-          "fullName": "ixo.token.v1beta1.MintAuthorization",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "minter",
-              "description": "address of minter",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "constraints",
-              "description": "",
-              "label": "repeated",
-              "type": "MintConstraints",
-              "longType": "MintConstraints",
-              "fullType": "ixo.token.v1beta1.MintConstraints",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "MintConstraints",
-          "longName": "MintConstraints",
-          "fullName": "ixo.token.v1beta1.MintConstraints",
-          "description": "",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
-            {
-              "name": "contract_address",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "amount",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "name",
-              "description": "name is the token name, which must be unique (namespace), will be verified\nagainst Token name provided on msgCreateToken",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "index",
-              "description": "index is the unique identifier hexstring that identifies the token",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "collection",
-              "description": "did of collection (eg Supamoto Malawi)",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "tokenData",
-              "description": "tokenData is the linkedResources added to tokenMetadata when queried eg\n(credential link ***.ipfs)",
-              "label": "repeated",
-              "type": "TokenData",
-              "longType": "TokenData",
-              "fullType": "ixo.token.v1beta1.TokenData",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            }
-          ]
-        }
-      ],
-      "services": []
-    },
-    {
       "name": "ixo/token/v1beta1/tx.proto",
       "description": "",
       "package": "ixo.token.v1beta1",
@@ -13143,6 +13009,990 @@
           ]
         }
       ]
+    },
+    {
+      "name": "ixo/smartaccount/v1beta1/event.proto",
+      "description": "",
+      "package": "ixo.smartaccount.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "AuthenticatorAddedEvent",
+          "longName": "AuthenticatorAddedEvent",
+          "fullName": "ixo.smartaccount.v1beta1.AuthenticatorAddedEvent",
+          "description": "AuthenticatorAddedEvent is an event triggered on Authenticator addition",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sender",
+              "description": "sender is the address of the account that added the authenticator",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authenticator_type",
+              "description": "authenticator_type is the type of the authenticator that was added",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authenticator_id",
+              "description": "authenticator_id is the id of the authenticator that was added",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AuthenticatorRemovedEvent",
+          "longName": "AuthenticatorRemovedEvent",
+          "fullName": "ixo.smartaccount.v1beta1.AuthenticatorRemovedEvent",
+          "description": "AuthenticatorRemovedEvent is an event triggered on Authenticator removal",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sender",
+              "description": "sender is the address of the account that removed the authenticator",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authenticator_id",
+              "description": "authenticator_id is the id of the authenticator that was removed",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AuthenticatorSetActiveStateEvent",
+          "longName": "AuthenticatorSetActiveStateEvent",
+          "fullName": "ixo.smartaccount.v1beta1.AuthenticatorSetActiveStateEvent",
+          "description": "AuthenticatorSetActiveStateEvent is an event triggered on Authenticator\nactive state change",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sender",
+              "description": "sender is the address of the account that changed the active state",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "is_smart_account_active",
+              "description": "active is the new active state",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/smartaccount/v1beta1/params.proto",
+      "description": "",
+      "package": "ixo.smartaccount.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "Params",
+          "longName": "Params",
+          "fullName": "ixo.smartaccount.v1beta1.Params",
+          "description": "Params defines the parameters for the module.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "maximum_unauthenticated_gas",
+              "description": "MaximumUnauthenticatedGas defines the maximum amount of gas that can be\nused to authenticate a transaction in ante handler without having fee payer\nauthenticated.",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "is_smart_account_active",
+              "description": "IsSmartAccountActive defines the state of the authenticator.\nIf set to false, the authenticator module will not be used\nand the classic cosmos sdk authentication will be used instead.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "circuit_breaker_controllers",
+              "description": "CircuitBreakerControllers defines list of addresses that are allowed to\nset is_smart_account_active without going through governance.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/smartaccount/v1beta1/models.proto",
+      "description": "",
+      "package": "ixo.smartaccount.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "AccountAuthenticator",
+          "longName": "AccountAuthenticator",
+          "fullName": "ixo.smartaccount.v1beta1.AccountAuthenticator",
+          "description": "AccountAuthenticator represents a foundational model for all authenticators.\nIt provides extensibility by allowing concrete types to interpret and\nvalidate transactions based on the encapsulated data.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "ID uniquely identifies the authenticator instance.",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "type",
+              "description": "Type specifies the category of the AccountAuthenticator.\nThis type information is essential for differentiating authenticators\nand ensuring precise data retrieval from the storage layer.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "config",
+              "description": "Config is a versatile field used in conjunction with the specific type of\naccount authenticator to facilitate complex authentication processes.\nThe interpretation of this field is overloaded, enabling multiple\nauthenticators to utilize it for their respective purposes.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/smartaccount/v1beta1/genesis.proto",
+      "description": "",
+      "package": "ixo.smartaccount.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "AuthenticatorData",
+          "longName": "AuthenticatorData",
+          "fullName": "ixo.smartaccount.v1beta1.AuthenticatorData",
+          "description": "AuthenticatorData represents a genesis exported account with Authenticators.\nThe address is used as the key, and the account authenticators are stored in\nthe authenticators field.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "address",
+              "description": "address is an account address, one address can have many authenticators",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authenticators",
+              "description": "authenticators are the account's authenticators, these can be multiple\ntypes including SignatureVerification, AllOfs, CosmWasmAuthenticators, etc",
+              "label": "repeated",
+              "type": "AccountAuthenticator",
+              "longType": "AccountAuthenticator",
+              "fullType": "ixo.smartaccount.v1beta1.AccountAuthenticator",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GenesisState",
+          "longName": "GenesisState",
+          "fullName": "ixo.smartaccount.v1beta1.GenesisState",
+          "description": "GenesisState defines the authenticator module's genesis state.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "params define the parameters for the authenticator module.",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.smartaccount.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "next_authenticator_id",
+              "description": "next_authenticator_id is the next available authenticator ID.",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authenticator_data",
+              "description": "authenticator_data contains the data for multiple accounts, each with their\nauthenticators.",
+              "label": "repeated",
+              "type": "AuthenticatorData",
+              "longType": "AuthenticatorData",
+              "fullType": "ixo.smartaccount.v1beta1.AuthenticatorData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/smartaccount/v1beta1/query.proto",
+      "description": "",
+      "package": "ixo.smartaccount.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GetAuthenticatorRequest",
+          "longName": "GetAuthenticatorRequest",
+          "fullName": "ixo.smartaccount.v1beta1.GetAuthenticatorRequest",
+          "description": "MsgGetAuthenticatorRequest defines the Msg/GetAuthenticator request type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "account",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authenticator_id",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetAuthenticatorResponse",
+          "longName": "GetAuthenticatorResponse",
+          "fullName": "ixo.smartaccount.v1beta1.GetAuthenticatorResponse",
+          "description": "MsgGetAuthenticatorResponse defines the Msg/GetAuthenticator response type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "account_authenticator",
+              "description": "",
+              "label": "",
+              "type": "AccountAuthenticator",
+              "longType": "AccountAuthenticator",
+              "fullType": "ixo.smartaccount.v1beta1.AccountAuthenticator",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetAuthenticatorsRequest",
+          "longName": "GetAuthenticatorsRequest",
+          "fullName": "ixo.smartaccount.v1beta1.GetAuthenticatorsRequest",
+          "description": "MsgGetAuthenticatorsRequest defines the Msg/GetAuthenticators request type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "account",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetAuthenticatorsResponse",
+          "longName": "GetAuthenticatorsResponse",
+          "fullName": "ixo.smartaccount.v1beta1.GetAuthenticatorsResponse",
+          "description": "MsgGetAuthenticatorsResponse defines the Msg/GetAuthenticators response type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "account_authenticators",
+              "description": "",
+              "label": "repeated",
+              "type": "AccountAuthenticator",
+              "longType": "AccountAuthenticator",
+              "fullType": "ixo.smartaccount.v1beta1.AccountAuthenticator",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryParamsRequest",
+          "longName": "QueryParamsRequest",
+          "fullName": "ixo.smartaccount.v1beta1.QueryParamsRequest",
+          "description": "QueryParamsRequest is request type for the Query/Params RPC method.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryParamsResponse",
+          "longName": "QueryParamsResponse",
+          "fullName": "ixo.smartaccount.v1beta1.QueryParamsResponse",
+          "description": "QueryParamsResponse is response type for the Query/Params RPC method.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "params holds all the parameters of this module.",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.smartaccount.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Query",
+          "longName": "Query",
+          "fullName": "ixo.smartaccount.v1beta1.Query",
+          "description": "Query defines the gRPC querier service.",
+          "methods": [
+            {
+              "name": "Params",
+              "description": "Parameters queries the parameters of the module.",
+              "requestType": "QueryParamsRequest",
+              "requestLongType": "QueryParamsRequest",
+              "requestFullType": "ixo.smartaccount.v1beta1.QueryParamsRequest",
+              "requestStreaming": false,
+              "responseType": "QueryParamsResponse",
+              "responseLongType": "QueryParamsResponse",
+              "responseFullType": "ixo.smartaccount.v1beta1.QueryParamsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/smartaccount/params"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetAuthenticator",
+              "description": "",
+              "requestType": "GetAuthenticatorRequest",
+              "requestLongType": "GetAuthenticatorRequest",
+              "requestFullType": "ixo.smartaccount.v1beta1.GetAuthenticatorRequest",
+              "requestStreaming": false,
+              "responseType": "GetAuthenticatorResponse",
+              "responseLongType": "GetAuthenticatorResponse",
+              "responseFullType": "ixo.smartaccount.v1beta1.GetAuthenticatorResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/smartaccount/authenticator/{account}/{authenticator_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetAuthenticators",
+              "description": "",
+              "requestType": "GetAuthenticatorsRequest",
+              "requestLongType": "GetAuthenticatorsRequest",
+              "requestFullType": "ixo.smartaccount.v1beta1.GetAuthenticatorsRequest",
+              "requestStreaming": false,
+              "responseType": "GetAuthenticatorsResponse",
+              "responseLongType": "GetAuthenticatorsResponse",
+              "responseFullType": "ixo.smartaccount.v1beta1.GetAuthenticatorsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/smartaccount/authenticators/{account}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ixo/smartaccount/v1beta1/tx.proto",
+      "description": "",
+      "package": "ixo.smartaccount.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MsgAddAuthenticator",
+          "longName": "MsgAddAuthenticator",
+          "fullName": "ixo.smartaccount.v1beta1.MsgAddAuthenticator",
+          "description": "MsgAddAuthenticatorRequest defines the Msg/AddAuthenticator request type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sender",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authenticator_type",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgAddAuthenticatorResponse",
+          "longName": "MsgAddAuthenticatorResponse",
+          "fullName": "ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse",
+          "description": "MsgAddAuthenticatorResponse defines the Msg/AddAuthenticator response type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "success",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgRemoveAuthenticator",
+          "longName": "MsgRemoveAuthenticator",
+          "fullName": "ixo.smartaccount.v1beta1.MsgRemoveAuthenticator",
+          "description": "MsgRemoveAuthenticatorRequest defines the Msg/RemoveAuthenticator request\ntype.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sender",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgRemoveAuthenticatorResponse",
+          "longName": "MsgRemoveAuthenticatorResponse",
+          "fullName": "ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse",
+          "description": "MsgRemoveAuthenticatorResponse defines the Msg/RemoveAuthenticator response\ntype.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "success",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgSetActiveState",
+          "longName": "MsgSetActiveState",
+          "fullName": "ixo.smartaccount.v1beta1.MsgSetActiveState",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "sender",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "active",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgSetActiveStateResponse",
+          "longName": "MsgSetActiveStateResponse",
+          "fullName": "ixo.smartaccount.v1beta1.MsgSetActiveStateResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "TxExtension",
+          "longName": "TxExtension",
+          "fullName": "ixo.smartaccount.v1beta1.TxExtension",
+          "description": "TxExtension allows for additional authenticator-specific data in\ntransactions.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "selected_authenticators",
+              "description": "selected_authenticators holds the authenticator_id for the chosen\nauthenticator per message.",
+              "label": "repeated",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Msg",
+          "longName": "Msg",
+          "fullName": "ixo.smartaccount.v1beta1.Msg",
+          "description": "Msg defines the Msg service.",
+          "methods": [
+            {
+              "name": "AddAuthenticator",
+              "description": "",
+              "requestType": "MsgAddAuthenticator",
+              "requestLongType": "MsgAddAuthenticator",
+              "requestFullType": "ixo.smartaccount.v1beta1.MsgAddAuthenticator",
+              "requestStreaming": false,
+              "responseType": "MsgAddAuthenticatorResponse",
+              "responseLongType": "MsgAddAuthenticatorResponse",
+              "responseFullType": "ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "RemoveAuthenticator",
+              "description": "",
+              "requestType": "MsgRemoveAuthenticator",
+              "requestLongType": "MsgRemoveAuthenticator",
+              "requestFullType": "ixo.smartaccount.v1beta1.MsgRemoveAuthenticator",
+              "requestStreaming": false,
+              "responseType": "MsgRemoveAuthenticatorResponse",
+              "responseLongType": "MsgRemoveAuthenticatorResponse",
+              "responseFullType": "ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "SetActiveState",
+              "description": "SetActiveState sets the active state of the authenticator.\nPrimarily used for circuit breaking.",
+              "requestType": "MsgSetActiveState",
+              "requestLongType": "MsgSetActiveState",
+              "requestFullType": "ixo.smartaccount.v1beta1.MsgSetActiveState",
+              "requestStreaming": false,
+              "responseType": "MsgSetActiveStateResponse",
+              "responseLongType": "MsgSetActiveStateResponse",
+              "responseFullType": "ixo.smartaccount.v1beta1.MsgSetActiveStateResponse",
+              "responseStreaming": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ixo/token/v1beta1/authz.proto",
+      "description": "",
+      "package": "ixo.token.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MintAuthorization",
+          "longName": "MintAuthorization",
+          "fullName": "ixo.token.v1beta1.MintAuthorization",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "minter",
+              "description": "address of minter",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "constraints",
+              "description": "",
+              "label": "repeated",
+              "type": "MintConstraints",
+              "longType": "MintConstraints",
+              "fullType": "ixo.token.v1beta1.MintConstraints",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MintConstraints",
+          "longName": "MintConstraints",
+          "fullName": "ixo.token.v1beta1.MintConstraints",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "contract_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "name is the token name, which must be unique (namespace), will be verified\nagainst Token name provided on msgCreateToken",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "index",
+              "description": "index is the unique identifier hexstring that identifies the token",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection",
+              "description": "did of collection (eg Supamoto Malawi)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokenData",
+              "description": "tokenData is the linkedResources added to tokenMetadata when queried eg\n(credential link ***.ipfs)",
+              "label": "repeated",
+              "type": "TokenData",
+              "longType": "TokenData",
+              "fullType": "ixo.token.v1beta1.TokenData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
     },
     {
       "name": "ixo/token/v1beta1/event.proto",

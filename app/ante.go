@@ -5,6 +5,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -14,17 +15,21 @@ import (
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
 	iidante "github.com/ixofoundation/ixo-blockchain/v3/x/iid/ante"
 	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
+	smartaccountante "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/ante"
+	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
 type HandlerOptions struct {
 	authante.HandlerOptions
 
-	IidKeeper         iidkeeper.Keeper
-	EntityKeeper      entitykeeper.Keeper
-	WasmConfig        wasmtypes.WasmConfig
-	IBCKeeper         *ibckeeper.Keeper
-	TxCounterStoreKey corestoretypes.KVStoreService
+	appCodec           codec.Codec
+	smartAccountKeeper *smartaccountkeeper.Keeper
+	IidKeeper          iidkeeper.Keeper
+	EntityKeeper       entitykeeper.Keeper
+	WasmConfig         wasmtypes.WasmConfig
+	IBCKeeper          *ibckeeper.Keeper
+	TxCounterStoreKey  corestoretypes.KVStoreService
 }
 
 // IxoAnteHandler returns an AnteHandler that checks and increments sequence
@@ -49,29 +54,54 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		sigGasConsumer = authante.DefaultSigVerificationGasConsumer
 	}
 
-	anteDecorators := []sdk.AnteDecorator{
-		// outermost AnteDecorator. SetUpContext must be called first
-		authante.NewSetUpContextDecorator(),
-		// wasm ante handlers after setup context to enforce limits early
-		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
-		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
-		// standard SDK AnteDecorators
-		// TODO add circuit breaker everywhere
-		// circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
-		authante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
-		authante.NewValidateBasicDecorator(),
-		authante.NewTxTimeoutHeightDecorator(),
-		authante.NewValidateMemoDecorator(options.AccountKeeper),
-		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
-		authante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker),
+	deductFeeDecorator := authante.NewDeductFeeDecorator(options.AccountKeeper, options.BankKeeper, options.FeegrantKeeper, options.TxFeeChecker)
+
+	// classicSignatureVerificationDecorator is the old flow to enable a circuit breaker
+	classicSignatureVerificationDecorator := sdk.ChainAnteDecorators(
+		deductFeeDecorator,
+		// We use the old pubkey decorator here to ensure that accounts work as expected,
+		// in SetPubkeyDecorator we set a pubkey in the account store, for authenticators
+		// we avoid this code path completely.
 		// SetPubKeyDecorator must be called before all signature verification decorators
 		authante.NewSetPubKeyDecorator(options.AccountKeeper),
 		authante.NewValidateSigCountDecorator(options.AccountKeeper),
 		authante.NewSigGasConsumeDecorator(options.AccountKeeper, sigGasConsumer),
 		authante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		authante.NewIncrementSequenceDecorator(options.AccountKeeper),
+	)
+
+	// authenticatorVerificationDecorator is the new authenticator flow that's embedded into the circuit breaker ante
+	authenticatorVerificationDecorator := sdk.ChainAnteDecorators(
+		smartaccountante.NewEmitPubKeyDecoratorEvents(options.AccountKeeper),
+		authante.NewValidateSigCountDecorator(options.AccountKeeper), // we can probably remove this as multisigs are not supported here
+		// Both the signature verification, fee deduction, and gas consumption functionality
+		// is embedded in the authenticator decorator
+		smartaccountante.NewAuthenticatorDecorator(options.appCodec, options.smartAccountKeeper, options.AccountKeeper, options.SignModeHandler, deductFeeDecorator),
+		authante.NewIncrementSequenceDecorator(options.AccountKeeper),
+	)
+
+	anteDecorators := []sdk.AnteDecorator{
+		// outermost AnteDecorator. SetUpContext must be called first
+		authante.NewSetUpContextDecorator(),
+		// wasm ante handlers after setup context to enforce limits early
+		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
+		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
+		// TODO: look into circuit breaker
+		// circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
+		authante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
+		authante.NewValidateBasicDecorator(),
+		authante.NewTxTimeoutHeightDecorator(),
+		authante.NewValidateMemoDecorator(options.AccountKeeper),
+		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+
+		smartaccountante.NewCircuitBreakerDecorator(
+			options.smartAccountKeeper,
+			authenticatorVerificationDecorator,
+			classicSignatureVerificationDecorator,
+		),
+
 		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
-		// custom ixo handlers
+		// TODO: analyse how smart accounts affect iid handlers
 		iidante.NewIidResolutionDecorator(options.IidKeeper),
 		entityante.NewBlockNftContractTransferForEntityDecorator(options.EntityKeeper),
 	}

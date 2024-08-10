@@ -6,7 +6,8 @@ const (
 	StoreKey          = ModuleName
 	RouterKey         = ModuleName
 	QuerierRoute      = ModuleName
-	MemStoreKey       = "mem_token"
+	// TODO: remove all MemStoreKey as not used?
+	MemStoreKey = "mem_token"
 )
 
 var (
