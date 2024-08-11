@@ -40,7 +40,6 @@ func StargateQuerier(queryRouter baseapp.GRPCQueryRouter, cdc codec.Codec) func(
 			return nil, fmt.Errorf("Res returned from abci query route is nil")
 		}
 
-		// TODO: use custom one like osmosis, check once packages sorted
 		bz, err := wasmkeeper.ConvertProtoToJSONMarshal(cdc, protoResponseType, res.Value)
 		if err != nil {
 			return nil, err

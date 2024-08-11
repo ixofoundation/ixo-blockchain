@@ -35,7 +35,6 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgUpdateCollectionPayments{},
 	)
 
-	// TODO: make sure authz shouldn't also be registered as concrete type above?
 	registry.RegisterImplementations(
 		(*authz.Authorization)(nil),
 		&SubmitClaimAuthorization{},

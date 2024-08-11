@@ -81,7 +81,7 @@ func NewRootCmd() *cobra.Command {
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastSync).
 		WithHomeDir(app.DefaultNodeHome).
-		WithViper("IXO") // TODO check into viper
+		WithViper("IXO")
 
 	// TODO consider adding .toml config file functionality for extra params
 	// Allows you to add extra params to your client.toml

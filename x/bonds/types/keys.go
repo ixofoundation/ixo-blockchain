@@ -19,9 +19,6 @@ const (
 	// BondsReserveAccount the root string for the bonds reserve account address
 	BondsReserveAccount = "bonds_reserve_account"
 
-	// QuerierRoute is the querier route for this module's store.
-	QuerierRoute = ModuleName
-
 	// RouterKey is the message route for this module
 	RouterKey = ModuleName
 )

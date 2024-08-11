@@ -23,14 +23,11 @@ deps-go-mod-cache: go.sum
 deps-go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
 	@GOWORK=off go mod verify
-# TODO test to make sure @GOWORK=off works
-# @go mod verify
 
 deps-draw:
 	@# requires brew install graphviz or apt-get install graphviz
 	go get github.com/RobotsAndPencils/goviz
 	@goviz -i ./cmd/ixod -d 2 | dot -Tpng -o dependency-graph.png
-# TODO test or use below
 # @goviz -i github.com/ixofoundation/ixo-blockchain/cmd/ixod -d 2 | dot -Tpng -o dependency-graph.png
 
 deps-clean:

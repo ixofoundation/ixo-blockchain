@@ -53,7 +53,7 @@ func post(url string, requestBody, val interface{}) error {
 func serialize(in interface{}) io.Reader {
 	v, err := json.Marshal(in)
 	if err != nil {
-		// TODO: NO PANIC
+		// NO PANIC?
 		panic(err.Error())
 	}
 	return bytes.NewBuffer(v)

@@ -29,7 +29,6 @@ type Keeper struct {
 	AuthzKeeper    types.AuthzKeeper
 }
 
-// TODO: resolve wasm keeper passed
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,

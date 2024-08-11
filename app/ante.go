@@ -86,8 +86,6 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		// wasm ante handlers after setup context to enforce limits early
 		wasmkeeper.NewLimitSimulationGasDecorator(options.WasmConfig.SimulationGasLimit),
 		wasmkeeper.NewCountTXDecorator(options.TxCounterStoreKey),
-		// TODO: look into circuit breaker
-		// circuitante.NewCircuitBreakerDecorator(options.CircuitKeeper),
 		authante.NewExtensionOptionsDecorator(options.ExtensionOptionChecker),
 		authante.NewValidateBasicDecorator(),
 		authante.NewTxTimeoutHeightDecorator(),

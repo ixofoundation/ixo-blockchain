@@ -328,7 +328,6 @@ func NewAppKeepers(
 		govModAddress,
 	)
 
-	// TODO: check all ibc keepers below (add rate linmit and ics4 hooks?)
 	// IBC Keepers
 	// =============================
 	appKeepers.IBCKeeper = ibckeeper.NewKeeper(
@@ -570,7 +569,7 @@ func NewAppKeepers(
 		AddRoute(entitytypes.RouterKey, entitykeeper.NewEntityProposalHandler(appKeepers.EntityKeeper)).
 		AddRoute(tokentypes.RouterKey, tokenkeeper.NewTokenProposalHandler(appKeepers.TokenKeeper)).
 		// leaving legacy gov proposal handler for client updates, will remove in future
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper))
+		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)) // nolint
 
 	govConfig := govtypes.DefaultConfig()
 	// set the MaxMetadataLen for proposals to the same value as it was pre-sdk v0.47.x

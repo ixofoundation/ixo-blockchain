@@ -13,9 +13,6 @@ const (
 	// RouterKey is the message route for this module
 	RouterKey = ModuleName
 
-	// QuerierRoute is the querier route for this module's store.
-	QuerierRoute = ModuleName
-
 	// MemStoreKey defines the in-memory store key.
 	MemStoreKey = "mem_entity"
 )

@@ -30,7 +30,6 @@ func GetTxCmd() *cobra.Command {
 		NewRevokeVerificationCmd(),
 		NewDeleteServiceCmd(),
 		NewSetVerificationRelationshipCmd(),
-		// TODO check if need aries agent creation
 		// NewLinkAriesAgentCmd(),
 		NewAddControllerCmd(),
 		NewDeleteControllerCmd(),

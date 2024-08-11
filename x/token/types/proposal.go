@@ -29,8 +29,13 @@ func (p *SetTokenContractCodes) GetTitle() string {
 func (p *SetTokenContractCodes) ProposalRoute() string { return RouterKey }
 func (p *SetTokenContractCodes) ProposalType() string  { return ProposalTypeSetTokenContractCodes }
 
-// TODO add validation
-func (p *SetTokenContractCodes) ValidateBasic() error { return nil }
+func (p *SetTokenContractCodes) ValidateBasic() error {
+	err := validateContractCode(p.Ixo1155ContractCode)
+	if err != nil {
+		return err
+	}
+	return nil
+}
 
 func init() {
 	govtypesv1.RegisterProposalType(ProposalTypeSetTokenContractCodes)

@@ -5,7 +5,6 @@ const (
 	DefaultParamspace = ModuleName
 	StoreKey          = ModuleName
 	RouterKey         = ModuleName
-	QuerierRoute      = ModuleName
 	// TODO: remove all MemStoreKey as not used?
 	MemStoreKey = "mem_token"
 )

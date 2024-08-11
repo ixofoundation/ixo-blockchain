@@ -12,20 +12,10 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
-var _ types.QueryServer = Querier{}
-
-// Querier defines a wrapper around the x/iid keeper providing gRPC method
-// handlers.
-type Querier struct {
-	Keeper
-}
-
-func NewQuerier(k Keeper) Querier {
-	return Querier{Keeper: k}
-}
+var _ types.QueryServer = Keeper{}
 
 // IidDocuments implements the DidDocuments gRPC method
-func (q Querier) IidDocuments(
+func (k Keeper) IidDocuments(
 	c context.Context,
 	req *types.QueryIidDocumentsRequest,
 ) (*types.QueryIidDocumentsResponse, error) {
@@ -35,11 +25,11 @@ func (q Querier) IidDocuments(
 
 	ctx := sdk.UnwrapSDKContext(c)
 	var iidDocs []types.IidDocument
-	iidDocStore := prefix.NewStore(ctx.KVStore(q.Keeper.storeKey), types.DidDocumentKey)
+	iidDocStore := prefix.NewStore(ctx.KVStore(k.storeKey), types.DidDocumentKey)
 
 	pageRes, err := query.Paginate(iidDocStore, req.Pagination, func(key []byte, value []byte) error {
 		var iidDoc types.IidDocument
-		if err := q.Keeper.cdc.Unmarshal(value, &iidDoc); err != nil {
+		if err := k.cdc.Unmarshal(value, &iidDoc); err != nil {
 			return err
 		}
 
@@ -57,7 +47,7 @@ func (q Querier) IidDocuments(
 }
 
 // IidDocument implements the IidDocument gRPC method
-func (q Querier) IidDocument(
+func (k Keeper) IidDocument(
 	c context.Context,
 	req *types.QueryIidDocumentRequest,
 ) (*types.QueryIidDocumentResponse, error) {
@@ -66,7 +56,7 @@ func (q Querier) IidDocument(
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	doc, err := q.Keeper.ResolveDid(ctx, types.DID(req.Id))
+	doc, err := k.ResolveDid(ctx, types.DID(req.Id))
 	if err != nil {
 		return nil, status.Error(codes.NotFound, err.Error())
 	}

@@ -25,9 +25,7 @@ release-dry-run:
 		release \
 		--clean \
 		--skip-publish
-
-# TODO check why added this before?
-# --skip-validate
+#   --skip-validate
 
 release-snapshot:
 	docker run \

@@ -6,15 +6,6 @@ func NewGenesisState(iids []IidDocument, meta []IidMetadata) *GenesisState {
 	}
 }
 
-//func ValidateGenesis(data *GenesisState) error {
-//	err := ValidateParams(data.Params)
-//	if err != nil {
-//		return err
-//	}
-//
-//	return nil
-//}
-
 func DefaultGenesisState() *GenesisState {
 	return &GenesisState{
 		IidDocs: nil,
