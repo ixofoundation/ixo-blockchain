@@ -1,12 +1,15 @@
 package types
 
 const (
+	// ModuleName defines the module name
 	ModuleName        = "token"
 	DefaultParamspace = ModuleName
-	StoreKey          = ModuleName
-	RouterKey         = ModuleName
-	// TODO: remove all MemStoreKey as not used?
-	MemStoreKey = "mem_token"
+
+	// StoreKey defines the primary module store key
+	StoreKey = ModuleName
+
+	// RouterKey defines the module's message routing key
+	RouterKey = ModuleName
 )
 
 var (

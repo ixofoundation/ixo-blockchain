@@ -12,12 +12,6 @@ const (
 
 	// DidChainPrefix defines the did prefix for this chain
 	DidChainPrefix = "did:x:"
-
-	// DidKeyPrefix defines the did key prefix
-	// DidKeyPrefix = "did:key:"
-
-	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_capability_did"
 )
 
 var (

@@ -20,7 +20,6 @@ type MarshalFn func(value interface{}) []byte
 type Keeper struct {
 	cdc            codec.BinaryCodec
 	storeKey       storetypes.StoreKey
-	memStoreKey    storetypes.StoreKey
 	IidKeeper      types.IidKeeper
 	WasmKeeper     types.WasmKeeper
 	WasmViewKeeper types.WasmViewKeeper
@@ -32,7 +31,6 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
-	memStoreKey storetypes.StoreKey,
 	iidKeeper types.IidKeeper,
 	wasmKeeper types.WasmKeeper,
 	wasViewKeeper types.WasmViewKeeper,
@@ -47,7 +45,6 @@ func NewKeeper(
 	return Keeper{
 		cdc:            cdc,
 		storeKey:       key,
-		memStoreKey:    memStoreKey,
 		IidKeeper:      iidKeeper,
 		WasmKeeper:     wasmKeeper,
 		ParamSpace:     paramSpace,

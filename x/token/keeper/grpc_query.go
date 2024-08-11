@@ -12,7 +12,6 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
-// TODO look into Params and any related changes
 func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

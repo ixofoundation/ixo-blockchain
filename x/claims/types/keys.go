@@ -9,9 +9,6 @@ const (
 
 	// RouterKey is the message route for slashing
 	RouterKey = ModuleName
-
-	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_claims"
 )
 
 func KeyPrefix(p string) []byte {

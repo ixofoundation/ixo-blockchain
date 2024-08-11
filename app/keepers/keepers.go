@@ -494,7 +494,6 @@ func NewAppKeepers(
 	appKeepers.IidKeeper = iidmodulekeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[iidtypes.StoreKey],
-		appKeepers.keys[iidtypes.MemStoreKey],
 	)
 	appKeepers.BondsKeeper = bondskeeper.NewKeeper(
 		appCodec,
@@ -508,7 +507,6 @@ func NewAppKeepers(
 	appKeepers.EntityKeeper = entitykeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[entitytypes.StoreKey],
-		appKeepers.keys[entitytypes.MemStoreKey],
 		appKeepers.IidKeeper,
 		appKeepers.ContractKeeper,
 		appKeepers.WasmKeeper,
@@ -519,7 +517,6 @@ func NewAppKeepers(
 	appKeepers.TokenKeeper = tokenkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[tokentypes.StoreKey],
-		appKeepers.keys[tokentypes.MemStoreKey],
 		appKeepers.IidKeeper,
 		appKeepers.ContractKeeper,
 		appKeepers.GetSubspace(tokentypes.ModuleName),
@@ -527,7 +524,6 @@ func NewAppKeepers(
 	appKeepers.ClaimsKeeper = claimsmodulekeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[claimsmoduletypes.StoreKey],
-		appKeepers.keys[claimsmoduletypes.MemStoreKey],
 		appKeepers.GetSubspace(claimsmoduletypes.ModuleName),
 		appKeepers.IidKeeper,
 		appKeepers.AuthzKeeper,

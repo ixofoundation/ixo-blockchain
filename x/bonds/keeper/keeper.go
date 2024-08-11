@@ -37,13 +37,17 @@ func NewKeeper(
 		panic(fmt.Sprintf("%s module account has not been set", types.BatchesIntermediaryAccount))
 	}
 
+	if !paramSpace.HasKeyTable() {
+		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
+	}
+
 	return Keeper{
 		BankKeeper:    bankKeeper,
 		accountKeeper: accountKeeper,
 		StakingKeeper: stakingKeeper,
 		iidKeeper:     iidKeeper,
 		storeKey:      storeKey,
-		paramSpace:    paramSpace.WithKeyTable(types.ParamKeyTable()),
+		paramSpace:    paramSpace,
 		cdc:           cdc,
 	}
 }

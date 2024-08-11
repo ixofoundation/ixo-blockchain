@@ -12,9 +12,6 @@ const (
 
 	// RouterKey is the message route for this module
 	RouterKey = ModuleName
-
-	// MemStoreKey defines the in-memory store key.
-	MemStoreKey = "mem_entity"
 )
 
 func KeyPrefix(p string) []byte {
