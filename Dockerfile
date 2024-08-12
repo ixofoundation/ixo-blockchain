@@ -11,7 +11,7 @@ ARG BUILD_TAGS="netgo,ledger,muslc"
 
 FROM golang:${GO_VERSION}-alpine3.18 AS builder
 
-# todo: maybe extract below args to where called in cicd?
+# TODO: maybe extract below args to where called in cicd?
 # git log -1 --format='%H'
 ARG GIT_VERSION="2.0.0-rc.0"
 ARG GIT_COMMIT="ca9e64cf2f8c29b8bb001281abcdcb942dc9fa01"

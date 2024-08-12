@@ -181,13 +181,11 @@ func NewAppKeepers(
 	// Set keys KVStoreKey, TransientStoreKey, MemoryStoreKey
 	appKeepers.GenerateKeys()
 
-	// TODO: check into new ParamStore
 	/*
 		configure state listening capabilities using AppOptions
 		we are doing nothing with the returned streamingServices and waitGroup in this case
 	*/
 	// load state streaming if enabled
-
 	if err := bApp.RegisterStreamingServices(appOpts, appKeepers.keys); err != nil {
 		panic(err)
 	}

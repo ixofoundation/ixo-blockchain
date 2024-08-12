@@ -83,7 +83,7 @@ func NewRootCmd() *cobra.Command {
 		WithHomeDir(app.DefaultNodeHome).
 		WithViper("IXO")
 
-	// TODO consider adding .toml config file functionality for extra params
+	// consider adding .toml custom config in next cosmos upgrade
 	// Allows you to add extra params to your client.toml
 	// gas, gas-price, gas-adjustment, fees, note, etc.
 	// SetCustomEnvVariablesFromClientToml(initClientCtx)

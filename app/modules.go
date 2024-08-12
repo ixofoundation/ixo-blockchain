@@ -163,34 +163,33 @@ func newBasicManagerFromManager(app *IxoApp) module.BasicManager {
 	return basicManager
 }
 
-// TODO: uncomment while no tests, re-add when tests are added
-// // simulationModules returns modules for simulation manager
-// // define the order of the modules for deterministic simulationss
-// func simulationModules(
-// 	app *IxoApp,
-// 	encodingConfig appparams.EncodingConfig,
-// 	_ bool,
-// ) []module.AppModuleSimulation {
-// 	appCodec := encodingConfig.Marshaler
-
-// 	return []module.AppModuleSimulation{
-// 		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
-// 		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
-// 		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
-// 		gov.NewAppModule(appCodec, *app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-// 		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
-// 		staking.NewAppModule(appCodec, *app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-// 		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-// 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-// 		sdkparams.NewAppModule(app.ParamsKeeper),
-// 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-// 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-// 		evidence.NewAppModule(app.EvidenceKeeper),
-// 		ibc.NewAppModule(app.IBCKeeper),
-// 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-// 		transfer.NewAppModule(app.TransferKeeper),
-// 	}
-// }
+// simulationModules returns modules for simulation manager
+// define the order of the modules for deterministic simulations
+func simulationModules(
+	app *IxoApp,
+	appCodec codec.Codec,
+	_ bool,
+) []module.AppModuleSimulation {
+	return []module.AppModuleSimulation{
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
+		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
+		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper, nil, app.GetSubspace(minttypes.ModuleName)),
+		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
+		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(distrtypes.ModuleName)),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(slashingtypes.ModuleName), app.interfaceRegistry),
+		sdkparams.NewAppModule(app.ParamsKeeper),
+		evidence.NewAppModule(app.EvidenceKeeper),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
+		ibc.NewAppModule(app.IBCKeeper),
+		transfer.NewAppModule(app.TransferKeeper),
+		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
+		ibcfee.NewAppModule(app.IBCFeeKeeper),
+	}
+}
 
 // OrderBeginBlockers returns the order of BeginBlockers, by module name.
 func OrderBeginBlockers() []string {

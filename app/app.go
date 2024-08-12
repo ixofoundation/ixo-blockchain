@@ -302,12 +302,8 @@ func NewIxoApp(
 	}
 
 	// create the simulation manager and define the order of the modules for deterministic simulations
-	//
-	// NOTE: this is not required apps that don't use the simulator for fuzz testing
-	// transactions
-	// TODO: work in tests, none for now
-	// app.sm = module.NewSimulationManager(simulationModules(app, encodingConfig, skipGenesisInvariants)...)
-	// app.sm.RegisterStoreDecoders()
+	app.sm = module.NewSimulationManager(simulationModules(app, appCodec, skipGenesisInvariants)...)
+	app.sm.RegisterStoreDecoders()
 
 	return app
 }
