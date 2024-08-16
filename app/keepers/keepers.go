@@ -90,6 +90,8 @@ import (
 	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 	entitykeeper "github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	epochskeeper "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/keeper"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/authenticator"
@@ -106,7 +108,7 @@ type AppKeepers struct {
 	memKeys map[string]*storetypes.MemoryStoreKey
 
 	// For every module that has hooks set on it,
-	// you must check InitKeepers to ensure that it is passed by reference
+	// please ensure that it is passed by reference
 	// e.g. *app.StakingKeeper
 
 	// keepers
@@ -145,6 +147,7 @@ type AppKeepers struct {
 	ClaimsKeeper         claimsmodulekeeper.Keeper
 	SmartAccountKeeper   *smartaccountkeeper.Keeper
 	AuthenticatorManager *authenticator.AuthenticatorManager
+	EpochsKeeper         *epochskeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
@@ -305,15 +308,6 @@ func NewAppKeepers(
 		runtime.NewKVStoreService(appKeepers.keys[slashingtypes.StoreKey]),
 		appKeepers.StakingKeeper,
 		govModAddress,
-	)
-
-	// register the staking hooks
-	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
-	appKeepers.StakingKeeper.SetHooks(
-		stakingtypes.NewMultiStakingHooks(
-			appKeepers.DistrKeeper.Hooks(),
-			appKeepers.SlashingKeeper.Hooks(),
-		),
 	)
 
 	// UpgradeKeeper must be created before IBCKeeper
@@ -489,10 +483,13 @@ func NewAppKeepers(
 
 	// Custom IXO Keepers
 	// =============================
+	appKeepers.EpochsKeeper = epochskeeper.NewKeeper(appKeepers.keys[epochstypes.StoreKey])
+
 	appKeepers.IidKeeper = iidmodulekeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[iidtypes.StoreKey],
 	)
+
 	appKeepers.BondsKeeper = bondskeeper.NewKeeper(
 		appCodec,
 		appKeepers.BankKeeper,
@@ -502,6 +499,7 @@ func NewAppKeepers(
 		appKeepers.keys[bondstypes.StoreKey],
 		appKeepers.GetSubspace(bondstypes.ModuleName),
 	)
+
 	appKeepers.EntityKeeper = entitykeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[entitytypes.StoreKey],
@@ -512,6 +510,7 @@ func NewAppKeepers(
 		appKeepers.AccountKeeper,
 		appKeepers.AuthzKeeper,
 	)
+
 	appKeepers.TokenKeeper = tokenkeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[tokentypes.StoreKey],
@@ -519,6 +518,7 @@ func NewAppKeepers(
 		appKeepers.ContractKeeper,
 		appKeepers.GetSubspace(tokentypes.ModuleName),
 	)
+
 	appKeepers.ClaimsKeeper = claimsmodulekeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[claimsmoduletypes.StoreKey],
@@ -640,6 +640,32 @@ func NewAppKeepers(
 	return appKeepers
 }
 
+// SetupHooks sets up hooks for modules.
+func (appKeepers *AppKeepers) SetupHooks() {
+	// For every module that has hooks set on it,
+	// you must check InitNormalKeepers to ensure that its not passed by de-reference
+	// e.g. *app.StakingKeeper doesn't appear
+
+	appKeepers.StakingKeeper.SetHooks(
+		stakingtypes.NewMultiStakingHooks(
+			appKeepers.DistrKeeper.Hooks(),
+			appKeepers.SlashingKeeper.Hooks(),
+		),
+	)
+
+	appKeepers.EpochsKeeper.SetHooks(
+		epochstypes.NewMultiEpochHooks(
+		// insert epoch hooks receivers here
+		),
+	)
+
+	appKeepers.GovKeeper.SetHooks(
+		govtypes.NewMultiGovHooks(
+		// insert governance hooks receivers here
+		),
+	)
+}
+
 // initParamsKeeper init params keeper and its subspaces
 func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino, key, tkey storetypes.StoreKey) paramskeeper.Keeper {
 	paramsKeeper := paramskeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
@@ -711,5 +737,6 @@ func KVStoreKeys() []string {
 		tokentypes.StoreKey,
 		claimsmoduletypes.StoreKey,
 		smartaccounttypes.StoreKey,
+		epochstypes.StoreKey,
 	}
 }

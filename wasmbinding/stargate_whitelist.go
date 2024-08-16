@@ -16,6 +16,7 @@ import (
 	bondstypes "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
 	claimstypes "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	epochtypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
@@ -114,6 +115,10 @@ func init() {
 	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/Params", &smartaccounttypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/GetAuthenticator", &smartaccounttypes.GetAuthenticatorResponse{})
 	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/GetAuthenticators", &smartaccounttypes.GetAuthenticatorsResponse{})
+
+	// epochs
+	setWhitelistedQuery("/ixo.epochs.v1beta1.Query/EpochInfos", &epochtypes.QueryEpochsInfoResponse{})
+	setWhitelistedQuery("/ixo.epochs.v1beta1.Query/CurrentEpoch", &epochtypes.QueryCurrentEpochResponse{})
 }
 
 // IsWhitelistedQuery returns if the query is not whitelisted.

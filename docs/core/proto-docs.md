@@ -279,6 +279,24 @@
   
     - [Msg](#ixo.entity.v1beta1.Msg)
   
+- [ixo/epochs/v1beta1/epoch.proto](#ixo/epochs/v1beta1/epoch.proto)
+    - [EpochInfo](#ixo.epochs.v1beta1.EpochInfo)
+  
+- [ixo/epochs/v1beta1/event.proto](#ixo/epochs/v1beta1/event.proto)
+    - [EpochEndEvent](#ixo.epochs.v1beta1.EpochEndEvent)
+    - [EpochStartEvent](#ixo.epochs.v1beta1.EpochStartEvent)
+  
+- [ixo/epochs/v1beta1/genesis.proto](#ixo/epochs/v1beta1/genesis.proto)
+    - [GenesisState](#ixo.epochs.v1beta1.GenesisState)
+  
+- [ixo/epochs/v1beta1/query.proto](#ixo/epochs/v1beta1/query.proto)
+    - [QueryCurrentEpochRequest](#ixo.epochs.v1beta1.QueryCurrentEpochRequest)
+    - [QueryCurrentEpochResponse](#ixo.epochs.v1beta1.QueryCurrentEpochResponse)
+    - [QueryEpochsInfoRequest](#ixo.epochs.v1beta1.QueryEpochsInfoRequest)
+    - [QueryEpochsInfoResponse](#ixo.epochs.v1beta1.QueryEpochsInfoResponse)
+  
+    - [Query](#ixo.epochs.v1beta1.Query)
+  
 - [ixo/iid/v1beta1/event.proto](#ixo/iid/v1beta1/event.proto)
     - [IidDocumentCreatedEvent](#ixo.iid.v1beta1.IidDocumentCreatedEvent)
     - [IidDocumentUpdatedEvent](#ixo.iid.v1beta1.IidDocumentUpdatedEvent)
@@ -4413,6 +4431,206 @@ Msg defines the project Msg service.
 | CreateEntityAccount | [MsgCreateEntityAccount](#ixo.entity.v1beta1.MsgCreateEntityAccount) | [MsgCreateEntityAccountResponse](#ixo.entity.v1beta1.MsgCreateEntityAccountResponse) | Create a module account for an entity, |
 | GrantEntityAccountAuthz | [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz) | [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse) | Create an authz grant from entity account |
 | RevokeEntityAccountAuthz | [MsgRevokeEntityAccountAuthz](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz) | [MsgRevokeEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse) | Revoke an authz grant from entity account |
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/epoch.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/epoch.proto
+
+
+
+<a name="ixo.epochs.v1beta1.EpochInfo"></a>
+
+### EpochInfo
+EpochInfo is a struct that describes the data going into
+a timer defined by the x/epochs module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifier | [string](#string) |  | identifier is a unique reference to this particular timer. |
+| start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time is the time at which the timer first ever ticks. If start_time is in the future, the epoch will not begin until the start time. |
+| duration | [google.protobuf.Duration](#google.protobuf.Duration) |  | duration is the time in between epoch ticks. In order for intended behavior to be met, duration should be greater than the chains expected block time. Duration must be non-zero. |
+| current_epoch | [int64](#int64) |  | current_epoch is the current epoch number, or in other words, how many times has the timer &#39;ticked&#39;. The first tick (current_epoch=1) is defined as the first block whose blocktime is greater than the EpochInfo start_time. |
+| current_epoch_start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | current_epoch_start_time describes the start time of the current timer interval. The interval is (current_epoch_start_time, current_epoch_start_time &#43; duration] When the timer ticks, this is set to current_epoch_start_time = last_epoch_start_time &#43; duration only one timer tick for a given identifier can occur per block.
+
+NOTE! The current_epoch_start_time may diverge significantly from the wall-clock time the epoch began at. Wall-clock time of epoch start may be &gt;&gt; current_epoch_start_time. Suppose current_epoch_start_time = 10, duration = 5. Suppose the chain goes offline at t=14, and comes back online at t=30, and produces blocks at every successive time. (t=31, 32, etc.) * The t=30 block will start the epoch for (10, 15] * The t=31 block will start the epoch for (15, 20] * The t=32 block will start the epoch for (20, 25] * The t=33 block will start the epoch for (25, 30] * The t=34 block will start the epoch for (30, 35] * The **t=36** block will start the epoch for (35, 40] |
+| epoch_counting_started | [bool](#bool) |  | epoch_counting_started is a boolean, that indicates whether this epoch timer has began yet. |
+| current_epoch_start_height | [int64](#int64) |  | current_epoch_start_height is the block height at which the current epoch started. (The block height at which the timer last ticked) |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/event.proto
+
+
+
+<a name="ixo.epochs.v1beta1.EpochEndEvent"></a>
+
+### EpochEndEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_number | [int64](#int64) |  | Epoch number, starting from 1. |
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.EpochStartEvent"></a>
+
+### EpochStartEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_number | [int64](#int64) |  | Epoch number, starting from 1. |
+| start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | The start timestamp of the epoch. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/genesis.proto
+
+
+
+<a name="ixo.epochs.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the epochs module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epochs | [EpochInfo](#ixo.epochs.v1beta1.EpochInfo) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/query.proto
+
+
+
+<a name="ixo.epochs.v1beta1.QueryCurrentEpochRequest"></a>
+
+### QueryCurrentEpochRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifier | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.QueryCurrentEpochResponse"></a>
+
+### QueryCurrentEpochResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| current_epoch | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.QueryEpochsInfoRequest"></a>
+
+### QueryEpochsInfoRequest
+
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.QueryEpochsInfoResponse"></a>
+
+### QueryEpochsInfoResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epochs | [EpochInfo](#ixo.epochs.v1beta1.EpochInfo) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.epochs.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| EpochInfos | [QueryEpochsInfoRequest](#ixo.epochs.v1beta1.QueryEpochsInfoRequest) | [QueryEpochsInfoResponse](#ixo.epochs.v1beta1.QueryEpochsInfoResponse) | EpochInfos provide running epochInfos |
+| CurrentEpoch | [QueryCurrentEpochRequest](#ixo.epochs.v1beta1.QueryCurrentEpochRequest) | [QueryCurrentEpochResponse](#ixo.epochs.v1beta1.QueryCurrentEpochResponse) | CurrentEpoch provide current epoch of specified identifier |
 
  
 

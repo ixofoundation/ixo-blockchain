@@ -1307,6 +1307,86 @@
         
           
           <li>
+            <a href="#ixo%2fepochs%2fv1beta1%2fepoch.proto">ixo/epochs/v1beta1/epoch.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.EpochInfo"><span class="badge">M</span>EpochInfo</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fepochs%2fv1beta1%2fevent.proto">ixo/epochs/v1beta1/event.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.EpochEndEvent"><span class="badge">M</span>EpochEndEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.EpochStartEvent"><span class="badge">M</span>EpochStartEvent</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fepochs%2fv1beta1%2fgenesis.proto">ixo/epochs/v1beta1/genesis.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.GenesisState"><span class="badge">M</span>GenesisState</a>
+                </li>
+              
+              
+              
+              
+            </ul>
+          </li>
+        
+          
+          <li>
+            <a href="#ixo%2fepochs%2fv1beta1%2fquery.proto">ixo/epochs/v1beta1/query.proto</a>
+            <ul>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.QueryCurrentEpochRequest"><span class="badge">M</span>QueryCurrentEpochRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.QueryCurrentEpochResponse"><span class="badge">M</span>QueryCurrentEpochResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.QueryEpochsInfoRequest"><span class="badge">M</span>QueryEpochsInfoRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.QueryEpochsInfoResponse"><span class="badge">M</span>QueryEpochsInfoResponse</a>
+                </li>
+              
+              
+              
+              
+                <li>
+                  <a href="#ixo.epochs.v1beta1.Query"><span class="badge">S</span>Query</a>
+                </li>
+              
+            </ul>
+          </li>
+        
+          
+          <li>
             <a href="#ixo%2fiid%2fv1beta1%2fevent.proto">ixo/iid/v1beta1/event.proto</a>
             <ul>
               
@@ -10735,6 +10815,376 @@ subject </p></td>
           </tbody>
         </table>
 
+        
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/epochs/v1beta1/epoch.proto">ixo/epochs/v1beta1/epoch.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.epochs.v1beta1.EpochInfo">EpochInfo</h3>
+        <p>EpochInfo is a struct that describes the data going into</p><p>a timer defined by the x/epochs module.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>identifier</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>identifier is a unique reference to this particular timer. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>start_time is the time at which the timer first ever ticks.
+If start_time is in the future, the epoch will not begin until the start
+time. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>duration</td>
+                  <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
+                  <td></td>
+                  <td><p>duration is the time in between epoch ticks.
+In order for intended behavior to be met, duration should
+be greater than the chains expected block time.
+Duration must be non-zero. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>current_epoch</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>current_epoch is the current epoch number, or in other words,
+how many times has the timer &#39;ticked&#39;.
+The first tick (current_epoch=1) is defined as
+the first block whose blocktime is greater than the EpochInfo start_time. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>current_epoch_start_time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>current_epoch_start_time describes the start time of the current timer
+interval. The interval is (current_epoch_start_time,
+current_epoch_start_time &#43; duration] When the timer ticks, this is set to
+current_epoch_start_time = last_epoch_start_time &#43; duration only one timer
+tick for a given identifier can occur per block.
+
+NOTE! The current_epoch_start_time may diverge significantly from the
+wall-clock time the epoch began at. Wall-clock time of epoch start may be
+&gt;&gt; current_epoch_start_time. Suppose current_epoch_start_time = 10,
+duration = 5. Suppose the chain goes offline at t=14, and comes back online
+at t=30, and produces blocks at every successive time. (t=31, 32, etc.)
+* The t=30 block will start the epoch for (10, 15]
+* The t=31 block will start the epoch for (15, 20]
+* The t=32 block will start the epoch for (20, 25]
+* The t=33 block will start the epoch for (25, 30]
+* The t=34 block will start the epoch for (30, 35]
+* The **t=36** block will start the epoch for (35, 40] </p></td>
+                </tr>
+              
+                <tr>
+                  <td>epoch_counting_started</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>epoch_counting_started is a boolean, that indicates whether this
+epoch timer has began yet. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>current_epoch_start_height</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>current_epoch_start_height is the block height at which the current epoch
+started. (The block height at which the timer last ticked) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/epochs/v1beta1/event.proto">ixo/epochs/v1beta1/event.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.epochs.v1beta1.EpochEndEvent">EpochEndEvent</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>epoch_number</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Epoch number, starting from 1. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.epochs.v1beta1.EpochStartEvent">EpochStartEvent</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>epoch_number</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p>Epoch number, starting from 1. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>start_time</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>The start timestamp of the epoch. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/epochs/v1beta1/genesis.proto">ixo/epochs/v1beta1/genesis.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.epochs.v1beta1.GenesisState">GenesisState</h3>
+        <p>GenesisState defines the epochs module's genesis state.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>epochs</td>
+                  <td><a href="#ixo.epochs.v1beta1.EpochInfo">EpochInfo</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+    
+      
+      <div class="file-heading">
+        <h2 id="ixo/epochs/v1beta1/query.proto">ixo/epochs/v1beta1/query.proto</h2><a href="#title">Top</a>
+      </div>
+      <p></p>
+
+      
+        <h3 id="ixo.epochs.v1beta1.QueryCurrentEpochRequest">QueryCurrentEpochRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>identifier</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.epochs.v1beta1.QueryCurrentEpochResponse">QueryCurrentEpochResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>current_epoch</td>
+                  <td><a href="#int64">int64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.epochs.v1beta1.QueryEpochsInfoRequest">QueryEpochsInfoRequest</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.epochs.v1beta1.QueryEpochsInfoResponse">QueryEpochsInfoResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>epochs</td>
+                  <td><a href="#ixo.epochs.v1beta1.EpochInfo">EpochInfo</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+
+      
+
+      
+
+      
+        <h3 id="ixo.epochs.v1beta1.Query">Query</h3>
+        <p>Query defines the gRPC querier service.</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Method Name</td><td>Request Type</td><td>Response Type</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>EpochInfos</td>
+                <td><a href="#ixo.epochs.v1beta1.QueryEpochsInfoRequest">QueryEpochsInfoRequest</a></td>
+                <td><a href="#ixo.epochs.v1beta1.QueryEpochsInfoResponse">QueryEpochsInfoResponse</a></td>
+                <td><p>EpochInfos provide running epochInfos</p></td>
+              </tr>
+            
+              <tr>
+                <td>CurrentEpoch</td>
+                <td><a href="#ixo.epochs.v1beta1.QueryCurrentEpochRequest">QueryCurrentEpochRequest</a></td>
+                <td><a href="#ixo.epochs.v1beta1.QueryCurrentEpochResponse">QueryCurrentEpochResponse</a></td>
+                <td><p>CurrentEpoch provide current epoch of specified identifier</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+
+        
+          
+          
+          <h4>Methods with HTTP bindings</h4>
+          <table>
+            <thead>
+              <tr>
+                <td>Method Name</td>
+                <td>Method</td>
+                <td>Pattern</td>
+                <td>Body</td>
+              </tr>
+            </thead>
+            <tbody>
+            
+              
+              
+              <tr>
+                <td>EpochInfos</td>
+                <td>GET</td>
+                <td>/ixo/epochs/v1beta1/epochs</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>CurrentEpoch</td>
+                <td>GET</td>
+                <td>/ixo/epochs/v1beta1/current_epoch</td>
+                <td></td>
+              </tr>
+              
+            
+            </tbody>
+          </table>
+          
         
     
       

@@ -1,0 +1,21 @@
+syntax = "proto3";
+package ixo.epochs.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types";
+
+message EpochStartEvent {
+  // Epoch number, starting from 1.
+  int64 epoch_number = 1;
+
+  // The start timestamp of the epoch.
+  google.protobuf.Timestamp start_time = 2
+      [ (gogoproto.stdtime) = true, (gogoproto.nullable) = false ];
+}
+
+message EpochEndEvent {
+  // Epoch number, starting from 1.
+  int64 epoch_number = 1;
+}

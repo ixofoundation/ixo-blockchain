@@ -65,6 +65,8 @@ import (
 	entitymodule "github.com/ixofoundation/ixo-blockchain/v3/x/entity"
 	entityclient "github.com/ixofoundation/ixo-blockchain/v3/x/entity/client"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/epochs"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/v3/x/iid"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 	smartaccount "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account"
@@ -121,6 +123,7 @@ func appModules(
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
 		ibc.NewAppModule(app.IBCKeeper),
 		ibctm.NewAppModule(),
+		epochs.NewAppModule(*app.EpochsKeeper),
 		sdkparams.NewAppModule(app.ParamsKeeper),
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.BaseApp.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
@@ -198,6 +201,12 @@ func OrderBeginBlockers() []string {
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	return []string{
+		// Epochs is set to be first right now, this in principle could change to come later / be at the end,
+		// but would have to be a holistic change with other pipelines taken into account.
+		// Epochs must come before staking, because txfees epoch hook sends fees to the auth "fee collector"
+		// module account, which is then distributed to stakers. If staking comes before epochs, then the
+		// funds will not be distributed to stakers as expected.
+		epochstypes.ModuleName,
 
 		// Next 7 is Staking ordering, dont change
 		minttypes.ModuleName,
@@ -269,6 +278,7 @@ func OrderEndBlockers() []string {
 		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		epochstypes.ModuleName,
 		smartaccounttypes.ModuleName,
 		iidtypes.ModuleName,
 		entitytypes.ModuleName,
@@ -317,6 +327,7 @@ func OrderInitGenesis() []string {
 		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		epochstypes.ModuleName,
 		smartaccounttypes.ModuleName,
 		iidtypes.ModuleName,
 		bondstypes.ModuleName,

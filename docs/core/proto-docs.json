@@ -11566,6 +11566,378 @@
       ]
     },
     {
+      "name": "ixo/epochs/v1beta1/epoch.proto",
+      "description": "",
+      "package": "ixo.epochs.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "EpochInfo",
+          "longName": "EpochInfo",
+          "fullName": "ixo.epochs.v1beta1.EpochInfo",
+          "description": "EpochInfo is a struct that describes the data going into\na timer defined by the x/epochs module.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "identifier",
+              "description": "identifier is a unique reference to this particular timer.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "start_time",
+              "description": "start_time is the time at which the timer first ever ticks.\nIf start_time is in the future, the epoch will not begin until the start\ntime.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "duration",
+              "description": "duration is the time in between epoch ticks.\nIn order for intended behavior to be met, duration should\nbe greater than the chains expected block time.\nDuration must be non-zero.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "current_epoch",
+              "description": "current_epoch is the current epoch number, or in other words,\nhow many times has the timer 'ticked'.\nThe first tick (current_epoch=1) is defined as\nthe first block whose blocktime is greater than the EpochInfo start_time.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "current_epoch_start_time",
+              "description": "current_epoch_start_time describes the start time of the current timer\ninterval. The interval is (current_epoch_start_time,\ncurrent_epoch_start_time + duration] When the timer ticks, this is set to\ncurrent_epoch_start_time = last_epoch_start_time + duration only one timer\ntick for a given identifier can occur per block.\n\nNOTE! The current_epoch_start_time may diverge significantly from the\nwall-clock time the epoch began at. Wall-clock time of epoch start may be\n\u003e\u003e current_epoch_start_time. Suppose current_epoch_start_time = 10,\nduration = 5. Suppose the chain goes offline at t=14, and comes back online\nat t=30, and produces blocks at every successive time. (t=31, 32, etc.)\n* The t=30 block will start the epoch for (10, 15]\n* The t=31 block will start the epoch for (15, 20]\n* The t=32 block will start the epoch for (20, 25]\n* The t=33 block will start the epoch for (25, 30]\n* The t=34 block will start the epoch for (30, 35]\n* The **t=36** block will start the epoch for (35, 40]",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "epoch_counting_started",
+              "description": "epoch_counting_started is a boolean, that indicates whether this\nepoch timer has began yet.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "current_epoch_start_height",
+              "description": "current_epoch_start_height is the block height at which the current epoch\nstarted. (The block height at which the timer last ticked)",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/epochs/v1beta1/event.proto",
+      "description": "",
+      "package": "ixo.epochs.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "EpochEndEvent",
+          "longName": "EpochEndEvent",
+          "fullName": "ixo.epochs.v1beta1.EpochEndEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "epoch_number",
+              "description": "Epoch number, starting from 1.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "EpochStartEvent",
+          "longName": "EpochStartEvent",
+          "fullName": "ixo.epochs.v1beta1.EpochStartEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "epoch_number",
+              "description": "Epoch number, starting from 1.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "start_time",
+              "description": "The start timestamp of the epoch.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/epochs/v1beta1/genesis.proto",
+      "description": "",
+      "package": "ixo.epochs.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GenesisState",
+          "longName": "GenesisState",
+          "fullName": "ixo.epochs.v1beta1.GenesisState",
+          "description": "GenesisState defines the epochs module's genesis state.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "epochs",
+              "description": "",
+              "label": "repeated",
+              "type": "EpochInfo",
+              "longType": "EpochInfo",
+              "fullType": "ixo.epochs.v1beta1.EpochInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/epochs/v1beta1/query.proto",
+      "description": "",
+      "package": "ixo.epochs.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "QueryCurrentEpochRequest",
+          "longName": "QueryCurrentEpochRequest",
+          "fullName": "ixo.epochs.v1beta1.QueryCurrentEpochRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "identifier",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCurrentEpochResponse",
+          "longName": "QueryCurrentEpochResponse",
+          "fullName": "ixo.epochs.v1beta1.QueryCurrentEpochResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "current_epoch",
+              "description": "",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryEpochsInfoRequest",
+          "longName": "QueryEpochsInfoRequest",
+          "fullName": "ixo.epochs.v1beta1.QueryEpochsInfoRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryEpochsInfoResponse",
+          "longName": "QueryEpochsInfoResponse",
+          "fullName": "ixo.epochs.v1beta1.QueryEpochsInfoResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "epochs",
+              "description": "",
+              "label": "repeated",
+              "type": "EpochInfo",
+              "longType": "EpochInfo",
+              "fullType": "ixo.epochs.v1beta1.EpochInfo",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Query",
+          "longName": "Query",
+          "fullName": "ixo.epochs.v1beta1.Query",
+          "description": "Query defines the gRPC querier service.",
+          "methods": [
+            {
+              "name": "EpochInfos",
+              "description": "EpochInfos provide running epochInfos",
+              "requestType": "QueryEpochsInfoRequest",
+              "requestLongType": "QueryEpochsInfoRequest",
+              "requestFullType": "ixo.epochs.v1beta1.QueryEpochsInfoRequest",
+              "requestStreaming": false,
+              "responseType": "QueryEpochsInfoResponse",
+              "responseLongType": "QueryEpochsInfoResponse",
+              "responseFullType": "ixo.epochs.v1beta1.QueryEpochsInfoResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/epochs/v1beta1/epochs"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CurrentEpoch",
+              "description": "CurrentEpoch provide current epoch of specified identifier",
+              "requestType": "QueryCurrentEpochRequest",
+              "requestLongType": "QueryCurrentEpochRequest",
+              "requestFullType": "ixo.epochs.v1beta1.QueryCurrentEpochRequest",
+              "requestStreaming": false,
+              "responseType": "QueryCurrentEpochResponse",
+              "responseLongType": "QueryCurrentEpochResponse",
+              "responseFullType": "ixo.epochs.v1beta1.QueryCurrentEpochResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/epochs/v1beta1/current_epoch"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "ixo/iid/v1beta1/event.proto",
       "description": "",
       "package": "ixo.iid.v1beta1",

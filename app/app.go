@@ -178,6 +178,7 @@ func NewIxoApp(
 		logger,
 		appOpts,
 	)
+	app.SetupHooks()
 
 	/****  Module Options ****/
 	// -----------------------------------------------------
@@ -214,7 +215,7 @@ func NewIxoApp(
 	}
 	app.txConfig = txConfig
 
-	// Tell the app's module manager how to set the order of PreBlockers, which are run before BeginBLocker of every block..
+	// Upgrades from v0.50.x onwards happen in pre block
 	app.ModuleManager.SetOrderPreBlockers(upgradetypes.ModuleName)
 	// Tell the app's module manager how to set the order of BeginBlockers, which are run at the beginning of every block.
 	app.ModuleManager.SetOrderBeginBlockers(OrderBeginBlockers()...)
