@@ -37,8 +37,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	mintkeeper "github.com/cosmos/cosmos-sdk/x/mint/keeper"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	sdkparams "github.com/cosmos/cosmos-sdk/x/params"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -94,6 +92,8 @@ import (
 	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	mintkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/mint/keeper"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/authenticator"
 	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/keeper"
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
@@ -131,7 +131,6 @@ type AppKeepers struct {
 	ICQKeeper           icqkeeper.Keeper
 	TransferKeeper      ibctransferkeeper.Keeper
 	EvidenceKeeper      evidencekeeper.Keeper
-	MintKeeper          mintkeeper.Keeper
 	GovKeeper           *govkeeper.Keeper
 	WasmKeeper          wasmkeeper.Keeper
 	ContractKeeper      wasmtypes.ContractOpsKeeper
@@ -148,6 +147,7 @@ type AppKeepers struct {
 	SmartAccountKeeper   *smartaccountkeeper.Keeper
 	AuthenticatorManager *authenticator.AuthenticatorManager
 	EpochsKeeper         *epochskeeper.Keeper
+	MintKeeper           *mintkeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
@@ -282,16 +282,6 @@ func NewAppKeepers(
 		addresscodec.NewBech32Codec(sdk.GetConfig().GetBech32ConsensusAddrPrefix()),
 	)
 
-	appKeepers.MintKeeper = mintkeeper.NewKeeper(
-		appCodec,
-		runtime.NewKVStoreService(appKeepers.keys[minttypes.StoreKey]),
-		appKeepers.StakingKeeper,
-		appKeepers.AccountKeeper,
-		appKeepers.BankKeeper,
-		authtypes.FeeCollectorName,
-		govModAddress,
-	)
-
 	appKeepers.DistrKeeper = distrkeeper.NewKeeper(
 		appCodec,
 		runtime.NewKVStoreService(appKeepers.keys[distrtypes.StoreKey]),
@@ -301,6 +291,16 @@ func NewAppKeepers(
 		authtypes.FeeCollectorName,
 		govModAddress,
 	)
+
+	mintKeeper := mintkeeper.NewKeeper(
+		appKeepers.keys[minttypes.StoreKey],
+		appKeepers.GetSubspace(minttypes.ModuleName),
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.DistrKeeper,
+		authtypes.FeeCollectorName,
+	)
+	appKeepers.MintKeeper = &mintKeeper
 
 	appKeepers.SlashingKeeper = slashingkeeper.NewKeeper(
 		appCodec,
@@ -653,9 +653,18 @@ func (appKeepers *AppKeepers) SetupHooks() {
 		),
 	)
 
+	// mint hooks must be set before epochs hooks, since mint modules epoch hooks are called by epochs module
+	// and it references the mint hooks, thus it needs to have been set before.
+	appKeepers.MintKeeper.SetHooks(
+		minttypes.NewMultiMintHooks(
+		// insert mint hooks receivers here
+		),
+	)
+
 	appKeepers.EpochsKeeper.SetHooks(
 		epochstypes.NewMultiEpochHooks(
-		// insert epoch hooks receivers here
+			// insert epoch hooks receivers here
+			appKeepers.MintKeeper.Hooks(),
 		),
 	)
 
@@ -677,7 +686,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(authtypes.ModuleName).WithKeyTable(authtypes.ParamKeyTable())         //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(banktypes.ModuleName).WithKeyTable(banktypes.ParamKeyTable())         //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(stakingtypes.ModuleName).WithKeyTable(stakingtypes.ParamKeyTable())   //nolint: staticcheck // SA1019
-	paramsKeeper.Subspace(minttypes.ModuleName).WithKeyTable(minttypes.ParamKeyTable())         //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(distrtypes.ModuleName).WithKeyTable(distrtypes.ParamKeyTable())       //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(slashingtypes.ModuleName).WithKeyTable(slashingtypes.ParamKeyTable()) //nolint: staticcheck // SA1019
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govv1.ParamKeyTable())              //nolint: staticcheck // SA1019
@@ -698,6 +706,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(tokentypes.ModuleName)
 	paramsKeeper.Subspace(claimsmoduletypes.ModuleName)
 	paramsKeeper.Subspace(smartaccounttypes.ModuleName)
+	paramsKeeper.Subspace(minttypes.ModuleName)
 
 	return paramsKeeper
 }

@@ -7,6 +7,7 @@ include scripts/makefiles/docker.mk
 include scripts/makefiles/lint.mk
 include scripts/makefiles/proto.mk
 include scripts/makefiles/release.mk
+include scripts/makefiles/tests.mk
 
 .DEFAULT_GOAL := help
 help:
@@ -24,6 +25,7 @@ help:
 	@echo "  make proto                 Show available proto commands"
 	@echo "  make release               Create a new release"
 	@echo "  make release-help          Show available release commands"
+	@echo "  make test                  Show available test commands"
 	@echo ""
 	@echo "Run 'make [subcommand]' to see the available commands for each subcommand."
 

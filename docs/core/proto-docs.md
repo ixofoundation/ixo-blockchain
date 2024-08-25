@@ -312,6 +312,23 @@
   
     - [Query](#ixo.iid.v1beta1.Query)
   
+- [ixo/mint/v1beta1/mint.proto](#ixo/mint/v1beta1/mint.proto)
+    - [DistributionProportions](#ixo.mint.v1beta1.DistributionProportions)
+    - [Minter](#ixo.mint.v1beta1.Minter)
+    - [Params](#ixo.mint.v1beta1.Params)
+    - [WeightedAddress](#ixo.mint.v1beta1.WeightedAddress)
+  
+- [ixo/mint/v1beta1/genesis.proto](#ixo/mint/v1beta1/genesis.proto)
+    - [GenesisState](#ixo.mint.v1beta1.GenesisState)
+  
+- [ixo/mint/v1beta1/query.proto](#ixo/mint/v1beta1/query.proto)
+    - [QueryEpochProvisionsRequest](#ixo.mint.v1beta1.QueryEpochProvisionsRequest)
+    - [QueryEpochProvisionsResponse](#ixo.mint.v1beta1.QueryEpochProvisionsResponse)
+    - [QueryParamsRequest](#ixo.mint.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.mint.v1beta1.QueryParamsResponse)
+  
+    - [Query](#ixo.mint.v1beta1.Query)
+  
 - [ixo/token/v1beta1/token.proto](#ixo/token/v1beta1/token.proto)
     - [Params](#ixo.token.v1beta1.Params)
     - [Token](#ixo.token.v1beta1.Token)
@@ -4796,6 +4813,208 @@ Query defines the gRPC querier service.
 | ----------- | ------------ | ------------- | ------------|
 | IidDocuments | [QueryIidDocumentsRequest](#ixo.iid.v1beta1.QueryIidDocumentsRequest) | [QueryIidDocumentsResponse](#ixo.iid.v1beta1.QueryIidDocumentsResponse) | IidDocuments queries all iid documents that match the given status. |
 | IidDocument | [QueryIidDocumentRequest](#ixo.iid.v1beta1.QueryIidDocumentRequest) | [QueryIidDocumentResponse](#ixo.iid.v1beta1.QueryIidDocumentResponse) | IidDocument queries a iid documents with an id. |
+
+ 
+
+
+
+<a name="ixo/mint/v1beta1/mint.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/mint/v1beta1/mint.proto
+
+
+
+<a name="ixo.mint.v1beta1.DistributionProportions"></a>
+
+### DistributionProportions
+DistributionProportions defines the distribution proportions of the minted
+denom. In other words, defines which stakeholders will receive the minted
+denoms and how much.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| staking | [string](#string) |  | staking defines the proportion of the minted mint_denom that is to be allocated as staking rewards. |
+| impact_rewards | [string](#string) |  | impact_rewards defines the proportion of the minted mint_denom that is to be allocated to impact rewards addresses. |
+| community_pool | [string](#string) |  | community_pool defines the proportion of the minted mint_denom that is to be allocated to the community pool. |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.Minter"></a>
+
+### Minter
+Minter represents the minting state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_provisions | [string](#string) |  | epoch_provisions represent rewards for the current epoch. |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.Params"></a>
+
+### Params
+Params holds parameters for the x/mint module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| mint_denom | [string](#string) |  | mint_denom is the denom of the coin to mint. |
+| genesis_epoch_provisions | [string](#string) |  | genesis_epoch_provisions epoch provisions from the first epoch. |
+| epoch_identifier | [string](#string) |  | epoch_identifier mint epoch identifier e.g. (day, week). |
+| reduction_period_in_epochs | [int64](#int64) |  | reduction_period_in_epochs the number of epochs it takes to reduce the rewards. |
+| reduction_factor | [string](#string) |  | reduction_factor is the reduction multiplier to execute at the end of each period set by reduction_period_in_epochs. |
+| distribution_proportions | [DistributionProportions](#ixo.mint.v1beta1.DistributionProportions) |  | distribution_proportions defines the distribution proportions of the minted denom. In other words, defines which stakeholders will receive the minted denoms and how much. |
+| weighted_impact_rewards_receivers | [WeightedAddress](#ixo.mint.v1beta1.WeightedAddress) | repeated | weighted_impact_rewards_receivers is the address to receive impact rewards with weights assigned to each address. The final amount that each address receives is: epoch_provisions * distribution_proportions.impact_rewards * Address&#39;s Weight. |
+| minting_rewards_distribution_start_epoch | [int64](#int64) |  | minting_rewards_distribution_start_epoch start epoch to distribute minting rewards |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.WeightedAddress"></a>
+
+### WeightedAddress
+WeightedAddress represents an address with a weight assigned to it.
+The weight is used to determine the proportion of the total minted
+tokens to be minted to the address.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| weight | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/mint/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/mint/v1beta1/genesis.proto
+
+
+
+<a name="ixo.mint.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the mint module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [Minter](#ixo.mint.v1beta1.Minter) |  | minter is an abstraction for holding current rewards information. |
+| params | [Params](#ixo.mint.v1beta1.Params) |  | params defines all the parameters of the mint module. |
+| reduction_started_epoch | [int64](#int64) |  | reduction_started_epoch is the first epoch in which the reduction of mint begins. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/mint/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/mint/v1beta1/query.proto
+
+
+
+<a name="ixo.mint.v1beta1.QueryEpochProvisionsRequest"></a>
+
+### QueryEpochProvisionsRequest
+QueryEpochProvisionsRequest is the request type for the
+Query/EpochProvisions RPC method.
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.QueryEpochProvisionsResponse"></a>
+
+### QueryEpochProvisionsResponse
+QueryEpochProvisionsResponse is the response type for the
+Query/EpochProvisions RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_provisions | [bytes](#bytes) |  | epoch_provisions is the current minting per epoch provisions value. |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is the request type for the Query/Params RPC method.
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is the response type for the Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.mint.v1beta1.Params) |  | params defines the parameters of the module. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.mint.v1beta1.Query"></a>
+
+### Query
+Query provides defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.mint.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.mint.v1beta1.QueryParamsResponse) | Params returns the total set of minting parameters. |
+| EpochProvisions | [QueryEpochProvisionsRequest](#ixo.mint.v1beta1.QueryEpochProvisionsRequest) | [QueryEpochProvisionsResponse](#ixo.mint.v1beta1.QueryEpochProvisionsResponse) | EpochProvisions returns the current minting epoch provisions value. |
 
  
 

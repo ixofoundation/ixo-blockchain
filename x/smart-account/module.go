@@ -5,19 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/spf13/cobra"
-
 	"cosmossdk.io/core/appmodule"
-
-	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
+	"github.com/spf13/cobra"
 )
 
 // Type check to ensure the interface is properly implemented
@@ -94,10 +91,7 @@ type AppModule struct {
 	keeper keeper.Keeper
 }
 
-func NewAppModule(
-	cdc codec.Codec,
-	keeper keeper.Keeper,
-) AppModule {
+func NewAppModule(keeper keeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
 		keeper:         keeper,

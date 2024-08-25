@@ -27,6 +27,9 @@ Ixo has 5 custom cosmos modules which help to reach the Ixo goals and missions:
 - [Entity](/x/entity/spec/README.md)
 - [Claims](/x/claims/spec/README.md)
 - [Token](/x/token/spec/README.md)
+- [Epochs](/x/epochs/README.md)
+- [Mint](/x/mint/README.md)
+- [Smart Account](/x/smart-account/README.md)
 
 ## 🤝 How to contribute
 

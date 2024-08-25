@@ -512,6 +512,12 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
+// MakeCodecs returns the application codec and a legacy Amino codec.
+func MakeCodecs() (codec.Codec, *codec.LegacyAmino) {
+	config := MakeEncodingConfig()
+	return config.Codec, config.Amino
+}
+
 //------------------------------------------------------------------------------
 // Upgrades and forks
 //------------------------------------------------------------------------------

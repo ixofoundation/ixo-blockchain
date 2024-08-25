@@ -258,6 +258,7 @@ func (ad AuthenticatorDecorator) AnteHandle(
 // for the authenticator module.
 // The only user of a manually set fee payer is with fee grants, which are not
 // available on osmosis
+// TODO: debug and make sure can use feegrant for IXO chain
 func (ad AuthenticatorDecorator) ValidateAuthenticatorFeePayer(tx sdk.Tx) error {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {
