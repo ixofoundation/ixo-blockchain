@@ -534,6 +534,10 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.CW20Payment"><span class="badge">M</span>CW20Payment</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.Claim"><span class="badge">M</span>Claim</a>
                 </li>
               
@@ -4991,6 +4995,38 @@ in the SETTLE stage.</p></td>
       <p></p>
 
       
+        <h3 id="ixo.claims.v1beta1.CW20Payment">CW20Payment</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>chose uint64 for now as amounts should be small enough to fit in a
+uint64(max 18446744073709551615) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.claims.v1beta1.Claim">Claim</h3>
         <p></p>
 
@@ -5442,7 +5478,9 @@ on-chain </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>custom amount specified by evaluator for claim approval, if empty list then
-use default by Collection </p></td>
+use default by Collection
+
+TODO: add custom cw20 payments? </p></td>
                 </tr>
               
             </tbody>
@@ -5534,6 +5572,13 @@ use default by Collection </p></td>
                   <td></td>
                   <td><p>timeout after claim/evaluation to create authZ for payment, if 0 then
 immediate direct payment </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>cw20 payments, can be empty or multiple </p></td>
                 </tr>
               
             </tbody>
@@ -5837,6 +5882,14 @@ immediate direct payment </p></td>
 defined in Token payments </p></td>
                 </tr>
               
+                <tr>
+                  <td>max_custom_cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>max custom cw20 payment evaluator can change, if empty list must use amount
+defined in Token payments </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6003,6 +6056,13 @@ accordingly </p></td>
                   <td></td>
                   <td><p>date that grantee can execute authorization, calculated from created date
 plus the timeout on Collection payments, if null then none </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>cw20 payments, can be empty or multiple </p></td>
                 </tr>
               
             </tbody>
@@ -7020,6 +7080,14 @@ was given (codes defined by evaluator) </p></td>
 use default by Collection </p></td>
                 </tr>
               
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw20 payments specified by evaluator for claim approval, if empty
+list then use default by Collection </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7311,6 +7379,13 @@ plus the timeout on Collection payments </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>cw20 payments, can be empty or multiple </p></td>
                 </tr>
               
             </tbody>

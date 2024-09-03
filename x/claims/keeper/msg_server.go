@@ -50,6 +50,10 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	if msg.Payments.Evaluation.Contract_1155Payment != nil {
 		return nil, types.ErrCollectionEvalError
 	}
+	// check that Evaluation Payment does not have CW20 payments
+	if len(msg.Payments.Evaluation.Cw20Payment) > 1 {
+		return nil, types.ErrCollectionEvalCW20Error
+	}
 
 	// check that all payments accounts is part of entity module accounts
 	if !msg.Payments.AccountsIsEntityAccounts(entity) {
@@ -265,12 +269,17 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 
 	// update amounts for collection, make payouts and persist
 	if msg.Status == types.EvaluationStatus_approved {
-		collection.Approved++
 		// payout process for evaluation approval to claim agent
-		// if msg amount is not zero, it means agent set custo amount that was authenticated through authZ constraints to be valid.
+		collection.Approved++
+		// if msg amount/cw20Payment length is not zero, it means agent set custom amount/cw20Payment that was authenticated
+		// through authZ constraints to be valid since all evaluations must be done by module account through authz.
 		approvedPayment := collection.Payments.Approval
-		if !msg.Amount.IsZero() {
+		if len(msg.Amount) > 0 {
 			approvedPayment.Amount = msg.Amount
+		}
+		// TODO: test and check that setting collection does changte the payments permanently since it passes by reference
+		if len(msg.Cw20Payment) > 0 {
+			approvedPayment.Cw20Payment = msg.Cw20Payment
 		}
 		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, msg.ClaimId); err != nil {
 			return nil, err
@@ -407,10 +416,10 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 // --------------------------
 // WITHDRAW PAYMENT
 // --------------------------
+// TODO: test upgrade scenario where no cw20 payment, then upgrade then handle previous existing authz
 func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdrawPayment) (*types.MsgWithdrawPaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// get Claim for dispute
 	claim, err := s.Keeper.GetClaim(ctx, msg.ClaimId)
 	if err != nil {
 		return nil, err
@@ -439,7 +448,7 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 	}
 
 	// make payout
-	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate, msg.Contract_1155Payment, fromAddress, toAddress)
+	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate, msg.Contract_1155Payment, msg.Cw20Payment, fromAddress, toAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -543,6 +552,10 @@ func (s msgServer) UpdateCollectionPayments(goCtx context.Context, msg *types.Ms
 	// check that Evaluation Payment does not have 1155 payment
 	if msg.Payments.Evaluation.Contract_1155Payment != nil {
 		return nil, types.ErrCollectionEvalError
+	}
+	// check that Evaluation Payment does not have CW20 payments
+	if len(msg.Payments.Evaluation.Cw20Payment) > 1 {
+		return nil, types.ErrCollectionEvalCW20Error
 	}
 
 	// check that all payments accounts is part of entity module accounts

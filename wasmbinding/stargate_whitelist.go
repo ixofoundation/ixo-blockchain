@@ -78,6 +78,7 @@ func init() {
 
 	// ixo queries
 	// =============================
+	// TODO: add new queries also, add queries to icq in migration
 
 	// bonds
 	setWhitelistedQuery("/ixo.bonds.v1beta1.Query/Params", &bondstypes.QueryParamsResponse{})

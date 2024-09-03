@@ -51296,6 +51296,22 @@ paths:
                                 for payment, if 0 then
 
                                 immediate direct payment
+                            cw20_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                                    title: >-
+                                      chose uint64 for now as amounts should be
+                                      small enough to fit in a
+
+                                      uint64(max 18446744073709551615)
+                              title: cw20 payments, can be empty or multiple
                         evaluation:
                           type: object
                           properties:
@@ -51342,6 +51358,22 @@ paths:
                                 for payment, if 0 then
 
                                 immediate direct payment
+                            cw20_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                                    title: >-
+                                      chose uint64 for now as amounts should be
+                                      small enough to fit in a
+
+                                      uint64(max 18446744073709551615)
+                              title: cw20 payments, can be empty or multiple
                         approval:
                           type: object
                           properties:
@@ -51388,6 +51420,22 @@ paths:
                                 for payment, if 0 then
 
                                 immediate direct payment
+                            cw20_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                                    title: >-
+                                      chose uint64 for now as amounts should be
+                                      small enough to fit in a
+
+                                      uint64(max 18446744073709551615)
+                              title: cw20 payments, can be empty or multiple
                         rejection:
                           type: object
                           properties:
@@ -51434,6 +51482,22 @@ paths:
                                 for payment, if 0 then
 
                                 immediate direct payment
+                            cw20_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                                    title: >-
+                                      chose uint64 for now as amounts should be
+                                      small enough to fit in a
+
+                                      uint64(max 18446744073709551615)
+                              title: cw20 payments, can be empty or multiple
                     signer:
                       type: string
                       title: signer address
@@ -51706,6 +51770,22 @@ paths:
                               payment, if 0 then
 
                               immediate direct payment
+                          cw20_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                                  title: >-
+                                    chose uint64 for now as amounts should be
+                                    small enough to fit in a
+
+                                    uint64(max 18446744073709551615)
+                            title: cw20 payments, can be empty or multiple
                       evaluation:
                         type: object
                         properties:
@@ -51752,6 +51832,22 @@ paths:
                               payment, if 0 then
 
                               immediate direct payment
+                          cw20_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                                  title: >-
+                                    chose uint64 for now as amounts should be
+                                    small enough to fit in a
+
+                                    uint64(max 18446744073709551615)
+                            title: cw20 payments, can be empty or multiple
                       approval:
                         type: object
                         properties:
@@ -51798,6 +51894,22 @@ paths:
                               payment, if 0 then
 
                               immediate direct payment
+                          cw20_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                                  title: >-
+                                    chose uint64 for now as amounts should be
+                                    small enough to fit in a
+
+                                    uint64(max 18446744073709551615)
+                            title: cw20 payments, can be empty or multiple
                       rejection:
                         type: object
                         properties:
@@ -51844,6 +51956,22 @@ paths:
                               payment, if 0 then
 
                               immediate direct payment
+                          cw20_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                                  title: >-
+                                    chose uint64 for now as amounts should be
+                                    small enough to fit in a
+
+                                    uint64(max 18446744073709551615)
+                            title: cw20 payments, can be empty or multiple
                   signer:
                     type: string
                     title: signer address
@@ -86495,6 +86623,17 @@ definitions:
       a
 
       bond.
+  ixo.claims.v1beta1.CW20Payment:
+    type: object
+    properties:
+      address:
+        type: string
+      amount:
+        type: string
+        format: uint64
+        title: |-
+          chose uint64 for now as amounts should be small enough to fit in a
+          uint64(max 18446744073709551615)
   ixo.claims.v1beta1.Claim:
     type: object
     properties:
@@ -86816,6 +86955,22 @@ definitions:
                   0 then
 
                   immediate direct payment
+              cw20_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    amount:
+                      type: string
+                      format: uint64
+                      title: >-
+                        chose uint64 for now as amounts should be small enough
+                        to fit in a
+
+                        uint64(max 18446744073709551615)
+                title: cw20 payments, can be empty or multiple
           evaluation:
             type: object
             properties:
@@ -86861,6 +87016,22 @@ definitions:
                   0 then
 
                   immediate direct payment
+              cw20_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    amount:
+                      type: string
+                      format: uint64
+                      title: >-
+                        chose uint64 for now as amounts should be small enough
+                        to fit in a
+
+                        uint64(max 18446744073709551615)
+                title: cw20 payments, can be empty or multiple
           approval:
             type: object
             properties:
@@ -86906,6 +87077,22 @@ definitions:
                   0 then
 
                   immediate direct payment
+              cw20_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    amount:
+                      type: string
+                      format: uint64
+                      title: >-
+                        chose uint64 for now as amounts should be small enough
+                        to fit in a
+
+                        uint64(max 18446744073709551615)
+                title: cw20 payments, can be empty or multiple
           rejection:
             type: object
             properties:
@@ -86951,6 +87138,22 @@ definitions:
                   0 then
 
                   immediate direct payment
+              cw20_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    amount:
+                      type: string
+                      format: uint64
+                      title: >-
+                        chose uint64 for now as amounts should be small enough
+                        to fit in a
+
+                        uint64(max 18446744073709551615)
+                title: cw20 payments, can be empty or multiple
       signer:
         type: string
         title: signer address
@@ -87140,6 +87343,22 @@ definitions:
         title: |-
           timeout after claim/evaluation to create authZ for payment, if 0 then
           immediate direct payment
+      cw20_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: string
+              format: uint64
+              title: >-
+                chose uint64 for now as amounts should be small enough to fit in
+                a
+
+                uint64(max 18446744073709551615)
+        title: cw20 payments, can be empty or multiple
   ixo.claims.v1beta1.PaymentStatus:
     type: string
     enum:
@@ -87199,6 +87418,22 @@ definitions:
               then
 
               immediate direct payment
+          cw20_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: cw20 payments, can be empty or multiple
       evaluation:
         type: object
         properties:
@@ -87244,6 +87479,22 @@ definitions:
               then
 
               immediate direct payment
+          cw20_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: cw20 payments, can be empty or multiple
       approval:
         type: object
         properties:
@@ -87289,6 +87540,22 @@ definitions:
               then
 
               immediate direct payment
+          cw20_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: cw20 payments, can be empty or multiple
       rejection:
         type: object
         properties:
@@ -87334,6 +87601,22 @@ definitions:
               then
 
               immediate direct payment
+          cw20_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: cw20 payments, can be empty or multiple
   ixo.claims.v1beta1.QueryClaimListResponse:
     type: object
     properties:
@@ -87816,6 +88099,22 @@ definitions:
                         payment, if 0 then
 
                         immediate direct payment
+                    cw20_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      title: cw20 payments, can be empty or multiple
                 evaluation:
                   type: object
                   properties:
@@ -87862,6 +88161,22 @@ definitions:
                         payment, if 0 then
 
                         immediate direct payment
+                    cw20_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      title: cw20 payments, can be empty or multiple
                 approval:
                   type: object
                   properties:
@@ -87908,6 +88223,22 @@ definitions:
                         payment, if 0 then
 
                         immediate direct payment
+                    cw20_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      title: cw20 payments, can be empty or multiple
                 rejection:
                   type: object
                   properties:
@@ -87954,6 +88285,22 @@ definitions:
                         payment, if 0 then
 
                         immediate direct payment
+                    cw20_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      title: cw20 payments, can be empty or multiple
             signer:
               type: string
               title: signer address
@@ -88136,6 +88483,22 @@ definitions:
                       payment, if 0 then
 
                       immediate direct payment
+                  cw20_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    title: cw20 payments, can be empty or multiple
               evaluation:
                 type: object
                 properties:
@@ -88181,6 +88544,22 @@ definitions:
                       payment, if 0 then
 
                       immediate direct payment
+                  cw20_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    title: cw20 payments, can be empty or multiple
               approval:
                 type: object
                 properties:
@@ -88226,6 +88605,22 @@ definitions:
                       payment, if 0 then
 
                       immediate direct payment
+                  cw20_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    title: cw20 payments, can be empty or multiple
               rejection:
                 type: object
                 properties:
@@ -88271,6 +88666,22 @@ definitions:
                       payment, if 0 then
 
                       immediate direct payment
+                  cw20_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    title: cw20 payments, can be empty or multiple
           signer:
             type: string
             title: signer address

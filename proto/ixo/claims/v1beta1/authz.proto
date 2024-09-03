@@ -48,6 +48,9 @@ message EvaluateClaimConstraints {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // max custom cw20 payment evaluator can change, if empty list must use amount
+  // defined in Token payments
+  repeated CW20Payment max_custom_cw20_payment = 11;
 }
 
 message WithdrawPaymentAuthorization {
@@ -80,4 +83,6 @@ message WithdrawPaymentConstraints {
   // date that grantee can execute authorization, calculated from created date
   // plus the timeout on Collection payments, if null then none
   google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
+  // cw20 payments, can be empty or multiple
+  repeated CW20Payment cw20_payment = 9;
 }

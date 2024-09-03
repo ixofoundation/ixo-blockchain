@@ -122,6 +122,8 @@ message Payment {
   // immediate direct payment
   google.protobuf.Duration timeout_ns = 4
       [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // cw20 payments, can be empty or multiple
+  repeated CW20Payment cw20_payment = 5;
 }
 
 message Contract1155Payment {
@@ -130,6 +132,15 @@ message Contract1155Payment {
   string address = 1;
   string token_id = 2;
   uint32 amount = 3;
+}
+
+message CW20Payment {
+  option (gogoproto.equal) = true;
+
+  string address = 1;
+  // chose uint64 for now as amounts should be small enough to fit in a
+  // uint64(max 18446744073709551615)
+  uint64 amount = 3;
 }
 
 message Claim {
@@ -183,6 +194,7 @@ message Evaluation {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // TODO: add custom cw20 payments?
 }
 
 message Dispute {

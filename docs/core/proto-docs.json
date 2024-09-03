@@ -4099,6 +4099,42 @@
       "extensions": [],
       "messages": [
         {
+          "name": "CW20Payment",
+          "longName": "CW20Payment",
+          "fullName": "ixo.claims.v1beta1.CW20Payment",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "chose uint64 for now as amounts should be small enough to fit in a\nuint64(max 18446744073709551615)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "Claim",
           "longName": "Claim",
           "fullName": "ixo.claims.v1beta1.Claim",
@@ -4734,7 +4770,7 @@
             },
             {
               "name": "amount",
-              "description": "custom amount specified by evaluator for claim approval, if empty list then\nuse default by Collection",
+              "description": "custom amount specified by evaluator for claim approval, if empty list then\nuse default by Collection\n\nTODO: add custom cw20 payments?",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -4859,6 +4895,18 @@
               "type": "Duration",
               "longType": "google.protobuf.Duration",
               "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "cw20 payments, can be empty or multiple",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5041,6 +5089,18 @@
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
               "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_custom_cw20_payment",
+              "description": "max custom cw20 payment evaluator can change, if empty list must use amount\ndefined in Token payments",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5257,6 +5317,18 @@
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "cw20 payments, can be empty or multiple",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6425,6 +6497,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "custom cw20 payments specified by evaluator for claim approval, if empty\nlist then use default by Collection",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -6824,6 +6908,18 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "cw20 payments, can be empty or multiple",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

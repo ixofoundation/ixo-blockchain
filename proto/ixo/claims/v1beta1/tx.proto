@@ -101,6 +101,9 @@ message MsgEvaluateClaim {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // custom cw20 payments specified by evaluator for claim approval, if empty
+  // list then use default by Collection
+  repeated CW20Payment cw20_payment = 11;
 }
 
 message MsgEvaluateClaimResponse {}
@@ -152,6 +155,8 @@ message MsgWithdrawPayment {
   google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 9;
+  // cw20 payments, can be empty or multiple
+  repeated CW20Payment cw20_payment = 10;
 }
 
 message MsgWithdrawPaymentResponse {}

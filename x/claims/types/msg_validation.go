@@ -101,8 +101,12 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for status")
 	}
 
-	if msg.Amount.IsAnyNegative() {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "amount must be positive")
+	if err = msg.Amount.Sort().Validate(); err != nil {
+		return err
+	}
+
+	if err = ValidateCW20Payments(msg.Cw20Payment); err != nil {
+		return err
 	}
 
 	return nil
@@ -154,6 +158,10 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 	}
 
 	if err = msg.Contract_1155Payment.Validate(); err != nil {
+		return err
+	}
+
+	if err = ValidateCW20Payments(msg.Cw20Payment); err != nil {
 		return err
 	}
 

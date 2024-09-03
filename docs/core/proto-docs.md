@@ -91,6 +91,7 @@
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
 - [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
+    - [CW20Payment](#ixo.claims.v1beta1.CW20Payment)
     - [Claim](#ixo.claims.v1beta1.Claim)
     - [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments)
     - [Collection](#ixo.claims.v1beta1.Collection)
@@ -1779,6 +1780,22 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.CW20Payment"></a>
+
+### CW20Payment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| amount | [uint64](#uint64) |  | chose uint64 for now as amounts should be small enough to fit in a uint64(max 18446744073709551615) |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.Claim"></a>
 
 ### Claim
@@ -1917,7 +1934,9 @@ Msg defines the bonds Msg service.
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
 | evaluation_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | evaluationDate is the date and time that the claim evaluation was submitted on-chain |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection
+
+TODO: add custom cw20 payments? |
 
 
 
@@ -1954,6 +1973,7 @@ Msg defines the bonds Msg service.
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment, not allowed for Evaluation Payment |
 | timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immediate direct payment |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
 
 
 
@@ -2082,6 +2102,7 @@ Msg defines the bonds Msg service.
 | agent_quota | [uint64](#uint64) |  |  |
 | before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done |
 | max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, if empty list must use amount defined in Token payments |
+| max_custom_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | max custom cw20 payment evaluator can change, if empty list must use amount defined in Token payments |
 
 
 
@@ -2152,6 +2173,7 @@ Msg defines the bonds Msg service.
 | toAddress | [string](#string) |  | for contract payment |
 | fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments, if null then none |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
 
 
 
@@ -2664,6 +2686,7 @@ Collection entity, or have authz cap, aka is agent
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval, if empty list then use default by Collection |
 
 
 
@@ -2808,6 +2831,7 @@ Collection entity, or have authz cap, aka is agent
 | fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments |
 | admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
 
 
 

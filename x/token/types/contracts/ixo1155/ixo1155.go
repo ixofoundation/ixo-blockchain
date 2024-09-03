@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+// -----------------------------------------------------------------------------
+// MESSAGES
+// -----------------------------------------------------------------------------
+
 type InstantiateMsg struct {
 	/// The minter is the only one who can create new tokens.
 	Minter string `json:"minter"`
@@ -120,7 +124,9 @@ type RevokeAll struct {
 	Operator string `json:"operator"`
 }
 
-//queries
+// -----------------------------------------------------------------------------
+// QUERIES
+// -----------------------------------------------------------------------------
 
 type WasmMsgBalance struct {
 	Balance Balance `json:"balance"`

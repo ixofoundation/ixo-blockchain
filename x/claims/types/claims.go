@@ -101,8 +101,12 @@ func (p Payment) Validate() error {
 		return err
 	}
 
-	if p.Amount.IsAnyNegative() {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "payment amount must be positive")
+	if err = ValidateCW20Payments(p.Cw20Payment); err != nil {
+		return err
+	}
+
+	if err = p.Amount.Sort().Validate(); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "amounts not valid: (%s)", err)
 	}
 
 	return nil
@@ -116,8 +120,13 @@ func (p Payments) AccountsIsEntityAccounts(entity entitytypes.Entity) bool {
 }
 
 func (p Payments) Validate() error {
+	// if evaluation payment has contract_1155payment, it is not allowed
 	if p.Evaluation.Contract_1155Payment != nil {
 		return ErrCollectionEvalError
+	}
+	// if evaluation payment has cw20 payments, it is not allowed
+	if len(p.Evaluation.Cw20Payment) > 1 {
+		return ErrCollectionEvalCW20Error
 	}
 
 	if err := p.Submission.Validate(); err != nil {
