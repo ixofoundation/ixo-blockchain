@@ -7,7 +7,7 @@ ARG GIT_COMMIT="ca9e64cf2f8c29b8bb001281abcdcb942dc9fa01"
 # Builder
 # --------------------------------------------------------
 
-FROM golang:1.19.4-alpine as builder
+FROM golang:1.23.1-alpine as builder
 
 RUN apk add --no-cache \
   ca-certificates \
