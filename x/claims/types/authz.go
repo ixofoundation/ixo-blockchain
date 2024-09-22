@@ -142,7 +142,7 @@ func (a EvaluateClaimAuthorization) ValidateBasic() error {
 		if !iidtypes.IsEmpty(constraint.CollectionId) && len(constraint.ClaimIds) != 0 {
 			return sdkerrors.ErrInvalidRequest.Wrap("constraint must have either a collection_id or some claim ids, not both")
 		}
-		// TODO: test that amount 0 works and test against duplicate denoms
+		// TODO: test that amount 0 works and test against duplicate denoms (should it be allowed?)
 		if err = constraint.MaxCustomAmount.Sort().Validate(); err != nil {
 			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max custom amounts not valid: (%s)", err)
 		}
@@ -154,6 +154,7 @@ func (a EvaluateClaimAuthorization) ValidateBasic() error {
 	return nil
 }
 
+// TODO: if custom eval amount is 0 then payments are not required? Right now it then maps to collection payments
 // Accept implements Authorization.Accept.
 func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (authz.AcceptResponse, error) {
 	mEval, ok := msg.(*MsgEvaluateClaim)
@@ -193,7 +194,6 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 				valid := false
 				for _, cAmount := range constraint.MaxCustomAmount {
 					// get matching maxCustomAmount by checking denoms, if match then check that message amount must be less than or equal to maxCustomAmount
-					// TODO: run tests to ensure is correct
 					if mAmount.Denom == cAmount.Denom && mAmount.IsLTE(cAmount) {
 						valid = true
 						break

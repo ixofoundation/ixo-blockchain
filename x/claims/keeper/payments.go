@@ -245,9 +245,8 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 		for _, cw20Payment := range paymentCw20s {
 			// make the payments if amount is not 0
 			if cw20Payment.Amount != 0 {
-				encodedTransferMessage, err := cw20.Marshal(cw20.WasmTransferFrom{
-					TransferFrom: cw20.TransferFrom{
-						Owner:     fromAddress.String(),
+				encodedTransferMessage, err := cw20.Marshal(cw20.WasmTransfer{
+					Transfer: cw20.Transfer{
 						Recipient: toAddress.String(),
 						Amount:    fmt.Sprint(cw20Payment.Amount),
 					},

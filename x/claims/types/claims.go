@@ -144,3 +144,40 @@ func (p Payments) Validate() error {
 
 	return nil
 }
+
+// Creates a deep copy of Payment
+func (p *Payment) Clone() *Payment {
+	if p == nil {
+		return nil
+	}
+
+	var contract1155Payment *Contract1155Payment
+	if p.Contract_1155Payment != nil {
+		derefedContract1155Payment := *p.Contract_1155Payment
+		contract1155Payment = &derefedContract1155Payment
+	}
+
+	cloned := &Payment{
+		Account:              p.Account,
+		Amount:               p.Amount,
+		Contract_1155Payment: contract1155Payment,
+		TimeoutNs:            p.TimeoutNs,
+	}
+
+	if p.Cw20Payment != nil {
+		cloned.Cw20Payment = make([]*CW20Payment, len(p.Cw20Payment))
+		// Deep copy the cw20_payment field (slice of CW20Payment)
+		for i, cw20 := range p.Cw20Payment {
+			if cw20 != nil {
+				derefedCW20Payment := *cw20
+				cloned.Cw20Payment[i] = &derefedCW20Payment
+			} else {
+				cloned.Cw20Payment[i] = nil
+			}
+		}
+	} else {
+		cloned.Cw20Payment = nil
+	}
+
+	return cloned
+}

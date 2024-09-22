@@ -273,11 +273,11 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		collection.Approved++
 		// if msg amount/cw20Payment length is not zero, it means agent set custom amount/cw20Payment that was authenticated
 		// through authZ constraints to be valid since all evaluations must be done by module account through authz.
-		approvedPayment := collection.Payments.Approval
+		// Dereference the pointer to avoid changing collection payments as collection is saved in keeper below
+		approvedPayment := collection.Payments.Approval.Clone()
 		if len(msg.Amount) > 0 {
 			approvedPayment.Amount = msg.Amount
 		}
-		// TODO: test and check that setting collection does changte the payments permanently since it passes by reference
 		if len(msg.Cw20Payment) > 0 {
 			approvedPayment.Cw20Payment = msg.Cw20Payment
 		}
