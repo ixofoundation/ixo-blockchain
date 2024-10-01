@@ -5478,9 +5478,15 @@ on-chain </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>custom amount specified by evaluator for claim approval, if empty list then
-use default by Collection
-
-TODO: add custom cw20 payments? </p></td>
+use default by Collection </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw20 payments specified by evaluator for claim approval, if empty
+list then use default by Collection </p></td>
                 </tr>
               
             </tbody>

@@ -252,6 +252,8 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		Reason:            msg.Reason,
 		VerificationProof: msg.VerificationProof,
 		EvaluationDate:    &evaluationDate,
+		Amount:            msg.Amount,
+		Cw20Payment:       msg.Cw20Payment,
 	}
 
 	claim.Evaluation = &evaluation

@@ -194,7 +194,9 @@ message Evaluation {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // TODO: add custom cw20 payments?
+  // custom cw20 payments specified by evaluator for claim approval, if empty
+  // list then use default by Collection
+  repeated CW20Payment cw20_payment = 11;
 }
 
 message Dispute {

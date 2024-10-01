@@ -50744,6 +50744,26 @@ paths:
                             approval, if empty list then
 
                             use default by Collection
+                        cw20_payment:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              address:
+                                type: string
+                              amount:
+                                type: string
+                                format: uint64
+                                title: >-
+                                  chose uint64 for now as amounts should be
+                                  small enough to fit in a
+
+                                  uint64(max 18446744073709551615)
+                          title: >-
+                            custom cw20 payments specified by evaluator for
+                            claim approval, if empty
+
+                            list then use default by Collection
                     payments_status:
                       type: object
                       properties:
@@ -51017,6 +51037,26 @@ paths:
                           approval, if empty list then
 
                           use default by Collection
+                      cw20_payment:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            amount:
+                              type: string
+                              format: uint64
+                              title: >-
+                                chose uint64 for now as amounts should be small
+                                enough to fit in a
+
+                                uint64(max 18446744073709551615)
+                        title: >-
+                          custom cw20 payments specified by evaluator for claim
+                          approval, if empty
+
+                          list then use default by Collection
                   payments_status:
                     type: object
                     properties:
@@ -86733,6 +86773,26 @@ definitions:
               list then
 
               use default by Collection
+          cw20_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: >-
+              custom cw20 payments specified by evaluator for claim approval, if
+              empty
+
+              list then use default by Collection
       payments_status:
         type: object
         properties:
@@ -87282,6 +87342,26 @@ definitions:
           then
 
           use default by Collection
+      cw20_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: string
+              format: uint64
+              title: >-
+                chose uint64 for now as amounts should be small enough to fit in
+                a
+
+                uint64(max 18446744073709551615)
+        title: >-
+          custom cw20 payments specified by evaluator for claim approval, if
+          empty
+
+          list then use default by Collection
   ixo.claims.v1beta1.EvaluationStatus:
     type: string
     enum:
@@ -87725,6 +87805,26 @@ definitions:
                     empty list then
 
                     use default by Collection
+                cw20_payment:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                      amount:
+                        type: string
+                        format: uint64
+                        title: >-
+                          chose uint64 for now as amounts should be small enough
+                          to fit in a
+
+                          uint64(max 18446744073709551615)
+                  title: >-
+                    custom cw20 payments specified by evaluator for claim
+                    approval, if empty
+
+                    list then use default by Collection
             payments_status:
               type: object
               properties:
@@ -87904,6 +88004,26 @@ definitions:
                   empty list then
 
                   use default by Collection
+              cw20_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    amount:
+                      type: string
+                      format: uint64
+                      title: >-
+                        chose uint64 for now as amounts should be small enough
+                        to fit in a
+
+                        uint64(max 18446744073709551615)
+                title: >-
+                  custom cw20 payments specified by evaluator for claim
+                  approval, if empty
+
+                  list then use default by Collection
           payments_status:
             type: object
             properties:
