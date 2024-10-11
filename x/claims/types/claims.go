@@ -6,6 +6,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
@@ -63,6 +64,32 @@ func IsValidDispute(dispute *Dispute) bool {
 	return true
 }
 
+// IsValidIntent tells if a Intent is valid,
+func IsValidIntent(intent *Intent) bool {
+	if intent == nil {
+		return false
+	}
+	if iidtypes.IsEmpty(intent.AgentDid) {
+		return false
+	}
+	if iidtypes.IsEmpty(intent.Id) {
+		return false
+	}
+	_, err := sdk.AccAddressFromBech32(intent.AgentAddress)
+	if err != nil {
+		return false
+	}
+	if iidtypes.IsEmpty(intent.CollectionId) {
+		return false
+	}
+	_, err = sdk.AccAddressFromBech32(intent.FromAddress)
+	if err != nil {
+		return false
+	}
+	_, err = sdk.AccAddressFromBech32(intent.EscrowAddress)
+	return err == nil
+}
+
 func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.AccAddress,
 	requiredFunds sdk.Coins) bool {
 	for _, coin := range requiredFunds {
@@ -76,35 +103,49 @@ func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.Ac
 
 func (p *Contract1155Payment) Validate() error {
 	if p != nil {
-		_, err := sdk.AccAddressFromBech32(p.Address)
-		if err != nil {
-			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
-		}
-		if iidtypes.IsEmpty(p.TokenId) {
-			return fmt.Errorf("token id cannot be empty")
-		}
-		// if p.Contract_1155Payment.Amount == 0 {
-		// 	return fmt.Errorf("token amount cannot be 0")
+		// temporarily disable using 1155 tokens for payments
+		return fmt.Errorf("contract_1155_payment is currently disabled (not allowed)")
+
+		// _, err := sdk.AccAddressFromBech32(p.Address)
+		// if err != nil {
+		// 	return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
 		// }
+		// if iidtypes.IsEmpty(p.TokenId) {
+		// 	return fmt.Errorf("token id cannot be empty")
+		// }
+		// // if p.Contract_1155Payment.Amount == 0 {
+		// // 	return fmt.Errorf("token amount cannot be 0")
+		// // }
 	}
 
 	return nil
 }
 
-func (p Payment) Validate() error {
+func (p Payment) Validate(allowOraclePayments bool) error {
 	_, err := sdk.AccAddressFromBech32(p.Account)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
+	}
+
+	if !allowOraclePayments && p.IsOraclePayment {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "oracle payments is only allowed for APPROVAL payments")
+	}
+
+	// if is oracle payment then only native coins allowed
+	if p.IsOraclePayment && (!IsZeroCW20Payments(p.Cw20Payment) || p.Contract_1155Payment != nil) {
+		return ErrOraclePaymentOnlyNative
 	}
 
 	if err = p.Contract_1155Payment.Validate(); err != nil {
 		return err
 	}
 
-	if err = ValidateCW20Payments(p.Cw20Payment); err != nil {
+	// no 0 amounts allowed, otherwise unnnecesary 0 amount payments
+	if err = ValidateCW20Payments(p.Cw20Payment, false); err != nil {
 		return err
 	}
 
+	// no 0 amounts allowed, otherwise unnnecesary 0 amount payments
 	if err = p.Amount.Sort().Validate(); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "amounts not valid: (%s)", err)
 	}
@@ -129,16 +170,16 @@ func (p Payments) Validate() error {
 		return ErrCollectionEvalCW20Error
 	}
 
-	if err := p.Submission.Validate(); err != nil {
+	if err := p.Submission.Validate(false); err != nil {
 		return err
 	}
-	if err := p.Evaluation.Validate(); err != nil {
+	if err := p.Evaluation.Validate(false); err != nil {
 		return err
 	}
-	if err := p.Approval.Validate(); err != nil {
+	if err := p.Approval.Validate(true); err != nil {
 		return err
 	}
-	if err := p.Rejection.Validate(); err != nil {
+	if err := p.Rejection.Validate(false); err != nil {
 		return err
 	}
 
@@ -162,6 +203,7 @@ func (p *Payment) Clone() *Payment {
 		Amount:               p.Amount,
 		Contract_1155Payment: contract1155Payment,
 		TimeoutNs:            p.TimeoutNs,
+		IsOraclePayment:      p.IsOraclePayment,
 	}
 
 	if p.Cw20Payment != nil {
@@ -180,4 +222,91 @@ func (p *Payment) Clone() *Payment {
 	}
 
 	return cloned
+}
+
+// Helper to get module account key in form of claims_escrow_{collectionId}
+func GetModuleAccountKeyEscrow(collectionId string) string {
+	return ModuleName + "_escrow_" + collectionId
+}
+
+// Helper to get module account address
+func GetModuleAccountAddressEscrow(collectionId string) sdk.AccAddress {
+	return authtypes.NewModuleAddress(GetModuleAccountKeyEscrow(collectionId))
+}
+
+// IsCoinsInMaxConstraints checks if the provided coins are within the max constraints
+func IsCoinsInMaxConstraints(coins sdk.Coins, maxCoins sdk.Coins) bool {
+	maxCoinsMap := make(map[string]sdk.Coin)
+	for _, maxCoin := range maxCoins {
+		maxCoinsMap[maxCoin.Denom] = maxCoin
+	}
+
+	for _, coin := range coins {
+		maxCoin, ok := maxCoinsMap[coin.Denom]
+		if !ok || !coin.IsLTE(maxCoin) {
+			return false
+		}
+	}
+	return true
+}
+
+func IsCW20PaymentsInMaxConstraints(cw20Payments []*CW20Payment, maxCw20Payments []*CW20Payment) bool {
+	maxPaymentsMap := make(map[string]*CW20Payment)
+	for _, maxPayment := range maxCw20Payments {
+		maxPaymentsMap[maxPayment.Address] = maxPayment
+	}
+
+	for _, payment := range cw20Payments {
+		maxPayment, ok := maxPaymentsMap[payment.Address]
+		if !ok || payment.Amount > maxPayment.Amount {
+			return false
+		}
+	}
+	return true
+}
+
+// Validate checks that the Coins are sorted, have positive amount or zero, with a valid and unique
+// denomination (i.e no duplicates). Otherwise, it returns an error. Copied from sdk.Coins.Validate()
+func ValidateCoinsAllowZero(coins sdk.Coins) error {
+	switch len(coins) {
+	case 0:
+		return nil
+
+	case 1:
+		if err := sdk.ValidateDenom(coins[0].Denom); err != nil {
+			return err
+		}
+		if coins[0].IsNegative() {
+			return fmt.Errorf("coin %s amount is negative", coins[0])
+		}
+		return nil
+
+	default:
+		// check single coin case
+		if err := ValidateCoinsAllowZero(sdk.Coins{coins[0]}); err != nil {
+			return err
+		}
+
+		lowDenom := coins[0].Denom
+
+		for _, coin := range coins[1:] {
+			if err := sdk.ValidateDenom(coin.Denom); err != nil {
+				return err
+			}
+			if coin.Denom < lowDenom {
+				return fmt.Errorf("denomination %s is not sorted", coin.Denom)
+			}
+			if coin.Denom == lowDenom {
+				return fmt.Errorf("duplicate denomination %s", coin.Denom)
+			}
+			if coin.IsNegative() {
+				return fmt.Errorf("coin %s amount is negative", coin.Denom)
+			}
+
+			// we compare each coin against the last denom
+			lowDenom = coin.Denom
+		}
+
+		return nil
+	}
 }

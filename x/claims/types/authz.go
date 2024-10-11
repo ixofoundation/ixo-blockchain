@@ -52,6 +52,12 @@ func (a SubmitClaimAuthorization) ValidateBasic() error {
 		if iidtypes.IsEmpty(constraint.CollectionId) {
 			return sdkerrors.ErrInvalidRequest.Wrap("collection id can't be empty")
 		}
+		if err = ValidateCoinsAllowZero(constraint.MaxAmount.Sort()); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max amounts not valid: (%s)", err)
+		}
+		if err = ValidateCW20Payments(constraint.MaxCw20Payment, true); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max cw20 payments not valid: (%s)", err)
+		}
 	}
 
 	return nil
@@ -80,7 +86,16 @@ func (a SubmitClaimAuthorization) Accept(_ context.Context, msg sdk.Msg) (authz.
 			continue
 		}
 
-		// if reaches here it means there is a matching constraint for the specific batch
+		// if reaches here it means there is a matching constraint for the specific collection
+		// if amount or cw20 payment is defined, check that it is within max constraints
+		if len(mSubmit.Amount) != 0 && !IsCoinsInMaxConstraints(mSubmit.Amount, constraint.MaxAmount) {
+			return authz.AcceptResponse{}, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "amount is not within max constraints")
+		}
+		if len(mSubmit.Cw20Payment) != 0 && !IsCW20PaymentsInMaxConstraints(mSubmit.Cw20Payment, constraint.MaxCw20Payment) {
+			return authz.AcceptResponse{}, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "cw20 payments is not within max constraints")
+		}
+
+		// now the collection matches and amount and cw20 payments are within max constraints
 		matched = true
 		// subtract quota by one and if not 0 re-add to constraints, otherwise new quota is 0 so remove from constraints
 		if constraint.AgentQuota > 1 {
@@ -142,11 +157,10 @@ func (a EvaluateClaimAuthorization) ValidateBasic() error {
 		if !iidtypes.IsEmpty(constraint.CollectionId) && len(constraint.ClaimIds) != 0 {
 			return sdkerrors.ErrInvalidRequest.Wrap("constraint must have either a collection_id or some claim ids, not both")
 		}
-		// TODO: test that amount 0 works and test against duplicate denoms (should it be allowed?)
-		if err = constraint.MaxCustomAmount.Sort().Validate(); err != nil {
+		if err = ValidateCoinsAllowZero(constraint.MaxCustomAmount.Sort()); err != nil {
 			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max custom amounts not valid: (%s)", err)
 		}
-		if err = ValidateCW20Payments(constraint.MaxCustomCw20Payment); err != nil {
+		if err = ValidateCW20Payments(constraint.MaxCustomCw20Payment, true); err != nil {
 			return err
 		}
 	}
@@ -154,7 +168,6 @@ func (a EvaluateClaimAuthorization) ValidateBasic() error {
 	return nil
 }
 
-// TODO: if custom eval amount is 0 then payments are not required? Right now it then maps to collection payments
 // Accept implements Authorization.Accept.
 func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (authz.AcceptResponse, error) {
 	mEval, ok := msg.(*MsgEvaluateClaim)
@@ -186,24 +199,7 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 
 		// check when evaluator defined own custom amounts if is is allowed in constraints
 		if len(mEval.Amount) != 0 {
-			// state for below loop if one msg Amount is invalid whole msg is invalid
-			invalid := false
-			// for each custom amount check if it within allowed max amount
-			for _, mAmount := range mEval.Amount {
-				// state if this specific coin amount is within allowed max
-				valid := false
-				for _, cAmount := range constraint.MaxCustomAmount {
-					// get matching maxCustomAmount by checking denoms, if match then check that message amount must be less than or equal to maxCustomAmount
-					if mAmount.Denom == cAmount.Denom && mAmount.IsLTE(cAmount) {
-						valid = true
-						break
-					}
-				}
-				if !valid {
-					invalid = true
-					break
-				}
-			}
+			invalid := !IsCoinsInMaxConstraints(mEval.Amount, constraint.MaxCustomAmount)
 
 			// if invalid then add constraint back into list
 			if invalid {
@@ -214,29 +210,8 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 
 		// check when evaluator defined own custom cw20 payments if is is allowed in constraints
 		if len(mEval.Cw20Payment) != 0 {
-			// first validate that all cw20 payments are valid and no duplicates
-			if err := ValidateCW20Payments(mEval.Cw20Payment); err != nil {
-				return authz.AcceptResponse{}, err
-			}
-			// state for below loop if one msg Cw20Payment is invalid whole msg is invalid
-			invalid := false
-			// for each msg Cw20Payment check if it correlates to a granted constraint
-			for _, mCw20Payment := range mEval.Cw20Payment {
-				// state if this specific Cw20Payment is in the list of constraints
-				valid := false
-				for _, cCw20Payment := range constraint.MaxCustomCw20Payment {
-					// get matching maxCustomCw20Payment by checking addresses, if match then check that message amount must be less than or equal to maxCustomCw20Payment
-					if mCw20Payment.Address == cCw20Payment.Address && mCw20Payment.Amount <= cCw20Payment.Amount {
-						valid = true
-						break
-					}
-				}
-				// if this specific Cw20Payment is not in the list of constraints, then invalid
-				if !valid {
-					invalid = true
-					break
-				}
-			}
+			invalid := !IsCW20PaymentsInMaxConstraints(mEval.Cw20Payment, constraint.MaxCustomCw20Payment)
+
 			// if invalid then add constraint back into list
 			if invalid {
 				unhandledConstraints = append(unhandledConstraints, constraint)
@@ -334,7 +309,7 @@ func (a WithdrawPaymentAuthorization) ValidateBasic() error {
 		if err = constraint.Contract_1155Payment.Validate(); err != nil {
 			return err
 		}
-		if err = ValidateCW20Payments(constraint.Cw20Payment); err != nil {
+		if err = ValidateCW20Payments(constraint.Cw20Payment, true); err != nil {
 			return err
 		}
 	}
@@ -435,10 +410,6 @@ func (a WithdrawPaymentAuthorization) Accept(ctx context.Context, msg sdk.Msg) (
 
 		// if has cw20 payments then check that valid
 		if len(mWith.Cw20Payment) != 0 {
-			// first validate that all cw20 payments are valid and no duplicates
-			if err := ValidateCW20Payments(mWith.Cw20Payment); err != nil {
-				return authz.AcceptResponse{}, err
-			}
 			// then check that for each cw20 payment there is a corresponding constraint cw20 payment
 			for _, mCw20Payment := range mWith.Cw20Payment {
 				// state if this specific cw20Payment is valid

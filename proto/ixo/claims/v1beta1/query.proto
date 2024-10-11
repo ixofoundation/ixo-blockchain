@@ -33,6 +33,13 @@ service Query {
   rpc DisputeList(QueryDisputeListRequest) returns (QueryDisputeListResponse) {
     option (google.api.http).get = "/ixo/dispute";
   }
+  rpc Intent(QueryIntentRequest) returns (QueryIntentResponse) {
+    option (google.api.http).get =
+        "/ixo/intent/{agentAddress}/{collectionId}/{id}";
+  }
+  rpc IntentList(QueryIntentListRequest) returns (QueryIntentListResponse) {
+    option (google.api.http).get = "/ixo/intent";
+  }
 }
 
 message QueryParamsRequest {}
@@ -82,5 +89,24 @@ message QueryDisputeListRequest {
 
 message QueryDisputeListResponse {
   repeated Dispute disputes = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryIntentRequest {
+  string id = 1;
+  string agentAddress = 2;
+  string collectionId = 3;
+}
+
+message QueryIntentResponse {
+  Intent intent = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryIntentListRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryIntentListResponse {
+  repeated Intent intents = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

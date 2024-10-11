@@ -30,3 +30,9 @@ message PaymentWithdrawnEvent { WithdrawPaymentConstraints withdraw = 1; }
 
 // ClaimDisputedEvent is an event triggered on a Claim dispute
 message PaymentWithdrawCreatedEvent { WithdrawPaymentConstraints withdraw = 1; }
+
+// IntentSubmittedEvent is an event triggered on an Intent submission
+message IntentSubmittedEvent { Intent intent = 1; }
+
+// IntentUpdatedEvent is an event triggered on an Intent update
+message IntentUpdatedEvent { Intent intent = 1; }

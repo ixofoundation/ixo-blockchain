@@ -528,6 +528,7 @@ func NewAppKeepers(
 		appKeepers.BankKeeper,
 		appKeepers.EntityKeeper,
 		appKeepers.ContractKeeper,
+		appKeepers.AccountKeeper,
 	)
 
 	// Initialize authenticators

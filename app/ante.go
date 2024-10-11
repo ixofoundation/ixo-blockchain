@@ -68,6 +68,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		authante.NewSigGasConsumeDecorator(options.AccountKeeper, sigGasConsumer),
 		authante.NewSigVerificationDecorator(options.AccountKeeper, options.SignModeHandler),
 		authante.NewIncrementSequenceDecorator(options.AccountKeeper),
+		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
 	)
 
 	// authenticatorVerificationDecorator is the new authenticator flow that's embedded into the circuit breaker ante
@@ -92,16 +93,15 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		authante.NewValidateMemoDecorator(options.AccountKeeper),
 		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
 
+		// TODO: analyse how to make smart accounts work for iid handlers
+		iidante.NewIidResolutionDecorator(options.IidKeeper),
+		entityante.NewBlockNftContractTransferForEntityDecorator(options.EntityKeeper),
+
 		smartaccountante.NewCircuitBreakerDecorator(
 			options.smartAccountKeeper,
 			authenticatorVerificationDecorator,
 			classicSignatureVerificationDecorator,
 		),
-
-		ibcante.NewRedundantRelayDecorator(options.IBCKeeper),
-		// TODO: analyse how smart accounts affect iid handlers
-		iidante.NewIidResolutionDecorator(options.IidKeeper),
-		entityante.NewBlockNftContractTransferForEntityDecorator(options.EntityKeeper),
 	}
 
 	return sdk.ChainAnteDecorators(anteDecorators...), nil

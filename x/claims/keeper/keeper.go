@@ -19,14 +19,15 @@ type MarshalFn func(value interface{}) []byte
 
 type (
 	Keeper struct {
-		cdc          codec.BinaryCodec
-		storeKey     storetypes.StoreKey
-		paramstore   paramtypes.Subspace
-		AuthzKeeper  types.AuthzKeeper
-		IidKeeper    types.IidKeeper
-		BankKeeper   types.BankKeeper
-		EntityKeeper types.EntityKeeper
-		WasmKeeper   types.WasmKeeper
+		cdc           codec.BinaryCodec
+		storeKey      storetypes.StoreKey
+		paramstore    paramtypes.Subspace
+		AuthzKeeper   types.AuthzKeeper
+		IidKeeper     types.IidKeeper
+		BankKeeper    types.BankKeeper
+		EntityKeeper  types.EntityKeeper
+		WasmKeeper    types.WasmKeeper
+		AccountKeeper types.AccountKeeper
 	}
 )
 
@@ -39,6 +40,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	entityKeeper types.EntityKeeper,
 	wasmKeeper types.WasmKeeper,
+	accountKeeper types.AccountKeeper,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -46,14 +48,15 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		cdc:          cdc,
-		storeKey:     storeKey,
-		paramstore:   ps,
-		IidKeeper:    iidKeeper,
-		AuthzKeeper:  authzKeeper,
-		BankKeeper:   bankKeeper,
-		EntityKeeper: entityKeeper,
-		WasmKeeper:   wasmKeeper,
+		cdc:           cdc,
+		storeKey:      storeKey,
+		paramstore:    ps,
+		IidKeeper:     iidKeeper,
+		AuthzKeeper:   authzKeeper,
+		BankKeeper:    bankKeeper,
+		EntityKeeper:  entityKeeper,
+		WasmKeeper:    wasmKeeper,
+		AccountKeeper: accountKeeper,
 	}
 }
 

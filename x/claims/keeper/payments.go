@@ -10,7 +10,6 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/cw20"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/ixo1155"
 )
 
@@ -27,46 +26,26 @@ import (
 // after the native coin payments is calculated, it does the following:
 // 1. if timeout for the payment is nil, it makes the payment by calling payout() function
 // 2. if timeout for the payment is not nil, it creates an authz grant to make the payment by calling createAuthz() function
-func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment *types.Payment, paymentType types.PaymentType, claimId string) error {
+func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment *types.Payment, paymentType types.PaymentType, claimId string, collection types.Collection, useIntent bool) error {
 	// check that there is outcome payment to make, otherwise skip this with no error as no payment for action
 	paymentExists := false
-	if !payment.Amount.IsZero() {
+	if !payment.Amount.IsZero() || !types.IsZeroCW20Payments(payment.Cw20Payment) {
 		paymentExists = true
 	}
 	if payment.Contract_1155Payment != nil && payment.Contract_1155Payment.Amount != 0 {
 		paymentExists = true
 	}
-	if payment.Cw20Payment != nil && len(payment.Cw20Payment) > 0 {
-		// map to check if there is any cw20 payments
-		for _, cw20Payment := range payment.Cw20Payment {
-			if cw20Payment.Amount != 0 {
-				paymentExists = true
-				break
-			}
-		}
-	}
 	if !paymentExists {
 		return nil
 	}
 
+	// if payment is oracle payment then only native coins allowed
+	if payment.IsOraclePayment && (!types.IsZeroCW20Payments(payment.Cw20Payment) || payment.Contract_1155Payment != nil) {
+		return types.ErrOraclePaymentOnlyNative
+	}
+
 	// Get payer address
 	payerAddress, err := sdk.AccAddressFromBech32(payment.Account)
-	if err != nil {
-		return err
-	}
-
-	// Not sure if needed as authz can still be created even if sender has no fees
-	// check that sender has enough tokens to make the payment
-	// if !types.HasBalances(ctx, k.BankKeeper, payerAddress, payment.Amount) {
-	// 	return errorsmod.Wrapf(sdkerrors.ErrInsufficientFunds, "sender has insufficient funds")
-	// }
-
-	// get claim and collection payment is for
-	claim, err := k.GetClaim(ctx, claimId)
-	if err != nil {
-		return err
-	}
-	collection, err := k.GetCollection(ctx, claim.CollectionId)
 	if err != nil {
 		return err
 	}
@@ -76,8 +55,8 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 
 	// if there is cosmos coins in payment get input/outputs for multisend
 	if !payment.Amount.IsZero() {
-		// if evaluation payment then do split based on params
-		if paymentType == types.PaymentType_evaluation {
+		// if evaluation payment or oracle payment then do split based on params
+		if paymentType == types.PaymentType_evaluation || payment.IsOraclePayment {
 			params := k.GetParams(ctx)
 
 			// Get node address
@@ -148,9 +127,10 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 		inputs = append(inputs, banktypes.NewInput(payerAddress, payment.Amount))
 	}
 
-	// if no timeout in payment make payout immediately
-	if payment.TimeoutNs == 0 {
-		if err := payout(ctx, k, inputs, outputs, paymentType, claimId, &time.Time{}, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver); err != nil {
+	// if no timeout in payment or use intent is true make payout immediately
+	// if use intent then funds is already in escrow account, so no need to wait even if timeout is set
+	if payment.TimeoutNs == 0 || useIntent {
+		if err := payout(ctx, k, inputs, outputs, paymentType, claimId, collection, &time.Time{}, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver); err != nil {
 			return err
 		}
 	} else {
@@ -177,34 +157,39 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 // 4. if paymentCw20s is not nil, it makes the payments by calling k.WasmKeeper.Execute()
 // 5. update the claim payment status to success
 // 6. emit PaymentWithdrawnEvent event
-func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claimId string, releaseDate *time.Time, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress) error {
+func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claimId string, collection types.Collection, releaseDate *time.Time, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress) error {
 	// get entity payout is for to validate if from address is valid entity module account
-	claim, err := k.GetClaim(ctx, claimId)
-	if err != nil {
-		return err
-	}
-	collection, err := k.GetCollection(ctx, claim.CollectionId)
-	if err != nil {
-		return err
-	}
 	_, entity, err := k.EntityKeeper.ResolveEntity(ctx, collection.Entity)
 	if err != nil {
 		return err
 	}
 
-	// check that fromAddress and input addresses is entity module accounts
-	if !entity.ContainsAccountAddress(fromAddress.String()) {
+	// check that fromAddress and input addresses is entity module accounts or the collections escrow account
+	if !entity.ContainsAccountAddress(fromAddress.String()) && collection.EscrowAccount != fromAddress.String() {
 		return types.ErrCollNotEntityAcc
 	}
 	for _, i := range inputs {
-		if !entity.ContainsAccountAddress(i.Address) {
+		if !entity.ContainsAccountAddress(i.Address) && collection.EscrowAccount != i.Address {
 			return types.ErrCollNotEntityAcc
 		}
 	}
 
+	// clear input[0] list of Coin of any Coin with amount 0, generally validation will already block this,
+	// but we allow it to know when to use collection defaults or when to have no payments, aka amount 0.
+	cleanedInput := banktypes.Input{}
+	if len(inputs) != 0 {
+		cleanedInput.Address = inputs[0].Address
+		for _, coin := range inputs[0].Coins {
+			if coin.Amount.IsPositive() {
+				cleanedInput.Coins = append(cleanedInput.Coins, coin)
+			}
+		}
+	}
+
+	// TODO: Test case where one output will have 0 amount
 	// distribute the payment according to the outputs for Cosmos Coins if has inputs and outputs
-	if len(inputs) != 0 && len(outputs) != 0 {
-		if err := k.BankKeeper.InputOutputCoins(ctx, inputs[0], outputs); err != nil {
+	if len(cleanedInput.Coins) != 0 && len(outputs) != 0 {
+		if err := k.BankKeeper.InputOutputCoins(ctx, cleanedInput, outputs); err != nil {
 			return errorsmod.Wrapf(types.ErrPaymentWithdrawFailed, "%s", err)
 		}
 	}
@@ -243,31 +228,9 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 	// pay cw20 payments if has any
 	if len(paymentCw20s) > 0 {
 		for _, cw20Payment := range paymentCw20s {
-			// make the payments if amount is not 0
+			// if amount not zero, then transfer
 			if cw20Payment.Amount != 0 {
-				encodedTransferMessage, err := cw20.Marshal(cw20.WasmTransfer{
-					Transfer: cw20.Transfer{
-						Recipient: toAddress.String(),
-						Amount:    fmt.Sprint(cw20Payment.Amount),
-					},
-				})
-				if err != nil {
-					return err
-				}
-
-				contractAddress, err := sdk.AccAddressFromBech32(cw20Payment.Address)
-				if err != nil {
-					return err
-				}
-
-				_, err = k.WasmKeeper.Execute(
-					ctx,
-					contractAddress,
-					fromAddress,
-					encodedTransferMessage,
-					sdk.NewCoins(sdk.NewCoin("uixo", math.ZeroInt())),
-				)
-				if err != nil {
+				if err := k.TransferCW20Payment(ctx, fromAddress, toAddress, cw20Payment); err != nil {
 					return err
 				}
 			}
@@ -368,6 +331,7 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	return nil
 }
 
+// TODO: analyse claims events emited after this change?
 // updatePaymentStatus updates the payment status for the provided different paymentType.
 // it does the following:
 // 1. get claim and payment is for
@@ -401,5 +365,6 @@ func updatePaymentStatus(ctx sdk.Context, k Keeper, paymentType types.PaymentTyp
 	); err != nil {
 		return err
 	}
+
 	return nil
 }

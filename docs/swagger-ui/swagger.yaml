@@ -50740,10 +50740,11 @@ paths:
 
                               signatures required by gogoproto.
                           title: >-
-                            custom amount specified by evaluator for claim
-                            approval, if empty list then
+                            if both amount and cw20 amount are empty then use
+                            default by Collection
 
-                            use default by Collection
+                            custom amount specified by evaluator for claim
+                            approval
                         cw20_payment:
                           type: array
                           items:
@@ -50761,10 +50762,11 @@ paths:
                                   uint64(max 18446744073709551615)
                           title: >-
                             custom cw20 payments specified by evaluator for
-                            claim approval, if empty
-
-                            list then use default by Collection
+                            claim approval
                     payments_status:
+                      title: >-
+                        payments_status is the status of the payments for the
+                        claim
                       type: object
                       properties:
                         submission:
@@ -50778,6 +50780,14 @@ paths:
                             - FAILED
                             - DISPUTED_PAYMENT
                           default: NO_PAYMENT
+                          title: >-
+                            - PROMISED: Promised: Agent is contracted to receive
+                            payment
+                             - AUTHORIZED: Authorized: Authz set up, no guarantee
+                             - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                             - PAID: Paid: Funds have been paid
+                             - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                             - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                         evaluation:
                           type: string
                           enum:
@@ -50789,6 +50799,14 @@ paths:
                             - FAILED
                             - DISPUTED_PAYMENT
                           default: NO_PAYMENT
+                          title: >-
+                            - PROMISED: Promised: Agent is contracted to receive
+                            payment
+                             - AUTHORIZED: Authorized: Authz set up, no guarantee
+                             - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                             - PAID: Paid: Funds have been paid
+                             - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                             - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                         approval:
                           type: string
                           enum:
@@ -50800,6 +50818,14 @@ paths:
                             - FAILED
                             - DISPUTED_PAYMENT
                           default: NO_PAYMENT
+                          title: >-
+                            - PROMISED: Promised: Agent is contracted to receive
+                            payment
+                             - AUTHORIZED: Authorized: Authz set up, no guarantee
+                             - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                             - PAID: Paid: Funds have been paid
+                             - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                             - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                         rejection:
                           type: string
                           enum:
@@ -50811,6 +50837,64 @@ paths:
                             - FAILED
                             - DISPUTED_PAYMENT
                           default: NO_PAYMENT
+                          title: >-
+                            - PROMISED: Promised: Agent is contracted to receive
+                            payment
+                             - AUTHORIZED: Authorized: Authz set up, no guarantee
+                             - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                             - PAID: Paid: Funds have been paid
+                             - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                             - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
+                    use_intent:
+                      type: boolean
+                      title: intent_id is the id of the intent for this claim, if any
+                    amount:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      title: >-
+                        NOTE: if both amount and cw20 amount are empty then use
+                        default by
+
+                        Collection custom amount specified by service agent for
+                        claim approval
+                    cw20_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      title: >-
+                        NOTE: if both amount and cw20 amount are empty then use
+                        default by
+
+                        Collection custom cw20 payments specified by service
+                        agent for claim
+
+                        approval
               pagination:
                 type: object
                 properties:
@@ -51033,10 +51117,11 @@ paths:
 
                             signatures required by gogoproto.
                         title: >-
-                          custom amount specified by evaluator for claim
-                          approval, if empty list then
+                          if both amount and cw20 amount are empty then use
+                          default by Collection
 
-                          use default by Collection
+                          custom amount specified by evaluator for claim
+                          approval
                       cw20_payment:
                         type: array
                         items:
@@ -51054,10 +51139,11 @@ paths:
                                 uint64(max 18446744073709551615)
                         title: >-
                           custom cw20 payments specified by evaluator for claim
-                          approval, if empty
-
-                          list then use default by Collection
+                          approval
                   payments_status:
+                    title: >-
+                      payments_status is the status of the payments for the
+                      claim
                     type: object
                     properties:
                       submission:
@@ -51071,6 +51157,14 @@ paths:
                           - FAILED
                           - DISPUTED_PAYMENT
                         default: NO_PAYMENT
+                        title: >-
+                          - PROMISED: Promised: Agent is contracted to receive
+                          payment
+                           - AUTHORIZED: Authorized: Authz set up, no guarantee
+                           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                           - PAID: Paid: Funds have been paid
+                           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                       evaluation:
                         type: string
                         enum:
@@ -51082,6 +51176,14 @@ paths:
                           - FAILED
                           - DISPUTED_PAYMENT
                         default: NO_PAYMENT
+                        title: >-
+                          - PROMISED: Promised: Agent is contracted to receive
+                          payment
+                           - AUTHORIZED: Authorized: Authz set up, no guarantee
+                           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                           - PAID: Paid: Funds have been paid
+                           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                       approval:
                         type: string
                         enum:
@@ -51093,6 +51195,14 @@ paths:
                           - FAILED
                           - DISPUTED_PAYMENT
                         default: NO_PAYMENT
+                        title: >-
+                          - PROMISED: Promised: Agent is contracted to receive
+                          payment
+                           - AUTHORIZED: Authorized: Authz set up, no guarantee
+                           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                           - PAID: Paid: Funds have been paid
+                           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                       rejection:
                         type: string
                         enum:
@@ -51104,6 +51214,63 @@ paths:
                           - FAILED
                           - DISPUTED_PAYMENT
                         default: NO_PAYMENT
+                        title: >-
+                          - PROMISED: Promised: Agent is contracted to receive
+                          payment
+                           - AUTHORIZED: Authorized: Authz set up, no guarantee
+                           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                           - PAID: Paid: Funds have been paid
+                           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
+                  use_intent:
+                    type: boolean
+                    title: intent_id is the id of the intent for this claim, if any
+                  amount:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    title: >-
+                      NOTE: if both amount and cw20 amount are empty then use
+                      default by
+
+                      Collection custom amount specified by service agent for
+                      claim approval
+                  cw20_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    title: >-
+                      NOTE: if both amount and cw20 amount are empty then use
+                      default by
+
+                      Collection custom cw20 payments specified by service agent
+                      for claim
+
+                      approval
         default:
           description: An unexpected error response.
           schema:
@@ -51156,6 +51323,9 @@ paths:
                     type: string
                   node_fee_percentage:
                     type: string
+                  intent_sequence:
+                    type: string
+                    format: uint64
         default:
           description: An unexpected error response.
           schema:
@@ -51352,6 +51522,17 @@ paths:
 
                                       uint64(max 18446744073709551615)
                               title: cw20 payments, can be empty or multiple
+                            is_oracle_payment:
+                              type: boolean
+                              title: >-
+                                boolean to indicate if the payment is for oracle
+                                payments, aka it will go
+
+                                through network fees split NOTE: if true the
+                                payment can only have amount
+
+                                values(Native coins), no cw20 payments allowed
+                                then
                         evaluation:
                           type: object
                           properties:
@@ -51414,6 +51595,17 @@ paths:
 
                                       uint64(max 18446744073709551615)
                               title: cw20 payments, can be empty or multiple
+                            is_oracle_payment:
+                              type: boolean
+                              title: >-
+                                boolean to indicate if the payment is for oracle
+                                payments, aka it will go
+
+                                through network fees split NOTE: if true the
+                                payment can only have amount
+
+                                values(Native coins), no cw20 payments allowed
+                                then
                         approval:
                           type: object
                           properties:
@@ -51476,6 +51668,17 @@ paths:
 
                                       uint64(max 18446744073709551615)
                               title: cw20 payments, can be empty or multiple
+                            is_oracle_payment:
+                              type: boolean
+                              title: >-
+                                boolean to indicate if the payment is for oracle
+                                payments, aka it will go
+
+                                through network fees split NOTE: if true the
+                                payment can only have amount
+
+                                values(Native coins), no cw20 payments allowed
+                                then
                         rejection:
                           type: object
                           properties:
@@ -51538,6 +51741,17 @@ paths:
 
                                       uint64(max 18446744073709551615)
                               title: cw20 payments, can be empty or multiple
+                            is_oracle_payment:
+                              type: boolean
+                              title: >-
+                                boolean to indicate if the payment is for oracle
+                                payments, aka it will go
+
+                                through network fees split NOTE: if true the
+                                payment can only have amount
+
+                                values(Native coins), no cw20 payments allowed
+                                then
                     signer:
                       type: string
                       title: signer address
@@ -51549,6 +51763,34 @@ paths:
                         evaluated as invalid
 
                         (internally calculated)
+                    escrow_account:
+                      type: string
+                      title: >-
+                        escrow_account is the escrow account address for this
+                        collection created at
+
+                        collection creation, current purpose is to transfer
+                        payments to escrow
+
+                        account for GUARANTEED payments through intents
+                    intents:
+                      title: >-
+                        intents is the option for intents for this collection
+                        (allow, deny,
+
+                        required)
+                      type: string
+                      enum:
+                        - ALLOW
+                        - DENY
+                        - REQUIRED
+                      default: ALLOW
+                      description: |2-
+                         - ALLOW: Allow: Intents can be made for claims, but claims can also be made without
+                        intents.
+                         - DENY: Deny: Intents cannot be made for claims for the collection.
+                         - REQUIRED: Required: Claims cannot be made without an associated intent. An intent is
+                        mandatory before a claim can be submitted.
               pagination:
                 type: object
                 properties:
@@ -51826,6 +52068,17 @@ paths:
 
                                     uint64(max 18446744073709551615)
                             title: cw20 payments, can be empty or multiple
+                          is_oracle_payment:
+                            type: boolean
+                            title: >-
+                              boolean to indicate if the payment is for oracle
+                              payments, aka it will go
+
+                              through network fees split NOTE: if true the
+                              payment can only have amount
+
+                              values(Native coins), no cw20 payments allowed
+                              then
                       evaluation:
                         type: object
                         properties:
@@ -51888,6 +52141,17 @@ paths:
 
                                     uint64(max 18446744073709551615)
                             title: cw20 payments, can be empty or multiple
+                          is_oracle_payment:
+                            type: boolean
+                            title: >-
+                              boolean to indicate if the payment is for oracle
+                              payments, aka it will go
+
+                              through network fees split NOTE: if true the
+                              payment can only have amount
+
+                              values(Native coins), no cw20 payments allowed
+                              then
                       approval:
                         type: object
                         properties:
@@ -51950,6 +52214,17 @@ paths:
 
                                     uint64(max 18446744073709551615)
                             title: cw20 payments, can be empty or multiple
+                          is_oracle_payment:
+                            type: boolean
+                            title: >-
+                              boolean to indicate if the payment is for oracle
+                              payments, aka it will go
+
+                              through network fees split NOTE: if true the
+                              payment can only have amount
+
+                              values(Native coins), no cw20 payments allowed
+                              then
                       rejection:
                         type: object
                         properties:
@@ -52012,6 +52287,17 @@ paths:
 
                                     uint64(max 18446744073709551615)
                             title: cw20 payments, can be empty or multiple
+                          is_oracle_payment:
+                            type: boolean
+                            title: >-
+                              boolean to indicate if the payment is for oracle
+                              payments, aka it will go
+
+                              through network fees split NOTE: if true the
+                              payment can only have amount
+
+                              values(Native coins), no cw20 payments allowed
+                              then
                   signer:
                     type: string
                     title: signer address
@@ -52023,6 +52309,34 @@ paths:
                       evaluated as invalid
 
                       (internally calculated)
+                  escrow_account:
+                    type: string
+                    title: >-
+                      escrow_account is the escrow account address for this
+                      collection created at
+
+                      collection creation, current purpose is to transfer
+                      payments to escrow
+
+                      account for GUARANTEED payments through intents
+                  intents:
+                    title: >-
+                      intents is the option for intents for this collection
+                      (allow, deny,
+
+                      required)
+                    type: string
+                    enum:
+                      - ALLOW
+                      - DENY
+                      - REQUIRED
+                    default: ALLOW
+                    description: |2-
+                       - ALLOW: Allow: Intents can be made for claims, but claims can also be made without
+                      intents.
+                       - DENY: Deny: Intents cannot be made for claims for the collection.
+                       - REQUIRED: Required: Claims cannot be made without an associated intent. An intent is
+                      mandatory before a claim can be submitted.
         default:
           description: An unexpected error response.
           schema:
@@ -52247,6 +52561,361 @@ paths:
                       format: byte
       parameters:
         - name: proof
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /ixo/intent:
+    get:
+      operationId: IntentList
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              intents:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      title: id is the incremented internal id for the intent
+                    agent_did:
+                      type: string
+                      description: The service agent's DID (Decentralized Identifier).
+                    agent_address:
+                      type: string
+                      description: The service agent's address.
+                    collection_id:
+                      type: string
+                      description: The id of the collection this intent is linked to.
+                    claim_id:
+                      type: string
+                      title: claim_id (optional, set when claim is submitted)
+                    created_at:
+                      type: string
+                      format: date-time
+                      description: The time the intent was created.
+                    expire_at:
+                      type: string
+                      format: date-time
+                      description: >-
+                        Timeout period for the intent. If the claim is not
+                        submitted by this time,
+
+                        the intent expires.
+                    status:
+                      description: Status of the intent (e.g., "ACTIVE" or "FULFILLED").
+                      type: string
+                      enum:
+                        - ACTIVE
+                        - FULFILLED
+                        - EXPIRED
+                      default: ACTIVE
+                      title: >-
+                        - ACTIVE: Active: Intent is created and active, payments
+                        have been transferred to
+
+                        escrow if there is any
+                         - FULFILLED: Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+                        be released on claim APPROVAL, or funds will be reverted
+                        on claim REJECTION
+
+                        or DISPUTE
+                         - EXPIRED: Expired: Intent has expired, payments have been transferred back out of
+                        escrow
+                    amount:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      description: The payment amount the agent intends to claim, if any.
+                    cw20_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      description: >-
+                        The CW20Payment amount the agent intends to claim, if
+                        any.
+                    from_address:
+                      type: string
+                      title: the address the escrow payment came from
+                    escrow_address:
+                      type: string
+                      title: the escrow account address
+                  description: >-
+                    Intent defines the structure for a service agent's claim
+                    intent.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /ixo/intent/{agentAddress}/{collectionId}/{id}:
+    get:
+      operationId: Intent
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              intent:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    title: id is the incremented internal id for the intent
+                  agent_did:
+                    type: string
+                    description: The service agent's DID (Decentralized Identifier).
+                  agent_address:
+                    type: string
+                    description: The service agent's address.
+                  collection_id:
+                    type: string
+                    description: The id of the collection this intent is linked to.
+                  claim_id:
+                    type: string
+                    title: claim_id (optional, set when claim is submitted)
+                  created_at:
+                    type: string
+                    format: date-time
+                    description: The time the intent was created.
+                  expire_at:
+                    type: string
+                    format: date-time
+                    description: >-
+                      Timeout period for the intent. If the claim is not
+                      submitted by this time,
+
+                      the intent expires.
+                  status:
+                    description: Status of the intent (e.g., "ACTIVE" or "FULFILLED").
+                    type: string
+                    enum:
+                      - ACTIVE
+                      - FULFILLED
+                      - EXPIRED
+                    default: ACTIVE
+                    title: >-
+                      - ACTIVE: Active: Intent is created and active, payments
+                      have been transferred to
+
+                      escrow if there is any
+                       - FULFILLED: Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+                      be released on claim APPROVAL, or funds will be reverted
+                      on claim REJECTION
+
+                      or DISPUTE
+                       - EXPIRED: Expired: Intent has expired, payments have been transferred back out of
+                      escrow
+                  amount:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    description: The payment amount the agent intends to claim, if any.
+                  cw20_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    description: The CW20Payment amount the agent intends to claim, if any.
+                  from_address:
+                    type: string
+                    title: the address the escrow payment came from
+                  escrow_address:
+                    type: string
+                    title: the escrow account address
+                description: >-
+                  Intent defines the structure for a service agent's claim
+                  intent.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: agentAddress
+          in: path
+          required: true
+          type: string
+        - name: collectionId
+          in: path
+          required: true
+          type: string
+        - name: id
           in: path
           required: true
           type: string
@@ -86769,10 +87438,10 @@ definitions:
 
                 signatures required by gogoproto.
             title: >-
-              custom amount specified by evaluator for claim approval, if empty
-              list then
+              if both amount and cw20 amount are empty then use default by
+              Collection
 
-              use default by Collection
+              custom amount specified by evaluator for claim approval
           cw20_payment:
             type: array
             items:
@@ -86788,12 +87457,9 @@ definitions:
                     fit in a
 
                     uint64(max 18446744073709551615)
-            title: >-
-              custom cw20 payments specified by evaluator for claim approval, if
-              empty
-
-              list then use default by Collection
+            title: custom cw20 payments specified by evaluator for claim approval
       payments_status:
+        title: payments_status is the status of the payments for the claim
         type: object
         properties:
           submission:
@@ -86807,6 +87473,13 @@ definitions:
               - FAILED
               - DISPUTED_PAYMENT
             default: NO_PAYMENT
+            title: |-
+              - PROMISED: Promised: Agent is contracted to receive payment
+               - AUTHORIZED: Authorized: Authz set up, no guarantee
+               - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+               - PAID: Paid: Funds have been paid
+               - FAILED: Failed: Payment failed, most probably due to insufficient funds
+               - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
           evaluation:
             type: string
             enum:
@@ -86818,6 +87491,13 @@ definitions:
               - FAILED
               - DISPUTED_PAYMENT
             default: NO_PAYMENT
+            title: |-
+              - PROMISED: Promised: Agent is contracted to receive payment
+               - AUTHORIZED: Authorized: Authz set up, no guarantee
+               - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+               - PAID: Paid: Funds have been paid
+               - FAILED: Failed: Payment failed, most probably due to insufficient funds
+               - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
           approval:
             type: string
             enum:
@@ -86829,6 +87509,13 @@ definitions:
               - FAILED
               - DISPUTED_PAYMENT
             default: NO_PAYMENT
+            title: |-
+              - PROMISED: Promised: Agent is contracted to receive payment
+               - AUTHORIZED: Authorized: Authz set up, no guarantee
+               - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+               - PAID: Paid: Funds have been paid
+               - FAILED: Failed: Payment failed, most probably due to insufficient funds
+               - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
           rejection:
             type: string
             enum:
@@ -86840,6 +87527,52 @@ definitions:
               - FAILED
               - DISPUTED_PAYMENT
             default: NO_PAYMENT
+            title: |-
+              - PROMISED: Promised: Agent is contracted to receive payment
+               - AUTHORIZED: Authorized: Authz set up, no guarantee
+               - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+               - PAID: Paid: Funds have been paid
+               - FAILED: Failed: Payment failed, most probably due to insufficient funds
+               - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
+      use_intent:
+        type: boolean
+        title: intent_id is the id of the intent for this claim, if any
+      amount:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: |-
+          NOTE: if both amount and cw20 amount are empty then use default by
+          Collection custom amount specified by service agent for claim approval
+      cw20_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: string
+              format: uint64
+              title: >-
+                chose uint64 for now as amounts should be small enough to fit in
+                a
+
+                uint64(max 18446744073709551615)
+        title: |-
+          NOTE: if both amount and cw20 amount are empty then use default by
+          Collection custom cw20 payments specified by service agent for claim
+          approval
   ixo.claims.v1beta1.ClaimPayments:
     type: object
     properties:
@@ -86854,6 +87587,13 @@ definitions:
           - FAILED
           - DISPUTED_PAYMENT
         default: NO_PAYMENT
+        title: |-
+          - PROMISED: Promised: Agent is contracted to receive payment
+           - AUTHORIZED: Authorized: Authz set up, no guarantee
+           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+           - PAID: Paid: Funds have been paid
+           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
       evaluation:
         type: string
         enum:
@@ -86865,6 +87605,13 @@ definitions:
           - FAILED
           - DISPUTED_PAYMENT
         default: NO_PAYMENT
+        title: |-
+          - PROMISED: Promised: Agent is contracted to receive payment
+           - AUTHORIZED: Authorized: Authz set up, no guarantee
+           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+           - PAID: Paid: Funds have been paid
+           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
       approval:
         type: string
         enum:
@@ -86876,6 +87623,13 @@ definitions:
           - FAILED
           - DISPUTED_PAYMENT
         default: NO_PAYMENT
+        title: |-
+          - PROMISED: Promised: Agent is contracted to receive payment
+           - AUTHORIZED: Authorized: Authz set up, no guarantee
+           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+           - PAID: Paid: Funds have been paid
+           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
       rejection:
         type: string
         enum:
@@ -86887,6 +87641,13 @@ definitions:
           - FAILED
           - DISPUTED_PAYMENT
         default: NO_PAYMENT
+        title: |-
+          - PROMISED: Promised: Agent is contracted to receive payment
+           - AUTHORIZED: Authorized: Authz set up, no guarantee
+           - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+           - PAID: Paid: Funds have been paid
+           - FAILED: Failed: Payment failed, most probably due to insufficient funds
+           - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
   ixo.claims.v1beta1.Collection:
     type: object
     properties:
@@ -87031,6 +87792,16 @@ definitions:
 
                         uint64(max 18446744073709551615)
                 title: cw20 payments, can be empty or multiple
+              is_oracle_payment:
+                type: boolean
+                title: >-
+                  boolean to indicate if the payment is for oracle payments, aka
+                  it will go
+
+                  through network fees split NOTE: if true the payment can only
+                  have amount
+
+                  values(Native coins), no cw20 payments allowed then
           evaluation:
             type: object
             properties:
@@ -87092,6 +87863,16 @@ definitions:
 
                         uint64(max 18446744073709551615)
                 title: cw20 payments, can be empty or multiple
+              is_oracle_payment:
+                type: boolean
+                title: >-
+                  boolean to indicate if the payment is for oracle payments, aka
+                  it will go
+
+                  through network fees split NOTE: if true the payment can only
+                  have amount
+
+                  values(Native coins), no cw20 payments allowed then
           approval:
             type: object
             properties:
@@ -87153,6 +87934,16 @@ definitions:
 
                         uint64(max 18446744073709551615)
                 title: cw20 payments, can be empty or multiple
+              is_oracle_payment:
+                type: boolean
+                title: >-
+                  boolean to indicate if the payment is for oracle payments, aka
+                  it will go
+
+                  through network fees split NOTE: if true the payment can only
+                  have amount
+
+                  values(Native coins), no cw20 payments allowed then
           rejection:
             type: object
             properties:
@@ -87214,6 +88005,16 @@ definitions:
 
                         uint64(max 18446744073709551615)
                 title: cw20 payments, can be empty or multiple
+              is_oracle_payment:
+                type: boolean
+                title: >-
+                  boolean to indicate if the payment is for oracle payments, aka
+                  it will go
+
+                  through network fees split NOTE: if true the payment can only
+                  have amount
+
+                  values(Native coins), no cw20 payments allowed then
       signer:
         type: string
         title: signer address
@@ -87225,6 +88026,44 @@ definitions:
           invalid
 
           (internally calculated)
+      escrow_account:
+        type: string
+        title: >-
+          escrow_account is the escrow account address for this collection
+          created at
+
+          collection creation, current purpose is to transfer payments to escrow
+
+          account for GUARANTEED payments through intents
+      intents:
+        title: |-
+          intents is the option for intents for this collection (allow, deny,
+          required)
+        type: string
+        enum:
+          - ALLOW
+          - DENY
+          - REQUIRED
+        default: ALLOW
+        description: |2-
+           - ALLOW: Allow: Intents can be made for claims, but claims can also be made without
+          intents.
+           - DENY: Deny: Intents cannot be made for claims for the collection.
+           - REQUIRED: Required: Claims cannot be made without an associated intent. An intent is
+          mandatory before a claim can be submitted.
+  ixo.claims.v1beta1.CollectionIntentOptions:
+    type: string
+    enum:
+      - ALLOW
+      - DENY
+      - REQUIRED
+    default: ALLOW
+    description: |2-
+       - ALLOW: Allow: Intents can be made for claims, but claims can also be made without
+      intents.
+       - DENY: Deny: Intents cannot be made for claims for the collection.
+       - REQUIRED: Required: Claims cannot be made without an associated intent. An intent is
+      mandatory before a claim can be submitted.
   ixo.claims.v1beta1.CollectionState:
     type: string
     enum:
@@ -87338,10 +88177,10 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
         title: >-
-          custom amount specified by evaluator for claim approval, if empty list
-          then
+          if both amount and cw20 amount are empty then use default by
+          Collection
 
-          use default by Collection
+          custom amount specified by evaluator for claim approval
       cw20_payment:
         type: array
         items:
@@ -87357,11 +88196,7 @@ definitions:
                 a
 
                 uint64(max 18446744073709551615)
-        title: >-
-          custom cw20 payments specified by evaluator for claim approval, if
-          empty
-
-          list then use default by Collection
+        title: custom cw20 payments specified by evaluator for claim approval
   ixo.claims.v1beta1.EvaluationStatus:
     type: string
     enum:
@@ -87371,6 +88206,113 @@ definitions:
       - DISPUTED
       - INVALIDATED
     default: PENDING
+  ixo.claims.v1beta1.Intent:
+    type: object
+    properties:
+      id:
+        type: string
+        title: id is the incremented internal id for the intent
+      agent_did:
+        type: string
+        description: The service agent's DID (Decentralized Identifier).
+      agent_address:
+        type: string
+        description: The service agent's address.
+      collection_id:
+        type: string
+        description: The id of the collection this intent is linked to.
+      claim_id:
+        type: string
+        title: claim_id (optional, set when claim is submitted)
+      created_at:
+        type: string
+        format: date-time
+        description: The time the intent was created.
+      expire_at:
+        type: string
+        format: date-time
+        description: >-
+          Timeout period for the intent. If the claim is not submitted by this
+          time,
+
+          the intent expires.
+      status:
+        description: Status of the intent (e.g., "ACTIVE" or "FULFILLED").
+        type: string
+        enum:
+          - ACTIVE
+          - FULFILLED
+          - EXPIRED
+        default: ACTIVE
+        title: >-
+          - ACTIVE: Active: Intent is created and active, payments have been
+          transferred to
+
+          escrow if there is any
+           - FULFILLED: Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+          be released on claim APPROVAL, or funds will be reverted on claim
+          REJECTION
+
+          or DISPUTE
+           - EXPIRED: Expired: Intent has expired, payments have been transferred back out of
+          escrow
+      amount:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        description: The payment amount the agent intends to claim, if any.
+      cw20_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: string
+              format: uint64
+              title: >-
+                chose uint64 for now as amounts should be small enough to fit in
+                a
+
+                uint64(max 18446744073709551615)
+        description: The CW20Payment amount the agent intends to claim, if any.
+      from_address:
+        type: string
+        title: the address the escrow payment came from
+      escrow_address:
+        type: string
+        title: the escrow account address
+    description: Intent defines the structure for a service agent's claim intent.
+  ixo.claims.v1beta1.IntentStatus:
+    type: string
+    enum:
+      - ACTIVE
+      - FULFILLED
+      - EXPIRED
+    default: ACTIVE
+    title: >-
+      - ACTIVE: Active: Intent is created and active, payments have been
+      transferred to
+
+      escrow if there is any
+       - FULFILLED: Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+      be released on claim APPROVAL, or funds will be reverted on claim
+      REJECTION
+
+      or DISPUTE
+       - EXPIRED: Expired: Intent has expired, payments have been transferred back out of
+      escrow
   ixo.claims.v1beta1.Params:
     type: object
     properties:
@@ -87383,6 +88325,9 @@ definitions:
         type: string
       node_fee_percentage:
         type: string
+      intent_sequence:
+        type: string
+        format: uint64
   ixo.claims.v1beta1.Payment:
     type: object
     properties:
@@ -87439,6 +88384,16 @@ definitions:
 
                 uint64(max 18446744073709551615)
         title: cw20 payments, can be empty or multiple
+      is_oracle_payment:
+        type: boolean
+        title: >-
+          boolean to indicate if the payment is for oracle payments, aka it will
+          go
+
+          through network fees split NOTE: if true the payment can only have
+          amount
+
+          values(Native coins), no cw20 payments allowed then
   ixo.claims.v1beta1.PaymentStatus:
     type: string
     enum:
@@ -87450,6 +88405,13 @@ definitions:
       - FAILED
       - DISPUTED_PAYMENT
     default: NO_PAYMENT
+    title: |-
+      - PROMISED: Promised: Agent is contracted to receive payment
+       - AUTHORIZED: Authorized: Authz set up, no guarantee
+       - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+       - PAID: Paid: Funds have been paid
+       - FAILED: Failed: Payment failed, most probably due to insufficient funds
+       - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
   ixo.claims.v1beta1.Payments:
     type: object
     properties:
@@ -87514,6 +88476,16 @@ definitions:
 
                     uint64(max 18446744073709551615)
             title: cw20 payments, can be empty or multiple
+          is_oracle_payment:
+            type: boolean
+            title: >-
+              boolean to indicate if the payment is for oracle payments, aka it
+              will go
+
+              through network fees split NOTE: if true the payment can only have
+              amount
+
+              values(Native coins), no cw20 payments allowed then
       evaluation:
         type: object
         properties:
@@ -87575,6 +88547,16 @@ definitions:
 
                     uint64(max 18446744073709551615)
             title: cw20 payments, can be empty or multiple
+          is_oracle_payment:
+            type: boolean
+            title: >-
+              boolean to indicate if the payment is for oracle payments, aka it
+              will go
+
+              through network fees split NOTE: if true the payment can only have
+              amount
+
+              values(Native coins), no cw20 payments allowed then
       approval:
         type: object
         properties:
@@ -87636,6 +88618,16 @@ definitions:
 
                     uint64(max 18446744073709551615)
             title: cw20 payments, can be empty or multiple
+          is_oracle_payment:
+            type: boolean
+            title: >-
+              boolean to indicate if the payment is for oracle payments, aka it
+              will go
+
+              through network fees split NOTE: if true the payment can only have
+              amount
+
+              values(Native coins), no cw20 payments allowed then
       rejection:
         type: object
         properties:
@@ -87697,6 +88689,16 @@ definitions:
 
                     uint64(max 18446744073709551615)
             title: cw20 payments, can be empty or multiple
+          is_oracle_payment:
+            type: boolean
+            title: >-
+              boolean to indicate if the payment is for oracle payments, aka it
+              will go
+
+              through network fees split NOTE: if true the payment can only have
+              amount
+
+              values(Native coins), no cw20 payments allowed then
   ixo.claims.v1beta1.QueryClaimListResponse:
     type: object
     properties:
@@ -87801,10 +88803,10 @@ definitions:
 
                       signatures required by gogoproto.
                   title: >-
-                    custom amount specified by evaluator for claim approval, if
-                    empty list then
+                    if both amount and cw20 amount are empty then use default by
+                    Collection
 
-                    use default by Collection
+                    custom amount specified by evaluator for claim approval
                 cw20_payment:
                   type: array
                   items:
@@ -87822,10 +88824,9 @@ definitions:
                           uint64(max 18446744073709551615)
                   title: >-
                     custom cw20 payments specified by evaluator for claim
-                    approval, if empty
-
-                    list then use default by Collection
+                    approval
             payments_status:
+              title: payments_status is the status of the payments for the claim
               type: object
               properties:
                 submission:
@@ -87839,6 +88840,13 @@ definitions:
                     - FAILED
                     - DISPUTED_PAYMENT
                   default: NO_PAYMENT
+                  title: |-
+                    - PROMISED: Promised: Agent is contracted to receive payment
+                     - AUTHORIZED: Authorized: Authz set up, no guarantee
+                     - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                     - PAID: Paid: Funds have been paid
+                     - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                     - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                 evaluation:
                   type: string
                   enum:
@@ -87850,6 +88858,13 @@ definitions:
                     - FAILED
                     - DISPUTED_PAYMENT
                   default: NO_PAYMENT
+                  title: |-
+                    - PROMISED: Promised: Agent is contracted to receive payment
+                     - AUTHORIZED: Authorized: Authz set up, no guarantee
+                     - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                     - PAID: Paid: Funds have been paid
+                     - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                     - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                 approval:
                   type: string
                   enum:
@@ -87861,6 +88876,13 @@ definitions:
                     - FAILED
                     - DISPUTED_PAYMENT
                   default: NO_PAYMENT
+                  title: |-
+                    - PROMISED: Promised: Agent is contracted to receive payment
+                     - AUTHORIZED: Authorized: Authz set up, no guarantee
+                     - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                     - PAID: Paid: Funds have been paid
+                     - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                     - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
                 rejection:
                   type: string
                   enum:
@@ -87872,6 +88894,62 @@ definitions:
                     - FAILED
                     - DISPUTED_PAYMENT
                   default: NO_PAYMENT
+                  title: |-
+                    - PROMISED: Promised: Agent is contracted to receive payment
+                     - AUTHORIZED: Authorized: Authz set up, no guarantee
+                     - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                     - PAID: Paid: Funds have been paid
+                     - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                     - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
+            use_intent:
+              type: boolean
+              title: intent_id is the id of the intent for this claim, if any
+            amount:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              title: >-
+                NOTE: if both amount and cw20 amount are empty then use default
+                by
+
+                Collection custom amount specified by service agent for claim
+                approval
+            cw20_payment:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  amount:
+                    type: string
+                    format: uint64
+                    title: >-
+                      chose uint64 for now as amounts should be small enough to
+                      fit in a
+
+                      uint64(max 18446744073709551615)
+              title: >-
+                NOTE: if both amount and cw20 amount are empty then use default
+                by
+
+                Collection custom cw20 payments specified by service agent for
+                claim
+
+                approval
       pagination:
         type: object
         properties:
@@ -88000,10 +89078,10 @@ definitions:
 
                     signatures required by gogoproto.
                 title: >-
-                  custom amount specified by evaluator for claim approval, if
-                  empty list then
+                  if both amount and cw20 amount are empty then use default by
+                  Collection
 
-                  use default by Collection
+                  custom amount specified by evaluator for claim approval
               cw20_payment:
                 type: array
                 items:
@@ -88019,12 +89097,9 @@ definitions:
                         to fit in a
 
                         uint64(max 18446744073709551615)
-                title: >-
-                  custom cw20 payments specified by evaluator for claim
-                  approval, if empty
-
-                  list then use default by Collection
+                title: custom cw20 payments specified by evaluator for claim approval
           payments_status:
+            title: payments_status is the status of the payments for the claim
             type: object
             properties:
               submission:
@@ -88038,6 +89113,13 @@ definitions:
                   - FAILED
                   - DISPUTED_PAYMENT
                 default: NO_PAYMENT
+                title: |-
+                  - PROMISED: Promised: Agent is contracted to receive payment
+                   - AUTHORIZED: Authorized: Authz set up, no guarantee
+                   - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                   - PAID: Paid: Funds have been paid
+                   - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                   - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
               evaluation:
                 type: string
                 enum:
@@ -88049,6 +89131,13 @@ definitions:
                   - FAILED
                   - DISPUTED_PAYMENT
                 default: NO_PAYMENT
+                title: |-
+                  - PROMISED: Promised: Agent is contracted to receive payment
+                   - AUTHORIZED: Authorized: Authz set up, no guarantee
+                   - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                   - PAID: Paid: Funds have been paid
+                   - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                   - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
               approval:
                 type: string
                 enum:
@@ -88060,6 +89149,13 @@ definitions:
                   - FAILED
                   - DISPUTED_PAYMENT
                 default: NO_PAYMENT
+                title: |-
+                  - PROMISED: Promised: Agent is contracted to receive payment
+                   - AUTHORIZED: Authorized: Authz set up, no guarantee
+                   - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                   - PAID: Paid: Funds have been paid
+                   - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                   - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
               rejection:
                 type: string
                 enum:
@@ -88071,6 +89167,60 @@ definitions:
                   - FAILED
                   - DISPUTED_PAYMENT
                 default: NO_PAYMENT
+                title: |-
+                  - PROMISED: Promised: Agent is contracted to receive payment
+                   - AUTHORIZED: Authorized: Authz set up, no guarantee
+                   - GUARANTEED: Guaranteed: Escrow set up with funds blocked
+                   - PAID: Paid: Funds have been paid
+                   - FAILED: Failed: Payment failed, most probably due to insufficient funds
+                   - DISPUTED_PAYMENT: DisputedPayment: Payment disputed
+          use_intent:
+            type: boolean
+            title: intent_id is the id of the intent for this claim, if any
+          amount:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            title: >-
+              NOTE: if both amount and cw20 amount are empty then use default by
+
+              Collection custom amount specified by service agent for claim
+              approval
+          cw20_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: >-
+              NOTE: if both amount and cw20 amount are empty then use default by
+
+              Collection custom cw20 payments specified by service agent for
+              claim
+
+              approval
   ixo.claims.v1beta1.QueryCollectionListResponse:
     type: object
     properties:
@@ -88235,6 +89385,16 @@ definitions:
 
                               uint64(max 18446744073709551615)
                       title: cw20 payments, can be empty or multiple
+                    is_oracle_payment:
+                      type: boolean
+                      title: >-
+                        boolean to indicate if the payment is for oracle
+                        payments, aka it will go
+
+                        through network fees split NOTE: if true the payment can
+                        only have amount
+
+                        values(Native coins), no cw20 payments allowed then
                 evaluation:
                   type: object
                   properties:
@@ -88297,6 +89457,16 @@ definitions:
 
                               uint64(max 18446744073709551615)
                       title: cw20 payments, can be empty or multiple
+                    is_oracle_payment:
+                      type: boolean
+                      title: >-
+                        boolean to indicate if the payment is for oracle
+                        payments, aka it will go
+
+                        through network fees split NOTE: if true the payment can
+                        only have amount
+
+                        values(Native coins), no cw20 payments allowed then
                 approval:
                   type: object
                   properties:
@@ -88359,6 +89529,16 @@ definitions:
 
                               uint64(max 18446744073709551615)
                       title: cw20 payments, can be empty or multiple
+                    is_oracle_payment:
+                      type: boolean
+                      title: >-
+                        boolean to indicate if the payment is for oracle
+                        payments, aka it will go
+
+                        through network fees split NOTE: if true the payment can
+                        only have amount
+
+                        values(Native coins), no cw20 payments allowed then
                 rejection:
                   type: object
                   properties:
@@ -88421,6 +89601,16 @@ definitions:
 
                               uint64(max 18446744073709551615)
                       title: cw20 payments, can be empty or multiple
+                    is_oracle_payment:
+                      type: boolean
+                      title: >-
+                        boolean to indicate if the payment is for oracle
+                        payments, aka it will go
+
+                        through network fees split NOTE: if true the payment can
+                        only have amount
+
+                        values(Native coins), no cw20 payments allowed then
             signer:
               type: string
               title: signer address
@@ -88432,6 +89622,34 @@ definitions:
                 invalid
 
                 (internally calculated)
+            escrow_account:
+              type: string
+              title: >-
+                escrow_account is the escrow account address for this collection
+                created at
+
+                collection creation, current purpose is to transfer payments to
+                escrow
+
+                account for GUARANTEED payments through intents
+            intents:
+              title: >-
+                intents is the option for intents for this collection (allow,
+                deny,
+
+                required)
+              type: string
+              enum:
+                - ALLOW
+                - DENY
+                - REQUIRED
+              default: ALLOW
+              description: |2-
+                 - ALLOW: Allow: Intents can be made for claims, but claims can also be made without
+                intents.
+                 - DENY: Deny: Intents cannot be made for claims for the collection.
+                 - REQUIRED: Required: Claims cannot be made without an associated intent. An intent is
+                mandatory before a claim can be submitted.
       pagination:
         type: object
         properties:
@@ -88619,6 +89837,16 @@ definitions:
 
                             uint64(max 18446744073709551615)
                     title: cw20 payments, can be empty or multiple
+                  is_oracle_payment:
+                    type: boolean
+                    title: >-
+                      boolean to indicate if the payment is for oracle payments,
+                      aka it will go
+
+                      through network fees split NOTE: if true the payment can
+                      only have amount
+
+                      values(Native coins), no cw20 payments allowed then
               evaluation:
                 type: object
                 properties:
@@ -88680,6 +89908,16 @@ definitions:
 
                             uint64(max 18446744073709551615)
                     title: cw20 payments, can be empty or multiple
+                  is_oracle_payment:
+                    type: boolean
+                    title: >-
+                      boolean to indicate if the payment is for oracle payments,
+                      aka it will go
+
+                      through network fees split NOTE: if true the payment can
+                      only have amount
+
+                      values(Native coins), no cw20 payments allowed then
               approval:
                 type: object
                 properties:
@@ -88741,6 +89979,16 @@ definitions:
 
                             uint64(max 18446744073709551615)
                     title: cw20 payments, can be empty or multiple
+                  is_oracle_payment:
+                    type: boolean
+                    title: >-
+                      boolean to indicate if the payment is for oracle payments,
+                      aka it will go
+
+                      through network fees split NOTE: if true the payment can
+                      only have amount
+
+                      values(Native coins), no cw20 payments allowed then
               rejection:
                 type: object
                 properties:
@@ -88802,6 +90050,16 @@ definitions:
 
                             uint64(max 18446744073709551615)
                     title: cw20 payments, can be empty or multiple
+                  is_oracle_payment:
+                    type: boolean
+                    title: >-
+                      boolean to indicate if the payment is for oracle payments,
+                      aka it will go
+
+                      through network fees split NOTE: if true the payment can
+                      only have amount
+
+                      values(Native coins), no cw20 payments allowed then
           signer:
             type: string
             title: signer address
@@ -88813,6 +90071,34 @@ definitions:
               invalid
 
               (internally calculated)
+          escrow_account:
+            type: string
+            title: >-
+              escrow_account is the escrow account address for this collection
+              created at
+
+              collection creation, current purpose is to transfer payments to
+              escrow
+
+              account for GUARANTEED payments through intents
+          intents:
+            title: >-
+              intents is the option for intents for this collection (allow,
+              deny,
+
+              required)
+            type: string
+            enum:
+              - ALLOW
+              - DENY
+              - REQUIRED
+            default: ALLOW
+            description: |2-
+               - ALLOW: Allow: Intents can be made for claims, but claims can also be made without
+              intents.
+               - DENY: Deny: Intents cannot be made for claims for the collection.
+               - REQUIRED: Required: Claims cannot be made without an associated intent. An intent is
+              mandatory before a claim can be submitted.
   ixo.claims.v1beta1.QueryDisputeListResponse:
     type: object
     properties:
@@ -88887,6 +90173,222 @@ definitions:
                 type: string
               encrypted:
                 type: boolean
+  ixo.claims.v1beta1.QueryIntentListResponse:
+    type: object
+    properties:
+      intents:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              title: id is the incremented internal id for the intent
+            agent_did:
+              type: string
+              description: The service agent's DID (Decentralized Identifier).
+            agent_address:
+              type: string
+              description: The service agent's address.
+            collection_id:
+              type: string
+              description: The id of the collection this intent is linked to.
+            claim_id:
+              type: string
+              title: claim_id (optional, set when claim is submitted)
+            created_at:
+              type: string
+              format: date-time
+              description: The time the intent was created.
+            expire_at:
+              type: string
+              format: date-time
+              description: >-
+                Timeout period for the intent. If the claim is not submitted by
+                this time,
+
+                the intent expires.
+            status:
+              description: Status of the intent (e.g., "ACTIVE" or "FULFILLED").
+              type: string
+              enum:
+                - ACTIVE
+                - FULFILLED
+                - EXPIRED
+              default: ACTIVE
+              title: >-
+                - ACTIVE: Active: Intent is created and active, payments have
+                been transferred to
+
+                escrow if there is any
+                 - FULFILLED: Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+                be released on claim APPROVAL, or funds will be reverted on
+                claim REJECTION
+
+                or DISPUTE
+                 - EXPIRED: Expired: Intent has expired, payments have been transferred back out of
+                escrow
+            amount:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              description: The payment amount the agent intends to claim, if any.
+            cw20_payment:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  amount:
+                    type: string
+                    format: uint64
+                    title: >-
+                      chose uint64 for now as amounts should be small enough to
+                      fit in a
+
+                      uint64(max 18446744073709551615)
+              description: The CW20Payment amount the agent intends to claim, if any.
+            from_address:
+              type: string
+              title: the address the escrow payment came from
+            escrow_address:
+              type: string
+              title: the escrow account address
+          description: Intent defines the structure for a service agent's claim intent.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  ixo.claims.v1beta1.QueryIntentResponse:
+    type: object
+    properties:
+      intent:
+        type: object
+        properties:
+          id:
+            type: string
+            title: id is the incremented internal id for the intent
+          agent_did:
+            type: string
+            description: The service agent's DID (Decentralized Identifier).
+          agent_address:
+            type: string
+            description: The service agent's address.
+          collection_id:
+            type: string
+            description: The id of the collection this intent is linked to.
+          claim_id:
+            type: string
+            title: claim_id (optional, set when claim is submitted)
+          created_at:
+            type: string
+            format: date-time
+            description: The time the intent was created.
+          expire_at:
+            type: string
+            format: date-time
+            description: >-
+              Timeout period for the intent. If the claim is not submitted by
+              this time,
+
+              the intent expires.
+          status:
+            description: Status of the intent (e.g., "ACTIVE" or "FULFILLED").
+            type: string
+            enum:
+              - ACTIVE
+              - FULFILLED
+              - EXPIRED
+            default: ACTIVE
+            title: >-
+              - ACTIVE: Active: Intent is created and active, payments have been
+              transferred to
+
+              escrow if there is any
+               - FULFILLED: Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+              be released on claim APPROVAL, or funds will be reverted on claim
+              REJECTION
+
+              or DISPUTE
+               - EXPIRED: Expired: Intent has expired, payments have been transferred back out of
+              escrow
+          amount:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            description: The payment amount the agent intends to claim, if any.
+          cw20_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            description: The CW20Payment amount the agent intends to claim, if any.
+          from_address:
+            type: string
+            title: the address the escrow payment came from
+          escrow_address:
+            type: string
+            title: the escrow account address
+        description: Intent defines the structure for a service agent's claim intent.
   ixo.claims.v1beta1.QueryParamsResponse:
     type: object
     properties:
@@ -88903,6 +90405,9 @@ definitions:
             type: string
           node_fee_percentage:
             type: string
+          intent_sequence:
+            type: string
+            format: uint64
   ixo.entity.v1beta1.Entity:
     type: object
     properties:

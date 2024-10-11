@@ -105,3 +105,27 @@ var _ sdk.Msg = &MsgUpdateCollectionPayments{}
 func (msg MsgUpdateCollectionPayments) Type() string { return TypeMsgUpdateCollectionPayments }
 
 func (msg MsgUpdateCollectionPayments) Route() string { return RouterKey }
+
+// --------------------------
+// UPDATE COLLECTION INTENTS
+// --------------------------
+const TypeMsgUpdateCollectionIntents = "update_collection_intents"
+
+var _ sdk.Msg = &MsgUpdateCollectionIntents{}
+
+func (msg MsgUpdateCollectionIntents) Type() string { return TypeMsgUpdateCollectionIntents }
+
+func (msg MsgUpdateCollectionIntents) Route() string { return RouterKey }
+
+// --------------------------
+// CLAIM INTENT
+// --------------------------
+const TypeMsgClaimIntent = "claim_intent"
+
+var _ sdk.Msg = &MsgClaimIntent{}
+
+func (msg MsgClaimIntent) Type() string { return TypeMsgClaimIntent }
+
+func (msg MsgClaimIntent) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+
+func (msg MsgClaimIntent) Route() string { return RouterKey }

@@ -242,8 +242,6 @@ func NewMsgWithdrawReserve(withdrawerDid iidtypes.DIDFragment, amount sdk.Coins,
 
 func (msg MsgWithdrawReserve) GetIidController() iidtypes.DIDFragment { return msg.WithdrawerDid }
 
-// TODO: test messages once sdk works and they say we can safely remove all GetSigners and ValidateBasic, do so and test
-
 func (msg MsgWithdrawReserve) Route() string { return RouterKey }
 
 func (msg MsgWithdrawReserve) Type() string { return TypeMsgWithdrawReserve }

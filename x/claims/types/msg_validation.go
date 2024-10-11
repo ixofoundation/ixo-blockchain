@@ -32,6 +32,9 @@ func (msg MsgCreateCollection) ValidateBasic() error {
 	if !ixo.IsEnumValueValid(CollectionState_name, int32(msg.State)) {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for state")
 	}
+	if !ixo.IsEnumValueValid(CollectionIntentOptions_name, int32(msg.Intents)) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for intents")
+	}
 
 	return nil
 }
@@ -58,6 +61,13 @@ func (msg MsgSubmitClaim) ValidateBasic() error {
 	}
 	if ixo.IsEmpty(msg.CollectionId) {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+
+	if err = ValidateCoinsAllowZero(msg.Amount.Sort()); err != nil {
+		return err
+	}
+	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
+		return err
 	}
 
 	return nil
@@ -101,11 +111,10 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for status")
 	}
 
-	if err = msg.Amount.Sort().Validate(); err != nil {
+	if err = ValidateCoinsAllowZero(msg.Amount.Sort()); err != nil {
 		return err
 	}
-
-	if err = ValidateCW20Payments(msg.Cw20Payment); err != nil {
+	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
 		return err
 	}
 
@@ -161,7 +170,7 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 		return err
 	}
 
-	if err = ValidateCW20Payments(msg.Cw20Payment); err != nil {
+	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
 		return err
 	}
 
@@ -222,6 +231,49 @@ func (msg MsgUpdateCollectionPayments) ValidateBasic() error {
 	}
 
 	if err = msg.Payments.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// --------------------------
+// UPDATE COLLECTION INTENTS
+// --------------------------
+func (msg MsgUpdateCollectionIntents) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+	if !ixo.IsEnumValueValid(CollectionIntentOptions_name, int32(msg.Intents)) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for intents")
+	}
+
+	return nil
+}
+
+// --------------------------
+// CLAIM INTENT
+// --------------------------
+func (msg *MsgClaimIntent) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+	if err != nil {
+		return errorsmod.Wrapf(err, "invalid agent address (%s)", err)
+	}
+	if !iidtypes.IsValidDID(msg.AgentDid.Did()) {
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.AgentDid.String())
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+
+	if err = ValidateCoinsAllowZero(msg.Amount.Sort()); err != nil {
+		return err
+	}
+	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
 		return err
 	}
 

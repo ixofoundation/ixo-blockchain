@@ -10,6 +10,7 @@ import (
 
 var (
 	KeyCollectionSequence   = []byte("CollectionSequence")
+	KeyIntentSequence       = []byte("IntentSequence")
 	KeyIxoAccount           = []byte("IxoAccount")
 	KeyNetworkFeePercentage = []byte("NetworkFeePercentage")
 	KeyNodeFeePercentage    = []byte("NodeFeePercentage")
@@ -23,10 +24,11 @@ func ParamKeyTable() paramtypes.KeyTable {
 }
 
 // NewParams creates a new Params instance
-func NewParams(collectionSequence uint64, ixoAccount string,
+func NewParams(collectionSequence, intentSequence uint64, ixoAccount string,
 	networkFeePercentage, nodeFeePercentage math.LegacyDec) Params {
 	return Params{
 		CollectionSequence:   collectionSequence,
+		IntentSequence:       intentSequence,
 		IxoAccount:           ixoAccount,
 		NetworkFeePercentage: networkFeePercentage,
 		NodeFeePercentage:    nodeFeePercentage,
@@ -38,13 +40,14 @@ func DefaultParams() Params {
 	defaultIxoAccount := "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
 	tenPercentFee := math.LegacyNewDec(10)
 
-	return NewParams(1, defaultIxoAccount, tenPercentFee, tenPercentFee)
+	return NewParams(1, 1, defaultIxoAccount, tenPercentFee, tenPercentFee)
 }
 
 // ParamSetPairs get the params.ParamSet
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.ParamSetPair{Key: KeyCollectionSequence, Value: &p.CollectionSequence, ValidatorFn: validateCollectionSequence},
+		paramtypes.ParamSetPair{Key: KeyIntentSequence, Value: &p.IntentSequence, ValidatorFn: validateCollectionSequence},
 		paramtypes.ParamSetPair{Key: KeyIxoAccount, Value: &p.IxoAccount, ValidatorFn: validateIxoAccount},
 		paramtypes.ParamSetPair{Key: KeyNetworkFeePercentage, Value: &p.NetworkFeePercentage, ValidatorFn: validateFeePercentage},
 		paramtypes.ParamSetPair{Key: KeyNodeFeePercentage, Value: &p.NodeFeePercentage, ValidatorFn: validateFeePercentage},
@@ -92,6 +95,10 @@ func validateCollectionSequence(i interface{}) error {
 // Validate validates the set of params
 func (p Params) Validate() error {
 	err := validateCollectionSequence(p.CollectionSequence)
+	if err != nil {
+		return err
+	}
+	err = validateCollectionSequence(p.IntentSequence)
 	if err != nil {
 		return err
 	}

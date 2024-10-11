@@ -151,3 +151,27 @@ func NewCmdWithdrawPayment() *cobra.Command {
 	flags.AddTxFlagsToCmd(cmd)
 	return cmd
 }
+
+func NewCmdSubmitIntent() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "submit-intent [claim-intent-doc]",
+		Short: "Submit a claim - flag is raw json with struct of MsgClaimIntent",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgClaimIntent
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}

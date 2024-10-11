@@ -18,6 +18,7 @@ import (
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 	epochtypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
 )
@@ -99,6 +100,8 @@ func init() {
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Collection", &claimstypes.QueryCollectionResponse{})
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Claim", &claimstypes.QueryClaimResponse{})
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Dispute", &claimstypes.QueryDisputeResponse{})
+	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Intent", &claimstypes.QueryIntentResponse{})
+	setWhitelistedQuery("/ixo.claims.v1beta1.Query/IntentList", &claimstypes.QueryIntentListResponse{})
 
 	// entity
 	setWhitelistedQuery("/ixo.entity.v1beta1.Query/Params", &entitytypes.QueryParamsResponse{})
@@ -111,6 +114,7 @@ func init() {
 	// token
 	setWhitelistedQuery("/ixo.token.v1beta1.Query/Params", &tokentypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.token.v1beta1.Query/TokenMetadata", &tokentypes.QueryTokenMetadataResponse{})
+	setWhitelistedQuery("/ixo.token.v1beta1.Query/TokenDoc", &tokentypes.QueryTokenDocResponse{})
 
 	// smartaccount
 	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/Params", &smartaccounttypes.QueryParamsResponse{})
@@ -120,6 +124,10 @@ func init() {
 	// epochs
 	setWhitelistedQuery("/ixo.epochs.v1beta1.Query/EpochInfos", &epochtypes.QueryEpochsInfoResponse{})
 	setWhitelistedQuery("/ixo.epochs.v1beta1.Query/CurrentEpoch", &epochtypes.QueryCurrentEpochResponse{})
+
+	// mint
+	setWhitelistedQuery("/ixo.mint.v1beta1.Query/Params", &minttypes.QueryParamsResponse{})
+	setWhitelistedQuery("/ixo.mint.v1beta1.Query/EpochProvisions", &minttypes.QueryEpochProvisionsResponse{})
 }
 
 // IsWhitelistedQuery returns if the query is not whitelisted.

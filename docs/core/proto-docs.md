@@ -99,12 +99,15 @@
     - [Dispute](#ixo.claims.v1beta1.Dispute)
     - [DisputeData](#ixo.claims.v1beta1.DisputeData)
     - [Evaluation](#ixo.claims.v1beta1.Evaluation)
+    - [Intent](#ixo.claims.v1beta1.Intent)
     - [Params](#ixo.claims.v1beta1.Params)
     - [Payment](#ixo.claims.v1beta1.Payment)
     - [Payments](#ixo.claims.v1beta1.Payments)
   
+    - [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions)
     - [CollectionState](#ixo.claims.v1beta1.CollectionState)
     - [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus)
+    - [IntentStatus](#ixo.claims.v1beta1.IntentStatus)
     - [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus)
     - [PaymentType](#ixo.claims.v1beta1.PaymentType)
   
@@ -123,6 +126,8 @@
     - [ClaimUpdatedEvent](#ixo.claims.v1beta1.ClaimUpdatedEvent)
     - [CollectionCreatedEvent](#ixo.claims.v1beta1.CollectionCreatedEvent)
     - [CollectionUpdatedEvent](#ixo.claims.v1beta1.CollectionUpdatedEvent)
+    - [IntentSubmittedEvent](#ixo.claims.v1beta1.IntentSubmittedEvent)
+    - [IntentUpdatedEvent](#ixo.claims.v1beta1.IntentUpdatedEvent)
     - [PaymentWithdrawCreatedEvent](#ixo.claims.v1beta1.PaymentWithdrawCreatedEvent)
     - [PaymentWithdrawnEvent](#ixo.claims.v1beta1.PaymentWithdrawnEvent)
   
@@ -142,12 +147,18 @@
     - [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse)
     - [QueryDisputeRequest](#ixo.claims.v1beta1.QueryDisputeRequest)
     - [QueryDisputeResponse](#ixo.claims.v1beta1.QueryDisputeResponse)
+    - [QueryIntentListRequest](#ixo.claims.v1beta1.QueryIntentListRequest)
+    - [QueryIntentListResponse](#ixo.claims.v1beta1.QueryIntentListResponse)
+    - [QueryIntentRequest](#ixo.claims.v1beta1.QueryIntentRequest)
+    - [QueryIntentResponse](#ixo.claims.v1beta1.QueryIntentResponse)
     - [QueryParamsRequest](#ixo.claims.v1beta1.QueryParamsRequest)
     - [QueryParamsResponse](#ixo.claims.v1beta1.QueryParamsResponse)
   
     - [Query](#ixo.claims.v1beta1.Query)
   
 - [ixo/claims/v1beta1/tx.proto](#ixo/claims/v1beta1/tx.proto)
+    - [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent)
+    - [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse)
     - [MsgCreateCollection](#ixo.claims.v1beta1.MsgCreateCollection)
     - [MsgCreateCollectionResponse](#ixo.claims.v1beta1.MsgCreateCollectionResponse)
     - [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim)
@@ -158,6 +169,8 @@
     - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
     - [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates)
     - [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse)
+    - [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents)
+    - [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse)
     - [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments)
     - [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse)
     - [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState)
@@ -1810,7 +1823,10 @@ Msg defines the bonds Msg service.
 | submission_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | submissionDate is the date and time that the claim was submitted on-chain |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim in the cid hash format |
 | evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations |
-| payments_status | [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments) |  |  |
+| payments_status | [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments) |  | payments_status is the status of the payments for the claim |
+| use_intent | [bool](#bool) |  | intent_id is the id of the intent for this claim, if any |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20 amount are empty then use default by Collection custom amount specified by service agent for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then use default by Collection custom cw20 payments specified by service agent for claim approval |
 
 
 
@@ -1859,6 +1875,8 @@ Msg defines the bonds Msg service.
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
 | signer | [string](#string) |  | signer address |
 | invalidated | [uint64](#uint64) |  | invalidated is the number of claims that have been evaluated as invalid (internally calculated) |
+| escrow_account | [string](#string) |  | escrow_account is the escrow account address for this collection created at collection creation, current purpose is to transfer payments to escrow account for GUARANTEED payments through intents |
+| intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
 
 
 
@@ -1934,8 +1952,34 @@ Msg defines the bonds Msg service.
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
 | evaluation_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | evaluationDate is the date and time that the claim evaluation was submitted on-chain |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval, if empty list then use default by Collection |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | if both amount and cw20 amount are empty then use default by Collection custom amount specified by evaluator for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Intent"></a>
+
+### Intent
+Intent defines the structure for a service agent&#39;s claim intent.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | id is the incremented internal id for the intent |
+| agent_did | [string](#string) |  | The service agent&#39;s DID (Decentralized Identifier). |
+| agent_address | [string](#string) |  | The service agent&#39;s address. |
+| collection_id | [string](#string) |  | The id of the collection this intent is linked to. |
+| claim_id | [string](#string) |  | claim_id (optional, set when claim is submitted) |
+| created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | The time the intent was created. |
+| expire_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Timeout period for the intent. If the claim is not submitted by this time, the intent expires. |
+| status | [IntentStatus](#ixo.claims.v1beta1.IntentStatus) |  | Status of the intent (e.g., &#34;ACTIVE&#34; or &#34;FULFILLED&#34;). |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | The payment amount the agent intends to claim, if any. |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | The CW20Payment amount the agent intends to claim, if any. |
+| from_address | [string](#string) |  | the address the escrow payment came from |
+| escrow_address | [string](#string) |  | the escrow account address |
 
 
 
@@ -1954,6 +1998,7 @@ Msg defines the bonds Msg service.
 | ixo_account | [string](#string) |  |  |
 | network_fee_percentage | [string](#string) |  |  |
 | node_fee_percentage | [string](#string) |  |  |
+| intent_sequence | [uint64](#uint64) |  |  |
 
 
 
@@ -1973,6 +2018,7 @@ Msg defines the bonds Msg service.
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment, not allowed for Evaluation Payment |
 | timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immediate direct payment |
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
+| is_oracle_payment | [bool](#bool) |  | boolean to indicate if the payment is for oracle payments, aka it will go through network fees split NOTE: if true the payment can only have amount values(Native coins), no cw20 payments allowed then |
 
 
 
@@ -1997,6 +2043,19 @@ Msg defines the bonds Msg service.
 
 
  
+
+
+<a name="ixo.claims.v1beta1.CollectionIntentOptions"></a>
+
+### CollectionIntentOptions
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ALLOW | 0 | Allow: Intents can be made for claims, but claims can also be made without intents. |
+| DENY | 1 | Deny: Intents cannot be made for claims for the collection. |
+| REQUIRED | 2 | Required: Claims cannot be made without an associated intent. An intent is mandatory before a claim can be submitted. |
+
 
 
 <a name="ixo.claims.v1beta1.CollectionState"></a>
@@ -2027,6 +2086,19 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.IntentStatus"></a>
+
+### IntentStatus
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ACTIVE | 0 | Active: Intent is created and active, payments have been transferred to escrow if there is any |
+| FULFILLED | 1 | Fulfilled: Intent is fulfilled, was used to create a claim and funds will be released on claim APPROVAL, or funds will be reverted on claim REJECTION or DISPUTE |
+| EXPIRED | 2 | Expired: Intent has expired, payments have been transferred back out of escrow |
+
+
+
 <a name="ixo.claims.v1beta1.PaymentStatus"></a>
 
 ### PaymentStatus
@@ -2035,12 +2107,12 @@ Msg defines the bonds Msg service.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | NO_PAYMENT | 0 |  |
-| PROMISED | 1 | agent is contracted to receive payment |
-| AUTHORIZED | 2 | authz set up, no guarantee |
-| GUARANTEED | 3 | escrow set up with funds blocked |
-| PAID | 4 |  |
-| FAILED | 5 |  |
-| DISPUTED_PAYMENT | 6 |  |
+| PROMISED | 1 | Promised: Agent is contracted to receive payment |
+| AUTHORIZED | 2 | Authorized: Authz set up, no guarantee |
+| GUARANTEED | 3 | Guaranteed: Escrow set up with funds blocked |
+| PAID | 4 | Paid: Funds have been paid |
+| FAILED | 5 | Failed: Payment failed, most probably due to insufficient funds |
+| DISPUTED_PAYMENT | 6 | DisputedPayment: Payment disputed |
 
 
 
@@ -2134,6 +2206,9 @@ Msg defines the bonds Msg service.
 | ----- | ---- | ----- | ----------- |
 | collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
 | agent_quota | [uint64](#uint64) |  |  |
+| max_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom max_amount allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed |
+| max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom max_cw20_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed |
+| intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | intent_duration_ns is the duration for which the intent is active, after which it will expire (in nanoseconds) |
 
 
 
@@ -2285,6 +2360,36 @@ CollectionUpdatedEvent is an event triggered on a Collection update
 
 
 
+<a name="ixo.claims.v1beta1.IntentSubmittedEvent"></a>
+
+### IntentSubmittedEvent
+IntentSubmittedEvent is an event triggered on an Intent submission
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent | [Intent](#ixo.claims.v1beta1.Intent) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.IntentUpdatedEvent"></a>
+
+### IntentUpdatedEvent
+IntentUpdatedEvent is an event triggered on an Intent update
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent | [Intent](#ixo.claims.v1beta1.Intent) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.PaymentWithdrawCreatedEvent"></a>
 
 ### PaymentWithdrawCreatedEvent
@@ -2343,6 +2448,7 @@ GenesisState defines the claims module&#39;s genesis state.
 | collections | [Collection](#ixo.claims.v1beta1.Collection) | repeated |  |
 | claims | [Claim](#ixo.claims.v1beta1.Claim) | repeated |  |
 | disputes | [Dispute](#ixo.claims.v1beta1.Dispute) | repeated |  |
+| intents | [Intent](#ixo.claims.v1beta1.Intent) | repeated |  |
 
 
 
@@ -2548,6 +2654,69 @@ GenesisState defines the claims module&#39;s genesis state.
 
 
 
+<a name="ixo.claims.v1beta1.QueryIntentListRequest"></a>
+
+### QueryIntentListRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryIntentListResponse"></a>
+
+### QueryIntentListResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intents | [Intent](#ixo.claims.v1beta1.Intent) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryIntentRequest"></a>
+
+### QueryIntentRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| agentAddress | [string](#string) |  |  |
+| collectionId | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryIntentResponse"></a>
+
+### QueryIntentResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent | [Intent](#ixo.claims.v1beta1.Intent) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
@@ -2593,6 +2762,8 @@ Query defines the gRPC querier service.
 | ClaimList | [QueryClaimListRequest](#ixo.claims.v1beta1.QueryClaimListRequest) | [QueryClaimListResponse](#ixo.claims.v1beta1.QueryClaimListResponse) |  |
 | Dispute | [QueryDisputeRequest](#ixo.claims.v1beta1.QueryDisputeRequest) | [QueryDisputeResponse](#ixo.claims.v1beta1.QueryDisputeResponse) |  |
 | DisputeList | [QueryDisputeListRequest](#ixo.claims.v1beta1.QueryDisputeListRequest) | [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse) |  |
+| Intent | [QueryIntentRequest](#ixo.claims.v1beta1.QueryIntentRequest) | [QueryIntentResponse](#ixo.claims.v1beta1.QueryIntentResponse) |  |
+| IntentList | [QueryIntentListRequest](#ixo.claims.v1beta1.QueryIntentListRequest) | [QueryIntentListResponse](#ixo.claims.v1beta1.QueryIntentListResponse) |  |
 
  
 
@@ -2602,6 +2773,41 @@ Query defines the gRPC querier service.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/claims/v1beta1/tx.proto
+
+
+
+<a name="ixo.claims.v1beta1.MsgClaimIntent"></a>
+
+### MsgClaimIntent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| agent_did | [string](#string) |  | The service agent&#39;s DID (Decentralized Identifier). |
+| agent_address | [string](#string) |  | The service agent&#39;s address (who submits this message). |
+| collection_id | [string](#string) |  | The id of the collection this intent is linked to. |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20 amount are empty then default by Collection is used (APPROVAL payment). The desired claim amount, if any. |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then default by Collection is used (APPROVAL payment). The custom CW20 payment, if any. |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgClaimIntentResponse"></a>
+
+### MsgClaimIntentResponse
+MsgClaimIntentResponse defines the response after submitting an intent.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent_id | [string](#string) |  | Resulting intent id. |
+| expire_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Timeout period for the intent. If the claim is not submitted by this time, the intent expires. |
+
+
+
 
 
 
@@ -2621,6 +2827,7 @@ Query defines the gRPC querier service.
 | quota | [uint64](#uint64) |  | quota is the maximum number of claims that may be submitted, 0 is unlimited |
 | state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
+| intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
 
 
 
@@ -2684,8 +2891,8 @@ Collection entity, or have authz cap, aka is agent
 | status | [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus) |  | status is the evaluation status expressed as an integer (2=approved, 3=rejected, ...) |
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval, if empty list then use default by Collection |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20 amount are empty then use collection default custom amount specified by evaluator for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then use collection default custom cw20 payments specified by evaluator for claim approval |
 
 
 
@@ -2715,6 +2922,9 @@ Collection entity, or have authz cap, aka is agent
 | agent_did | [string](#string) |  | agent is the DID of the agent submitting the claim |
 | agent_address | [string](#string) |  |  |
 | admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+| use_intent | [bool](#bool) |  | use_intent is the option for using intent for this claim if it exists and is active. NOTE: if use_intent is true then amount and cw20 amount are ignored and overriden with intent amounts. NOTE: if use_intent is true and there is no active intent then will error |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20_payment are empty then use default by Collection custom amount specified by service agent for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then use default by Collection custom cw20 payments specified by service agent for claim approval |
 
 
 
@@ -2752,6 +2962,33 @@ Collection entity, or have authz cap, aka is agent
 <a name="ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse"></a>
 
 ### MsgUpdateCollectionDatesResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionIntents"></a>
+
+### MsgUpdateCollectionIntents
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse"></a>
+
+### MsgUpdateCollectionIntentsResponse
 
 
 
@@ -2868,6 +3105,8 @@ Msg defines the Msg service.
 | UpdateCollectionState | [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState) | [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse) |  |
 | UpdateCollectionDates | [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates) | [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse) |  |
 | UpdateCollectionPayments | [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments) | [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse) |  |
+| UpdateCollectionIntents | [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents) | [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse) |  |
+| ClaimIntent | [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent) | [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse) |  |
 
  
 

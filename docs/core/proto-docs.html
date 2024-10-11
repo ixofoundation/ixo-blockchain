@@ -566,6 +566,10 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.Intent"><span class="badge">M</span>Intent</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
@@ -579,11 +583,19 @@
               
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.CollectionIntentOptions"><span class="badge">E</span>CollectionIntentOptions</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.CollectionState"><span class="badge">E</span>CollectionState</a>
                 </li>
               
                 <li>
                   <a href="#ixo.claims.v1beta1.EvaluationStatus"><span class="badge">E</span>EvaluationStatus</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.IntentStatus"><span class="badge">E</span>IntentStatus</a>
                 </li>
               
                 <li>
@@ -661,6 +673,14 @@
               
                 <li>
                   <a href="#ixo.claims.v1beta1.CollectionUpdatedEvent"><span class="badge">M</span>CollectionUpdatedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.IntentSubmittedEvent"><span class="badge">M</span>IntentSubmittedEvent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.IntentUpdatedEvent"><span class="badge">M</span>IntentUpdatedEvent</a>
                 </li>
               
                 <li>
@@ -746,6 +766,22 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.QueryIntentListRequest"><span class="badge">M</span>QueryIntentListRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryIntentListResponse"><span class="badge">M</span>QueryIntentListResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryIntentRequest"><span class="badge">M</span>QueryIntentRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryIntentResponse"><span class="badge">M</span>QueryIntentResponse</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.QueryParamsRequest"><span class="badge">M</span>QueryParamsRequest</a>
                 </li>
               
@@ -767,6 +803,14 @@
           <li>
             <a href="#ixo%2fclaims%2fv1beta1%2ftx.proto">ixo/claims/v1beta1/tx.proto</a>
             <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgClaimIntent"><span class="badge">M</span>MsgClaimIntent</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgClaimIntentResponse"><span class="badge">M</span>MsgClaimIntentResponse</a>
+                </li>
               
                 <li>
                   <a href="#ixo.claims.v1beta1.MsgCreateCollection"><span class="badge">M</span>MsgCreateCollection</a>
@@ -806,6 +850,14 @@
               
                 <li>
                   <a href="#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse"><span class="badge">M</span>MsgUpdateCollectionDatesResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionIntents"><span class="badge">M</span>MsgUpdateCollectionIntents</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse"><span class="badge">M</span>MsgUpdateCollectionIntentsResponse</a>
                 </li>
               
                 <li>
@@ -5083,7 +5135,31 @@ uint64(max 18446744073709551615) </p></td>
                   <td>payments_status</td>
                   <td><a href="#ixo.claims.v1beta1.ClaimPayments">ClaimPayments</a></td>
                   <td></td>
-                  <td><p> </p></td>
+                  <td><p>payments_status is the status of the payments for the claim </p></td>
+                </tr>
+              
+                <tr>
+                  <td>use_intent</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>intent_id is the id of the intent for this claim, if any </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: if both amount and cw20 amount are empty then use default by
+Collection custom amount specified by service agent for claim approval </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: if both amount and cw20 amount are empty then use default by
+Collection custom cw20 payments specified by service agent for claim
+approval </p></td>
                 </tr>
               
             </tbody>
@@ -5266,6 +5342,23 @@ rejection </p></td>
                   <td></td>
                   <td><p>invalidated is the number of claims that have been evaluated as invalid
 (internally calculated) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>escrow_account</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>escrow_account is the escrow account address for this collection created at
+collection creation, current purpose is to transfer payments to escrow
+account for GUARANTEED payments through intents </p></td>
+                </tr>
+              
+                <tr>
+                  <td>intents</td>
+                  <td><a href="#ixo.claims.v1beta1.CollectionIntentOptions">CollectionIntentOptions</a></td>
+                  <td></td>
+                  <td><p>intents is the option for intents for this collection (allow, deny,
+required) </p></td>
                 </tr>
               
             </tbody>
@@ -5477,16 +5570,117 @@ on-chain </p></td>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>custom amount specified by evaluator for claim approval, if empty list then
-use default by Collection </p></td>
+                  <td><p>if both amount and cw20 amount are empty then use default by Collection
+custom amount specified by evaluator for claim approval </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>custom cw20 payments specified by evaluator for claim approval, if empty
-list then use default by Collection </p></td>
+                  <td><p>custom cw20 payments specified by evaluator for claim approval </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.Intent">Intent</h3>
+        <p>Intent defines the structure for a service agent's claim intent.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>id is the incremented internal id for the intent </p></td>
+                </tr>
+              
+                <tr>
+                  <td>agent_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The service agent&#39;s DID (Decentralized Identifier). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>agent_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The service agent&#39;s address. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The id of the collection this intent is linked to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>claim_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>claim_id (optional, set when claim is submitted) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>created_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>The time the intent was created. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>expire_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Timeout period for the intent. If the claim is not submitted by this time,
+the intent expires. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>status</td>
+                  <td><a href="#ixo.claims.v1beta1.IntentStatus">IntentStatus</a></td>
+                  <td></td>
+                  <td><p>Status of the intent (e.g., &#34;ACTIVE&#34; or &#34;FULFILLED&#34;). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>The payment amount the agent intends to claim, if any. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>The CW20Payment amount the agent intends to claim, if any. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>from_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the address the escrow payment came from </p></td>
+                </tr>
+              
+                <tr>
+                  <td>escrow_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>the escrow account address </p></td>
                 </tr>
               
             </tbody>
@@ -5530,6 +5724,13 @@ list then use default by Collection </p></td>
                 <tr>
                   <td>node_fee_percentage</td>
                   <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>intent_sequence</td>
+                  <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -5587,6 +5788,15 @@ immediate direct payment </p></td>
                   <td><p>cw20 payments, can be empty or multiple </p></td>
                 </tr>
               
+                <tr>
+                  <td>is_oracle_payment</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>boolean to indicate if the payment is for oracle payments, aka it will go
+through network fees split NOTE: if true the payment can only have amount
+values(Native coins), no cw20 payments allowed then </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -5640,6 +5850,37 @@ immediate direct payment </p></td>
         
       
 
+      
+        <h3 id="ixo.claims.v1beta1.CollectionIntentOptions">CollectionIntentOptions</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ALLOW</td>
+                <td>0</td>
+                <td><p>Allow: Intents can be made for claims, but claims can also be made without
+intents.</p></td>
+              </tr>
+            
+              <tr>
+                <td>DENY</td>
+                <td>1</td>
+                <td><p>Deny: Intents cannot be made for claims for the collection.</p></td>
+              </tr>
+            
+              <tr>
+                <td>REQUIRED</td>
+                <td>2</td>
+                <td><p>Required: Claims cannot be made without an associated intent. An intent is
+mandatory before a claim can be submitted.</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
       
         <h3 id="ixo.claims.v1beta1.CollectionState">CollectionState</h3>
         <p></p>
@@ -5711,6 +5952,39 @@ immediate direct payment </p></td>
           </tbody>
         </table>
       
+        <h3 id="ixo.claims.v1beta1.IntentStatus">IntentStatus</h3>
+        <p></p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ACTIVE</td>
+                <td>0</td>
+                <td><p>Active: Intent is created and active, payments have been transferred to
+escrow if there is any</p></td>
+              </tr>
+            
+              <tr>
+                <td>FULFILLED</td>
+                <td>1</td>
+                <td><p>Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+be released on claim APPROVAL, or funds will be reverted on claim REJECTION
+or DISPUTE</p></td>
+              </tr>
+            
+              <tr>
+                <td>EXPIRED</td>
+                <td>2</td>
+                <td><p>Expired: Intent has expired, payments have been transferred back out of
+escrow</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
         <h3 id="ixo.claims.v1beta1.PaymentStatus">PaymentStatus</h3>
         <p></p>
         <table class="enum-table">
@@ -5728,37 +6002,37 @@ immediate direct payment </p></td>
               <tr>
                 <td>PROMISED</td>
                 <td>1</td>
-                <td><p>agent is contracted to receive payment</p></td>
+                <td><p>Promised: Agent is contracted to receive payment</p></td>
               </tr>
             
               <tr>
                 <td>AUTHORIZED</td>
                 <td>2</td>
-                <td><p>authz set up, no guarantee</p></td>
+                <td><p>Authorized: Authz set up, no guarantee</p></td>
               </tr>
             
               <tr>
                 <td>GUARANTEED</td>
                 <td>3</td>
-                <td><p>escrow set up with funds blocked</p></td>
+                <td><p>Guaranteed: Escrow set up with funds blocked</p></td>
               </tr>
             
               <tr>
                 <td>PAID</td>
                 <td>4</td>
-                <td><p></p></td>
+                <td><p>Paid: Funds have been paid</p></td>
               </tr>
             
               <tr>
                 <td>FAILED</td>
                 <td>5</td>
-                <td><p></p></td>
+                <td><p>Failed: Payment failed, most probably due to insufficient funds</p></td>
               </tr>
             
               <tr>
                 <td>DISPUTED_PAYMENT</td>
                 <td>6</td>
-                <td><p></p></td>
+                <td><p>DisputedPayment: Payment disputed</p></td>
               </tr>
             
           </tbody>
@@ -5956,6 +6230,30 @@ defined in Token payments </p></td>
                   <td><a href="#uint64">uint64</a></td>
                   <td></td>
                   <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>custom max_amount allowed to be specified by service agent for claim
+approval, if empty then no custom amount is allowed </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom max_cw20_payment allowed to be specified by service agent for claim
+approval, if empty then no custom amount is allowed </p></td>
+                </tr>
+              
+                <tr>
+                  <td>intent_duration_ns</td>
+                  <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
+                  <td></td>
+                  <td><p>intent_duration_ns is the duration for which the intent is active, after
+which it will expire (in nanoseconds) </p></td>
                 </tr>
               
             </tbody>
@@ -6236,6 +6534,54 @@ plus the timeout on Collection payments, if null then none </p></td>
 
         
       
+        <h3 id="ixo.claims.v1beta1.IntentSubmittedEvent">IntentSubmittedEvent</h3>
+        <p>IntentSubmittedEvent is an event triggered on an Intent submission</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>intent</td>
+                  <td><a href="#ixo.claims.v1beta1.Intent">Intent</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.IntentUpdatedEvent">IntentUpdatedEvent</h3>
+        <p>IntentUpdatedEvent is an event triggered on an Intent update</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>intent</td>
+                  <td><a href="#ixo.claims.v1beta1.Intent">Intent</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.claims.v1beta1.PaymentWithdrawCreatedEvent">PaymentWithdrawCreatedEvent</h3>
         <p>ClaimDisputedEvent is an event triggered on a Claim dispute</p>
 
@@ -6332,6 +6678,13 @@ plus the timeout on Collection payments, if null then none </p></td>
                 <tr>
                   <td>disputes</td>
                   <td><a href="#ixo.claims.v1beta1.Dispute">Dispute</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>intents</td>
+                  <td><a href="#ixo.claims.v1beta1.Intent">Intent</a></td>
                   <td>repeated</td>
                   <td><p> </p></td>
                 </tr>
@@ -6666,6 +7019,123 @@ plus the timeout on Collection payments, if null then none </p></td>
 
         
       
+        <h3 id="ixo.claims.v1beta1.QueryIntentListRequest">QueryIntentListRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>pagination</td>
+                  <td><a href="#cosmos.base.query.v1beta1.PageRequest">cosmos.base.query.v1beta1.PageRequest</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryIntentListResponse">QueryIntentListResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>intents</td>
+                  <td><a href="#ixo.claims.v1beta1.Intent">Intent</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pagination</td>
+                  <td><a href="#cosmos.base.query.v1beta1.PageResponse">cosmos.base.query.v1beta1.PageResponse</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryIntentRequest">QueryIntentRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>agentAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collectionId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryIntentResponse">QueryIntentResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>intent</td>
+                  <td><a href="#ixo.claims.v1beta1.Intent">Intent</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.claims.v1beta1.QueryParamsRequest">QueryParamsRequest</h3>
         <p></p>
 
@@ -6760,6 +7230,20 @@ plus the timeout on Collection payments, if null then none </p></td>
                 <td><p></p></td>
               </tr>
             
+              <tr>
+                <td>Intent</td>
+                <td><a href="#ixo.claims.v1beta1.QueryIntentRequest">QueryIntentRequest</a></td>
+                <td><a href="#ixo.claims.v1beta1.QueryIntentResponse">QueryIntentResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>IntentList</td>
+                <td><a href="#ixo.claims.v1beta1.QueryIntentListRequest">QueryIntentListRequest</a></td>
+                <td><a href="#ixo.claims.v1beta1.QueryIntentListResponse">QueryIntentListResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
           </tbody>
         </table>
 
@@ -6848,6 +7332,26 @@ plus the timeout on Collection payments, if null then none </p></td>
               </tr>
               
             
+              
+              
+              <tr>
+                <td>Intent</td>
+                <td>GET</td>
+                <td>/ixo/intent/{agentAddress}/{collectionId}/{id}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>IntentList</td>
+                <td>GET</td>
+                <td>/ixo/intent</td>
+                <td></td>
+              </tr>
+              
+            
             </tbody>
           </table>
           
@@ -6859,6 +7363,92 @@ plus the timeout on Collection payments, if null then none </p></td>
       </div>
       <p></p>
 
+      
+        <h3 id="ixo.claims.v1beta1.MsgClaimIntent">MsgClaimIntent</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>agent_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The service agent&#39;s DID (Decentralized Identifier). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>agent_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The service agent&#39;s address (who submits this message). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>The id of the collection this intent is linked to. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: if both amount and cw20 amount are empty then default by Collection
+is used (APPROVAL payment). The desired claim amount, if any. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: if both amount and cw20 amount are empty then default by Collection
+is used (APPROVAL payment). The custom CW20 payment, if any. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgClaimIntentResponse">MsgClaimIntentResponse</h3>
+        <p>MsgClaimIntentResponse defines the response after submitting an intent.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>intent_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Resulting intent id. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>expire_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Timeout period for the intent. If the claim is not submitted by this time,
+the intent expires. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
       
         <h3 id="ixo.claims.v1beta1.MsgCreateCollection">MsgCreateCollection</h3>
         <p></p>
@@ -6926,6 +7516,14 @@ is allowed) </p></td>
                   <td></td>
                   <td><p>payments is the amount paid for claim submission, evaluation, approval, or
 rejection </p></td>
+                </tr>
+              
+                <tr>
+                  <td>intents</td>
+                  <td><a href="#ixo.claims.v1beta1.CollectionIntentOptions">CollectionIntentOptions</a></td>
+                  <td></td>
+                  <td><p>intents is the option for intents for this collection (allow, deny,
+required) </p></td>
                 </tr>
               
             </tbody>
@@ -7082,16 +7680,16 @@ was given (codes defined by evaluator) </p></td>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>custom amount specified by evaluator for claim approval, if empty list then
-use default by Collection </p></td>
+                  <td><p>NOTE: if both amount and cw20 amount are empty then use collection default
+custom amount specified by evaluator for claim approval </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>custom cw20 payments specified by evaluator for claim approval, if empty
-list then use default by Collection </p></td>
+                  <td><p>NOTE: if both amount and cw20 amount are empty then use collection default
+custom cw20 payments specified by evaluator for claim approval </p></td>
                 </tr>
               
             </tbody>
@@ -7151,6 +7749,33 @@ list then use default by Collection </p></td>
                   <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+                <tr>
+                  <td>use_intent</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>use_intent is the option for using intent for this claim if it exists and
+is active. NOTE: if use_intent is true then amount and cw20 amount are
+ignored and overriden with intent amounts. NOTE: if use_intent is true and
+there is no active intent then will error </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: if both amount and cw20_payment are empty then use default by
+Collection custom amount specified by service agent for claim approval </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>NOTE: if both amount and cw20 amount are empty then use default by
+Collection custom cw20 payments specified by service agent for claim
+approval </p></td>
                 </tr>
               
             </tbody>
@@ -7214,6 +7839,52 @@ is allowed) </p></td>
         
       
         <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse">MsgUpdateCollectionDatesResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionIntents">MsgUpdateCollectionIntents</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>intents</td>
+                  <td><a href="#ixo.claims.v1beta1.CollectionIntentOptions">CollectionIntentOptions</a></td>
+                  <td></td>
+                  <td><p>intents is the option for intents for this collection (allow, deny,
+required) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse">MsgUpdateCollectionIntentsResponse</h3>
         <p></p>
 
         
@@ -7475,6 +8146,20 @@ plus the timeout on Collection payments </p></td>
                 <td>UpdateCollectionPayments</td>
                 <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionPayments">MsgUpdateCollectionPayments</a></td>
                 <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse">MsgUpdateCollectionPaymentsResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionIntents</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionIntents">MsgUpdateCollectionIntents</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse">MsgUpdateCollectionIntentsResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>ClaimIntent</td>
+                <td><a href="#ixo.claims.v1beta1.MsgClaimIntent">MsgClaimIntent</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgClaimIntentResponse">MsgClaimIntentResponse</a></td>
                 <td><p></p></td>
               </tr>
             

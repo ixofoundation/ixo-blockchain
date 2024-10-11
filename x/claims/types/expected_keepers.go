@@ -30,8 +30,15 @@ type AuthzKeeper interface {
 type BankKeeper interface {
 	HasBalance(ctx context.Context, addr sdk.AccAddress, amt sdk.Coin) bool
 	InputOutputCoins(ctx context.Context, input banktypes.Input, outputs []banktypes.Output) error
+	SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) error
 }
 
 type WasmKeeper interface {
 	Execute(ctx sdk.Context, contractAddress sdk.AccAddress, caller sdk.AccAddress, msg []byte, coins sdk.Coins) ([]byte, error)
+}
+
+type AccountKeeper interface {
+	NewAccountWithAddress(context.Context, sdk.AccAddress) sdk.AccountI
+	GetAccount(context.Context, sdk.AccAddress) sdk.AccountI
+	SetAccount(context.Context, sdk.AccountI)
 }

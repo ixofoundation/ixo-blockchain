@@ -136,6 +136,13 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 	return cdc.MustMarshalJSON(am.keeper.ExportGenesis(ctx))
 }
 
+// EndBlock returns the end blocker for the bonds module. It returns no validator updates.
+func (am AppModule) EndBlock(context context.Context) error {
+	ctx := sdk.UnwrapSDKContext(context)
+	EndBlocker(ctx, am.keeper)
+	return nil
+}
+
 // ConsensusVersion is a sequence number for state-breaking change of the
 // module. It should be incremented on each consensus-breaking change
 // introduced by the module. To avoid wrong/empty versions, the initial version

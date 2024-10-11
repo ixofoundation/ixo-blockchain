@@ -24,6 +24,9 @@ service Msg {
       returns (MsgUpdateCollectionDatesResponse);
   rpc UpdateCollectionPayments(MsgUpdateCollectionPayments)
       returns (MsgUpdateCollectionPaymentsResponse);
+  rpc UpdateCollectionIntents(MsgUpdateCollectionIntents)
+      returns (MsgUpdateCollectionIntentsResponse);
+  rpc ClaimIntent(MsgClaimIntent) returns (MsgClaimIntentResponse);
 }
 
 message MsgCreateCollection {
@@ -47,8 +50,10 @@ message MsgCreateCollection {
   // payments is the amount paid for claim submission, evaluation, approval, or
   // rejection
   Payments payments = 8;
+  // intents is the option for intents for this collection (allow, deny,
+  // required)
+  CollectionIntentOptions intents = 9;
 }
-
 message MsgCreateCollectionResponse {}
 
 message MsgSubmitClaim {
@@ -66,8 +71,22 @@ message MsgSubmitClaim {
   string agent_address = 4;
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 5;
+  // use_intent is the option for using intent for this claim if it exists and
+  // is active. NOTE: if use_intent is true then amount and cw20 amount are
+  // ignored and overriden with intent amounts. NOTE: if use_intent is true and
+  // there is no active intent then will error
+  bool use_intent = 6;
+  // NOTE: if both amount and cw20_payment are empty then use default by
+  // Collection custom amount specified by service agent for claim approval
+  repeated cosmos.base.v1beta1.Coin amount = 7 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // NOTE: if both amount and cw20 amount are empty then use default by
+  // Collection custom cw20 payments specified by service agent for claim
+  // approval
+  repeated CW20Payment cw20_payment = 8;
 }
-
 message MsgSubmitClaimResponse {}
 
 message MsgEvaluateClaim {
@@ -95,17 +114,18 @@ message MsgEvaluateClaim {
   uint32 reason = 8;
   // verificationProof is the cid of the evaluation Verfiable Credential
   string verification_proof = 9;
-  // custom amount specified by evaluator for claim approval, if empty list then
-  // use default by Collection
+  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts
+  // NOTE: if both amount and cw20 amount are empty then use collection default
+  // custom amount specified by evaluator for claim approval
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // custom cw20 payments specified by evaluator for claim approval, if empty
-  // list then use default by Collection
+  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts
+  // NOTE: if both amount and cw20 amount are empty then use collection default
+  // custom cw20 payments specified by evaluator for claim approval
   repeated CW20Payment cw20_payment = 11;
 }
-
 message MsgEvaluateClaimResponse {}
 
 // Agent laying dispute must be admin for Collection, or controller on
@@ -127,7 +147,6 @@ message MsgDisputeClaim {
   int32 dispute_type = 4;
   DisputeData data = 5;
 }
-
 message MsgDisputeClaimResponse {}
 
 message MsgWithdrawPayment {
@@ -158,7 +177,6 @@ message MsgWithdrawPayment {
   // cw20 payments, can be empty or multiple
   repeated CW20Payment cw20_payment = 10;
 }
-
 message MsgWithdrawPaymentResponse {}
 
 message MsgUpdateCollectionState {
@@ -172,7 +190,6 @@ message MsgUpdateCollectionState {
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 3;
 }
-
 message MsgUpdateCollectionStateResponse {}
 
 message MsgUpdateCollectionDates {
@@ -188,7 +205,6 @@ message MsgUpdateCollectionDates {
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 4;
 }
-
 message MsgUpdateCollectionDatesResponse {}
 
 message MsgUpdateCollectionPayments {
@@ -202,5 +218,49 @@ message MsgUpdateCollectionPayments {
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 3;
 }
-
 message MsgUpdateCollectionPaymentsResponse {}
+
+message MsgUpdateCollectionIntents {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
+  // collection_id indicates which Collection to update
+  string collection_id = 1;
+  // intents is the option for intents for this collection (allow, deny,
+  // required)
+  CollectionIntentOptions intents = 2;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 3;
+}
+message MsgUpdateCollectionIntentsResponse {}
+
+message MsgClaimIntent {
+  option (cosmos.msg.v1.signer) = "agent_address";
+
+  // The service agent's DID (Decentralized Identifier).
+  string agent_did = 1 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+  ];
+  // The service agent's address (who submits this message).
+  string agent_address = 2;
+  // The id of the collection this intent is linked to.
+  string collection_id = 3;
+  // NOTE: if both amount and cw20 amount are empty then default by Collection
+  // is used (APPROVAL payment). The desired claim amount, if any.
+  repeated cosmos.base.v1beta1.Coin amount = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // NOTE: if both amount and cw20 amount are empty then default by Collection
+  // is used (APPROVAL payment). The custom CW20 payment, if any.
+  repeated CW20Payment cw20_payment = 5;
+}
+
+// MsgClaimIntentResponse defines the response after submitting an intent.
+message MsgClaimIntentResponse {
+  // Resulting intent id.
+  string intent_id = 1;
+  // Timeout period for the intent. If the claim is not submitted by this time,
+  // the intent expires.
+  google.protobuf.Timestamp expire_at = 2 [ (gogoproto.stdtime) = true ];
+}

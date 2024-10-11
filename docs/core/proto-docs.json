@@ -3969,6 +3969,29 @@
       "hasServices": false,
       "enums": [
         {
+          "name": "CollectionIntentOptions",
+          "longName": "CollectionIntentOptions",
+          "fullName": "ixo.claims.v1beta1.CollectionIntentOptions",
+          "description": "",
+          "values": [
+            {
+              "name": "ALLOW",
+              "number": "0",
+              "description": "Allow: Intents can be made for claims, but claims can also be made without\nintents."
+            },
+            {
+              "name": "DENY",
+              "number": "1",
+              "description": "Deny: Intents cannot be made for claims for the collection."
+            },
+            {
+              "name": "REQUIRED",
+              "number": "2",
+              "description": "Required: Claims cannot be made without an associated intent. An intent is\nmandatory before a claim can be submitted."
+            }
+          ]
+        },
+        {
           "name": "CollectionState",
           "longName": "CollectionState",
           "fullName": "ixo.claims.v1beta1.CollectionState",
@@ -4025,6 +4048,29 @@
           ]
         },
         {
+          "name": "IntentStatus",
+          "longName": "IntentStatus",
+          "fullName": "ixo.claims.v1beta1.IntentStatus",
+          "description": "",
+          "values": [
+            {
+              "name": "ACTIVE",
+              "number": "0",
+              "description": "Active: Intent is created and active, payments have been transferred to\nescrow if there is any"
+            },
+            {
+              "name": "FULFILLED",
+              "number": "1",
+              "description": "Fulfilled: Intent is fulfilled, was used to create a claim and funds will\nbe released on claim APPROVAL, or funds will be reverted on claim REJECTION\nor DISPUTE"
+            },
+            {
+              "name": "EXPIRED",
+              "number": "2",
+              "description": "Expired: Intent has expired, payments have been transferred back out of\nescrow"
+            }
+          ]
+        },
+        {
           "name": "PaymentStatus",
           "longName": "PaymentStatus",
           "fullName": "ixo.claims.v1beta1.PaymentStatus",
@@ -4038,32 +4084,32 @@
             {
               "name": "PROMISED",
               "number": "1",
-              "description": "agent is contracted to receive payment"
+              "description": "Promised: Agent is contracted to receive payment"
             },
             {
               "name": "AUTHORIZED",
               "number": "2",
-              "description": "authz set up, no guarantee"
+              "description": "Authorized: Authz set up, no guarantee"
             },
             {
               "name": "GUARANTEED",
               "number": "3",
-              "description": "escrow set up with funds blocked"
+              "description": "Guaranteed: Escrow set up with funds blocked"
             },
             {
               "name": "PAID",
               "number": "4",
-              "description": ""
+              "description": "Paid: Funds have been paid"
             },
             {
               "name": "FAILED",
               "number": "5",
-              "description": ""
+              "description": "Failed: Payment failed, most probably due to insufficient funds"
             },
             {
               "name": "DISPUTED_PAYMENT",
               "number": "6",
-              "description": ""
+              "description": "DisputedPayment: Payment disputed"
             }
           ]
         },
@@ -4218,11 +4264,47 @@
             },
             {
               "name": "payments_status",
-              "description": "",
+              "description": "payments_status is the status of the payments for the claim",
               "label": "",
               "type": "ClaimPayments",
               "longType": "ClaimPayments",
               "fullType": "ixo.claims.v1beta1.ClaimPayments",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "use_intent",
+              "description": "intent_id is the id of the intent for this claim, if any",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "NOTE: if both amount and cw20 amount are empty then use default by\nCollection custom amount specified by service agent for claim approval",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "NOTE: if both amount and cw20 amount are empty then use default by\nCollection custom cw20 payments specified by service agent for claim\napproval",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -4487,6 +4569,30 @@
               "type": "uint64",
               "longType": "uint64",
               "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "escrow_account",
+              "description": "escrow_account is the escrow account address for this collection created at\ncollection creation, current purpose is to transfer payments to escrow\naccount for GUARANTEED payments through intents",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intents",
+              "description": "intents is the option for intents for this collection (allow, deny,\nrequired)",
+              "label": "",
+              "type": "CollectionIntentOptions",
+              "longType": "CollectionIntentOptions",
+              "fullType": "ixo.claims.v1beta1.CollectionIntentOptions",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -4770,7 +4876,7 @@
             },
             {
               "name": "amount",
-              "description": "custom amount specified by evaluator for claim approval, if empty list then\nuse default by Collection",
+              "description": "if both amount and cw20 amount are empty then use default by Collection\ncustom amount specified by evaluator for claim approval",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -4782,11 +4888,167 @@
             },
             {
               "name": "cw20_payment",
-              "description": "custom cw20 payments specified by evaluator for claim approval, if empty\nlist then use default by Collection",
+              "description": "custom cw20 payments specified by evaluator for claim approval",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Intent",
+          "longName": "Intent",
+          "fullName": "ixo.claims.v1beta1.Intent",
+          "description": "Intent defines the structure for a service agent's claim intent.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "id is the incremented internal id for the intent",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_did",
+              "description": "The service agent's DID (Decentralized Identifier).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "The service agent's address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection_id",
+              "description": "The id of the collection this intent is linked to.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "claim_id",
+              "description": "claim_id (optional, set when claim is submitted)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "created_at",
+              "description": "The time the intent was created.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "expire_at",
+              "description": "Timeout period for the intent. If the claim is not submitted by this time,\nthe intent expires.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "Status of the intent (e.g., \"ACTIVE\" or \"FULFILLED\").",
+              "label": "",
+              "type": "IntentStatus",
+              "longType": "IntentStatus",
+              "fullType": "ixo.claims.v1beta1.IntentStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "The payment amount the agent intends to claim, if any.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "The CW20Payment amount the agent intends to claim, if any.",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "from_address",
+              "description": "the address the escrow payment came from",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "escrow_address",
+              "description": "the escrow account address",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -4847,6 +5109,18 @@
               "type": "string",
               "longType": "string",
               "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intent_sequence",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -4919,6 +5193,18 @@
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "is_oracle_payment",
+              "description": "boolean to indicate if the payment is for oracle payments, aka it will go\nthrough network fees split NOTE: if true the payment can only have amount\nvalues(Native coins), no cw20 payments allowed then",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5185,6 +5471,42 @@
               "type": "uint64",
               "longType": "uint64",
               "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_amount",
+              "description": "custom max_amount allowed to be specified by service agent for claim\napproval, if empty then no custom amount is allowed",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_cw20_payment",
+              "description": "custom max_cw20_payment allowed to be specified by service agent for claim\napproval, if empty then no custom amount is allowed",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intent_duration_ns",
+              "description": "intent_duration_ns is the duration for which the intent is active, after\nwhich it will expire (in nanoseconds)",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5507,6 +5829,54 @@
           ]
         },
         {
+          "name": "IntentSubmittedEvent",
+          "longName": "IntentSubmittedEvent",
+          "fullName": "ixo.claims.v1beta1.IntentSubmittedEvent",
+          "description": "IntentSubmittedEvent is an event triggered on an Intent submission",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "intent",
+              "description": "",
+              "label": "",
+              "type": "Intent",
+              "longType": "Intent",
+              "fullType": "ixo.claims.v1beta1.Intent",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "IntentUpdatedEvent",
+          "longName": "IntentUpdatedEvent",
+          "fullName": "ixo.claims.v1beta1.IntentUpdatedEvent",
+          "description": "IntentUpdatedEvent is an event triggered on an Intent update",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "intent",
+              "description": "",
+              "label": "",
+              "type": "Intent",
+              "longType": "Intent",
+              "fullType": "ixo.claims.v1beta1.Intent",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "PaymentWithdrawCreatedEvent",
           "longName": "PaymentWithdrawCreatedEvent",
           "fullName": "ixo.claims.v1beta1.PaymentWithdrawCreatedEvent",
@@ -5621,6 +5991,18 @@
               "type": "Dispute",
               "longType": "Dispute",
               "fullType": "ixo.claims.v1beta1.Dispute",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intents",
+              "description": "",
+              "label": "repeated",
+              "type": "Intent",
+              "longType": "Intent",
+              "fullType": "ixo.claims.v1beta1.Intent",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5967,6 +6349,138 @@
           ]
         },
         {
+          "name": "QueryIntentListRequest",
+          "longName": "QueryIntentListRequest",
+          "fullName": "ixo.claims.v1beta1.QueryIntentListRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryIntentListResponse",
+          "longName": "QueryIntentListResponse",
+          "fullName": "ixo.claims.v1beta1.QueryIntentListResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "intents",
+              "description": "",
+              "label": "repeated",
+              "type": "Intent",
+              "longType": "Intent",
+              "fullType": "ixo.claims.v1beta1.Intent",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryIntentRequest",
+          "longName": "QueryIntentRequest",
+          "fullName": "ixo.claims.v1beta1.QueryIntentRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agentAddress",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collectionId",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryIntentResponse",
+          "longName": "QueryIntentResponse",
+          "fullName": "ixo.claims.v1beta1.QueryIntentResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "intent",
+              "description": "",
+              "label": "",
+              "type": "Intent",
+              "longType": "Intent",
+              "fullType": "ixo.claims.v1beta1.Intent",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "QueryParamsRequest",
           "longName": "QueryParamsRequest",
           "fullName": "ixo.claims.v1beta1.QueryParamsRequest",
@@ -6162,6 +6676,50 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "Intent",
+              "description": "",
+              "requestType": "QueryIntentRequest",
+              "requestLongType": "QueryIntentRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryIntentRequest",
+              "requestStreaming": false,
+              "responseType": "QueryIntentResponse",
+              "responseLongType": "QueryIntentResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryIntentResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/intent/{agentAddress}/{collectionId}/{id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "IntentList",
+              "description": "",
+              "requestType": "QueryIntentListRequest",
+              "requestLongType": "QueryIntentListRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryIntentListRequest",
+              "requestStreaming": false,
+              "responseType": "QueryIntentListResponse",
+              "responseLongType": "QueryIntentListResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryIntentListResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/intent"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
@@ -6178,6 +6736,114 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "MsgClaimIntent",
+          "longName": "MsgClaimIntent",
+          "fullName": "ixo.claims.v1beta1.MsgClaimIntent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "agent_did",
+              "description": "The service agent's DID (Decentralized Identifier).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "The service agent's address (who submits this message).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection_id",
+              "description": "The id of the collection this intent is linked to.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "NOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment). The desired claim amount, if any.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "NOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment). The custom CW20 payment, if any.",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgClaimIntentResponse",
+          "longName": "MsgClaimIntentResponse",
+          "fullName": "ixo.claims.v1beta1.MsgClaimIntentResponse",
+          "description": "MsgClaimIntentResponse defines the response after submitting an intent.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "intent_id",
+              "description": "Resulting intent id.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "expire_at",
+              "description": "Timeout period for the intent. If the claim is not submitted by this time,\nthe intent expires.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "MsgCreateCollection",
           "longName": "MsgCreateCollection",
@@ -6279,6 +6945,18 @@
               "type": "Payments",
               "longType": "Payments",
               "fullType": "ixo.claims.v1beta1.Payments",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intents",
+              "description": "intents is the option for intents for this collection (allow, deny,\nrequired)",
+              "label": "",
+              "type": "CollectionIntentOptions",
+              "longType": "CollectionIntentOptions",
+              "fullType": "ixo.claims.v1beta1.CollectionIntentOptions",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6500,7 +7178,7 @@
             },
             {
               "name": "amount",
-              "description": "custom amount specified by evaluator for claim approval, if empty list then\nuse default by Collection",
+              "description": "NOTE: if both amount and cw20 amount are empty then use collection default\ncustom amount specified by evaluator for claim approval",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -6512,7 +7190,7 @@
             },
             {
               "name": "cw20_payment",
-              "description": "custom cw20 payments specified by evaluator for claim approval, if empty\nlist then use default by Collection",
+              "description": "NOTE: if both amount and cw20 amount are empty then use collection default\ncustom cw20 payments specified by evaluator for claim approval",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -6604,6 +7282,42 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "use_intent",
+              "description": "use_intent is the option for using intent for this claim if it exists and\nis active. NOTE: if use_intent is true then amount and cw20 amount are\nignored and overriden with intent amounts. NOTE: if use_intent is true and\nthere is no active intent then will error",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "NOTE: if both amount and cw20_payment are empty then use default by\nCollection custom amount specified by service agent for claim approval",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_payment",
+              "description": "NOTE: if both amount and cw20 amount are empty then use default by\nCollection custom cw20 payments specified by service agent for claim\napproval",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -6682,6 +7396,65 @@
           "name": "MsgUpdateCollectionDatesResponse",
           "longName": "MsgUpdateCollectionDatesResponse",
           "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateCollectionIntents",
+          "longName": "MsgUpdateCollectionIntents",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionIntents",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates which Collection to update",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intents",
+              "description": "intents is the option for intents for this collection (allow, deny,\nrequired)",
+              "label": "",
+              "type": "CollectionIntentOptions",
+              "longType": "CollectionIntentOptions",
+              "fullType": "ixo.claims.v1beta1.CollectionIntentOptions",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateCollectionIntentsResponse",
+          "longName": "MsgUpdateCollectionIntentsResponse",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse",
           "description": "",
           "hasExtensions": false,
           "hasFields": false,
@@ -7052,6 +7825,30 @@
               "responseType": "MsgUpdateCollectionPaymentsResponse",
               "responseLongType": "MsgUpdateCollectionPaymentsResponse",
               "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateCollectionIntents",
+              "description": "",
+              "requestType": "MsgUpdateCollectionIntents",
+              "requestLongType": "MsgUpdateCollectionIntents",
+              "requestFullType": "ixo.claims.v1beta1.MsgUpdateCollectionIntents",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateCollectionIntentsResponse",
+              "responseLongType": "MsgUpdateCollectionIntentsResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "ClaimIntent",
+              "description": "",
+              "requestType": "MsgClaimIntent",
+              "requestLongType": "MsgClaimIntent",
+              "requestFullType": "ixo.claims.v1beta1.MsgClaimIntent",
+              "requestStreaming": false,
+              "responseType": "MsgClaimIntentResponse",
+              "responseLongType": "MsgClaimIntentResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgClaimIntentResponse",
               "responseStreaming": false
             }
           ]

@@ -44,6 +44,17 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "proof"}},
 				},
 				{
+					RpcMethod: "IntentList",
+					Use:       "intent-list",
+					Short:     "Query for all intents",
+				},
+				{
+					RpcMethod:      "Intent",
+					Use:            "intent [agent-address] [collection-id] [id]",
+					Short:          "Query for an intent",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "agentAddress"}, {ProtoField: "collectionId"}, {ProtoField: "id"}},
+				},
+				{
 					RpcMethod: "Params",
 					Use:       "params",
 					Short:     "Query the current claims parameters",

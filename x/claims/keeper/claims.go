@@ -1,11 +1,16 @@
 package keeper
 
 import (
+	"fmt"
+
 	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/cw20"
 )
 
 func (k Keeper) SetCollection(ctx sdk.Context, data types.Collection) {
@@ -37,6 +42,8 @@ func (k Keeper) Marshal(value interface{}) (bytes []byte) {
 	case types.Claim:
 		bytes = k.cdc.MustMarshal(&value)
 	case types.Dispute:
+		bytes = k.cdc.MustMarshal(&value)
+	case types.Intent:
 		bytes = k.cdc.MustMarshal(&value)
 	}
 	return
@@ -147,4 +154,187 @@ func (k Keeper) GetDisputes(ctx sdk.Context) []types.Dispute {
 	}
 
 	return disputes
+}
+
+// SetIntent stores the intent in the KV store with the generated key format.
+func (k Keeper) SetIntent(ctx sdk.Context, data types.Intent) {
+	key := types.IntentKeyCreate(data.AgentAddress, data.CollectionId, data.Id)
+
+	k.Set(ctx, key, types.IntentKey, data, k.Marshal)
+}
+
+// GetIntent retrieves an intent from the KV store using the generated key.
+func (k Keeper) GetIntent(ctx sdk.Context, agentAddress, collectionId, intentID string) (types.Intent, error) {
+	key := types.IntentKeyCreate(agentAddress, collectionId, intentID)
+
+	// Retrieve the intent from the store
+	val, found := k.Get(ctx, key, types.IntentKey, k.UnmarshalIntent)
+	if !found {
+		return types.Intent{}, errorsmod.Wrapf(types.ErrIntentNotFound, "for id %s", intentID)
+	}
+	intent, ok := val.(types.Intent)
+	if !ok {
+		return types.Intent{}, errorsmod.Wrapf(types.ErrIntentNotFound, "for id %s", intentID)
+	}
+	return intent, nil
+}
+
+func (k Keeper) GetIntents(ctx sdk.Context) []types.Intent {
+	var intents []types.Intent
+	iterator := k.GetAll(ctx, types.IntentKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var intent types.Intent
+		k.Unmarshal(iterator.Value(), &intent)
+		intents = append(intents, intent)
+	}
+	return intents
+}
+
+func (k Keeper) UnmarshalIntent(value []byte) (interface{}, bool) {
+	data := types.Intent{}
+	k.Unmarshal(value, &data)
+	return data, types.IsValidIntent(&data)
+}
+
+func (k Keeper) GetAllUserCollectionIntents(ctx sdk.Context, agentAddress, collectionId string) []types.Intent {
+	var intents []types.Intent
+
+	prefix := []byte(agentAddress + "/" + collectionId + "/")
+	iterator := k.GetAll(ctx, append(types.IntentKey, prefix...))
+	defer iterator.Close()
+
+	for ; iterator.Valid(); iterator.Next() {
+		var intent types.Intent
+		k.Unmarshal(iterator.Value(), &intent)
+		intents = append(intents, intent)
+	}
+
+	return intents
+}
+
+// GetActiveIntent retrieves agents current intents for the collection, and returns the first intent if exists
+func (k Keeper) GetActiveIntent(ctx sdk.Context, agentAddress, collectionId string) (types.Intent, bool) {
+	intents := k.GetAllUserCollectionIntents(ctx, agentAddress, collectionId)
+	if len(intents) == 0 {
+		return types.Intent{}, false
+	}
+	k.Logger(ctx).Info("intents", "intent", intents)
+	k.Logger(ctx).Info("intent", "intent", intents[0])
+	return intents[0], true
+}
+
+// RemoveIntentAndEmitEvents removes the intent from the KV store and emits the event as IntentUpdated
+// for offchain indexers, Intent status will always change on removal so safe to always emit UpdateIntent event
+func (k Keeper) RemoveIntentAndEmitEvents(ctx sdk.Context, intent types.Intent) error {
+	// first remove the intent from the KV store
+	key := types.IntentKeyCreate(intent.AgentAddress, intent.CollectionId, intent.Id)
+	k.Delete(ctx, key, types.IntentKey)
+
+	// then emit events for intent update for offchain indexers
+	if err := ctx.EventManager().EmitTypedEvent(
+		&types.IntentUpdatedEvent{
+			Intent: &intent,
+		},
+	); err != nil {
+		return err
+	}
+	return nil
+}
+
+// TransferCW20Payment transfers CW20 payments to the recipient address.
+func (k Keeper) TransferCW20Payment(ctx sdk.Context, fromAddress, toAddress sdk.AccAddress, payment *types.CW20Payment) error {
+	// make the payments if amount is not 0
+	if payment.Amount == 0 {
+		return nil
+	}
+
+	encodedTransferMessage, err := cw20.Marshal(cw20.WasmTransfer{
+		Transfer: cw20.Transfer{
+			Recipient: toAddress.String(),
+			Amount:    fmt.Sprint(payment.Amount),
+		},
+	})
+	if err != nil {
+		return err
+	}
+
+	contractAddress, err := sdk.AccAddressFromBech32(payment.Address)
+	if err != nil {
+		return err
+	}
+
+	_, err = k.WasmKeeper.Execute(
+		ctx,
+		contractAddress,
+		fromAddress,
+		encodedTransferMessage,
+		sdk.NewCoins(sdk.NewCoin("uixo", math.ZeroInt())),
+	)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// TransferIntentPayments transfers payments, both native coins and CW20 payments, to the recipient address.
+func (k Keeper) TransferIntentPayments(ctx sdk.Context, fromAddress, toAddress sdk.AccAddress, amount sdk.Coins, cw20Payments []*types.CW20Payment) error {
+	// transfer native coins
+	if len(amount) > 0 {
+		// clear any Coin with amount 0, generally validation will already block this,
+		// but we allow it to know when to use collection defaults or when to have no payments, aka amount 0.
+		cleanedAmount := sdk.Coins{}
+		for _, coin := range amount {
+			if coin.Amount.IsPositive() {
+				cleanedAmount = append(cleanedAmount, coin)
+			}
+		}
+
+		err := k.BankKeeper.SendCoins(ctx, fromAddress, toAddress, cleanedAmount)
+		if err != nil {
+			return err
+		}
+	}
+
+	// transfer CW20 payments
+	for _, payment := range cw20Payments {
+		if payment.Amount != 0 {
+			err := k.TransferCW20Payment(ctx, fromAddress, toAddress, payment)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// Create a module account for entity id and name of account as fragemnt in form: did#name
+func (k Keeper) CreateNewCollectionEscrow(ctx sdk.Context, collectionId string) (sdk.AccAddress, error) {
+	address := types.GetModuleAccountAddressEscrow(collectionId)
+
+	if k.AccountKeeper.GetAccount(ctx, address) != nil {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
+	}
+
+	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
+	k.AccountKeeper.SetAccount(ctx, account)
+
+	return account.GetAddress(), nil
+}
+
+// CollectionPersistAndEmitEvents persists the collection and emits the events.
+func (k Keeper) CollectionPersistAndEmitEvents(ctx sdk.Context, collection types.Collection) error {
+	// persist the Collection
+	k.SetCollection(ctx, collection)
+
+	// emit the events
+	if err := ctx.EventManager().EmitTypedEvent(
+		&types.CollectionCreatedEvent{
+			Collection: &collection,
+		},
+	); err != nil {
+		return err
+	}
+
+	return nil
 }
