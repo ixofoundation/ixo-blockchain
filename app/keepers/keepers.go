@@ -72,7 +72,6 @@ import (
 	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
 	ibctransferkeeper "github.com/cosmos/ibc-go/v8/modules/apps/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	ibcclient "github.com/cosmos/ibc-go/v8/modules/core/02-client"
 	ibcclienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 	ibcconnectiontypes "github.com/cosmos/ibc-go/v8/modules/core/03-connection/types"
 	porttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
@@ -562,9 +561,7 @@ func NewAppKeepers(
 	govRouter.AddRoute(govtypes.RouterKey, govtypesv1.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, sdkparams.NewParamChangeProposalHandler(appKeepers.ParamsKeeper)).
 		AddRoute(entitytypes.RouterKey, entitykeeper.NewEntityProposalHandler(appKeepers.EntityKeeper)).
-		AddRoute(tokentypes.RouterKey, tokenkeeper.NewTokenProposalHandler(appKeepers.TokenKeeper)).
-		// leaving legacy gov proposal handler for client updates, will remove in future
-		AddRoute(ibcclienttypes.RouterKey, ibcclient.NewClientProposalHandler(appKeepers.IBCKeeper.ClientKeeper)) // nolint
+		AddRoute(tokentypes.RouterKey, tokenkeeper.NewTokenProposalHandler(appKeepers.TokenKeeper))
 
 	govConfig := govtypes.DefaultConfig()
 	// set the MaxMetadataLen for proposals to the same value as it was pre-sdk v0.47.x

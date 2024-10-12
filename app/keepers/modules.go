@@ -36,11 +36,13 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/entity"
+	entityclient "github.com/ixofoundation/ixo-blockchain/v3/x/entity/client"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/epochs"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/iid"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/mint"
 	smartaccount "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/token"
+	tokenclient "github.com/ixofoundation/ixo-blockchain/v3/x/token/client"
 )
 
 // AppModuleBasics returns ModuleBasics for the module BasicManager.
@@ -55,6 +57,8 @@ var AppModuleBasics = module.NewBasicManager(
 	gov.NewAppModuleBasic(
 		[]govclient.ProposalHandler{
 			paramsclient.ProposalHandler,
+			entityclient.ProposalHandler,
+			tokenclient.ProposalHandler,
 		},
 	),
 	params.AppModuleBasic{},

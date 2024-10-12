@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -55,13 +56,14 @@ import (
 // NewRootCmd creates a new root command for simd. It is called once in the main function.
 func NewRootCmd() *cobra.Command {
 	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
+	tempDir := tempDir()
 	tempApp := app.NewIxoApp(
 		log.NewNopLogger(),
 		cosmosdb.NewMemDB(),
 		nil,
 		true,
 		map[int64]bool{},
-		app.DefaultNodeHome,
+		tempDir,
 		sims.EmptyAppOptions{},
 		app.EmptyWasmOpts,
 	)
@@ -69,6 +71,9 @@ func NewRootCmd() *cobra.Command {
 	defer func() {
 		if err := tempApp.Close(); err != nil {
 			panic(err)
+		}
+		if tempDir != app.DefaultNodeHome {
+			os.RemoveAll(tempDir)
 		}
 	}()
 
@@ -142,12 +147,22 @@ func NewRootCmd() *cobra.Command {
 	// add keyring to autocli opts
 	autoCliOpts := tempApp.AutoCliOpts()
 	autoCliOpts.ClientCtx = initClientCtx
-
 	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
 		panic(err)
 	}
 
 	return rootCmd
+}
+
+// tempDir create a temporary directory to initialize the command line client
+func tempDir() string {
+	dir, err := os.MkdirTemp("", "ixod")
+	if err != nil {
+		panic(fmt.Sprintf("failed creating temp directory: %s", err.Error()))
+	}
+	defer os.RemoveAll(dir)
+
+	return dir
 }
 
 // initCometBFTConfig helps to override default CometBFT Config values.
