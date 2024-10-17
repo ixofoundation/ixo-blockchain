@@ -7277,7 +7277,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>Collection</td>
                 <td>GET</td>
-                <td>/ixo/collection/{id}</td>
+                <td>/ixo/claims/collection/{id}</td>
                 <td></td>
               </tr>
               
@@ -7287,7 +7287,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>CollectionList</td>
                 <td>GET</td>
-                <td>/ixo/collection</td>
+                <td>/ixo/claims/collections</td>
                 <td></td>
               </tr>
               
@@ -7297,7 +7297,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>Claim</td>
                 <td>GET</td>
-                <td>/ixo/claim/{id}</td>
+                <td>/ixo/claims/claim/{id}</td>
                 <td></td>
               </tr>
               
@@ -7307,7 +7307,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>ClaimList</td>
                 <td>GET</td>
-                <td>/ixo/claim</td>
+                <td>/ixo/claims/claims</td>
                 <td></td>
               </tr>
               
@@ -7317,7 +7317,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>Dispute</td>
                 <td>GET</td>
-                <td>/ixo/dispute/{proof}</td>
+                <td>/ixo/claims/dispute/{proof}</td>
                 <td></td>
               </tr>
               
@@ -7327,7 +7327,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>DisputeList</td>
                 <td>GET</td>
-                <td>/ixo/dispute</td>
+                <td>/ixo/claims/disputes</td>
                 <td></td>
               </tr>
               
@@ -7337,7 +7337,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>Intent</td>
                 <td>GET</td>
-                <td>/ixo/intent/{agentAddress}/{collectionId}/{id}</td>
+                <td>/ixo/claims/intent/{agentAddress}/{collectionId}/{id}</td>
                 <td></td>
               </tr>
               
@@ -7347,7 +7347,7 @@ plus the timeout on Collection payments, if null then none </p></td>
               <tr>
                 <td>IntentList</td>
                 <td>GET</td>
-                <td>/ixo/intent</td>
+                <td>/ixo/claims/intents</td>
                 <td></td>
               </tr>
               
@@ -7680,16 +7680,20 @@ was given (codes defined by evaluator) </p></td>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20 amount are empty then use collection default
-custom amount specified by evaluator for claim approval </p></td>
+                  <td><p>NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+overriden with intent amounts NOTE: if both amount and cw20 amount are
+empty then use collection default custom amount specified by evaluator for
+claim approval </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20 amount are empty then use collection default
-custom cw20 payments specified by evaluator for claim approval </p></td>
+                  <td><p>NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+overriden with intent amounts NOTE: if both amount and cw20 amount are
+empty then use collection default custom cw20 payments specified by
+evaluator for claim approval </p></td>
                 </tr>
               
             </tbody>
@@ -12016,7 +12020,7 @@ started. (The block height at which the timer last ticked) </p></td>
               <tr>
                 <td>CurrentEpoch</td>
                 <td>GET</td>
-                <td>/ixo/epochs/v1beta1/current_epoch</td>
+                <td>/ixo/epochs/v1beta1/epochs/{identifier}</td>
                 <td></td>
               </tr>
               
@@ -12577,7 +12581,7 @@ begins. </p></td>
               
                 <tr>
                   <td>epoch_provisions</td>
-                  <td><a href="#bytes">bytes</a></td>
+                  <td><a href="#string">string</a></td>
                   <td></td>
                   <td><p>epoch_provisions is the current minting per epoch provisions value. </p></td>
                 </tr>

@@ -17,7 +17,7 @@ service Query {
   // CurrentEpoch provide current epoch of specified identifier
   rpc CurrentEpoch(QueryCurrentEpochRequest)
       returns (QueryCurrentEpochResponse) {
-    option (google.api.http).get = "/ixo/epochs/v1beta1/current_epoch";
+    option (google.api.http).get = "/ixo/epochs/v1beta1/epochs/{identifier}";
   }
 }
 

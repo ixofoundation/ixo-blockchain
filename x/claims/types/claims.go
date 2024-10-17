@@ -310,3 +310,17 @@ func ValidateCoinsAllowZero(coins sdk.Coins) error {
 		return nil
 	}
 }
+
+// Create a module account for entity id and name of account as fragemnt in form: did#name
+func CreateNewCollectionEscrow(ctx sdk.Context, accKeeper AccountKeeper, collectionId string) (sdk.AccAddress, error) {
+	address := GetModuleAccountAddressEscrow(collectionId)
+
+	if accKeeper.GetAccount(ctx, address) != nil {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
+	}
+
+	account := accKeeper.NewAccountWithAddress(ctx, address)
+	accKeeper.SetAccount(ctx, account)
+
+	return account.GetAddress(), nil
+}

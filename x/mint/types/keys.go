@@ -5,7 +5,7 @@ const (
 	ModuleName = "mint"
 
 	// StoreKey is the default store key for mint.
-	StoreKey = ModuleName
+	StoreKey = ModuleName + "-store"
 )
 
 var (

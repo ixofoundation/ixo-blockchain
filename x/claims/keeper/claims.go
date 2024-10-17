@@ -8,7 +8,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/cw20"
 )
@@ -308,20 +307,6 @@ func (k Keeper) TransferIntentPayments(ctx sdk.Context, fromAddress, toAddress s
 	return nil
 }
 
-// Create a module account for entity id and name of account as fragemnt in form: did#name
-func (k Keeper) CreateNewCollectionEscrow(ctx sdk.Context, collectionId string) (sdk.AccAddress, error) {
-	address := types.GetModuleAccountAddressEscrow(collectionId)
-
-	if k.AccountKeeper.GetAccount(ctx, address) != nil {
-		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
-	}
-
-	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
-	k.AccountKeeper.SetAccount(ctx, account)
-
-	return account.GetAddress(), nil
-}
-
 // CollectionPersistAndEmitEvents persists the collection and emits the events.
 func (k Keeper) CollectionPersistAndEmitEvents(ctx sdk.Context, collection types.Collection) error {
 	// persist the Collection
@@ -329,7 +314,7 @@ func (k Keeper) CollectionPersistAndEmitEvents(ctx sdk.Context, collection types
 
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvent(
-		&types.CollectionCreatedEvent{
+		&types.CollectionUpdatedEvent{
 			Collection: &collection,
 		},
 	); err != nil {

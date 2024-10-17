@@ -895,21 +895,21 @@ func RegisterQueryHandlerClient(ctx context.Context, mux *runtime.ServeMux, clie
 var (
 	pattern_Query_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ixo", "claims", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Collection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"ixo", "collection", "id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Collection_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"ixo", "claims", "collection", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_CollectionList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ixo", "collection"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_CollectionList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ixo", "claims", "collections"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Claim_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"ixo", "claim", "id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Claim_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"ixo", "claims", "claim", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_ClaimList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ixo", "claim"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_ClaimList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 1}, []string{"ixo", "claims"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Dispute_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"ixo", "dispute", "proof"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Dispute_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"ixo", "claims", "dispute", "proof"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_DisputeList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ixo", "dispute"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_DisputeList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ixo", "claims", "disputes"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_Intent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"ixo", "intent", "agentAddress", "collectionId", "id"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_Intent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"ixo", "claims", "intent", "agentAddress", "collectionId", "id"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_Query_IntentList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ixo", "intent"}, "", runtime.AssumeColonVerbOpt(false)))
+	pattern_Query_IntentList_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ixo", "claims", "intents"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (

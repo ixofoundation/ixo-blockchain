@@ -139,7 +139,7 @@ func appModules(
 		bonds.NewAppModule(app.BondsKeeper),
 		entitymodule.NewAppModule(app.EntityKeeper),
 		tokenmodule.NewAppModule(app.TokenKeeper),
-		claimsmodule.NewAppModule(app.ClaimsKeeper),
+		claimsmodule.NewAppModule(app.ClaimsKeeper, app.GetSubspace(claimsmoduletypes.ModuleName)),
 		smartaccount.NewAppModule(*app.SmartAccountKeeper),
 		epochs.NewAppModule(*app.EpochsKeeper),
 	}

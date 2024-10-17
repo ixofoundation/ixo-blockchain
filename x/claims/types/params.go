@@ -37,10 +37,9 @@ func NewParams(collectionSequence, intentSequence uint64, ixoAccount string,
 
 // DefaultParams returns a default set of parameters
 func DefaultParams() Params {
-	defaultIxoAccount := "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
 	tenPercentFee := math.LegacyNewDec(10)
 
-	return NewParams(1, 1, defaultIxoAccount, tenPercentFee, tenPercentFee)
+	return NewParams(DefaultCollectionSequence, DefaultIntentSequence, DefaultIxoAccount, tenPercentFee, tenPercentFee)
 }
 
 // ParamSetPairs get the params.ParamSet

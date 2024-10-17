@@ -24,9 +24,9 @@ import (
 //  2. if any other paymentType, it sets the output for payment to the amount set in the payment
 //
 // after the native coin payments is calculated, it does the following:
-// 1. if timeout for the payment is nil, it makes the payment by calling payout() function
+// 1. if timeout for the payment is nil(or it is intent payment) it makes the payment by calling payout() function
 // 2. if timeout for the payment is not nil, it creates an authz grant to make the payment by calling createAuthz() function
-func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment *types.Payment, paymentType types.PaymentType, claimId string, collection types.Collection, useIntent bool) error {
+func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment *types.Payment, paymentType types.PaymentType, claim *types.Claim, collection types.Collection, useIntent bool) error {
 	// check that there is outcome payment to make, otherwise skip this with no error as no payment for action
 	paymentExists := false
 	if !payment.Amount.IsZero() || !types.IsZeroCW20Payments(payment.Cw20Payment) {
@@ -130,7 +130,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 	// if no timeout in payment or use intent is true make payout immediately
 	// if use intent then funds is already in escrow account, so no need to wait even if timeout is set
 	if payment.TimeoutNs == 0 || useIntent {
-		if err := payout(ctx, k, inputs, outputs, paymentType, claimId, collection, &time.Time{}, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver); err != nil {
+		if err := payout(ctx, k, inputs, outputs, paymentType, claim, collection, &time.Time{}, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver); err != nil {
 			return err
 		}
 	} else {
@@ -141,7 +141,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 		}
 
 		// else create authz WithdrawPaymentAuthorization for receiver to execute to receive payout once timeout has passed
-		if err := createAuthz(ctx, k, receiver, adminAddress, inputs, outputs, paymentType, claimId, payment.TimeoutNs, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver); err != nil {
+		if err := createAuthz(ctx, k, receiver, adminAddress, inputs, outputs, paymentType, claim, payment.TimeoutNs, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver); err != nil {
 			return err
 		}
 	}
@@ -157,7 +157,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 // 4. if paymentCw20s is not nil, it makes the payments by calling k.WasmKeeper.Execute()
 // 5. update the claim payment status to success
 // 6. emit PaymentWithdrawnEvent event
-func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claimId string, collection types.Collection, releaseDate *time.Time, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress) error {
+func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claim *types.Claim, collection types.Collection, releaseDate *time.Time, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress) error {
 	// get entity payout is for to validate if from address is valid entity module account
 	_, entity, err := k.EntityKeeper.ResolveEntity(ctx, collection.Entity)
 	if err != nil {
@@ -186,7 +186,7 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 		}
 	}
 
-	// TODO: Test case where one output will have 0 amount
+	// Note: Check into case where one output will have 0 amount
 	// distribute the payment according to the outputs for Cosmos Coins if has inputs and outputs
 	if len(cleanedInput.Coins) != 0 && len(outputs) != 0 {
 		if err := k.BankKeeper.InputOutputCoins(ctx, cleanedInput, outputs); err != nil {
@@ -238,7 +238,7 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 	}
 
 	// update payment status to success
-	if err := updatePaymentStatus(ctx, k, paymentType, claimId, types.PaymentStatus_paid); err != nil {
+	if err := updatePaymentStatus(paymentType, claim, types.PaymentStatus_paid); err != nil {
 		return err
 	}
 
@@ -246,7 +246,7 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.PaymentWithdrawnEvent{
 			Withdraw: &types.WithdrawPaymentConstraints{
-				ClaimId:              claimId,
+				ClaimId:              claim.ClaimId,
 				Inputs:               inputs,
 				Outputs:              outputs,
 				PaymentType:          paymentType,
@@ -269,7 +269,7 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 // 2. create and add the new WithdrawPaymentConstraints to the current existing constraints, and persist
 // 3. update the payment status to authorized
 // 4. emit PaymentWithdrawCreatedEvent event
-func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claimId string, timeoutNs time.Duration, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress) error {
+func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claim *types.Claim, timeoutNs time.Duration, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress) error {
 	// get user's current WithdrawPaymentAuthorization authorization
 	authzMsgType := sdk.MsgTypeURL(&types.MsgWithdrawPayment{})
 	auth, _ := k.AuthzKeeper.GetAuthorization(ctx, receiver, admin, authzMsgType)
@@ -277,7 +277,7 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	releaseDate := ctx.BlockTime().Add(timeoutNs)
 	var constraints []*types.WithdrawPaymentConstraints
 	constraint := types.WithdrawPaymentConstraints{
-		ClaimId:              claimId,
+		ClaimId:              claim.ClaimId,
 		Inputs:               inputs,
 		Outputs:              outputs,
 		PaymentType:          paymentType,
@@ -305,7 +305,7 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	}
 
 	// update payment status to authorized
-	if err := updatePaymentStatus(ctx, k, paymentType, claimId, types.PaymentStatus_authorized); err != nil {
+	if err := updatePaymentStatus(paymentType, claim, types.PaymentStatus_authorized); err != nil {
 		return err
 	}
 
@@ -313,7 +313,7 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.PaymentWithdrawCreatedEvent{
 			Withdraw: &types.WithdrawPaymentConstraints{
-				ClaimId:              claimId,
+				ClaimId:              claim.ClaimId,
 				Inputs:               inputs,
 				Outputs:              outputs,
 				PaymentType:          paymentType,
@@ -331,20 +331,11 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	return nil
 }
 
-// TODO: analyse claims events emited after this change?
 // updatePaymentStatus updates the payment status for the provided different paymentType.
-// it does the following:
-// 1. get claim and payment is for
-// 2. update the payment status to the provided paymentStatus
-// 3. persist the updated claim
-// 4. emit PaymentWithdrawnEvent event
-func updatePaymentStatus(ctx sdk.Context, k Keeper, paymentType types.PaymentType, claimId string, paymentStatus types.PaymentStatus) error {
-	// get claim and payment is for
-	claim, err := k.GetClaim(ctx, claimId)
-	if err != nil {
-		return err
+func updatePaymentStatus(paymentType types.PaymentType, claim *types.Claim, paymentStatus types.PaymentStatus) error {
+	if claim == nil {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "claim cannot be nil")
 	}
-
 	switch paymentType {
 	case types.PaymentType_approval:
 		claim.PaymentsStatus.Approval = paymentStatus
@@ -352,18 +343,6 @@ func updatePaymentStatus(ctx sdk.Context, k Keeper, paymentType types.PaymentTyp
 		claim.PaymentsStatus.Evaluation = paymentStatus
 	case types.PaymentType_submission:
 		claim.PaymentsStatus.Submission = paymentStatus
-	}
-
-	// persist claim changes
-	k.SetClaim(ctx, claim)
-
-	// emit the events
-	if err := ctx.EventManager().EmitTypedEvents(
-		&types.ClaimUpdatedEvent{
-			Claim: &claim,
-		},
-	); err != nil {
-		return err
 	}
 
 	return nil

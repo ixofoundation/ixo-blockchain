@@ -1,6 +1,8 @@
 .DS_STORE
 # docker-compose volume mapping for chain config and data
 .data
+.data2
+.data3
 
 # Created by https://www.toptal.com/developers/gitignore/api/intellij,vscode,macos,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=intellij,vscode,macos,windows

@@ -362,11 +362,15 @@ type MsgEvaluateClaim struct {
 	Reason uint32 `protobuf:"varint,8,opt,name=reason,proto3" json:"reason,omitempty"`
 	// verificationProof is the cid of the evaluation Verfiable Credential
 	VerificationProof string `protobuf:"bytes,9,opt,name=verification_proof,json=verificationProof,proto3" json:"verification_proof,omitempty"`
-	// NOTE: if both amount and cw20 amount are empty then use collection default
-	// custom amount specified by evaluator for claim approval
+	// NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+	// overriden with intent amounts NOTE: if both amount and cw20 amount are
+	// empty then use collection default custom amount specified by evaluator for
+	// claim approval
 	Amount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,10,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
-	// NOTE: if both amount and cw20 amount are empty then use collection default
-	// custom cw20 payments specified by evaluator for claim approval
+	// NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+	// overriden with intent amounts NOTE: if both amount and cw20 amount are
+	// empty then use collection default custom cw20 payments specified by
+	// evaluator for claim approval
 	Cw20Payment []*CW20Payment `protobuf:"bytes,11,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
 }
 

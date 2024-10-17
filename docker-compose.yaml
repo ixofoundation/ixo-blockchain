@@ -16,3 +16,37 @@ services:
       - '1317:1317' # API
       - '26657:26657' # RPC
       - '9090:9090' # gRPC
+
+  ixo-blockchain-2:
+    container_name: ixo_blockchain_2
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: .infra/dockerfiles/Dockerfile
+    tty: true
+    image: ixo-chain:devel
+    restart: unless-stopped
+    volumes:
+      - './:/app'
+      - '.data2/:/root/.ixod'
+    ports:
+      - '1318:1317' # API
+      - '26658:26657' # RPC
+      - '9091:9090' # gRPC
+
+  ixo-blockchain-3:
+    container_name: ixo_blockchain_3
+    platform: linux/amd64
+    build:
+      context: .
+      dockerfile: .infra/dockerfiles/Dockerfile
+    tty: true
+    image: ixo-chain:devel
+    restart: unless-stopped
+    volumes:
+      - './:/app'
+      - '.data3/:/root/.ixod'
+    ports:
+      - '1319:1317' # API
+      - '26659:26657' # RPC
+      - '9092:9090' # gRPC

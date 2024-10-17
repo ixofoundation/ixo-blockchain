@@ -10,6 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v3/lib/ixo"
 	epochtypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 )
 
@@ -41,20 +42,21 @@ func NewParams(
 // DefaultParams returns the default minting module parameters.
 func DefaultParams() Params {
 	return Params{
-		MintDenom:              sdk.DefaultBondDenom,
-		GenesisEpochProvisions: ixomath.NewDec(5000000),
-		// EpochIdentifier:         "2min", // 1 day
-		// ReductionPeriodInEpochs: 4,      // 1 years
-		EpochIdentifier:         "day",                        // 1 day
-		ReductionPeriodInEpochs: 365,                          // 1 years
-		ReductionFactor:         ixomath.NewDecWithPrec(5, 1), // 0.5
+		MintDenom:              ixo.IxoNativeToken,
+		GenesisEpochProvisions: ixomath.NewDec(43_500_000_000), // 43_500 IXO
+		// comment out 2min and uncomment day, 2min is for local testing
+		// EpochIdentifier:         "2min", // 2 min
+		// ReductionPeriodInEpochs: 7,      // 14 min
+		EpochIdentifier:         "day",                                          // 1 day
+		ReductionPeriodInEpochs: 365,                                            // 1 years
+		ReductionFactor:         ixomath.NewDecWithPrec(666666666666666666, 18), // 0.666666666666666666
 		DistributionProportions: DistributionProportions{
-			Staking:       ixomath.NewDecWithPrec(9, 1), // 0.9
-			ImpactRewards: ixomath.NewDecWithPrec(1, 1), // 0.1
+			Staking:       ixomath.NewDecWithPrec(1, 0), // 1.0
+			ImpactRewards: ixomath.NewDecWithPrec(0, 1), // 0.0
 			CommunityPool: ixomath.NewDecWithPrec(0, 1), // 0.0
 		},
 		WeightedImpactRewardsReceivers:       []WeightedAddress{},
-		MintingRewardsDistributionStartEpoch: 0,
+		MintingRewardsDistributionStartEpoch: 1,
 	}
 }
 

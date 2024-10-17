@@ -2891,8 +2891,8 @@ Collection entity, or have authz cap, aka is agent
 | status | [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus) |  | status is the evaluation status expressed as an integer (2=approved, 3=rejected, ...) |
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20 amount are empty then use collection default custom amount specified by evaluator for claim approval |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then use collection default custom cw20 payments specified by evaluator for claim approval |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts NOTE: if both amount and cw20 amount are empty then use collection default custom amount specified by evaluator for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts NOTE: if both amount and cw20 amount are empty then use collection default custom cw20 payments specified by evaluator for claim approval |
 
 
 
@@ -5230,7 +5230,7 @@ Query/EpochProvisions RPC method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| epoch_provisions | [bytes](#bytes) |  | epoch_provisions is the current minting per epoch provisions value. |
+| epoch_provisions | [string](#string) |  | epoch_provisions is the current minting per epoch provisions value. |
 
 
 

@@ -49,6 +49,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/v3/app/upgrades"
 	v2 "github.com/ixofoundation/ixo-blockchain/v3/app/upgrades/v2"
 	v3 "github.com/ixofoundation/ixo-blockchain/v3/app/upgrades/v3"
+	v4 "github.com/ixofoundation/ixo-blockchain/v3/app/upgrades/v4"
 	"github.com/ixofoundation/ixo-blockchain/v3/docs"
 	"github.com/ixofoundation/ixo-blockchain/v3/lib/ixo"
 	"github.com/spf13/cast"
@@ -66,7 +67,7 @@ var (
 	maccPerms = moduleAccountPermissions
 
 	// scheduled upgrades and forks
-	Upgrades = []upgrades.Upgrade{v2.Upgrade, v3.Upgrade}
+	Upgrades = []upgrades.Upgrade{v2.Upgrade, v3.Upgrade, v4.Upgrade}
 	Forks    = []upgrades.Fork{}
 
 	// EmptyWasmOpts defines a type alias for a list of wasm options.
@@ -544,7 +545,7 @@ func (app *IxoApp) setupUpgradeHandlers() {
 	for _, upgrade := range Upgrades {
 		app.UpgradeKeeper.SetUpgradeHandler(
 			upgrade.UpgradeName,
-			upgrade.CreateUpgradeHandler(app.ModuleManager, app.configurator),
+			upgrade.CreateUpgradeHandler(app.ModuleManager, app.configurator, app.AppKeepers),
 		)
 	}
 }

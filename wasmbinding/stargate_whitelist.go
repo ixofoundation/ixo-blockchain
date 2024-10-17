@@ -2,6 +2,7 @@ package wasmbinding
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
@@ -44,7 +45,6 @@ func init() {
 
 	// cosmos-sdk queries
 	// =============================
-
 	// auth
 	setWhitelistedQuery("/cosmos.auth.v1beta1.Query/Account", &authtypes.QueryAccountResponse{})
 	setWhitelistedQuery("/cosmos.auth.v1beta1.Query/Params", &authtypes.QueryParamsResponse{})
@@ -79,8 +79,6 @@ func init() {
 
 	// ixo queries
 	// =============================
-	// TODO: add new queries also, add queries to icq in migration
-
 	// bonds
 	setWhitelistedQuery("/ixo.bonds.v1beta1.Query/Params", &bondstypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.bonds.v1beta1.Query/Bond", &bondstypes.QueryBondResponse{})
@@ -182,5 +180,8 @@ func GetStargateWhitelistedPaths() (keys []string) {
 	for k := range stargateResponsePools {
 		keys = append(keys, k)
 	}
+
+	// Sort the keys to ensure determinism
+	sort.Strings(keys)
 	return keys
 }

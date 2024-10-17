@@ -6561,7 +6561,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/collection/{id}"
+                      "pattern": "/ixo/claims/collection/{id}"
                     }
                   ]
                 }
@@ -6583,7 +6583,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/collection"
+                      "pattern": "/ixo/claims/collections"
                     }
                   ]
                 }
@@ -6605,7 +6605,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/claim/{id}"
+                      "pattern": "/ixo/claims/claim/{id}"
                     }
                   ]
                 }
@@ -6627,7 +6627,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/claim"
+                      "pattern": "/ixo/claims/claims"
                     }
                   ]
                 }
@@ -6649,7 +6649,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/dispute/{proof}"
+                      "pattern": "/ixo/claims/dispute/{proof}"
                     }
                   ]
                 }
@@ -6671,7 +6671,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/dispute"
+                      "pattern": "/ixo/claims/disputes"
                     }
                   ]
                 }
@@ -6693,7 +6693,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/intent/{agentAddress}/{collectionId}/{id}"
+                      "pattern": "/ixo/claims/intent/{agentAddress}/{collectionId}/{id}"
                     }
                   ]
                 }
@@ -6715,7 +6715,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/intent"
+                      "pattern": "/ixo/claims/intents"
                     }
                   ]
                 }
@@ -7178,7 +7178,7 @@
             },
             {
               "name": "amount",
-              "description": "NOTE: if both amount and cw20 amount are empty then use collection default\ncustom amount specified by evaluator for claim approval",
+              "description": "NOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverriden with intent amounts NOTE: if both amount and cw20 amount are\nempty then use collection default custom amount specified by evaluator for\nclaim approval",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -7190,7 +7190,7 @@
             },
             {
               "name": "cw20_payment",
-              "description": "NOTE: if both amount and cw20 amount are empty then use collection default\ncustom cw20 payments specified by evaluator for claim approval",
+              "description": "NOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverriden with intent amounts NOTE: if both amount and cw20 amount are\nempty then use collection default custom cw20 payments specified by\nevaluator for claim approval",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -12832,7 +12832,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/epochs/v1beta1/current_epoch"
+                      "pattern": "/ixo/epochs/v1beta1/epochs/{identifier}"
                     }
                   ]
                 }
@@ -13445,9 +13445,9 @@
               "name": "epoch_provisions",
               "description": "epoch_provisions is the current minting per epoch provisions value.",
               "label": "",
-              "type": "bytes",
-              "longType": "bytes",
-              "fullType": "bytes",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",

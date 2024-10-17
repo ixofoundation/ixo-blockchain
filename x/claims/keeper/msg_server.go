@@ -24,7 +24,6 @@ func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-// TODO: ensure to creatre escrow accounts on migration for existing collections
 // TODO: ADD 1155 and 721 capabilities to claims and payments also.
 // TODO: add possibility to allow multiple intents per agent based of collection flag
 
@@ -97,13 +96,19 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	}
 
 	// create escrow account for the collection
-	escrowAccount, err := s.Keeper.CreateNewCollectionEscrow(ctx, collection.Id)
+	escrowAccount, err := types.CreateNewCollectionEscrow(ctx, s.Keeper.AccountKeeper, collection.Id)
 	if err != nil {
 		return nil, errorsmod.Wrapf(err, "failed to create escrow account for collection: %s", collection.Id)
 	}
 	collection.EscrowAccount = escrowAccount.String()
 
-	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+	// persist and emit the events
+	s.Keeper.SetCollection(ctx, collection)
+	if err := ctx.EventManager().EmitTypedEvent(
+		&types.CollectionCreatedEvent{
+			Collection: &collection,
+		},
+	); err != nil {
 		return nil, err
 	}
 
@@ -231,6 +236,11 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 		return nil, err
 	}
 
+	// start payout process for claim submission
+	if err = processPayment(ctx, *s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, &claim, collection, false); err != nil {
+		return nil, err
+	}
+
 	// persist claim and emit the events
 	s.Keeper.SetClaim(ctx, claim)
 	if err := ctx.EventManager().EmitTypedEvents(
@@ -238,11 +248,6 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 			Claim: &claim,
 		},
 	); err != nil {
-		return nil, err
-	}
-
-	// start payout process for claim submission
-	if err = processPayment(ctx, *s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, msg.ClaimId, collection, false); err != nil {
 		return nil, err
 	}
 
@@ -316,12 +321,9 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		evaluation.Cw20Payment = claim.Cw20Payment
 	}
 
-	claim.Evaluation = &evaluation
-	s.Keeper.SetClaim(ctx, claim)
-
 	// start payout process for evaluation submission, if evaluation has status invalidated, dont run evaluation payout process
 	if msg.Status != types.EvaluationStatus_invalidated {
-		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId, collection, false); err != nil {
+		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, &claim, collection, false); err != nil {
 			return nil, err
 		}
 
@@ -345,7 +347,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 			return nil, err
 		}
 		// Update payment status to no payment again as was guaranteed with intent
-		err = updatePaymentStatus(ctx, *s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_no_payment)
+		err = updatePaymentStatus(types.PaymentType_approval, &claim, types.PaymentStatus_no_payment)
 		if err != nil {
 			return nil, err
 		}
@@ -357,7 +359,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		collection.Approved++
 		// Dereference the pointer to avoid changing collection payments as collection is saved in keeper below
 		approvedPayment := collection.Payments.Approval.Clone()
-		// if intent on claim then overide payments with claim payments as it used the intent and payment must be intent amount
+		// if intent on claim then override payments with claim payments as it used the intent and payment must be intent amount
 		// also override payment account to escrow account, so funds can be transferred from escrow to agent
 		if claim.UseIntent {
 			approvedPayment.Amount = claim.Amount
@@ -375,20 +377,20 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(approvedPayment.Cw20Payment) {
 			return nil, types.ErrOraclePaymentOnlyNative
 		}
-		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, msg.ClaimId, collection, claim.UseIntent); err != nil {
+		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, &claim, collection, claim.UseIntent); err != nil {
 			return nil, err
 		}
 	} else if msg.Status == types.EvaluationStatus_rejected {
 		// payout process for evaluation rejected to claim agent
 		collection.Rejected++
-		if err = processPayment(ctx, *s.Keeper, claimAgent, collection.Payments.Rejection, types.PaymentType_rejection, msg.ClaimId, collection, false); err != nil {
+		if err = processPayment(ctx, *s.Keeper, claimAgent, collection.Payments.Rejection, types.PaymentType_rejection, &claim, collection, false); err != nil {
 			return nil, err
 		}
 	} else if msg.Status == types.EvaluationStatus_disputed {
 		// no payment for disputed
 		collection.Disputed++
 		// update payment status to disputed
-		err := updatePaymentStatus(ctx, *s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_disputed)
+		err := updatePaymentStatus(types.PaymentType_approval, &claim, types.PaymentStatus_disputed)
 		if err != nil {
 			return nil, err
 		}
@@ -401,7 +403,9 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		return nil, err
 	}
 
-	// emit the events
+	// persist and emit the events
+	claim.Evaluation = &evaluation
+	s.Keeper.SetClaim(ctx, claim)
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.ClaimEvaluatedEvent{
 			Evaluation: &evaluation,
@@ -513,7 +517,6 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 // --------------------------
 // WITHDRAW PAYMENT
 // --------------------------
-// TODO: test upgrade scenario where no cw20 payment, then upgrade then handle previous existing authz
 func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdrawPayment) (*types.MsgWithdrawPaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
@@ -559,10 +562,21 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 	}
 
 	// make payout
-	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, collection, msg.ReleaseDate, msg.Contract_1155Payment, msg.Cw20Payment, fromAddress, toAddress)
+	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, &claim, collection, msg.ReleaseDate, msg.Contract_1155Payment, msg.Cw20Payment, fromAddress, toAddress)
 	if err != nil {
 		return nil, err
 	}
+
+	// persist and emit the events
+	s.Keeper.SetClaim(ctx, claim)
+	if err := ctx.EventManager().EmitTypedEvent(
+		&types.ClaimUpdatedEvent{
+			Claim: &claim,
+		},
+	); err != nil {
+		return nil, err
+	}
+
 	return &types.MsgWithdrawPaymentResponse{}, nil
 }
 

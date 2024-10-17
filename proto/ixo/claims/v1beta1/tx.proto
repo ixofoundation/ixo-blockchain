@@ -114,16 +114,18 @@ message MsgEvaluateClaim {
   uint32 reason = 8;
   // verificationProof is the cid of the evaluation Verfiable Credential
   string verification_proof = 9;
-  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts
-  // NOTE: if both amount and cw20 amount are empty then use collection default
-  // custom amount specified by evaluator for claim approval
+  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+  // overriden with intent amounts NOTE: if both amount and cw20 amount are
+  // empty then use collection default custom amount specified by evaluator for
+  // claim approval
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts
-  // NOTE: if both amount and cw20 amount are empty then use collection default
-  // custom cw20 payments specified by evaluator for claim approval
+  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+  // overriden with intent amounts NOTE: if both amount and cw20 amount are
+  // empty then use collection default custom cw20 payments specified by
+  // evaluator for claim approval
   repeated CW20Payment cw20_payment = 11;
 }
 message MsgEvaluateClaimResponse {}
