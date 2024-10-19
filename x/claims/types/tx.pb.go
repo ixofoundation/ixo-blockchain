@@ -8,12 +8,13 @@ import (
 	fmt "fmt"
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types "github.com/cosmos/cosmos-sdk/types"
-	github_com_cosmos_cosmos_sdk_x_bank_types "github.com/cosmos/cosmos-sdk/x/bank/types"
-	_ "github.com/gogo/protobuf/gogoproto"
-	grpc1 "github.com/gogo/protobuf/grpc"
-	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
-	github_com_ixofoundation_ixo_blockchain_v3_x_iid_types "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	_ "github.com/cosmos/cosmos-sdk/types/msgservice"
+	types1 "github.com/cosmos/cosmos-sdk/x/bank/types"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	grpc1 "github.com/cosmos/gogoproto/grpc"
+	proto "github.com/cosmos/gogoproto/proto"
+	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
+	github_com_ixofoundation_ixo_blockchain_v4_x_iid_types "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -55,6 +56,9 @@ type MsgCreateCollection struct {
 	// payments is the amount paid for claim submission, evaluation, approval, or
 	// rejection
 	Payments *Payments `protobuf:"bytes,8,opt,name=payments,proto3" json:"payments,omitempty"`
+	// intents is the option for intents for this collection (allow, deny,
+	// required)
+	Intents CollectionIntentOptions `protobuf:"varint,9,opt,name=intents,proto3,enum=ixo.claims.v1beta1.CollectionIntentOptions" json:"intents,omitempty"`
 }
 
 func (m *MsgCreateCollection) Reset()         { *m = MsgCreateCollection{} }
@@ -146,6 +150,13 @@ func (m *MsgCreateCollection) GetPayments() *Payments {
 	return nil
 }
 
+func (m *MsgCreateCollection) GetIntents() CollectionIntentOptions {
+	if m != nil {
+		return m.Intents
+	}
+	return CollectionIntentOptions_allow
+}
+
 type MsgCreateCollectionResponse struct {
 }
 
@@ -188,10 +199,22 @@ type MsgSubmitClaim struct {
 	// claimID is the unique identifier of the claim in the cid hash format
 	ClaimId string `protobuf:"bytes,2,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
 	// agent is the DID of the agent submitting the claim
-	AgentDid     github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	AgentDid     github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
 	AgentAddress string                                                             `protobuf:"bytes,4,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// admin address used to sign this message, validated against Collection Admin
 	AdminAddress string `protobuf:"bytes,5,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
+	// use_intent is the option for using intent for this claim if it exists and
+	// is active. NOTE: if use_intent is true then amount and cw20 amount are
+	// ignored and overriden with intent amounts. NOTE: if use_intent is true and
+	// there is no active intent then will error
+	UseIntent bool `protobuf:"varint,6,opt,name=use_intent,json=useIntent,proto3" json:"use_intent,omitempty"`
+	// NOTE: if both amount and cw20_payment are empty then use default by
+	// Collection custom amount specified by service agent for claim approval
+	Amount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,7,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+	// NOTE: if both amount and cw20 amount are empty then use default by
+	// Collection custom cw20 payments specified by service agent for claim
+	// approval
+	Cw20Payment []*CW20Payment `protobuf:"bytes,8,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
 }
 
 func (m *MsgSubmitClaim) Reset()         { *m = MsgSubmitClaim{} }
@@ -241,7 +264,7 @@ func (m *MsgSubmitClaim) GetClaimId() string {
 	return ""
 }
 
-func (m *MsgSubmitClaim) GetAgentDid() github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment {
+func (m *MsgSubmitClaim) GetAgentDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.AgentDid
 	}
@@ -260,6 +283,27 @@ func (m *MsgSubmitClaim) GetAdminAddress() string {
 		return m.AdminAddress
 	}
 	return ""
+}
+
+func (m *MsgSubmitClaim) GetUseIntent() bool {
+	if m != nil {
+		return m.UseIntent
+	}
+	return false
+}
+
+func (m *MsgSubmitClaim) GetAmount() github_com_cosmos_cosmos_sdk_types.Coins {
+	if m != nil {
+		return m.Amount
+	}
+	return nil
+}
+
+func (m *MsgSubmitClaim) GetCw20Payment() []*CW20Payment {
+	if m != nil {
+		return m.Cw20Payment
+	}
+	return nil
 }
 
 type MsgSubmitClaimResponse struct {
@@ -306,7 +350,7 @@ type MsgEvaluateClaim struct {
 	// oracle is the DID of the Oracle entity that evaluates the claim
 	Oracle string `protobuf:"bytes,3,opt,name=oracle,proto3" json:"oracle,omitempty"`
 	// agent is the DID of the agent that submits the evaluation
-	AgentDid     github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	AgentDid     github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
 	AgentAddress string                                                             `protobuf:"bytes,5,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// admin address used to sign this message, validated against Collection Admin
 	AdminAddress string `protobuf:"bytes,6,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
@@ -318,9 +362,16 @@ type MsgEvaluateClaim struct {
 	Reason uint32 `protobuf:"varint,8,opt,name=reason,proto3" json:"reason,omitempty"`
 	// verificationProof is the cid of the evaluation Verfiable Credential
 	VerificationProof string `protobuf:"bytes,9,opt,name=verification_proof,json=verificationProof,proto3" json:"verification_proof,omitempty"`
-	// custom amount specified by evaluator for claim approval, if empty list then
-	// use default by Collection
+	// NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+	// overriden with intent amounts NOTE: if both amount and cw20 amount are
+	// empty then use collection default custom amount specified by evaluator for
+	// claim approval
 	Amount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,10,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+	// NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+	// overriden with intent amounts NOTE: if both amount and cw20 amount are
+	// empty then use collection default custom cw20 payments specified by
+	// evaluator for claim approval
+	Cw20Payment []*CW20Payment `protobuf:"bytes,11,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
 }
 
 func (m *MsgEvaluateClaim) Reset()         { *m = MsgEvaluateClaim{} }
@@ -377,7 +428,7 @@ func (m *MsgEvaluateClaim) GetOracle() string {
 	return ""
 }
 
-func (m *MsgEvaluateClaim) GetAgentDid() github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment {
+func (m *MsgEvaluateClaim) GetAgentDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.AgentDid
 	}
@@ -426,6 +477,13 @@ func (m *MsgEvaluateClaim) GetAmount() github_com_cosmos_cosmos_sdk_types.Coins 
 	return nil
 }
 
+func (m *MsgEvaluateClaim) GetCw20Payment() []*CW20Payment {
+	if m != nil {
+		return m.Cw20Payment
+	}
+	return nil
+}
+
 type MsgEvaluateClaimResponse struct {
 }
 
@@ -468,9 +526,9 @@ type MsgDisputeClaim struct {
 	// subject_id for which this dispute is against, for now can only lay disputes
 	// against claims
 	SubjectId string `protobuf:"bytes,1,opt,name=subject_id,json=subjectId,proto3" json:"subject_id,omitempty"`
-	// agent is the DID of the agent disputing the claim, agent detials wont be
+	// agent is the DID of the agent disputing the claim, agent details won't be
 	// saved in kvStore
-	AgentDid     github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	AgentDid     github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
 	AgentAddress string                                                             `protobuf:"bytes,3,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// type is expressed as an integer, interpreted by the client
 	DisputeType int32        `protobuf:"varint,4,opt,name=dispute_type,json=disputeType,proto3" json:"dispute_type,omitempty"`
@@ -517,7 +575,7 @@ func (m *MsgDisputeClaim) GetSubjectId() string {
 	return ""
 }
 
-func (m *MsgDisputeClaim) GetAgentDid() github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment {
+func (m *MsgDisputeClaim) GetAgentDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.AgentDid
 	}
@@ -585,9 +643,9 @@ type MsgWithdrawPayment struct {
 	// claim_id the withdrawal is for
 	ClaimId string `protobuf:"bytes,1,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
 	// Inputs to the multisend tx to run to withdraw payment
-	Inputs []github_com_cosmos_cosmos_sdk_x_bank_types.Input `protobuf:"bytes,2,rep,name=inputs,proto3,casttype=github.com/cosmos/cosmos-sdk/x/bank/types.Input" json:"inputs"`
+	Inputs []types1.Input `protobuf:"bytes,2,rep,name=inputs,proto3" json:"inputs"`
 	// Outputs for the multisend tx to run to withdraw payment
-	Outputs []github_com_cosmos_cosmos_sdk_x_bank_types.Output `protobuf:"bytes,3,rep,name=outputs,proto3,casttype=github.com/cosmos/cosmos-sdk/x/bank/types.Output" json:"outputs"`
+	Outputs []types1.Output `protobuf:"bytes,3,rep,name=outputs,proto3" json:"outputs"`
 	// payment type to keep track what payment is for and mark claim payment
 	// accordingly
 	PaymentType PaymentType `protobuf:"varint,4,opt,name=payment_type,json=paymentType,proto3,enum=ixo.claims.v1beta1.PaymentType" json:"payment_type,omitempty"`
@@ -602,6 +660,8 @@ type MsgWithdrawPayment struct {
 	ReleaseDate *time.Time `protobuf:"bytes,8,opt,name=release_date,json=releaseDate,proto3,stdtime" json:"release_date,omitempty"`
 	// admin address used to sign this message, validated against Collection Admin
 	AdminAddress string `protobuf:"bytes,9,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
+	// cw20 payments, can be empty or multiple
+	Cw20Payment []*CW20Payment `protobuf:"bytes,10,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
 }
 
 func (m *MsgWithdrawPayment) Reset()         { *m = MsgWithdrawPayment{} }
@@ -644,14 +704,14 @@ func (m *MsgWithdrawPayment) GetClaimId() string {
 	return ""
 }
 
-func (m *MsgWithdrawPayment) GetInputs() []github_com_cosmos_cosmos_sdk_x_bank_types.Input {
+func (m *MsgWithdrawPayment) GetInputs() []types1.Input {
 	if m != nil {
 		return m.Inputs
 	}
 	return nil
 }
 
-func (m *MsgWithdrawPayment) GetOutputs() []github_com_cosmos_cosmos_sdk_x_bank_types.Output {
+func (m *MsgWithdrawPayment) GetOutputs() []types1.Output {
 	if m != nil {
 		return m.Outputs
 	}
@@ -698,6 +758,13 @@ func (m *MsgWithdrawPayment) GetAdminAddress() string {
 		return m.AdminAddress
 	}
 	return ""
+}
+
+func (m *MsgWithdrawPayment) GetCw20Payment() []*CW20Payment {
+	if m != nil {
+		return m.Cw20Payment
+	}
+	return nil
 }
 
 type MsgWithdrawPaymentResponse struct {
@@ -1045,6 +1112,245 @@ func (m *MsgUpdateCollectionPaymentsResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgUpdateCollectionPaymentsResponse proto.InternalMessageInfo
 
+type MsgUpdateCollectionIntents struct {
+	// collection_id indicates which Collection to update
+	CollectionId string `protobuf:"bytes,1,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// intents is the option for intents for this collection (allow, deny,
+	// required)
+	Intents CollectionIntentOptions `protobuf:"varint,2,opt,name=intents,proto3,enum=ixo.claims.v1beta1.CollectionIntentOptions" json:"intents,omitempty"`
+	// admin address used to sign this message, validated against Collection Admin
+	AdminAddress string `protobuf:"bytes,3,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
+}
+
+func (m *MsgUpdateCollectionIntents) Reset()         { *m = MsgUpdateCollectionIntents{} }
+func (m *MsgUpdateCollectionIntents) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionIntents) ProtoMessage()    {}
+func (*MsgUpdateCollectionIntents) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{16}
+}
+func (m *MsgUpdateCollectionIntents) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionIntents) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionIntents.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionIntents) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionIntents.Merge(m, src)
+}
+func (m *MsgUpdateCollectionIntents) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionIntents) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionIntents.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionIntents proto.InternalMessageInfo
+
+func (m *MsgUpdateCollectionIntents) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *MsgUpdateCollectionIntents) GetIntents() CollectionIntentOptions {
+	if m != nil {
+		return m.Intents
+	}
+	return CollectionIntentOptions_allow
+}
+
+func (m *MsgUpdateCollectionIntents) GetAdminAddress() string {
+	if m != nil {
+		return m.AdminAddress
+	}
+	return ""
+}
+
+type MsgUpdateCollectionIntentsResponse struct {
+}
+
+func (m *MsgUpdateCollectionIntentsResponse) Reset()         { *m = MsgUpdateCollectionIntentsResponse{} }
+func (m *MsgUpdateCollectionIntentsResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgUpdateCollectionIntentsResponse) ProtoMessage()    {}
+func (*MsgUpdateCollectionIntentsResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{17}
+}
+func (m *MsgUpdateCollectionIntentsResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgUpdateCollectionIntentsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgUpdateCollectionIntentsResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgUpdateCollectionIntentsResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgUpdateCollectionIntentsResponse.Merge(m, src)
+}
+func (m *MsgUpdateCollectionIntentsResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgUpdateCollectionIntentsResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgUpdateCollectionIntentsResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgUpdateCollectionIntentsResponse proto.InternalMessageInfo
+
+type MsgClaimIntent struct {
+	// The service agent's DID (Decentralized Identifier).
+	AgentDid github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	// The service agent's address (who submits this message).
+	AgentAddress string `protobuf:"bytes,2,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
+	// The id of the collection this intent is linked to.
+	CollectionId string `protobuf:"bytes,3,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// NOTE: if both amount and cw20 amount are empty then default by Collection
+	// is used (APPROVAL payment). The desired claim amount, if any.
+	Amount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,4,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+	// NOTE: if both amount and cw20 amount are empty then default by Collection
+	// is used (APPROVAL payment). The custom CW20 payment, if any.
+	Cw20Payment []*CW20Payment `protobuf:"bytes,5,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
+}
+
+func (m *MsgClaimIntent) Reset()         { *m = MsgClaimIntent{} }
+func (m *MsgClaimIntent) String() string { return proto.CompactTextString(m) }
+func (*MsgClaimIntent) ProtoMessage()    {}
+func (*MsgClaimIntent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{18}
+}
+func (m *MsgClaimIntent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgClaimIntent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgClaimIntent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgClaimIntent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgClaimIntent.Merge(m, src)
+}
+func (m *MsgClaimIntent) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgClaimIntent) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgClaimIntent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgClaimIntent proto.InternalMessageInfo
+
+func (m *MsgClaimIntent) GetAgentDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
+	if m != nil {
+		return m.AgentDid
+	}
+	return ""
+}
+
+func (m *MsgClaimIntent) GetAgentAddress() string {
+	if m != nil {
+		return m.AgentAddress
+	}
+	return ""
+}
+
+func (m *MsgClaimIntent) GetCollectionId() string {
+	if m != nil {
+		return m.CollectionId
+	}
+	return ""
+}
+
+func (m *MsgClaimIntent) GetAmount() github_com_cosmos_cosmos_sdk_types.Coins {
+	if m != nil {
+		return m.Amount
+	}
+	return nil
+}
+
+func (m *MsgClaimIntent) GetCw20Payment() []*CW20Payment {
+	if m != nil {
+		return m.Cw20Payment
+	}
+	return nil
+}
+
+// MsgClaimIntentResponse defines the response after submitting an intent.
+type MsgClaimIntentResponse struct {
+	// Resulting intent id.
+	IntentId string `protobuf:"bytes,1,opt,name=intent_id,json=intentId,proto3" json:"intent_id,omitempty"`
+	// Timeout period for the intent. If the claim is not submitted by this time,
+	// the intent expires.
+	ExpireAt *time.Time `protobuf:"bytes,2,opt,name=expire_at,json=expireAt,proto3,stdtime" json:"expire_at,omitempty"`
+}
+
+func (m *MsgClaimIntentResponse) Reset()         { *m = MsgClaimIntentResponse{} }
+func (m *MsgClaimIntentResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgClaimIntentResponse) ProtoMessage()    {}
+func (*MsgClaimIntentResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e0095508349b828a, []int{19}
+}
+func (m *MsgClaimIntentResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgClaimIntentResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgClaimIntentResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgClaimIntentResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgClaimIntentResponse.Merge(m, src)
+}
+func (m *MsgClaimIntentResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgClaimIntentResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgClaimIntentResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgClaimIntentResponse proto.InternalMessageInfo
+
+func (m *MsgClaimIntentResponse) GetIntentId() string {
+	if m != nil {
+		return m.IntentId
+	}
+	return ""
+}
+
+func (m *MsgClaimIntentResponse) GetExpireAt() *time.Time {
+	if m != nil {
+		return m.ExpireAt
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*MsgCreateCollection)(nil), "ixo.claims.v1beta1.MsgCreateCollection")
 	proto.RegisterType((*MsgCreateCollectionResponse)(nil), "ixo.claims.v1beta1.MsgCreateCollectionResponse")
@@ -1062,89 +1368,108 @@ func init() {
 	proto.RegisterType((*MsgUpdateCollectionDatesResponse)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse")
 	proto.RegisterType((*MsgUpdateCollectionPayments)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionPayments")
 	proto.RegisterType((*MsgUpdateCollectionPaymentsResponse)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse")
+	proto.RegisterType((*MsgUpdateCollectionIntents)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionIntents")
+	proto.RegisterType((*MsgUpdateCollectionIntentsResponse)(nil), "ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse")
+	proto.RegisterType((*MsgClaimIntent)(nil), "ixo.claims.v1beta1.MsgClaimIntent")
+	proto.RegisterType((*MsgClaimIntentResponse)(nil), "ixo.claims.v1beta1.MsgClaimIntentResponse")
 }
 
 func init() { proto.RegisterFile("ixo/claims/v1beta1/tx.proto", fileDescriptor_e0095508349b828a) }
 
 var fileDescriptor_e0095508349b828a = []byte{
-	// 1223 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0x4d, 0x6f, 0xdb, 0x46,
-	0x13, 0x36, 0x25, 0x59, 0x96, 0x46, 0xce, 0xc7, 0xbb, 0xf9, 0x78, 0x19, 0x26, 0x91, 0x54, 0x39,
-	0x6d, 0x8d, 0xb6, 0x21, 0x63, 0xa7, 0x41, 0x12, 0xb4, 0x40, 0x11, 0xd9, 0x0d, 0xe0, 0x83, 0xd0,
-	0x80, 0x49, 0x51, 0xa0, 0x45, 0xa1, 0xae, 0xc8, 0x35, 0xb3, 0x89, 0xc4, 0x55, 0xb9, 0x4b, 0x57,
-	0x46, 0x8f, 0x6d, 0xef, 0x41, 0xff, 0x40, 0xd1, 0x6b, 0x7f, 0x49, 0x8e, 0x39, 0x15, 0x3d, 0x25,
-	0x85, 0x7d, 0xeb, 0x4f, 0xc8, 0xa5, 0x05, 0x97, 0x4b, 0xea, 0x8b, 0x72, 0x29, 0x14, 0xc8, 0xc9,
-	0xde, 0xd9, 0x67, 0x66, 0x76, 0x9e, 0x19, 0xce, 0x8c, 0xe0, 0x32, 0x1d, 0x31, 0xcb, 0xe9, 0x63,
-	0x3a, 0xe0, 0xd6, 0xc1, 0x56, 0x8f, 0x08, 0xbc, 0x65, 0x89, 0x91, 0x39, 0x0c, 0x98, 0x60, 0x08,
-	0xd1, 0x11, 0x33, 0xe3, 0x4b, 0x53, 0x5d, 0x1a, 0xe7, 0x3d, 0xe6, 0x31, 0x79, 0x6d, 0x45, 0xff,
-	0xc5, 0x48, 0xa3, 0xe1, 0x31, 0xe6, 0xf5, 0x89, 0x25, 0x4f, 0xbd, 0x70, 0xdf, 0x12, 0x74, 0x40,
-	0xb8, 0xc0, 0x83, 0x61, 0x02, 0xc8, 0xf0, 0xa3, 0x2c, 0xc7, 0x80, 0xba, 0xc3, 0xf8, 0x80, 0x71,
-	0xab, 0x87, 0x39, 0x19, 0x23, 0x18, 0xf5, 0x4f, 0x32, 0x20, 0x55, 0x62, 0x40, 0xeb, 0xaf, 0x02,
-	0x9c, 0xeb, 0x70, 0x6f, 0x27, 0x20, 0x58, 0x90, 0x1d, 0xd6, 0xef, 0x13, 0x47, 0x50, 0xe6, 0xa3,
-	0x8b, 0x50, 0x26, 0xbe, 0xa0, 0xe2, 0x50, 0xd7, 0x9a, 0xda, 0x66, 0xd5, 0x56, 0xa7, 0x48, 0xce,
-	0xa9, 0xe7, 0x93, 0x40, 0x2f, 0xc4, 0xf2, 0xf8, 0x84, 0x0c, 0xa8, 0x48, 0x83, 0x0e, 0xeb, 0xeb,
-	0x45, 0x79, 0x93, 0x9e, 0xd1, 0x27, 0x00, 0x5c, 0xe0, 0x40, 0x74, 0x5d, 0x2c, 0x88, 0x5e, 0x6a,
-	0x6a, 0x9b, 0xb5, 0x6d, 0xc3, 0x8c, 0x63, 0x37, 0x93, 0xd8, 0xcd, 0x47, 0x49, 0xec, 0xed, 0xd2,
-	0xb3, 0x57, 0x0d, 0xcd, 0xae, 0x4a, 0x9d, 0x5d, 0x2c, 0x08, 0xfa, 0x08, 0x2a, 0xc4, 0x77, 0x63,
-	0xf5, 0xd5, 0x9c, 0xea, 0x6b, 0xc4, 0x77, 0xa5, 0xf2, 0x79, 0x58, 0xfd, 0x36, 0x64, 0x02, 0xeb,
-	0xe5, 0xa6, 0xb6, 0x59, 0xb2, 0xe3, 0x03, 0xba, 0x0b, 0xab, 0x5c, 0x44, 0xf6, 0xd6, 0x9a, 0xda,
-	0xe6, 0xe9, 0xed, 0x0d, 0x73, 0x3e, 0x69, 0xe6, 0x98, 0x8e, 0x87, 0x11, 0xd4, 0x8e, 0x35, 0xd0,
-	0x1d, 0xa8, 0x0c, 0xf1, 0xe1, 0x80, 0xf8, 0x82, 0xeb, 0x15, 0xf9, 0x9a, 0x2b, 0x59, 0xda, 0x0f,
-	0x14, 0xc6, 0x4e, 0xd1, 0xad, 0xab, 0x70, 0x39, 0x83, 0x6b, 0x9b, 0xf0, 0x21, 0xf3, 0x39, 0x69,
-	0xfd, 0xad, 0xc1, 0xe9, 0x0e, 0xf7, 0x1e, 0x86, 0xbd, 0x01, 0x15, 0x3b, 0x91, 0x35, 0xb4, 0x01,
-	0xa7, 0x9c, 0x14, 0xd8, 0xa5, 0xae, 0xca, 0xc6, 0xfa, 0x58, 0xb8, 0xe7, 0xa2, 0x4b, 0x50, 0x91,
-	0xbe, 0xa3, 0xfb, 0x38, 0x2b, 0x6b, 0xf2, 0xbc, 0xe7, 0x22, 0x07, 0xaa, 0xd8, 0x23, 0xbe, 0xe8,
-	0xba, 0xd4, 0x8d, 0xf3, 0xd2, 0xbe, 0xff, 0xfa, 0x65, 0xa3, 0xed, 0x51, 0xf1, 0x38, 0xec, 0x99,
-	0x0e, 0x1b, 0x58, 0x74, 0xc4, 0xf6, 0x59, 0xe8, 0xbb, 0x38, 0xb2, 0x16, 0x9d, 0xae, 0xf7, 0xfa,
-	0xcc, 0x79, 0xea, 0x3c, 0xc6, 0xd4, 0xb7, 0x0e, 0x6e, 0x5a, 0x23, 0x8b, 0x52, 0xd7, 0x12, 0x87,
-	0x43, 0xc2, 0xcd, 0xdd, 0xbd, 0xdd, 0xfb, 0x01, 0xf6, 0xa2, 0x68, 0xec, 0x8a, 0x34, 0xbc, 0x4b,
-	0xdd, 0xe8, 0x91, 0xb1, 0x13, 0xec, 0xba, 0x01, 0xe1, 0x5c, 0xa6, 0xb8, 0x6a, 0xaf, 0x4b, 0xe1,
-	0xbd, 0x58, 0x26, 0x41, 0xee, 0x80, 0xfa, 0x29, 0x68, 0x55, 0x81, 0x22, 0xa1, 0x02, 0xb5, 0x74,
-	0xb8, 0x38, 0x4d, 0x40, 0xca, 0xcd, 0x0f, 0x25, 0x38, 0xdb, 0xe1, 0xde, 0xa7, 0x07, 0xb8, 0x1f,
-	0x46, 0xec, 0x49, 0x76, 0x26, 0x03, 0xd7, 0xa6, 0x03, 0x9f, 0x23, 0xae, 0x90, 0x41, 0xdc, 0x45,
-	0x28, 0xb3, 0x00, 0x3b, 0x7d, 0xa2, 0x4a, 0x56, 0x9d, 0xa6, 0x59, 0x2b, 0xbd, 0x29, 0xd6, 0x56,
-	0xf3, 0xb0, 0x56, 0x9e, 0x67, 0x0d, 0x7d, 0x0c, 0xe5, 0xa8, 0x32, 0x43, 0xae, 0x8a, 0xf9, 0x5a,
-	0x56, 0x39, 0x2a, 0xe6, 0x54, 0x31, 0x87, 0xdc, 0x56, 0x3a, 0x11, 0x09, 0x01, 0xc1, 0x9c, 0xf9,
-	0xb2, 0x98, 0x4f, 0xd9, 0xea, 0x84, 0xae, 0x03, 0x3a, 0x20, 0x01, 0xdd, 0xa7, 0x8e, 0xd4, 0xea,
-	0x0e, 0x03, 0xc6, 0xf6, 0xf5, 0xaa, 0xf4, 0xff, 0xbf, 0xc9, 0x9b, 0x07, 0xd1, 0x05, 0x72, 0xa0,
-	0x8c, 0x07, 0x2c, 0xf4, 0x85, 0x0e, 0xcd, 0xe2, 0x66, 0x6d, 0xfb, 0x92, 0xa9, 0xfa, 0x4c, 0xd4,
-	0x9a, 0x26, 0x3e, 0x29, 0xea, 0xb7, 0x6f, 0x3c, 0x7f, 0xd9, 0x58, 0xf9, 0xed, 0x55, 0x63, 0x73,
-	0x82, 0x4f, 0xd5, 0xc7, 0xe2, 0x3f, 0xd7, 0xb9, 0xfb, 0x54, 0x71, 0x17, 0x29, 0x70, 0x5b, 0x99,
-	0x6e, 0x19, 0xa0, 0xcf, 0x16, 0x41, 0x5a, 0x21, 0x3f, 0x17, 0xe0, 0x4c, 0x87, 0x7b, 0xbb, 0x94,
-	0x0f, 0xc3, 0xa4, 0x40, 0xae, 0x02, 0xf0, 0xb0, 0xf7, 0x84, 0x38, 0x62, 0x5c, 0x22, 0x55, 0x25,
-	0x99, 0xfd, 0x3a, 0x0a, 0x6f, 0x2a, 0xcf, 0xc5, 0x8c, 0x3c, 0xbf, 0x05, 0xeb, 0x6e, 0xfc, 0xf0,
-	0x6e, 0x64, 0x4b, 0x16, 0xdd, 0xaa, 0x5d, 0x53, 0xb2, 0x47, 0x87, 0x43, 0x82, 0x6e, 0x42, 0xc9,
-	0xc5, 0x02, 0xab, 0x06, 0xd8, 0xc8, 0xca, 0xb1, 0x8a, 0x7d, 0x17, 0x0b, 0x6c, 0x4b, 0x70, 0xeb,
-	0x12, 0xfc, 0x7f, 0x86, 0x93, 0x94, 0xaf, 0xdf, 0x4b, 0x80, 0x3a, 0xdc, 0xfb, 0x82, 0x8a, 0xc7,
-	0x6e, 0x80, 0xbf, 0x53, 0xed, 0xea, 0xa4, 0x6f, 0xea, 0x09, 0x94, 0xa9, 0x3f, 0x0c, 0x05, 0xd7,
-	0x0b, 0x2a, 0xc5, 0x19, 0x6f, 0xd8, 0x8b, 0x10, 0xed, 0xdb, 0x51, 0x8a, 0x5f, 0xbf, 0x6c, 0x58,
-	0x27, 0xa6, 0x78, 0x64, 0xf5, 0xb0, 0x9f, 0x64, 0x5a, 0x2a, 0xda, 0xca, 0x03, 0xf2, 0x61, 0x8d,
-	0x85, 0x42, 0x3a, 0x2b, 0x4a, 0x67, 0x46, 0x96, 0xb3, 0xcf, 0x24, 0xa4, 0x7d, 0x47, 0x79, 0xbb,
-	0x91, 0xdf, 0x5b, 0xac, 0x69, 0x27, 0x4e, 0x50, 0x1b, 0xd6, 0x55, 0x9b, 0x1e, 0x27, 0xe0, 0x74,
-	0x36, 0xcb, 0x8a, 0xa9, 0x28, 0x29, 0x76, 0x6d, 0x38, 0x3e, 0xa0, 0xaf, 0xe0, 0x82, 0xc3, 0x7c,
-	0x11, 0x60, 0x47, 0x74, 0xb7, 0xb6, 0x6e, 0xdd, 0xea, 0xaa, 0x4b, 0x95, 0xb2, 0x77, 0xb3, 0x67,
-	0x4c, 0xac, 0x10, 0xe1, 0x95, 0x61, 0xfb, 0x9c, 0x33, 0x2f, 0x44, 0x57, 0xa0, 0x2a, 0xd8, 0xbd,
-	0xa9, 0x2e, 0x30, 0x16, 0xa0, 0x26, 0xd4, 0xf6, 0x03, 0x36, 0x48, 0xee, 0xd7, 0xe4, 0xfd, 0xa4,
-	0x08, 0xed, 0xc0, 0x7a, 0x40, 0xfa, 0x04, 0x73, 0x12, 0xcf, 0xd1, 0x4a, 0xce, 0x39, 0x5a, 0x53,
-	0x5a, 0x72, 0x96, 0xce, 0xb5, 0xa3, 0x6a, 0x46, 0x13, 0xbf, 0x02, 0xc6, 0x7c, 0x5d, 0xa5, 0x65,
-	0xf7, 0x8b, 0x26, 0xbf, 0xe1, 0xcf, 0x87, 0xee, 0xd4, 0x10, 0x94, 0x13, 0x36, 0xdf, 0xb8, 0x4b,
-	0x47, 0x77, 0x61, 0xe9, 0xd1, 0x3d, 0xf7, 0xfe, 0x62, 0xc6, 0xfb, 0x5b, 0xd0, 0x5c, 0xf4, 0xc0,
-	0x34, 0x8a, 0xa3, 0xec, 0x28, 0x22, 0x92, 0x78, 0xbe, 0x28, 0xa6, 0x97, 0xa2, 0xc2, 0x7f, 0x5b,
-	0x8a, 0x8a, 0xcb, 0x2e, 0x45, 0x73, 0x44, 0x94, 0x72, 0x13, 0x21, 0x63, 0x4c, 0x89, 0xf8, 0x55,
-	0x93, 0x3b, 0xcd, 0x2c, 0x28, 0x59, 0x7e, 0xf2, 0x71, 0x31, 0xb9, 0x51, 0x15, 0x96, 0xd9, 0xa8,
-	0xf2, 0x25, 0xf4, 0x6d, 0xd8, 0x38, 0xe1, 0x89, 0x49, 0x28, 0xdb, 0x3f, 0xad, 0x41, 0xb1, 0xc3,
-	0x3d, 0xd4, 0x87, 0xb3, 0x73, 0xeb, 0x70, 0xe6, 0xb7, 0x9b, 0xb1, 0xcb, 0x19, 0x56, 0x4e, 0x60,
-	0xe2, 0x15, 0x7d, 0x0d, 0xb5, 0xc9, 0x85, 0xaf, 0xb5, 0x40, 0x7f, 0x02, 0x63, 0xbc, 0xf7, 0xef,
-	0x98, 0xd4, 0xbc, 0x03, 0xa7, 0xa6, 0x77, 0xa6, 0x6b, 0x0b, 0x94, 0xa7, 0x50, 0xc6, 0x07, 0x79,
-	0x50, 0xa9, 0x93, 0x6f, 0x60, 0x7d, 0x6a, 0xec, 0x6e, 0x2c, 0xd0, 0x9e, 0x04, 0x19, 0xef, 0xe7,
-	0x00, 0xa5, 0x1e, 0x28, 0x9c, 0x99, 0x1d, 0x54, 0xef, 0x2c, 0xd0, 0x9f, 0xc1, 0x19, 0x66, 0x3e,
-	0x5c, 0xea, 0xea, 0x7b, 0xb8, 0x90, 0xdd, 0x9c, 0x16, 0x71, 0x92, 0x89, 0x36, 0x3e, 0x5c, 0x06,
-	0x7d, 0x92, 0xf3, 0xb8, 0xa7, 0xe4, 0x75, 0x2e, 0xd1, 0xb9, 0x9d, 0x4f, 0x7d, 0xcb, 0xe8, 0x47,
-	0x0d, 0xf4, 0x85, 0x1f, 0xb2, 0x95, 0xd3, 0x64, 0xa2, 0x60, 0xdc, 0x5e, 0x52, 0x21, 0x79, 0x46,
-	0xfb, 0xe1, 0xf3, 0xa3, 0xba, 0xf6, 0xe2, 0xa8, 0xae, 0xfd, 0x79, 0x54, 0xd7, 0x9e, 0x1d, 0xd7,
-	0x57, 0x5e, 0x1c, 0xd7, 0x57, 0xfe, 0x38, 0xae, 0xaf, 0x7c, 0x79, 0x77, 0xa9, 0xc5, 0x4c, 0xfd,
-	0xec, 0x95, 0xf3, 0xbe, 0x57, 0x96, 0x3d, 0xf1, 0xe6, 0x3f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x00,
-	0x89, 0xbf, 0x5b, 0xba, 0x0f, 0x00, 0x00,
+	// 1463 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x58, 0xcd, 0x6f, 0x1b, 0x45,
+	0x14, 0xcf, 0xfa, 0xdb, 0xcf, 0xe9, 0x07, 0xd3, 0x2f, 0x77, 0xd3, 0x3a, 0xc6, 0x29, 0x10, 0xb5,
+	0x74, 0xb7, 0x49, 0x5b, 0xe8, 0x07, 0x08, 0xd5, 0x49, 0x2b, 0xe5, 0x10, 0xb5, 0xda, 0x16, 0x55,
+	0x02, 0x21, 0xb3, 0xde, 0x9d, 0x6c, 0x97, 0xd8, 0x3b, 0x66, 0x67, 0x36, 0x4d, 0xc4, 0x09, 0xc4,
+	0x1f, 0xd0, 0xbf, 0x82, 0x03, 0x27, 0x24, 0xc4, 0x15, 0x89, 0x5b, 0xb9, 0xf5, 0x88, 0x84, 0xd4,
+	0xa2, 0xe6, 0x00, 0x7f, 0x01, 0x07, 0xc4, 0x01, 0xcd, 0xec, 0x78, 0xbd, 0xb6, 0xd7, 0x61, 0x9d,
+	0x56, 0x39, 0xc5, 0x33, 0xef, 0xf7, 0x66, 0xe6, 0xfd, 0xde, 0xef, 0xcd, 0xbc, 0x0d, 0xcc, 0xb9,
+	0xdb, 0x44, 0xb7, 0x3a, 0xa6, 0xdb, 0xa5, 0xfa, 0xd6, 0x52, 0x1b, 0x33, 0x73, 0x49, 0x67, 0xdb,
+	0x5a, 0xcf, 0x27, 0x8c, 0x20, 0xe4, 0x6e, 0x13, 0x2d, 0x34, 0x6a, 0xd2, 0xa8, 0x1e, 0x77, 0x88,
+	0x43, 0x84, 0x59, 0xe7, 0xbf, 0x42, 0xa4, 0x3a, 0xef, 0x10, 0xe2, 0x74, 0xb0, 0x2e, 0x46, 0xed,
+	0x60, 0x43, 0x67, 0x6e, 0x17, 0x53, 0x66, 0x76, 0x7b, 0x7d, 0x40, 0xc2, 0x3e, 0x72, 0xe5, 0x10,
+	0x50, 0xb3, 0x08, 0xed, 0x12, 0xaa, 0xb7, 0x4d, 0x8a, 0x07, 0x08, 0xe2, 0x7a, 0x63, 0x76, 0x6f,
+	0x33, 0xb2, 0xf3, 0x81, 0xb4, 0x9f, 0x92, 0xf6, 0x2e, 0x75, 0xf4, 0xad, 0x25, 0xfe, 0x27, 0x34,
+	0x34, 0x7e, 0xce, 0xc2, 0xb1, 0x75, 0xea, 0xac, 0xf8, 0xd8, 0x64, 0x78, 0x85, 0x74, 0x3a, 0xd8,
+	0x62, 0x2e, 0xf1, 0xd0, 0x49, 0x28, 0x60, 0x8f, 0xb9, 0x6c, 0xa7, 0xaa, 0xd4, 0x95, 0xc5, 0xb2,
+	0x21, 0x47, 0x7c, 0x9e, 0xba, 0x8e, 0x87, 0xfd, 0x6a, 0x26, 0x9c, 0x0f, 0x47, 0x48, 0x85, 0x92,
+	0x58, 0xd0, 0x22, 0x9d, 0x6a, 0x56, 0x58, 0xa2, 0x31, 0xfa, 0x08, 0x80, 0x32, 0xd3, 0x67, 0x2d,
+	0xdb, 0x64, 0xb8, 0x9a, 0xab, 0x2b, 0x8b, 0x95, 0x65, 0x55, 0x0b, 0x39, 0xd1, 0xfa, 0x9c, 0x68,
+	0x0f, 0xfa, 0x9c, 0x34, 0x73, 0x4f, 0x5e, 0xcc, 0x2b, 0x46, 0x59, 0xf8, 0xac, 0x9a, 0x0c, 0xa3,
+	0x9b, 0x50, 0xc2, 0x9e, 0x1d, 0xba, 0xe7, 0x53, 0xba, 0x17, 0xb1, 0x67, 0x0b, 0xe7, 0xe3, 0x90,
+	0xff, 0x32, 0x20, 0xcc, 0xac, 0x16, 0xea, 0xca, 0x62, 0xce, 0x08, 0x07, 0xe8, 0x3a, 0xe4, 0x29,
+	0xe3, 0xeb, 0x15, 0xeb, 0xca, 0xe2, 0xe1, 0xe5, 0x05, 0x6d, 0x3c, 0x99, 0xda, 0x80, 0x8e, 0xfb,
+	0x1c, 0x6a, 0x84, 0x1e, 0xe8, 0x1a, 0x94, 0x7a, 0xe6, 0x4e, 0x17, 0x7b, 0x8c, 0x56, 0x4b, 0xe2,
+	0x34, 0x67, 0x92, 0xbc, 0xef, 0x49, 0x8c, 0x11, 0xa1, 0xd1, 0x6d, 0x28, 0xba, 0x1e, 0x13, 0x8e,
+	0x65, 0xb1, 0xed, 0x85, 0xbd, 0xb7, 0x5d, 0x13, 0xe0, 0xbb, 0x3d, 0xfe, 0x9b, 0x1a, 0x7d, 0xdf,
+	0x1b, 0x95, 0x6f, 0xfe, 0xfc, 0xe1, 0xbc, 0x24, 0xbe, 0x71, 0x16, 0xe6, 0x12, 0xf2, 0x67, 0x60,
+	0xda, 0x23, 0x1e, 0xc5, 0x8d, 0xdf, 0xb3, 0x70, 0x78, 0x9d, 0x3a, 0xf7, 0x83, 0x76, 0xd7, 0x65,
+	0x2b, 0x7c, 0x23, 0xb4, 0x00, 0x87, 0xac, 0x08, 0xd8, 0x72, 0x6d, 0x99, 0xe1, 0xd9, 0xc1, 0xe4,
+	0x9a, 0x8d, 0x4e, 0x43, 0x49, 0x1c, 0x8b, 0xdb, 0xc3, 0x4c, 0x17, 0xc5, 0x78, 0xcd, 0x46, 0x16,
+	0x94, 0x4d, 0x07, 0x7b, 0xac, 0x65, 0xbb, 0x76, 0x98, 0xeb, 0xe6, 0x9d, 0x7f, 0x9e, 0xcf, 0x37,
+	0x1d, 0x97, 0x3d, 0x0a, 0xda, 0x9a, 0x45, 0xba, 0xba, 0xbb, 0x4d, 0x36, 0x48, 0xe0, 0xd9, 0x26,
+	0x5f, 0x8d, 0x8f, 0x2e, 0xb6, 0x3b, 0xc4, 0xda, 0xb4, 0x1e, 0x99, 0xae, 0xa7, 0x6f, 0x5d, 0xd1,
+	0xb7, 0x75, 0xd7, 0xb5, 0x75, 0xb6, 0xd3, 0xc3, 0x54, 0x5b, 0x5d, 0x5b, 0xbd, 0xe3, 0x9b, 0x0e,
+	0x67, 0xc8, 0x28, 0x89, 0x85, 0x57, 0x5d, 0x9b, 0x1f, 0x32, 0xdc, 0xc4, 0xb4, 0x6d, 0x1f, 0x53,
+	0x2a, 0x64, 0x53, 0x36, 0x66, 0xc5, 0xe4, 0xad, 0x70, 0x4e, 0x80, 0xec, 0xae, 0xeb, 0x45, 0xa0,
+	0xbc, 0x04, 0xf1, 0xc9, 0x3e, 0xe8, 0x2c, 0x40, 0x40, 0x71, 0x2b, 0x24, 0x4f, 0x88, 0xa0, 0x64,
+	0x94, 0x03, 0x8a, 0x43, 0x72, 0x91, 0x05, 0x05, 0xb3, 0x4b, 0x02, 0x8f, 0x55, 0x8b, 0xf5, 0xec,
+	0x62, 0x65, 0xf9, 0xb4, 0x16, 0x96, 0x8a, 0xc6, 0x4b, 0x2d, 0x96, 0x13, 0xd7, 0x6b, 0x5e, 0x7a,
+	0xfa, 0x7c, 0x7e, 0xe6, 0xfb, 0x17, 0xf3, 0x8b, 0xb1, 0x48, 0x65, 0x5d, 0x85, 0x7f, 0x2e, 0x52,
+	0x7b, 0x53, 0x46, 0xc5, 0x1d, 0xa8, 0x21, 0x97, 0x46, 0x4d, 0x98, 0xb5, 0x1e, 0x2f, 0x5f, 0x6a,
+	0x49, 0x25, 0x54, 0x4b, 0x62, 0xab, 0xf9, 0xc4, 0xec, 0x3f, 0x5c, 0xbe, 0x24, 0xa5, 0x63, 0x54,
+	0xb8, 0x93, 0x1c, 0xdc, 0x40, 0x3c, 0xeb, 0xc3, 0xf1, 0x36, 0xaa, 0x70, 0x72, 0x38, 0xb9, 0x83,
+	0xbc, 0xe7, 0xe0, 0xe8, 0x3a, 0x75, 0x6e, 0x6f, 0x99, 0x9d, 0x80, 0x2b, 0x43, 0x64, 0x3e, 0x9e,
+	0x54, 0x65, 0x38, 0xa9, 0x63, 0xa2, 0xc8, 0x24, 0x88, 0xe2, 0x24, 0x14, 0x88, 0x6f, 0x5a, 0x1d,
+	0x2c, 0x4b, 0x5c, 0x8e, 0x86, 0x15, 0x91, 0x3b, 0x28, 0x45, 0xe4, 0xd3, 0x28, 0xa2, 0x90, 0xa0,
+	0x88, 0x0f, 0xa0, 0xc0, 0x2b, 0x39, 0xa0, 0xb2, 0xf8, 0xcf, 0x25, 0xe5, 0x41, 0x32, 0x27, 0x8b,
+	0x3f, 0xa0, 0x86, 0xf4, 0xe1, 0x24, 0xf8, 0xd8, 0xa4, 0xc4, 0x13, 0xc5, 0x7f, 0xc8, 0x90, 0x23,
+	0x74, 0x11, 0xd0, 0x16, 0xf6, 0xdd, 0x0d, 0xd7, 0x12, 0x5e, 0xad, 0x9e, 0x4f, 0xc8, 0x86, 0xa8,
+	0xf3, 0xb2, 0xf1, 0x46, 0xdc, 0x72, 0x8f, 0x1b, 0x62, 0xba, 0x83, 0x83, 0xd3, 0x5d, 0xe5, 0x35,
+	0xe9, 0x4e, 0x85, 0xea, 0xa8, 0xb8, 0x22, 0xe5, 0x7d, 0x97, 0x81, 0x23, 0xeb, 0xd4, 0x59, 0x75,
+	0x69, 0x2f, 0xe8, 0x0b, 0xef, 0x2c, 0x00, 0x0d, 0xda, 0x5f, 0x60, 0x8b, 0x0d, 0xa4, 0x57, 0x96,
+	0x33, 0xa3, 0x37, 0x4a, 0xe6, 0xa0, 0xf4, 0x93, 0x4d, 0xd0, 0xcf, 0x9b, 0x30, 0x6b, 0x87, 0x07,
+	0x6f, 0xf1, 0xb5, 0x84, 0x98, 0xf3, 0x46, 0x45, 0xce, 0x3d, 0xd8, 0xe9, 0x61, 0x74, 0x19, 0x72,
+	0xb6, 0xc9, 0x4c, 0xf9, 0x10, 0x25, 0x72, 0x29, 0x63, 0x5f, 0x35, 0x99, 0x69, 0x08, 0x70, 0x9f,
+	0xc4, 0xf8, 0xfe, 0x8d, 0xd3, 0x70, 0x6a, 0x84, 0xa7, 0x88, 0xc3, 0x5f, 0x73, 0x80, 0xd6, 0xa9,
+	0xf3, 0xd0, 0x65, 0x8f, 0x6c, 0xdf, 0x7c, 0x2c, 0x53, 0xb1, 0x57, 0xfd, 0x5e, 0x83, 0x82, 0xeb,
+	0xf5, 0x02, 0x46, 0xab, 0x19, 0x91, 0x63, 0x75, 0x20, 0x27, 0x6f, 0x33, 0x3a, 0xd8, 0x1a, 0x87,
+	0x34, 0x73, 0x5c, 0x4f, 0x86, 0xc4, 0xa3, 0x9b, 0x50, 0x24, 0x01, 0x13, 0xae, 0x59, 0xe1, 0x3a,
+	0x97, 0xe8, 0x7a, 0x57, 0x60, 0xa4, 0x6f, 0xdf, 0x83, 0x0b, 0x4c, 0x6a, 0x6b, 0xc0, 0xd7, 0xe1,
+	0x64, 0x52, 0x64, 0x10, 0x9c, 0x43, 0xa3, 0xd2, 0x1b, 0x0c, 0xd0, 0xa7, 0x70, 0xc2, 0x22, 0x1e,
+	0xf3, 0x4d, 0x8b, 0xb5, 0x96, 0x96, 0xae, 0x5e, 0x8d, 0xd4, 0x1a, 0x32, 0xfc, 0x4e, 0xf2, 0x1b,
+	0x19, 0x3a, 0x70, 0x7c, 0x5f, 0xb5, 0xc7, 0xac, 0xf1, 0x49, 0x74, 0x06, 0xca, 0x8c, 0xdc, 0x1a,
+	0xba, 0x0c, 0x06, 0x13, 0xa8, 0x0e, 0x95, 0x0d, 0x9f, 0x74, 0xfb, 0xf6, 0xa2, 0xb0, 0xc7, 0xa7,
+	0xd0, 0x0a, 0xcc, 0xfa, 0xb8, 0x83, 0x4d, 0x8a, 0xc3, 0xf6, 0xa3, 0x94, 0xb2, 0xfd, 0xa8, 0x48,
+	0x2f, 0xd1, 0x82, 0x8c, 0xdd, 0x4a, 0xe5, 0x84, 0x5b, 0x69, 0xb4, 0x56, 0xe1, 0x35, 0xd5, 0xea,
+	0x19, 0x50, 0xc7, 0xa5, 0x14, 0x29, 0xed, 0x47, 0x45, 0x94, 0xf2, 0xc7, 0x3d, 0x7b, 0xa8, 0x7f,
+	0x10, 0x0d, 0x4f, 0xba, 0x4e, 0x21, 0xea, 0xa4, 0x32, 0x53, 0x77, 0x52, 0x63, 0xbc, 0x64, 0xc7,
+	0x79, 0x49, 0x8c, 0xa9, 0x01, 0xf5, 0x49, 0x87, 0x8e, 0x22, 0xfb, 0x3b, 0x39, 0x32, 0x9e, 0x10,
+	0x9a, 0x2e, 0xb2, 0xe1, 0xbe, 0x35, 0xf3, 0x6a, 0x7d, 0x6b, 0x76, 0xda, 0xbe, 0x75, 0x8c, 0x9c,
+	0xdc, 0x2b, 0x91, 0x23, 0xe2, 0x8e, 0xc8, 0xf9, 0x49, 0x11, 0x6d, 0xe3, 0x28, 0xa8, 0xdf, 0xb3,
+	0xa6, 0xe3, 0x27, 0xde, 0x08, 0x67, 0xa6, 0x6a, 0x84, 0xf7, 0x9d, 0xf8, 0xb7, 0x60, 0x61, 0x8f,
+	0x63, 0x47, 0xe1, 0xfd, 0xa2, 0x08, 0xd1, 0x8f, 0xe2, 0xc2, 0x96, 0x2f, 0x65, 0x74, 0xb1, 0x66,
+	0x3d, 0xb3, 0xff, 0x66, 0x7d, 0xff, 0xa1, 0x9e, 0x83, 0xc6, 0xe4, 0x10, 0xa2, 0x48, 0xff, 0xcd,
+	0x88, 0xfe, 0x5e, 0x3c, 0x1f, 0x51, 0x47, 0x1b, 0x7b, 0x4d, 0x95, 0x83, 0x7a, 0x4d, 0x33, 0xc9,
+	0xdd, 0xd8, 0x30, 0xcf, 0xd9, 0x04, 0x9e, 0x07, 0x8d, 0x50, 0xee, 0xe0, 0x1a, 0xa1, 0xfc, 0xfe,
+	0x2f, 0xd7, 0xa1, 0x37, 0x9c, 0x89, 0x06, 0x3c, 0xc6, 0x7e, 0x3f, 0x31, 0x68, 0x0e, 0xca, 0xa1,
+	0x04, 0x06, 0xfa, 0x2a, 0x85, 0x13, 0x6b, 0x36, 0xfa, 0x10, 0xca, 0x78, 0xbb, 0xe7, 0xfa, 0xb8,
+	0x65, 0xb2, 0xd4, 0x17, 0x4b, 0x29, 0x74, 0xb9, 0xc5, 0x96, 0xff, 0x2a, 0x41, 0x76, 0x9d, 0x3a,
+	0xa8, 0x03, 0x47, 0xc7, 0x3e, 0xdc, 0x13, 0x9f, 0xcb, 0x84, 0x2f, 0x44, 0x55, 0x4f, 0x09, 0x8c,
+	0x22, 0xfa, 0x0c, 0x2a, 0xf1, 0xcf, 0xc8, 0xc6, 0x04, 0xff, 0x18, 0x46, 0x3d, 0xff, 0xff, 0x98,
+	0x68, 0x79, 0x0b, 0x0e, 0x0d, 0x7f, 0xad, 0x9c, 0x9b, 0xe0, 0x3c, 0x84, 0x52, 0xdf, 0x4d, 0x83,
+	0x8a, 0x36, 0xf9, 0x1c, 0x66, 0x87, 0x1a, 0xd3, 0x85, 0x09, 0xde, 0x71, 0x90, 0x7a, 0x21, 0x05,
+	0x28, 0xda, 0xc1, 0x85, 0x23, 0xa3, 0x6d, 0xdb, 0xdb, 0x13, 0xfc, 0x47, 0x70, 0xaa, 0x96, 0x0e,
+	0x17, 0x6d, 0xf5, 0x15, 0x9c, 0x48, 0x7e, 0xb7, 0x27, 0x71, 0x92, 0x88, 0x56, 0xaf, 0x4c, 0x83,
+	0xde, 0x6b, 0xf3, 0xf0, 0x69, 0x4d, 0xbb, 0xb9, 0x40, 0xa7, 0xde, 0x7c, 0xe8, 0xf9, 0x42, 0xdf,
+	0x2a, 0x50, 0x9d, 0xf8, 0x76, 0xe9, 0x29, 0x97, 0xec, 0x3b, 0xa8, 0xef, 0x4f, 0xe9, 0x10, 0x1d,
+	0xe3, 0x6b, 0x05, 0x4e, 0x4d, 0x7a, 0x63, 0xb4, 0x94, 0x8b, 0x4a, 0xbc, 0xfa, 0xde, 0x74, 0xf8,
+	0x78, 0x55, 0xc6, 0x2f, 0xff, 0x49, 0x55, 0x19, 0xc3, 0x4c, 0xac, 0xca, 0x84, 0x6b, 0xac, 0x79,
+	0xff, 0xe9, 0xcb, 0x9a, 0xf2, 0xec, 0x65, 0x4d, 0xf9, 0xe3, 0x65, 0x4d, 0x79, 0xb2, 0x5b, 0x9b,
+	0x79, 0xb6, 0x5b, 0x9b, 0xf9, 0x6d, 0xb7, 0x36, 0xf3, 0xc9, 0xf5, 0xa9, 0xde, 0x13, 0xf9, 0xcf,
+	0x4d, 0x71, 0x37, 0xb7, 0x0b, 0xe2, 0x8e, 0xbb, 0xfc, 0x5f, 0x00, 0x00, 0x00, 0xff, 0xff, 0x65,
+	0xfc, 0xb2, 0x58, 0x5f, 0x15, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1167,6 +1492,8 @@ type MsgClient interface {
 	UpdateCollectionState(ctx context.Context, in *MsgUpdateCollectionState, opts ...grpc.CallOption) (*MsgUpdateCollectionStateResponse, error)
 	UpdateCollectionDates(ctx context.Context, in *MsgUpdateCollectionDates, opts ...grpc.CallOption) (*MsgUpdateCollectionDatesResponse, error)
 	UpdateCollectionPayments(ctx context.Context, in *MsgUpdateCollectionPayments, opts ...grpc.CallOption) (*MsgUpdateCollectionPaymentsResponse, error)
+	UpdateCollectionIntents(ctx context.Context, in *MsgUpdateCollectionIntents, opts ...grpc.CallOption) (*MsgUpdateCollectionIntentsResponse, error)
+	ClaimIntent(ctx context.Context, in *MsgClaimIntent, opts ...grpc.CallOption) (*MsgClaimIntentResponse, error)
 }
 
 type msgClient struct {
@@ -1249,6 +1576,24 @@ func (c *msgClient) UpdateCollectionPayments(ctx context.Context, in *MsgUpdateC
 	return out, nil
 }
 
+func (c *msgClient) UpdateCollectionIntents(ctx context.Context, in *MsgUpdateCollectionIntents, opts ...grpc.CallOption) (*MsgUpdateCollectionIntentsResponse, error) {
+	out := new(MsgUpdateCollectionIntentsResponse)
+	err := c.cc.Invoke(ctx, "/ixo.claims.v1beta1.Msg/UpdateCollectionIntents", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *msgClient) ClaimIntent(ctx context.Context, in *MsgClaimIntent, opts ...grpc.CallOption) (*MsgClaimIntentResponse, error) {
+	out := new(MsgClaimIntentResponse)
+	err := c.cc.Invoke(ctx, "/ixo.claims.v1beta1.Msg/ClaimIntent", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	CreateCollection(context.Context, *MsgCreateCollection) (*MsgCreateCollectionResponse, error)
@@ -1259,6 +1604,8 @@ type MsgServer interface {
 	UpdateCollectionState(context.Context, *MsgUpdateCollectionState) (*MsgUpdateCollectionStateResponse, error)
 	UpdateCollectionDates(context.Context, *MsgUpdateCollectionDates) (*MsgUpdateCollectionDatesResponse, error)
 	UpdateCollectionPayments(context.Context, *MsgUpdateCollectionPayments) (*MsgUpdateCollectionPaymentsResponse, error)
+	UpdateCollectionIntents(context.Context, *MsgUpdateCollectionIntents) (*MsgUpdateCollectionIntentsResponse, error)
+	ClaimIntent(context.Context, *MsgClaimIntent) (*MsgClaimIntentResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -1288,6 +1635,12 @@ func (*UnimplementedMsgServer) UpdateCollectionDates(ctx context.Context, req *M
 }
 func (*UnimplementedMsgServer) UpdateCollectionPayments(ctx context.Context, req *MsgUpdateCollectionPayments) (*MsgUpdateCollectionPaymentsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCollectionPayments not implemented")
+}
+func (*UnimplementedMsgServer) UpdateCollectionIntents(ctx context.Context, req *MsgUpdateCollectionIntents) (*MsgUpdateCollectionIntentsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCollectionIntents not implemented")
+}
+func (*UnimplementedMsgServer) ClaimIntent(ctx context.Context, req *MsgClaimIntent) (*MsgClaimIntentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ClaimIntent not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -1438,6 +1791,42 @@ func _Msg_UpdateCollectionPayments_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_UpdateCollectionIntents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgUpdateCollectionIntents)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).UpdateCollectionIntents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.claims.v1beta1.Msg/UpdateCollectionIntents",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).UpdateCollectionIntents(ctx, req.(*MsgUpdateCollectionIntents))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Msg_ClaimIntent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgClaimIntent)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).ClaimIntent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ixo.claims.v1beta1.Msg/ClaimIntent",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).ClaimIntent(ctx, req.(*MsgClaimIntent))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "ixo.claims.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -1474,6 +1863,14 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 			MethodName: "UpdateCollectionPayments",
 			Handler:    _Msg_UpdateCollectionPayments_Handler,
 		},
+		{
+			MethodName: "UpdateCollectionIntents",
+			Handler:    _Msg_UpdateCollectionIntents_Handler,
+		},
+		{
+			MethodName: "ClaimIntent",
+			Handler:    _Msg_ClaimIntent_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "ixo/claims/v1beta1/tx.proto",
@@ -1499,6 +1896,11 @@ func (m *MsgCreateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.Intents != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Intents))
+		i--
+		dAtA[i] = 0x48
+	}
 	if m.Payments != nil {
 		{
 			size, err := m.Payments.MarshalToSizedBuffer(dAtA[:i])
@@ -1522,7 +1924,7 @@ func (m *MsgCreateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x30
 	}
 	if m.EndDate != nil {
-		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate):])
+		n2, err2 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.EndDate):])
 		if err2 != nil {
 			return 0, err2
 		}
@@ -1532,7 +1934,7 @@ func (m *MsgCreateCollection) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x2a
 	}
 	if m.StartDate != nil {
-		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate):])
+		n3, err3 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.StartDate):])
 		if err3 != nil {
 			return 0, err3
 		}
@@ -1608,6 +2010,44 @@ func (m *MsgSubmitClaim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Cw20Payment) > 0 {
+		for iNdEx := len(m.Cw20Payment) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Cw20Payment[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x42
+		}
+	}
+	if len(m.Amount) > 0 {
+		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Amount[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x3a
+		}
+	}
+	if m.UseIntent {
+		i--
+		if m.UseIntent {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x30
+	}
 	if len(m.AdminAddress) > 0 {
 		i -= len(m.AdminAddress)
 		copy(dAtA[i:], m.AdminAddress)
@@ -1689,6 +2129,20 @@ func (m *MsgEvaluateClaim) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Cw20Payment) > 0 {
+		for iNdEx := len(m.Cw20Payment) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Cw20Payment[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x5a
+		}
+	}
 	if len(m.Amount) > 0 {
 		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -1892,6 +2346,20 @@ func (m *MsgWithdrawPayment) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.Cw20Payment) > 0 {
+		for iNdEx := len(m.Cw20Payment) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Cw20Payment[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x52
+		}
+	}
 	if len(m.AdminAddress) > 0 {
 		i -= len(m.AdminAddress)
 		copy(dAtA[i:], m.AdminAddress)
@@ -1900,7 +2368,7 @@ func (m *MsgWithdrawPayment) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x4a
 	}
 	if m.ReleaseDate != nil {
-		n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.ReleaseDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.ReleaseDate):])
+		n5, err5 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.ReleaseDate, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.ReleaseDate):])
 		if err5 != nil {
 			return 0, err5
 		}
@@ -2094,7 +2562,7 @@ func (m *MsgUpdateCollectionDates) MarshalToSizedBuffer(dAtA []byte) (int, error
 		dAtA[i] = 0x22
 	}
 	if m.EndDate != nil {
-		n7, err7 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate):])
+		n7, err7 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.EndDate):])
 		if err7 != nil {
 			return 0, err7
 		}
@@ -2104,7 +2572,7 @@ func (m *MsgUpdateCollectionDates) MarshalToSizedBuffer(dAtA []byte) (int, error
 		dAtA[i] = 0x1a
 	}
 	if m.StartDate != nil {
-		n8, err8 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate):])
+		n8, err8 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.StartDate):])
 		if err8 != nil {
 			return 0, err8
 		}
@@ -2218,6 +2686,183 @@ func (m *MsgUpdateCollectionPaymentsResponse) MarshalToSizedBuffer(dAtA []byte) 
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgUpdateCollectionIntents) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionIntents) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionIntents) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.AdminAddress) > 0 {
+		i -= len(m.AdminAddress)
+		copy(dAtA[i:], m.AdminAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AdminAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Intents != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.Intents))
+		i--
+		dAtA[i] = 0x10
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgUpdateCollectionIntentsResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgUpdateCollectionIntentsResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgUpdateCollectionIntentsResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgClaimIntent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgClaimIntent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgClaimIntent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Cw20Payment) > 0 {
+		for iNdEx := len(m.Cw20Payment) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Cw20Payment[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x2a
+		}
+	}
+	if len(m.Amount) > 0 {
+		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Amount[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.CollectionId) > 0 {
+		i -= len(m.CollectionId)
+		copy(dAtA[i:], m.CollectionId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.CollectionId)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.AgentAddress) > 0 {
+		i -= len(m.AgentAddress)
+		copy(dAtA[i:], m.AgentAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AgentAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.AgentDid) > 0 {
+		i -= len(m.AgentDid)
+		copy(dAtA[i:], m.AgentDid)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.AgentDid)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgClaimIntentResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgClaimIntentResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgClaimIntentResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.ExpireAt != nil {
+		n10, err10 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.ExpireAt, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.ExpireAt):])
+		if err10 != nil {
+			return 0, err10
+		}
+		i -= n10
+		i = encodeVarintTx(dAtA, i, uint64(n10))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.IntentId) > 0 {
+		i -= len(m.IntentId)
+		copy(dAtA[i:], m.IntentId)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.IntentId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -2248,11 +2893,11 @@ func (m *MsgCreateCollection) Size() (n int) {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.StartDate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.StartDate)
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.EndDate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.EndDate)
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.Quota != 0 {
@@ -2264,6 +2909,9 @@ func (m *MsgCreateCollection) Size() (n int) {
 	if m.Payments != nil {
 		l = m.Payments.Size()
 		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Intents != 0 {
+		n += 1 + sovTx(uint64(m.Intents))
 	}
 	return n
 }
@@ -2302,6 +2950,21 @@ func (m *MsgSubmitClaim) Size() (n int) {
 	l = len(m.AdminAddress)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.UseIntent {
+		n += 2
+	}
+	if len(m.Amount) > 0 {
+		for _, e := range m.Amount {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Cw20Payment) > 0 {
+		for _, e := range m.Cw20Payment {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
 	return n
 }
@@ -2357,6 +3020,12 @@ func (m *MsgEvaluateClaim) Size() (n int) {
 	}
 	if len(m.Amount) > 0 {
 		for _, e := range m.Amount {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Cw20Payment) > 0 {
+		for _, e := range m.Cw20Payment {
 			l = e.Size()
 			n += 1 + l + sovTx(uint64(l))
 		}
@@ -2448,12 +3117,18 @@ func (m *MsgWithdrawPayment) Size() (n int) {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.ReleaseDate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.ReleaseDate)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.ReleaseDate)
 		n += 1 + l + sovTx(uint64(l))
 	}
 	l = len(m.AdminAddress)
 	if l > 0 {
 		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.Cw20Payment) > 0 {
+		for _, e := range m.Cw20Payment {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
 	}
 	return n
 }
@@ -2507,11 +3182,11 @@ func (m *MsgUpdateCollectionDates) Size() (n int) {
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.StartDate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.StartDate)
 		n += 1 + l + sovTx(uint64(l))
 	}
 	if m.EndDate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.EndDate)
 		n += 1 + l + sovTx(uint64(l))
 	}
 	l = len(m.AdminAddress)
@@ -2557,6 +3232,85 @@ func (m *MsgUpdateCollectionPaymentsResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
+	return n
+}
+
+func (m *MsgUpdateCollectionIntents) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.Intents != 0 {
+		n += 1 + sovTx(uint64(m.Intents))
+	}
+	l = len(m.AdminAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	return n
+}
+
+func (m *MsgUpdateCollectionIntentsResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgClaimIntent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.AgentDid)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.AgentAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.CollectionId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.Amount) > 0 {
+		for _, e := range m.Amount {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if len(m.Cw20Payment) > 0 {
+		for _, e := range m.Cw20Payment {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *MsgClaimIntentResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.IntentId)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if m.ExpireAt != nil {
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.ExpireAt)
+		n += 1 + l + sovTx(uint64(l))
+	}
 	return n
 }
 
@@ -2723,7 +3477,7 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 			if m.StartDate == nil {
 				m.StartDate = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2759,7 +3513,7 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 			if m.EndDate == nil {
 				m.EndDate = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -2837,6 +3591,25 @@ func (m *MsgCreateCollection) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Intents", wireType)
+			}
+			m.Intents = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Intents |= CollectionIntentOptions(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3031,7 +3804,7 @@ func (m *MsgSubmitClaim) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AgentDid = github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.AgentDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -3096,6 +3869,94 @@ func (m *MsgSubmitClaim) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.AdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 6:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UseIntent", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.UseIntent = bool(v != 0)
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Amount = append(m.Amount, types.Coin{})
+			if err := m.Amount[len(m.Amount)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cw20Payment", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cw20Payment = append(m.Cw20Payment, &CW20Payment{})
+			if err := m.Cw20Payment[len(m.Cw20Payment)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -3323,7 +4184,7 @@ func (m *MsgEvaluateClaim) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AgentDid = github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.AgentDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
@@ -3493,6 +4354,40 @@ func (m *MsgEvaluateClaim) Unmarshal(dAtA []byte) error {
 				return err
 			}
 			iNdEx = postIndex
+		case 11:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cw20Payment", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cw20Payment = append(m.Cw20Payment, &CW20Payment{})
+			if err := m.Cw20Payment[len(m.Cw20Payment)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])
@@ -3655,7 +4550,7 @@ func (m *MsgDisputeClaim) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.AgentDid = github_com_ixofoundation_ixo_blockchain_v3_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.AgentDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -3905,7 +4800,7 @@ func (m *MsgWithdrawPayment) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Inputs = append(m.Inputs, github_com_cosmos_cosmos_sdk_x_bank_types.Input{})
+			m.Inputs = append(m.Inputs, types1.Input{})
 			if err := m.Inputs[len(m.Inputs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -3939,7 +4834,7 @@ func (m *MsgWithdrawPayment) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.Outputs = append(m.Outputs, github_com_cosmos_cosmos_sdk_x_bank_types.Output{})
+			m.Outputs = append(m.Outputs, types1.Output{})
 			if err := m.Outputs[len(m.Outputs)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
@@ -4095,7 +4990,7 @@ func (m *MsgWithdrawPayment) Unmarshal(dAtA []byte) error {
 			if m.ReleaseDate == nil {
 				m.ReleaseDate = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.ReleaseDate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.ReleaseDate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4130,6 +5025,40 @@ func (m *MsgWithdrawPayment) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.AdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 10:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cw20Payment", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cw20Payment = append(m.Cw20Payment, &CW20Payment{})
+			if err := m.Cw20Payment[len(m.Cw20Payment)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -4478,7 +5407,7 @@ func (m *MsgUpdateCollectionDates) Unmarshal(dAtA []byte) error {
 			if m.StartDate == nil {
 				m.StartDate = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4514,7 +5443,7 @@ func (m *MsgUpdateCollectionDates) Unmarshal(dAtA []byte) error {
 			if m.EndDate == nil {
 				m.EndDate = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -4800,6 +5729,521 @@ func (m *MsgUpdateCollectionPaymentsResponse) Unmarshal(dAtA []byte) error {
 			return fmt.Errorf("proto: MsgUpdateCollectionPaymentsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionIntents) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionIntents: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionIntents: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Intents", wireType)
+			}
+			m.Intents = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.Intents |= CollectionIntentOptions(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AdminAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgUpdateCollectionIntentsResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgUpdateCollectionIntentsResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgUpdateCollectionIntentsResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgClaimIntent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgClaimIntent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgClaimIntent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AgentDid", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AgentDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AgentAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.AgentAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CollectionId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.CollectionId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Amount = append(m.Amount, types.Coin{})
+			if err := m.Amount[len(m.Amount)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cw20Payment", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Cw20Payment = append(m.Cw20Payment, &CW20Payment{})
+			if err := m.Cw20Payment[len(m.Cw20Payment)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgClaimIntentResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgClaimIntentResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgClaimIntentResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field IntentId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.IntentId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ExpireAt", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.ExpireAt == nil {
+				m.ExpireAt = new(time.Time)
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.ExpireAt, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipTx(dAtA[iNdEx:])

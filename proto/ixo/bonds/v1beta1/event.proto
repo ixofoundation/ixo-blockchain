@@ -1,11 +1,12 @@
 syntax = "proto3";
 package ixo.bonds.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types";
 
 import "gogoproto/gogo.proto";
 import "ixo/bonds/v1beta1/bonds.proto";
 import "cosmos/base/v1beta1/coin.proto";
+import "cosmos_proto/cosmos.proto";
 
 // BondCreatedEvent is an event triggered on a Bond creation
 message BondCreatedEvent { Bond bond = 1; }
@@ -109,11 +110,13 @@ message BondBuyOrderFulfilledEvent {
   ];
   string new_bond_token_balance = 6 [
     (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int"
   ];
   string charged_prices_of_which_reserve = 7 [
     (gogoproto.nullable) = true,
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int"
   ];
   repeated cosmos.base.v1beta1.Coin charged_prices_of_which_funding = 8 [
     (gogoproto.nullable) = false,
@@ -136,7 +139,8 @@ message BondSellOrderFulfilledEvent {
   ];
   string new_bond_token_balance = 5 [
     (gogoproto.nullable) = false,
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int"
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int"
   ];
 }
 

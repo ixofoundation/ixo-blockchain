@@ -2,8 +2,8 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v3/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v4/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 var (
@@ -19,18 +19,6 @@ const TypeMsgCreateCollection = "create_collection"
 
 var _ sdk.Msg = &MsgCreateCollection{}
 
-func (msg MsgCreateCollection) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.Signer)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgCreateCollection) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgCreateCollection) Type() string { return TypeMsgCreateCollection }
 
 func (msg MsgCreateCollection) Route() string { return RouterKey }
@@ -42,19 +30,7 @@ const TypeMsgSubmitClaim = "submit_claim"
 
 var _ sdk.Msg = &MsgSubmitClaim{}
 
-func (msg MsgSubmitClaim) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
 func (msg MsgSubmitClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
-
-func (msg MsgSubmitClaim) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
 
 func (msg MsgSubmitClaim) Type() string { return TypeMsgSubmitClaim }
 
@@ -67,19 +43,7 @@ const TypeMsgEvaluateClaim = "evaluate_claim"
 
 var _ sdk.Msg = &MsgEvaluateClaim{}
 
-func (msg MsgEvaluateClaim) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
 func (msg MsgEvaluateClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
-
-func (msg MsgEvaluateClaim) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
 
 func (msg MsgEvaluateClaim) Type() string { return TypeMsgEvaluateClaim }
 
@@ -92,19 +56,7 @@ const TypeMsgDisputeClaim = "dispute_claim"
 
 var _ sdk.Msg = &MsgDisputeClaim{}
 
-func (msg MsgDisputeClaim) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.AgentAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
 func (msg MsgDisputeClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
-
-func (msg MsgDisputeClaim) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
 
 func (msg MsgDisputeClaim) Type() string { return TypeMsgDisputeClaim }
 
@@ -117,18 +69,6 @@ const TypeMsgWithdrawPayment = "withdraw_payment"
 
 var _ sdk.Msg = &MsgWithdrawPayment{}
 
-func (msg MsgWithdrawPayment) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgWithdrawPayment) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgWithdrawPayment) Type() string { return TypeMsgWithdrawPayment }
 
 func (msg MsgWithdrawPayment) Route() string { return RouterKey }
@@ -139,18 +79,6 @@ func (msg MsgWithdrawPayment) Route() string { return RouterKey }
 const TypeMsgUpdateCollectionState = "update_collection_state"
 
 var _ sdk.Msg = &MsgUpdateCollectionState{}
-
-func (msg MsgUpdateCollectionState) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgUpdateCollectionState) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
 
 func (msg MsgUpdateCollectionState) Type() string { return TypeMsgUpdateCollectionState }
 
@@ -163,18 +91,6 @@ const TypeMsgUpdateCollectionDates = "update_collection_dates"
 
 var _ sdk.Msg = &MsgUpdateCollectionDates{}
 
-func (msg MsgUpdateCollectionDates) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgUpdateCollectionDates) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgUpdateCollectionDates) Type() string { return TypeMsgUpdateCollectionDates }
 
 func (msg MsgUpdateCollectionDates) Route() string { return RouterKey }
@@ -186,18 +102,30 @@ const TypeMsgUpdateCollectionPayments = "update_collection_payments"
 
 var _ sdk.Msg = &MsgUpdateCollectionPayments{}
 
-func (msg MsgUpdateCollectionPayments) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.AdminAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgUpdateCollectionPayments) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgUpdateCollectionPayments) Type() string { return TypeMsgUpdateCollectionPayments }
 
 func (msg MsgUpdateCollectionPayments) Route() string { return RouterKey }
+
+// --------------------------
+// UPDATE COLLECTION INTENTS
+// --------------------------
+const TypeMsgUpdateCollectionIntents = "update_collection_intents"
+
+var _ sdk.Msg = &MsgUpdateCollectionIntents{}
+
+func (msg MsgUpdateCollectionIntents) Type() string { return TypeMsgUpdateCollectionIntents }
+
+func (msg MsgUpdateCollectionIntents) Route() string { return RouterKey }
+
+// --------------------------
+// CLAIM INTENT
+// --------------------------
+const TypeMsgClaimIntent = "claim_intent"
+
+var _ sdk.Msg = &MsgClaimIntent{}
+
+func (msg MsgClaimIntent) Type() string { return TypeMsgClaimIntent }
+
+func (msg MsgClaimIntent) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+
+func (msg MsgClaimIntent) Route() string { return RouterKey }

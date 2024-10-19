@@ -3,9 +3,11 @@ package client
 import (
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types"
 )
 
 func splitParameters(fnParamsStr string) (paramValuePairs []string) {
@@ -23,7 +25,7 @@ func paramsListToMap(paramValuePairs []string) (paramsFieldMap map[string]string
 		// Split each "a:1" into ["a","1"]
 		pvArray := strings.SplitN(pv, ":", 2)
 		if len(pvArray) != 2 {
-			return nil, sdkerrors.Wrap(types.ErrInvalidFunctionParameter, pv)
+			return nil, errorsmod.Wrap(types.ErrInvalidFunctionParameter, pv)
 		}
 		paramsFieldMap[pvArray[0]] = pvArray[1]
 	}
@@ -32,9 +34,9 @@ func paramsListToMap(paramValuePairs []string) (paramsFieldMap map[string]string
 
 func paramsMapToObj(paramsFieldMap map[string]string) (functionParams types.FunctionParams, err error) {
 	for p, v := range paramsFieldMap {
-		vDec, err := sdk.NewDecFromStr(v)
+		vDec, err := math.LegacyNewDecFromStr(v)
 		if err != nil {
-			return nil, sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, p)
+			return nil, errorsmod.Wrap(types.ErrArgumentMissingOrNonFloat, p)
 		} else {
 			functionParams = append(functionParams, types.NewFunctionParam(p, vDec))
 		}
@@ -67,7 +69,7 @@ func ParseTwoPartCoin(amount, denom string) (coin sdk.Coin, err error) {
 	if err != nil {
 		return sdk.Coin{}, err
 	} else if denom != coin.Denom {
-		return sdk.Coin{}, sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, denom)
+		return sdk.Coin{}, errorsmod.Wrap(sdkerrors.ErrInvalidCoins, denom)
 	}
 	return coin, nil
 }

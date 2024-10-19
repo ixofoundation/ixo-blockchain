@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types"
 )
 
 // RegisterInvariants registers all supply invariants
@@ -128,7 +128,6 @@ func ReserveInvariant(k Keeper) sdk.Invariant {
 
 func AvailableReserveInvariant(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-
 		// Get actual available reserve
 		// reservePool := k.accountKeeper.GetModuleAddress(types.BondsReserveAccount)
 		// actualAvailableReserve := k.BankKeeper.GetAllBalances(ctx, reservePool)

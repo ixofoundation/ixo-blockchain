@@ -4,7 +4,7 @@ The iid module emits the following typed events:
 
 ### IidDocumentCreatedEvent
 
-Emitted after a successfull `MsgCreateIidDocument`, `MsgCreateEntity`, since for entity creation an iid doc also gets created.
+Emitted after a successful `MsgCreateIidDocument`, `MsgCreateEntity`, since for entity creation an iid doc also gets created.
 
 ```go
 type IidDocumentCreatedEvent struct {
@@ -18,7 +18,7 @@ The field's descriptions is as follows:
 
 ### IidDocumentUpdatedEvent
 
-Emitted after a successfull Msg of all the rest of iid module Msg types since they all update the iid doc.
+Emitted after a successful Msg of all the rest of iid module Msg types since they all update the iid doc.
 
 ```go
 type IidDocumentUpdatedEvent struct {

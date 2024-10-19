@@ -7,17 +7,23 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 )
 
+// RegisterCodec registers the necessary x/token interfaces and concrete types on the provided
+// LegacyAmino codec. These types are used for Amino JSON serialization.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateToken{}, "token/CreateToken", nil)
 	cdc.RegisterConcrete(&MsgMintToken{}, "token/MintToken", nil)
 	cdc.RegisterConcrete(&MsgTransferToken{}, "token/TransferToken", nil)
 	cdc.RegisterConcrete(&MsgRetireToken{}, "token/RetireToken", nil)
 	cdc.RegisterConcrete(&MsgCancelToken{}, "token/CancelToken", nil)
+
+	// gov proposals
+	cdc.RegisterConcrete(&SetTokenContractCodes{}, "token/SetTokenContractCodes", nil)
 }
 
+// RegisterInterfaces registers interfaces and implementations of the x/token module.
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateToken{},
@@ -28,7 +34,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	)
 
 	registry.RegisterImplementations(
-		(*govtypes.Content)(nil),
+		(*govtypesv1.Content)(nil),
 		&SetTokenContractCodes{},
 	)
 
@@ -41,15 +47,8 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 var (
-	amino = codec.NewLegacyAmino()
-
-	// ModuleCdc references the global x/gov module codec. Note, the codec should
-	// ONLY be used in certain instances of tests and for JSON encoding as Amino is
-	// still used for that purpose.
-	//
-	// The actual codec used for serialization should be provided to x/gov and
-	// defined at the application level.
-	ModuleCdc = codec.NewAminoCodec(amino)
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewProtoCodec(types.NewInterfaceRegistry())
 )
 
 func init() {

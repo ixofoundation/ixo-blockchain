@@ -2,7 +2,7 @@
 
 PASSWORD="12345678"
 GAS_PRICES="0.025uixo"
-CHAIN_ID="pandora-8"
+CHAIN_ID="devnet-1"
 NODE="https://devnet.ixo.earth:443/rpc/"
 
 USERS=(alice bob charlie miguel francesco shaun fee fee2 fee3 fee4 fee5 reserveOut)

@@ -1,0 +1,26 @@
+{
+	"go.lintOnSave": "workspace",
+	"go.lintTool": "golangci-lint",
+	"go.lintFlags": ["--fast"],
+	"go.formatTool": "goimports",
+	"go.useLanguageServer": true,
+	"[go.mod]": {
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		}
+	},
+	"[go]": {
+		"editor.formatOnSave": true,
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		}
+	},
+	"files.eol": "\n",
+	"[go][go.mod]": {
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": "explicit"
+		}
+	},
+	"rust-analyzer.checkOnSave": false
+}

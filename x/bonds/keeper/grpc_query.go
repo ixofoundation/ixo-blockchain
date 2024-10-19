@@ -3,52 +3,44 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/client"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/client"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-var _ types.QueryServer = Querier{}
+var _ types.QueryServer = Keeper{}
 
-// Querier defines a wrapper around the x/bonds keeper providing gRPC method
-// handlers.
-type Querier struct {
-	Keeper
-}
-
-func NewQuerier(k Keeper) Querier {
-	return Querier{Keeper: k}
-}
-
-func (q Querier) Bonds(c context.Context, _ *types.QueryBondsRequest) (*types.QueryBondsResponse, error) {
+func (k Keeper) Bonds(c context.Context, _ *types.QueryBondsRequest) (*types.QueryBondsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var bondsList []string
-	iterator := q.Keeper.GetBondIterator(ctx)
+	iterator := k.GetBondIterator(ctx)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		q.Keeper.cdc.MustUnmarshal(iterator.Value(), &bond)
+		k.cdc.MustUnmarshal(iterator.Value(), &bond)
 		bondsList = append(bondsList, bond.BondDid)
 	}
 
 	return &types.QueryBondsResponse{Bonds: bondsList}, nil
 }
 
-func (q Querier) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequest) (*types.QueryBondsDetailedResponse, error) {
+func (k Keeper) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedRequest) (*types.QueryBondsDetailedResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
 	var bondsList []*types.BondDetails
-	iterator := q.Keeper.GetBondIterator(ctx)
+	iterator := k.GetBondIterator(ctx)
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
 		var bond types.Bond
-		q.Keeper.cdc.MustUnmarshal(iterator.Value(), &bond)
+		k.cdc.MustUnmarshal(iterator.Value(), &bond)
 
-		reserveBalances := q.Keeper.GetReserveBalances(ctx, bond.BondDid)
+		reserveBalances := k.GetReserveBalances(ctx, bond.BondDid)
 		reservePrices, _ := bond.GetCurrentPricesPT(reserveBalances)
 		reservePrices = zeroReserveTokensIfEmptyDec(reservePrices, bond)
 
@@ -63,7 +55,7 @@ func (q Querier) BondsDetailed(c context.Context, _ *types.QueryBondsDetailedReq
 	return &types.QueryBondsDetailedResponse{BondsDetailed: bondsList}, nil
 }
 
-func (q Querier) Bond(c context.Context, req *types.QueryBondRequest) (*types.QueryBondResponse, error) {
+func (k Keeper) Bond(c context.Context, req *types.QueryBondRequest) (*types.QueryBondResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -72,15 +64,15 @@ func (q Querier) Bond(c context.Context, req *types.QueryBondRequest) (*types.Qu
 
 	bondDid := req.BondDid
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	return &types.QueryBondResponse{Bond: &bond}, nil
 }
 
-func (q Querier) Batch(c context.Context, req *types.QueryBatchRequest) (*types.QueryBatchResponse, error) {
+func (k Keeper) Batch(c context.Context, req *types.QueryBatchRequest) (*types.QueryBatchResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -89,16 +81,16 @@ func (q Querier) Batch(c context.Context, req *types.QueryBatchRequest) (*types.
 
 	bondDid := req.BondDid
 
-	if !q.Keeper.BatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "batch for '%s' does not exist", bondDid)
+	if !k.BatchExists(ctx, bondDid) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "batch for '%s' does not exist", bondDid)
 	}
 
-	batch := q.Keeper.MustGetBatch(ctx, bondDid)
+	batch := k.MustGetBatch(ctx, bondDid)
 
 	return &types.QueryBatchResponse{Batch: &batch}, nil
 }
 
-func (q Querier) LastBatch(c context.Context, req *types.QueryLastBatchRequest) (*types.QueryLastBatchResponse, error) {
+func (k Keeper) LastBatch(c context.Context, req *types.QueryLastBatchRequest) (*types.QueryLastBatchResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -107,16 +99,16 @@ func (q Querier) LastBatch(c context.Context, req *types.QueryLastBatchRequest) 
 
 	bondDid := req.BondDid
 
-	if !q.Keeper.LastBatchExists(ctx, bondDid) {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for '%s' does not exist", bondDid)
+	if !k.LastBatchExists(ctx, bondDid) {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "last batch for '%s' does not exist", bondDid)
 	}
 
-	batch := q.Keeper.MustGetLastBatch(ctx, bondDid)
+	batch := k.MustGetLastBatch(ctx, bondDid)
 
 	return &types.QueryLastBatchResponse{LastBatch: &batch}, nil
 }
 
-func (q Querier) CurrentPrice(c context.Context, req *types.QueryCurrentPriceRequest) (*types.QueryCurrentPriceResponse, error) {
+func (k Keeper) CurrentPrice(c context.Context, req *types.QueryCurrentPriceRequest) (*types.QueryCurrentPriceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -125,12 +117,12 @@ func (q Querier) CurrentPrice(c context.Context, req *types.QueryCurrentPriceReq
 
 	bondDid := req.BondDid
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
-	reserveBalances := q.Keeper.GetReserveBalances(ctx, bondDid)
+	reserveBalances := k.GetReserveBalances(ctx, bondDid)
 	reservePrices, err := bond.GetCurrentPricesPT(reserveBalances)
 	if err != nil {
 		return nil, err
@@ -140,7 +132,7 @@ func (q Querier) CurrentPrice(c context.Context, req *types.QueryCurrentPriceReq
 	return &types.QueryCurrentPriceResponse{CurrentPrice: reservePrices}, nil
 }
 
-func (q Querier) CurrentReserve(c context.Context, req *types.QueryCurrentReserveRequest) (*types.QueryCurrentReserveResponse, error) {
+func (k Keeper) CurrentReserve(c context.Context, req *types.QueryCurrentReserveRequest) (*types.QueryCurrentReserveResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -149,9 +141,9 @@ func (q Querier) CurrentReserve(c context.Context, req *types.QueryCurrentReserv
 
 	bondDid := req.BondDid
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	reserveBalances := zeroReserveTokensIfEmpty(bond.CurrentReserve, bond)
@@ -159,7 +151,7 @@ func (q Querier) CurrentReserve(c context.Context, req *types.QueryCurrentReserv
 	return &types.QueryCurrentReserveResponse{CurrentReserve: reserveBalances}, nil
 }
 
-func (q Querier) AvailableReserve(c context.Context, req *types.QueryAvailableReserveRequest) (*types.QueryAvailableReserveResponse, error) {
+func (k Keeper) AvailableReserve(c context.Context, req *types.QueryAvailableReserveRequest) (*types.QueryAvailableReserveResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -168,9 +160,9 @@ func (q Querier) AvailableReserve(c context.Context, req *types.QueryAvailableRe
 
 	bondDid := req.BondDid
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	availableReserve := zeroReserveTokensIfEmpty(bond.AvailableReserve, bond)
@@ -178,7 +170,7 @@ func (q Querier) AvailableReserve(c context.Context, req *types.QueryAvailableRe
 	return &types.QueryAvailableReserveResponse{AvailableReserve: availableReserve}, nil
 }
 
-func (q Querier) CustomPrice(c context.Context, req *types.QueryCustomPriceRequest) (*types.QueryCustomPriceResponse, error) {
+func (k Keeper) CustomPrice(c context.Context, req *types.QueryCustomPriceRequest) (*types.QueryCustomPriceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -188,9 +180,9 @@ func (q Querier) CustomPrice(c context.Context, req *types.QueryCustomPriceReque
 	bondDid := req.BondDid
 	bondAmount := req.BondAmount
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
@@ -207,7 +199,7 @@ func (q Querier) CustomPrice(c context.Context, req *types.QueryCustomPriceReque
 	return &types.QueryCustomPriceResponse{Price: reservePrices}, nil
 }
 
-func (q Querier) BuyPrice(c context.Context, req *types.QueryBuyPriceRequest) (*types.QueryBuyPriceResponse, error) {
+func (k Keeper) BuyPrice(c context.Context, req *types.QueryBuyPriceRequest) (*types.QueryBuyPriceResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -217,24 +209,23 @@ func (q Querier) BuyPrice(c context.Context, req *types.QueryBuyPriceRequest) (*
 	bondDid := req.BondDid
 	bondAmount := req.BondAmount
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
 	if err != nil {
 		return nil, err
-
 	}
 
 	// Max supply cannot be less than supply (max supply >= supply)
-	adjustedSupply := q.Keeper.GetSupplyAdjustedForBuy(ctx, bondDid)
+	adjustedSupply := k.GetSupplyAdjustedForBuy(ctx, bondDid)
 	if bond.MaxSupply.IsLT(adjustedSupply.Add(bondCoin)) {
 		return nil, types.ErrCannotMintMoreThanMaxSupply
 	}
 
-	reserveBalances := q.Keeper.GetReserveBalances(ctx, bondDid)
+	reserveBalances := k.GetReserveBalances(ctx, bondDid)
 	reservePrices, err := bond.GetPricesToMint(bondCoin.Amount, reserveBalances)
 	if err != nil {
 		return nil, err
@@ -251,7 +242,7 @@ func (q Querier) BuyPrice(c context.Context, req *types.QueryBuyPriceRequest) (*
 	}, nil
 }
 
-func (q Querier) SellReturn(c context.Context, req *types.QuerySellReturnRequest) (*types.QuerySellReturnResponse, error) {
+func (k Keeper) SellReturn(c context.Context, req *types.QuerySellReturnRequest) (*types.QuerySellReturnResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -261,9 +252,9 @@ func (q Querier) SellReturn(c context.Context, req *types.QuerySellReturnRequest
 	bondDid := req.BondDid
 	bondAmount := req.BondAmount
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
+		return nil, errorsmod.Wrapf(sdkerrors.ErrUnknownRequest, "bond '%s' does not exist", bondDid)
 	}
 
 	bondCoin, err := client.ParseTwoPartCoin(bondAmount, bond.Token)
@@ -276,12 +267,12 @@ func (q Querier) SellReturn(c context.Context, req *types.QuerySellReturnRequest
 	}
 
 	// Cannot burn more tokens than what exists
-	adjustedSupply := q.Keeper.GetSupplyAdjustedForSell(ctx, bondDid)
+	adjustedSupply := k.GetSupplyAdjustedForSell(ctx, bondDid)
 	if adjustedSupply.IsLT(bondCoin) {
 		return nil, types.ErrCannotBurnMoreThanSupply
 	}
 
-	reserveBalances := q.Keeper.GetReserveBalances(ctx, bondDid)
+	reserveBalances := k.GetReserveBalances(ctx, bondDid)
 	reserveReturns, err := bond.GetReturnsForBurn(bondCoin.Amount, reserveBalances)
 	if err != nil {
 		return nil, err
@@ -297,12 +288,12 @@ func (q Querier) SellReturn(c context.Context, req *types.QuerySellReturnRequest
 		Returns:        zeroReserveTokensIfEmpty(reserveReturnsRounded, bond),
 		TxFees:         zeroReserveTokensIfEmpty(txFees, bond),
 		ExitFees:       zeroReserveTokensIfEmpty(exitFees, bond),
-		TotalReturns:   zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees), bond),
+		TotalReturns:   zeroReserveTokensIfEmpty(reserveReturnsRounded.Sub(totalFees...), bond),
 		TotalFees:      zeroReserveTokensIfEmpty(totalFees, bond),
 	}, nil
 }
 
-func (q Querier) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest) (*types.QuerySwapReturnResponse, error) {
+func (k Keeper) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest) (*types.QuerySwapReturnResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -316,19 +307,19 @@ func (q Querier) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest
 		return nil, err
 	}
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+		return nil, errorsmod.Wrapf(types.ErrBondDoesNotExist, bondDid)
 	}
 
-	reserveBalances := q.Keeper.GetReserveBalances(ctx, bondDid)
+	reserveBalances := k.GetReserveBalances(ctx, bondDid)
 	reserveReturns, txFee, err := bond.GetReturnsForSwap(fromCoin, toToken, reserveBalances)
 	if err != nil {
 		return nil, err
 	}
 
 	if reserveReturns.Empty() {
-		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: sdk.ZeroInt()}}
+		reserveReturns = sdk.Coins{sdk.Coin{Denom: toToken, Amount: math.ZeroInt()}}
 	}
 
 	return &types.QuerySwapReturnResponse{
@@ -337,7 +328,7 @@ func (q Querier) SwapReturn(c context.Context, req *types.QuerySwapReturnRequest
 	}, nil
 }
 
-func (q Querier) AlphaMaximums(c context.Context, req *types.QueryAlphaMaximumsRequest) (*types.QueryAlphaMaximumsResponse, error) {
+func (k Keeper) AlphaMaximums(c context.Context, req *types.QueryAlphaMaximumsRequest) (*types.QueryAlphaMaximumsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -346,25 +337,25 @@ func (q Querier) AlphaMaximums(c context.Context, req *types.QueryAlphaMaximumsR
 
 	bondDid := req.BondDid
 
-	bond, found := q.Keeper.GetBond(ctx, bondDid)
+	bond, found := k.GetBond(ctx, bondDid)
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrBondDoesNotExist, bondDid)
+		return nil, errorsmod.Wrapf(types.ErrBondDoesNotExist, bondDid)
 	}
 
 	if bond.FunctionType != types.AugmentedFunction {
-		return nil, sdkerrors.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
+		return nil, errorsmod.Wrapf(types.ErrFunctionNotAvailableForFunctionType, bond.FunctionType)
 	} else if !bond.AlphaBond {
-		return nil, sdkerrors.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
+		return nil, errorsmod.Wrap(types.ErrFunctionNotAvailableForFunctionType, "bond is not an alpha bond")
 	}
 
-	var maxSystemAlphaIncrease, maxSystemAlpha sdk.Dec
+	var maxSystemAlphaIncrease, maxSystemAlpha math.LegacyDec
 	if len(bond.CurrentReserve) == 0 {
-		maxSystemAlphaIncrease = sdk.ZeroDec()
-		maxSystemAlpha = sdk.ZeroDec()
+		maxSystemAlphaIncrease = math.LegacyZeroDec()
+		maxSystemAlpha = math.LegacyZeroDec()
 	} else {
 		R := bond.CurrentReserve[0].Amount // common reserve balance
 		C := bond.OutcomePayment
-		maxSystemAlphaIncrease = sdk.NewDecFromInt(R).QuoInt(C)
+		maxSystemAlphaIncrease = math.LegacyNewDecFromInt(R).QuoInt(C)
 
 		paramsMap := bond.FunctionParameters.AsMap()
 		I := paramsMap["I0"]
@@ -377,10 +368,10 @@ func (q Querier) AlphaMaximums(c context.Context, req *types.QueryAlphaMaximumsR
 	}, nil
 }
 
-func (q Querier) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 
-	params := q.Keeper.GetParams(ctx)
+	params := k.GetParams(ctx)
 
 	return &types.QueryParamsResponse{Params: &params}, nil
 }
@@ -390,9 +381,9 @@ func (q Querier) Params(c context.Context, req *types.QueryParamsRequest) (*type
 
 func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins {
 	if reserveCoins.IsZero() {
-		zeroes, _ := bond.GetNewReserveDecCoins(sdk.OneDec()).TruncateDecimal()
+		zeroes, _ := bond.GetNewReserveDecCoins(math.LegacyOneDec()).TruncateDecimal()
 		for i := range zeroes {
-			zeroes[i].Amount = sdk.ZeroInt()
+			zeroes[i].Amount = math.ZeroInt()
 		}
 		reserveCoins = zeroes
 	}
@@ -401,9 +392,9 @@ func zeroReserveTokensIfEmpty(reserveCoins sdk.Coins, bond types.Bond) sdk.Coins
 
 func zeroReserveTokensIfEmptyDec(reserveCoins sdk.DecCoins, bond types.Bond) sdk.DecCoins {
 	if reserveCoins.IsZero() {
-		zeroes := bond.GetNewReserveDecCoins(sdk.OneDec())
+		zeroes := bond.GetNewReserveDecCoins(math.LegacyOneDec())
 		for i := range zeroes {
-			zeroes[i].Amount = sdk.ZeroDec()
+			zeroes[i].Amount = math.LegacyZeroDec()
 		}
 		reserveCoins = zeroes
 	}

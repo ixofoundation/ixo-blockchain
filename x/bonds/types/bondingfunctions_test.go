@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -61,16 +62,16 @@ func TestBondWithoutMaturityOrAlphaUpdates2(t *testing.T) {
 	alphaBond := Bond{
 		Token: token,
 		FunctionParameters: []FunctionParam{
-			NewFunctionParam("REVISION", sdk.NewDec(1)),
-			NewFunctionParam("Funding_Target", sdk.NewDec(60000)),
-			NewFunctionParam("Hatch_Supply", sdk.NewDec(0)),
-			NewFunctionParam("Hatch_Price", sdk.NewDec(0)),
-			NewFunctionParam("APY_MAX", sdk.NewDec(150)),
-			NewFunctionParam("APY_MIN", sdk.NewDec(10)),
-			NewFunctionParam("MATURITY", sdk.NewDec(1)),
-			NewFunctionParam("DISCOUNT_RATE", sdk.NewDec(2)),
-			NewFunctionParam("GAMMA", sdk.NewDec(2)),
-			NewFunctionParam("INITIAL_PUBLIC_ALPHA", sdk.NewDec(50)),
+			NewFunctionParam("REVISION", math.LegacyNewDec(1)),
+			NewFunctionParam("Funding_Target", math.LegacyNewDec(60000)),
+			NewFunctionParam("Hatch_Supply", math.LegacyNewDec(0)),
+			NewFunctionParam("Hatch_Price", math.LegacyNewDec(0)),
+			NewFunctionParam("APY_MAX", math.LegacyNewDec(150)),
+			NewFunctionParam("APY_MIN", math.LegacyNewDec(10)),
+			NewFunctionParam("MATURITY", math.LegacyNewDec(1)),
+			NewFunctionParam("DISCOUNT_RATE", math.LegacyNewDec(2)),
+			NewFunctionParam("GAMMA", math.LegacyNewDec(2)),
+			NewFunctionParam("INITIAL_PUBLIC_ALPHA", math.LegacyNewDec(50)),
 		},
 		CurrentSupply:            sdk.NewInt64Coin(token, 0),
 		Name:                     "Test Bond",
@@ -79,14 +80,14 @@ func TestBondWithoutMaturityOrAlphaUpdates2(t *testing.T) {
 		ControllerDid:            "did:test:0000000000000",
 		ReserveTokens:            []string{},
 		FunctionType:             "augmented_bond_v2",
-		TxFeePercentage:          sdk.ZeroDec(),
-		ExitFeePercentage:        sdk.ZeroDec(),
+		TxFeePercentage:          math.LegacyZeroDec(),
+		ExitFeePercentage:        math.LegacyZeroDec(),
 		FeeAddress:               "address",
 		ReserveWithdrawalAddress: "address",
 		MaxSupply:                sdk.NewInt64Coin(token, 60000),
 		OrderQuantityLimits:      sdk.Coins{},
-		SanityRate:               sdk.ZeroDec(),
-		SanityMarginPercentage:   sdk.ZeroDec(),
+		SanityRate:               math.LegacyZeroDec(),
+		SanityMarginPercentage:   math.LegacyZeroDec(),
 		CurrentReserve: sdk.Coins{
 			sdk.NewInt64Coin(reserveToken, 0),
 		},
@@ -99,7 +100,7 @@ func TestBondWithoutMaturityOrAlphaUpdates2(t *testing.T) {
 		AllowSells:              false,
 		AlphaBond:               true,
 		AllowReserveWithdrawals: true,
-		OutcomePayment:          sdk.NewInt(68100),
+		OutcomePayment:          math.NewInt(68100),
 		State:                   "OPEN",
 		BondDid:                 "did:test:0000000000000",
 	}

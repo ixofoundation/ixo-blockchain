@@ -4,51 +4,58 @@ import (
 	"context"
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/lib/ixo"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 type msgServer struct {
-	Keeper
+	Keeper *Keeper
 }
 
 var _ types.MsgServer = msgServer{}
 
 // NewMsgServerImpl returns an implementation of the MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
+func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
+
+// TODO: ADD 1155 and 721 capabilities to claims and payments also.
+// TODO: add possibility to allow multiple intents per agent based of collection flag
 
 // --------------------------
 // CREATE COLLECTION
 // --------------------------
 func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateCollection) (*types.MsgCreateCollectionResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
-	params := s.Keeper.GetParams(ctx)
 
 	// check that entity exists
 	_, entity, err := s.Keeper.EntityKeeper.ResolveEntity(ctx, msg.Entity)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", msg.Entity)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", msg.Entity)
 	}
 
 	// check that protocol exists
 	if _, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.Protocol)); !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for protocol %s", msg.Protocol)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for protocol %s", msg.Protocol)
 	}
 
 	// check that signer is nft owner
 	if err = s.Keeper.EntityKeeper.CheckIfOwner(ctx, msg.Entity, msg.Signer); err != nil {
-		return nil, sdkerrors.Wrapf(err, "unauthorized")
+		return nil, errorsmod.Wrapf(err, "unauthorized")
 	}
 
 	// check that Evaluation Payment does not have 1155 payment
 	if msg.Payments.Evaluation.Contract_1155Payment != nil {
 		return nil, types.ErrCollectionEvalError
+	}
+	// check that Evaluation Payment does not have CW20 payments
+	if len(msg.Payments.Evaluation.Cw20Payment) > 1 {
+		return nil, types.ErrCollectionEvalCW20Error
 	}
 
 	// check that all payments accounts is part of entity module accounts
@@ -59,14 +66,18 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	// get entity admin account
 	admin, err := entity.GetAdminAccount()
 	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "for admin")
+		return nil, errorsmod.Wrapf(err, "for admin")
 	}
 
+	// get collection id from params and update params
+	params := s.Keeper.GetParams(ctx)
+	collectionSequence := params.CollectionSequence
+	params.CollectionSequence++
+	s.Keeper.SetParams(ctx, &params)
+
 	// create and persist the Collection
-	var collection types.Collection
-	collectionId := fmt.Sprint(params.CollectionSequence)
-	collection = types.Collection{
-		Id:          collectionId,
+	collection := types.Collection{
+		Id:          fmt.Sprint(collectionSequence),
 		Entity:      msg.Entity,
 		Admin:       admin.Address,
 		Protocol:    msg.Protocol,
@@ -81,16 +92,19 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		Invalidated: 0,
 		State:       msg.State,
 		Payments:    msg.Payments,
+		Intents:     msg.Intents,
 	}
 
+	// create escrow account for the collection
+	escrowAccount, err := types.CreateNewCollectionEscrow(ctx, s.Keeper.AccountKeeper, collection.Id)
+	if err != nil {
+		return nil, errorsmod.Wrapf(err, "failed to create escrow account for collection: %s", collection.Id)
+	}
+	collection.EscrowAccount = escrowAccount.String()
+
+	// persist and emit the events
 	s.Keeper.SetCollection(ctx, collection)
-
-	// update and persist createSequence
-	params.CollectionSequence++
-	s.Keeper.SetParams(ctx, &params)
-
-	// emit the events
-	if err := ctx.EventManager().EmitTypedEvents(
+	if err := ctx.EventManager().EmitTypedEvent(
 		&types.CollectionCreatedEvent{
 			Collection: &collection,
 		},
@@ -110,7 +124,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 	// Make sure claim does not exist already
 	_, err := s.Keeper.GetClaim(ctx, msg.ClaimId)
 	if err == nil {
-		return nil, sdkerrors.Wrapf(types.ErrClaimDuplicate, "id %s", msg.ClaimId)
+		return nil, errorsmod.Wrapf(types.ErrClaimDuplicate, "id %s", msg.ClaimId)
 	}
 
 	// Get Collection for claim
@@ -127,12 +141,12 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// check that collection is in open state
 	if collection.State != types.CollectionState_open {
-		return nil, sdkerrors.Wrapf(types.ErrCollectionNotOpen, "state %s", collection.State)
+		return nil, errorsmod.Wrapf(types.ErrCollectionNotOpen, "state %s", collection.State)
 	}
 
 	// check that collection has already started and has not ended yet
@@ -149,6 +163,29 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 		return nil, types.ErrClaimCollectionQuotaReached
 	}
 
+	// if intents are required then check if intent is used
+	if collection.Intents == types.CollectionIntentOptions_required && !msg.UseIntent {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "collection %s requires intent", msg.CollectionId)
+	}
+	// if intents are not allowed then check if intent is used
+	if collection.Intents == types.CollectionIntentOptions_deny && msg.UseIntent {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "collection %s does not allow intent", msg.CollectionId)
+	}
+
+	// get intent if used, if used agent must have an active intent for this collection
+	var intent types.Intent
+	var intentFound bool
+	if msg.UseIntent {
+		intent, intentFound = s.Keeper.GetActiveIntent(ctx, msg.AgentAddress, msg.CollectionId)
+		if !intentFound {
+			return nil, errorsmod.Wrapf(types.ErrIntentNotFound, "for agent %s and collection %s", msg.AgentAddress, msg.CollectionId)
+		}
+		// check if intent is expired
+		if !intent.ExpireAt.IsZero() && intent.ExpireAt.Before(ctx.BlockTime()) {
+			return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "intent %s is expired", intent.Id)
+		}
+	}
+
 	// create and persist the Claim
 	claimSubmissionDate := ctx.BlockTime()
 	claim := types.Claim{
@@ -163,28 +200,54 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 			Evaluation: types.PaymentStatus_no_payment,
 			Rejection:  types.PaymentStatus_no_payment,
 		},
+		Amount:      msg.Amount,
+		Cw20Payment: msg.Cw20Payment,
+		UseIntent:   msg.UseIntent,
 	}
 
-	s.Keeper.SetClaim(ctx, claim)
+	// if intent then override payments, add intent id and update APPROVAL payment to GUARANTEED
+	if msg.UseIntent {
+		claim.Amount = intent.Amount
+		claim.Cw20Payment = intent.Cw20Payment
+
+		// if either payment is not empty then APPROVAL payment become GUARANTEED as funds is in escrow account
+		// if both payments is empty or all amounts is 0 then APPROVAL payment stays NO_PAYMENT since no funds are in escrow account
+		if !intent.Amount.IsZero() || !types.IsZeroCW20Payments(intent.Cw20Payment) {
+			claim.PaymentsStatus.Approval = types.PaymentStatus_guaranteed
+		}
+
+		// mark intent as fulfilled
+		intent.Status = types.IntentStatus_fulfilled
+		intent.ClaimId = claim.ClaimId
+		err = s.Keeper.RemoveIntentAndEmitEvents(ctx, intent)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	// if collection approval payment is oracle payment then only native coins allowed
+	if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(claim.Cw20Payment) {
+		return nil, types.ErrOraclePaymentOnlyNative
+	}
 
 	// update count for collection and persist
 	collection.Count++
-	s.Keeper.SetCollection(ctx, collection)
-
-	// emit the events
-	if err := ctx.EventManager().EmitTypedEvents(
-		&types.ClaimSubmittedEvent{
-			Claim: &claim,
-		},
-		&types.CollectionUpdatedEvent{
-			Collection: &collection,
-		},
-	); err != nil {
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
 		return nil, err
 	}
 
 	// start payout process for claim submission
-	if err = processPayment(ctx, s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, msg.ClaimId); err != nil {
+	if err = processPayment(ctx, *s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, &claim, collection, false); err != nil {
+		return nil, err
+	}
+
+	// persist claim and emit the events
+	s.Keeper.SetClaim(ctx, claim)
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.ClaimSubmittedEvent{
+			Claim: &claim,
+		},
+	); err != nil {
 		return nil, err
 	}
 
@@ -205,12 +268,12 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 
 	// check that collectionId in message corresponds to claims collection
 	if claim.CollectionId != msg.CollectionId {
-		return nil, sdkerrors.Wrapf(types.ErrEvaluateWrongCollection, "claim collection %s vs message collection %s", claim.CollectionId, msg.CollectionId)
+		return nil, errorsmod.Wrapf(types.ErrEvaluateWrongCollection, "claim collection %s vs message collection %s", claim.CollectionId, msg.CollectionId)
 	}
 
 	// check that claim was not evaluated already
 	if claim.Evaluation != nil {
-		return nil, sdkerrors.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
+		return nil, errorsmod.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
 	}
 
 	// get Collection for claim
@@ -221,7 +284,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// Get evaluation agent address
@@ -248,14 +311,19 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		Reason:            msg.Reason,
 		VerificationProof: msg.VerificationProof,
 		EvaluationDate:    &evaluationDate,
+		Amount:            msg.Amount,
+		Cw20Payment:       msg.Cw20Payment,
 	}
 
-	claim.Evaluation = &evaluation
-	s.Keeper.SetClaim(ctx, claim)
+	// if intent on claim then override payments with claim payments as it used the intent
+	if claim.UseIntent {
+		evaluation.Amount = claim.Amount
+		evaluation.Cw20Payment = claim.Cw20Payment
+	}
 
 	// start payout process for evaluation submission, if evaluation has status invalidated, dont run evaluation payout process
 	if msg.Status != types.EvaluationStatus_invalidated {
-		if err = processPayment(ctx, s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, msg.ClaimId); err != nil {
+		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, &claim, collection, false); err != nil {
 			return nil, err
 		}
 
@@ -263,42 +331,87 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		collection.Evaluated++
 	}
 
+	// if status is not approved and intent was used then transfer funds back out of escrow account to current APPROVAL payments account
+	if msg.Status != types.EvaluationStatus_approved && claim.UseIntent {
+		// Get account used for APPROVAL payments on collection
+		approvalAddress, err := sdk.AccAddressFromBech32(collection.Payments.Approval.Account)
+		if err != nil {
+			return nil, err
+		}
+		// Get escrow address
+		escrow, err := sdk.AccAddressFromBech32(collection.EscrowAccount)
+		if err != nil {
+			return nil, err
+		}
+		if err := s.Keeper.TransferIntentPayments(ctx, escrow, approvalAddress, claim.Amount, claim.Cw20Payment); err != nil {
+			return nil, err
+		}
+		// Update payment status to no payment again as was guaranteed with intent
+		err = updatePaymentStatus(types.PaymentType_approval, &claim, types.PaymentStatus_no_payment)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	// update amounts for collection, make payouts and persist
 	if msg.Status == types.EvaluationStatus_approved {
-		collection.Approved++
 		// payout process for evaluation approval to claim agent
-		// if msg amount is not zero, it means agent set custo amount that was authenticated through authZ constraints to be valid.
-		approvedPayment := collection.Payments.Approval
-		if !msg.Amount.IsZero() {
-			approvedPayment.Amount = msg.Amount
+		collection.Approved++
+		// Dereference the pointer to avoid changing collection payments as collection is saved in keeper below
+		approvedPayment := collection.Payments.Approval.Clone()
+		// if intent on claim then override payments with claim payments as it used the intent and payment must be intent amount
+		// also override payment account to escrow account, so funds can be transferred from escrow to agent
+		if claim.UseIntent {
+			approvedPayment.Amount = claim.Amount
+			approvedPayment.Cw20Payment = claim.Cw20Payment
+			approvedPayment.Account = collection.EscrowAccount
+		} else {
+			// if either msg amount or cw20Payment length is not zero, it means agent set custom amount/cw20Payment that was authenticated
+			// through authZ constraints to be valid since all evaluations must be done by module account through authz
+			if len(msg.Amount) > 0 || len(msg.Cw20Payment) > 0 {
+				approvedPayment.Amount = msg.Amount
+				approvedPayment.Cw20Payment = msg.Cw20Payment
+			}
 		}
-		if err = processPayment(ctx, s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, msg.ClaimId); err != nil {
+		// if collection approval payment is oracle payment then only native coins allowed
+		if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(approvedPayment.Cw20Payment) {
+			return nil, types.ErrOraclePaymentOnlyNative
+		}
+		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, &claim, collection, claim.UseIntent); err != nil {
 			return nil, err
 		}
 	} else if msg.Status == types.EvaluationStatus_rejected {
-		// no payment for rejected
+		// payout process for evaluation rejected to claim agent
 		collection.Rejected++
+		if err = processPayment(ctx, *s.Keeper, claimAgent, collection.Payments.Rejection, types.PaymentType_rejection, &claim, collection, false); err != nil {
+			return nil, err
+		}
 	} else if msg.Status == types.EvaluationStatus_disputed {
 		// no payment for disputed
 		collection.Disputed++
 		// update payment status to disputed
-		updatePaymentStatus(ctx, s.Keeper, types.PaymentType_approval, msg.ClaimId, types.PaymentStatus_disputed)
+		err := updatePaymentStatus(types.PaymentType_approval, &claim, types.PaymentStatus_disputed)
+		if err != nil {
+			return nil, err
+		}
 	} else if msg.Status == types.EvaluationStatus_invalidated {
 		// no payment for invalidated
 		collection.Invalidated++
 	}
-	s.Keeper.SetCollection(ctx, collection)
 
-	// emit the events
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
+
+	// persist and emit the events
+	claim.Evaluation = &evaluation
+	s.Keeper.SetClaim(ctx, claim)
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.ClaimEvaluatedEvent{
 			Evaluation: &evaluation,
 		},
 		&types.ClaimUpdatedEvent{
 			Claim: &claim,
-		},
-		&types.CollectionUpdatedEvent{
-			Collection: &collection,
 		},
 	); err != nil {
 		return nil, err
@@ -315,7 +428,7 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 	// Make sure dispute with proof does not exist already
 	_, err := s.Keeper.GetDispute(ctx, msg.Data.Proof)
 	if err == nil {
-		return nil, sdkerrors.Wrapf(types.ErrDisputeDuplicate, "proof %s", msg.Data.Proof)
+		return nil, errorsmod.Wrapf(types.ErrDisputeDuplicate, "proof %s", msg.Data.Proof)
 	}
 
 	// get Claim for dispute
@@ -332,7 +445,7 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 
 	entity, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(collection.Entity))
 	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
 	}
 
 	// check if user authorized to lay claim,
@@ -350,7 +463,10 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 		}
 
 		// get users current authorization to see if user is agent for claim/collection
-		authorizations := s.Keeper.AuthzKeeper.GetAuthorizations(ctx, grantee, granter)
+		authorizations, err := s.Keeper.AuthzKeeper.GetAuthorizations(ctx, grantee, granter)
+		if err != nil {
+			return nil, types.ErrDisputeUnauthorized
+		}
 
 		for _, auth := range authorizations {
 			if isAuthorized {
@@ -404,7 +520,6 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdrawPayment) (*types.MsgWithdrawPaymentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// get Claim for dispute
 	claim, err := s.Keeper.GetClaim(ctx, msg.ClaimId)
 	if err != nil {
 		return nil, err
@@ -416,9 +531,23 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 		return nil, err
 	}
 
+	// if any input address or the fromAddress is the escrow account then return error, as any escrow funds will be
+	// paid immediately through intents and never through this function, this also prevents collection owners from taking
+	// out funds from escrow account through this function
+	if msg.FromAddress == collection.EscrowAccount {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "from address cannot be collection's escrow account")
+	}
+	if len(msg.Inputs) > 0 {
+		for _, i := range msg.Inputs {
+			if i.Address == collection.EscrowAccount {
+				return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "input address cannot be collection's escrow account")
+			}
+		}
+	}
+
 	// check that user is authorized, aka signer is admin for Collection
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// get from address
@@ -433,10 +562,21 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 	}
 
 	// make payout
-	err = payout(ctx, s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, msg.ClaimId, msg.ReleaseDate, msg.Contract_1155Payment, fromAddress, toAddress)
+	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, &claim, collection, msg.ReleaseDate, msg.Contract_1155Payment, msg.Cw20Payment, fromAddress, toAddress)
 	if err != nil {
 		return nil, err
 	}
+
+	// persist and emit the events
+	s.Keeper.SetClaim(ctx, claim)
+	if err := ctx.EventManager().EmitTypedEvent(
+		&types.ClaimUpdatedEvent{
+			Claim: &claim,
+		},
+	); err != nil {
+		return nil, err
+	}
+
 	return &types.MsgWithdrawPaymentResponse{}, nil
 }
 
@@ -454,21 +594,14 @@ func (s msgServer) UpdateCollectionState(goCtx context.Context, msg *types.MsgUp
 
 	// check that signer is collection admin
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// update state
 	collection.State = msg.State
 
 	// persist the Collection
-	s.Keeper.SetCollection(ctx, collection)
-
-	// emit the events
-	if err := ctx.EventManager().EmitTypedEvents(
-		&types.CollectionUpdatedEvent{
-			Collection: &collection,
-		},
-	); err != nil {
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
 		return nil, err
 	}
 
@@ -489,7 +622,7 @@ func (s msgServer) UpdateCollectionDates(goCtx context.Context, msg *types.MsgUp
 
 	// check that signer is collection admin
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// update state
@@ -497,14 +630,7 @@ func (s msgServer) UpdateCollectionDates(goCtx context.Context, msg *types.MsgUp
 	collection.EndDate = msg.EndDate
 
 	// persist the Collection
-	s.Keeper.SetCollection(ctx, collection)
-
-	// emit the events
-	if err := ctx.EventManager().EmitTypedEvents(
-		&types.CollectionUpdatedEvent{
-			Collection: &collection,
-		},
-	); err != nil {
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
 		return nil, err
 	}
 
@@ -525,18 +651,22 @@ func (s msgServer) UpdateCollectionPayments(goCtx context.Context, msg *types.Ms
 
 	// check that signer is collection admin
 	if collection.Admin != msg.AdminAddress {
-		return nil, sdkerrors.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
 	}
 
 	// check that entity exists
 	_, entity, err := s.Keeper.EntityKeeper.ResolveEntity(ctx, collection.Entity)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
 	}
 
 	// check that Evaluation Payment does not have 1155 payment
 	if msg.Payments.Evaluation.Contract_1155Payment != nil {
 		return nil, types.ErrCollectionEvalError
+	}
+	// check that Evaluation Payment does not have CW20 payments
+	if len(msg.Payments.Evaluation.Cw20Payment) > 1 {
+		return nil, types.ErrCollectionEvalCW20Error
 	}
 
 	// check that all payments accounts is part of entity module accounts
@@ -548,16 +678,171 @@ func (s msgServer) UpdateCollectionPayments(goCtx context.Context, msg *types.Ms
 	collection.Payments = msg.Payments
 
 	// persist the Collection
-	s.Keeper.SetCollection(ctx, collection)
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
 
-	// emit the events
+	return &types.MsgUpdateCollectionPaymentsResponse{}, nil
+}
+
+// --------------------------
+// UPDATE COLLECTION STATE
+// --------------------------
+func (s msgServer) UpdateCollectionIntents(goCtx context.Context, msg *types.MsgUpdateCollectionIntents) (*types.MsgUpdateCollectionIntentsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	// update Intents
+	collection.Intents = msg.Intents
+
+	// persist the Collection
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateCollectionIntentsResponse{}, nil
+}
+
+// --------------------------
+// CLAIM INTENT
+// --------------------------
+func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent) (*types.MsgClaimIntentResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Check if the agent already has an active intent for this collection, if has throw error
+	_, found := s.Keeper.GetActiveIntent(ctx, msg.AgentAddress, msg.CollectionId)
+	if found {
+		return nil, errorsmod.Wrapf(types.ErrIntentExists, "agent already has an active intent for collection %s", msg.CollectionId)
+	}
+
+	// Get Collection for Intent
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that intents is allowed for the collection
+	if collection.Intents == types.CollectionIntentOptions_deny {
+		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intents is not allowed for collection %s", msg.CollectionId)
+	}
+
+	agentAddress, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+	if err != nil {
+		return nil, err
+	}
+	adminAddress, err := sdk.AccAddressFromBech32(collection.Admin)
+	if err != nil {
+		return nil, err
+	}
+	// get SubmitClaimAuthorization for agent to use for intent verification
+	authzMsgType := sdk.MsgTypeURL(&types.MsgSubmitClaim{})
+	authz, _ := s.Keeper.AuthzKeeper.GetAuthorization(ctx, agentAddress, adminAddress, authzMsgType)
+
+	// if no authz then return error
+	if authz == nil {
+		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "agent %s does not have authz from this collection %s", msg.AgentAddress, msg.CollectionId)
+	}
+	// get authz constraints for type match
+	var constraints []*types.SubmitClaimConstraints
+	switch k := authz.(type) {
+	case *types.SubmitClaimAuthorization:
+		constraints = k.Constraints
+	default:
+		return nil, fmt.Errorf("existing Authorizations for route %s is not of type SubmitClaimAuthorization", authzMsgType)
+	}
+	// get constraint for collection id
+	var constraint *types.SubmitClaimConstraints
+	for _, con := range constraints {
+		if con.CollectionId == msg.CollectionId {
+			constraint = con
+			break
+		}
+	}
+	// if no authz constraint for collection id then return error
+	if constraint == nil {
+		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "agent %s does not have authz from this collection %s", msg.AgentAddress, msg.CollectionId)
+	}
+
+	// check that intent amount and cw20 payments are within max constraints
+	if !types.IsCoinsInMaxConstraints(msg.Amount, constraint.MaxAmount) {
+		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intent amount is not within authz max constraints")
+	}
+	if !types.IsCW20PaymentsInMaxConstraints(msg.Cw20Payment, constraint.MaxCw20Payment) {
+		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intent cw20 payments is not within authz max constraints")
+	}
+
+	// if both amount and cw20 payments are empty then use default payments for APPROVAL
+	if len(msg.Amount) == 0 && len(msg.Cw20Payment) == 0 {
+		msg.Amount = collection.Payments.Approval.Amount
+		msg.Cw20Payment = collection.Payments.Approval.Cw20Payment
+	}
+
+	// if collection approval payment is oracle payment then only native coins allowed
+	if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(msg.Cw20Payment) {
+		return nil, types.ErrOraclePaymentOnlyNative
+	}
+
+	// Get account used for APPROVAL payments on collection
+	approvalAddress, err := sdk.AccAddressFromBech32(collection.Payments.Approval.Account)
+	if err != nil {
+		return nil, err
+	}
+	// Get escrow address
+	escrow, err := sdk.AccAddressFromBech32(collection.EscrowAccount)
+	if err != nil {
+		return nil, err
+	}
+
+	// get intent id from params and update params
+	params := s.Keeper.GetParams(ctx)
+	intentID := params.IntentSequence
+	params.IntentSequence++
+	s.Keeper.SetParams(ctx, &params)
+
+	// create Intent
+	createdDate := ctx.BlockTime()
+	expireAt := createdDate.Add(constraint.IntentDurationNs)
+	intent := types.Intent{
+		Id:            fmt.Sprint(intentID),
+		AgentDid:      msg.AgentDid.Did(),
+		AgentAddress:  msg.AgentAddress,
+		CollectionId:  msg.CollectionId,
+		CreatedAt:     &createdDate,
+		ExpireAt:      &expireAt,
+		Status:        types.IntentStatus_active,
+		Amount:        msg.Amount,
+		Cw20Payment:   msg.Cw20Payment,
+		FromAddress:   approvalAddress.String(),
+		EscrowAddress: escrow.String(),
+	}
+	// transfer the payments to escrow
+	err = s.Keeper.TransferIntentPayments(ctx, approvalAddress, escrow, intent.Amount, intent.Cw20Payment)
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "failed to transfer payments to escrow")
+	}
+
+	// Save the intent and emit the events
+	s.Keeper.SetIntent(ctx, intent)
 	if err := ctx.EventManager().EmitTypedEvents(
-		&types.CollectionUpdatedEvent{
-			Collection: &collection,
+		&types.IntentSubmittedEvent{
+			Intent: &intent,
 		},
 	); err != nil {
 		return nil, err
 	}
 
-	return &types.MsgUpdateCollectionPaymentsResponse{}, nil
+	return &types.MsgClaimIntentResponse{
+		IntentId: intent.Id,
+		ExpireAt: intent.ExpireAt,
+	}, nil
 }

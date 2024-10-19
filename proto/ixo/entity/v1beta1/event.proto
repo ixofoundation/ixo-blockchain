@@ -1,11 +1,11 @@
 syntax = "proto3";
 package ixo.entity.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types";
 
 import "gogoproto/gogo.proto";
 import "ixo/entity/v1beta1/entity.proto";
-import "ixo/entity/v1beta1/cosmos.proto";
+import "cosmos/authz/v1beta1/authz.proto";
 
 // EntityCreatedEvent is an event triggered on a Entity creation
 message EntityCreatedEvent {
@@ -50,7 +50,7 @@ message EntityAccountAuthzCreatedEvent {
   string account_name = 3;
   string granter = 4;
   string grantee = 5;
-  Grant grant = 6;
+  cosmos.authz.v1beta1.Grant grant = 6;
 }
 
 // EntityAccountAuthzRevokedEvent is an event triggered on a entity account

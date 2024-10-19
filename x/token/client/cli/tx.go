@@ -9,15 +9,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/token/types"
 	"github.com/spf13/cobra"
 )
 
 func NewTxCmd() *cobra.Command {
 	tokenTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "token transaction sub commands",
+		Short:                      "Token transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -66,7 +66,7 @@ func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 				return err
 			}
 
-			msg, err := govtypes.NewMsgSubmitProposal(&content, deposit, from)
+			msg, err := govtypesv1.NewMsgSubmitProposal(&content, deposit, from)
 			if err != nil {
 				return err
 			}
@@ -76,6 +76,7 @@ func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 	}
 
 	cmd.Flags().String(govcli.FlagTitle, "", "title of proposal")
+	// nolint:staticcheck
 	cmd.Flags().String(govcli.FlagDescription, "", "description of proposal")
 	cmd.Flags().String(govcli.FlagDeposit, "", "deposit of proposal")
 

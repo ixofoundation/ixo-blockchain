@@ -3,29 +3,30 @@ package types
 import (
 	"strings"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 var (
-	TEN18DEC = sdk.MustNewDecFromStr("1000000000000000000") // 1e18
+	TEN18DEC = math.LegacyMustNewDecFromStr("1000000000000000000") // 1e18
 )
 
 // ApproxRoot returns an approximation of a Dec's nth root
-func ApproxRoot(d sdk.Dec, root sdk.Dec) (guess sdk.Dec, err error) {
-	return ApproxPower(d, sdk.OneDec().Quo(root))
+func ApproxRoot(d math.LegacyDec, root math.LegacyDec) (guess math.LegacyDec, err error) {
+	return ApproxPower(d, math.LegacyOneDec().Quo(root))
 }
 
 // ApproxPower returns an approximation of raising a Dec to a positive power
-func ApproxPower(d sdk.Dec, power sdk.Dec) (guess sdk.Dec, err error) {
+func ApproxPower(d math.LegacyDec, power math.LegacyDec) (guess math.LegacyDec, err error) {
 	// Convert Dec's to Uint's
-	dUint := sdk.NewUintFromBigInt(d.BigInt())
-	powerUint := sdk.NewUintFromBigInt(power.BigInt())
+	dUint := math.NewUintFromBigInt(d.BigInt())
+	powerUint := math.NewUintFromBigInt(power.BigInt())
 
 	// Handle panics
 	defer func() {
 		if r := recover(); r != nil {
-			err = sdkerrors.Wrapf(ErrNumericOverflow, "%s", r)
+			err = errorsmod.Wrapf(ErrNumericOverflow, "%s", r)
 		}
 	}()
 
@@ -33,7 +34,7 @@ func ApproxPower(d sdk.Dec, power sdk.Dec) (guess sdk.Dec, err error) {
 	ansUint := pow(dUint, powerUint)
 
 	// Convert back to Dec
-	return sdk.NewDecFromBigInt(ansUint.BigInt()).Quo(TEN18DEC), nil
+	return math.LegacyNewDecFromBigInt(ansUint.BigInt()).Quo(TEN18DEC), nil
 }
 
 func RoundReservePrice(p sdk.DecCoin) sdk.Coin {
@@ -70,36 +71,36 @@ func RoundReserveReturns(rs sdk.DecCoins) (rounded sdk.Coins) {
 	return rounded
 }
 
-func MultiplyDecCoinByInt(dc sdk.DecCoin, scale sdk.Int) sdk.DecCoin {
+func MultiplyDecCoinByInt(dc sdk.DecCoin, scale math.Int) sdk.DecCoin {
 	return sdk.NewDecCoinFromDec(dc.Denom, dc.Amount.MulInt(scale))
 }
 
 // noinspection GoNilness
-func MultiplyDecCoinsByInt(dcs sdk.DecCoins, scale sdk.Int) (scaled sdk.DecCoins) {
+func MultiplyDecCoinsByInt(dcs sdk.DecCoins, scale math.Int) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
 		scaled = scaled.Add(MultiplyDecCoinByInt(dc, scale))
 	}
 	return scaled
 }
 
-func MultiplyDecCoinByDec(dc sdk.DecCoin, scale sdk.Dec) sdk.DecCoin {
+func MultiplyDecCoinByDec(dc sdk.DecCoin, scale math.LegacyDec) sdk.DecCoin {
 	return sdk.NewDecCoinFromDec(dc.Denom, dc.Amount.Mul(scale))
 }
 
 // noinspection GoNilness
-func MultiplyDecCoinsByDec(dcs sdk.DecCoins, scale sdk.Dec) (scaled sdk.DecCoins) {
+func MultiplyDecCoinsByDec(dcs sdk.DecCoins, scale math.LegacyDec) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
 		scaled = scaled.Add(MultiplyDecCoinByDec(dc, scale))
 	}
 	return scaled
 }
 
-func DivideDecCoinByDec(dc sdk.DecCoin, scale sdk.Dec) sdk.DecCoin {
+func DivideDecCoinByDec(dc sdk.DecCoin, scale math.LegacyDec) sdk.DecCoin {
 	return sdk.NewDecCoinFromDec(dc.Denom, dc.Amount.Quo(scale))
 }
 
 // noinspection GoNilness
-func DivideDecCoinsByDec(dcs sdk.DecCoins, scale sdk.Dec) (scaled sdk.DecCoins) {
+func DivideDecCoinsByDec(dcs sdk.DecCoins, scale math.LegacyDec) (scaled sdk.DecCoins) {
 	for _, dc := range dcs {
 		scaled = scaled.Add(DivideDecCoinByDec(dc, scale))
 	}
@@ -107,7 +108,6 @@ func DivideDecCoinsByDec(dcs sdk.DecCoins, scale sdk.Dec) (scaled sdk.DecCoins) 
 }
 
 func AdjustFees(fees sdk.Coins, maxFees sdk.Coins) sdk.Coins {
-
 	// List of extra fees to deduct at the end
 	extraFees := sdk.Coins{}
 
@@ -119,7 +119,7 @@ func AdjustFees(fees sdk.Coins, maxFees sdk.Coins) sdk.Coins {
 			extraFees = extraFees.Add(sdk.NewCoin(f.Denom, extraFee))
 		}
 	}
-	return fees.Sub(extraFees)
+	return fees.Sub(extraFees...)
 }
 
 func AccAddressesToString(addresses []sdk.AccAddress) (result string) {

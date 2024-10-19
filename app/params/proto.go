@@ -1,25 +1,40 @@
 package params
 
 import (
+	"cosmossdk.io/x/tx/signing"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/codec/address"
 	"github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
+	"github.com/cosmos/gogoproto/proto"
 )
 
-// MakeTestEncodingConfig creates an EncodingConfig for a non-amino based test configuration.
-// This function should be used only internally (in the SDK).
-// App user shouldn't create new codecs - use the app.AppCodec instead.
-// [DEPRECATED]
-func MakeTestEncodingConfig() EncodingConfig {
-	cdc := codec.NewLegacyAmino()
-	interfaceRegistry := types.NewInterfaceRegistry()
-	marshaler := codec.NewProtoCodec(interfaceRegistry)
-	txCfg := tx.NewTxConfig(marshaler, tx.DefaultSignModes)
+// MakeEncodingConfig creates an EncodingConfig for a non-amino based test configuration.
+func MakeEncodingConfig() EncodingConfig {
+	amino := codec.NewLegacyAmino()
+	interfaceRegistry, err := types.NewInterfaceRegistryWithOptions(types.InterfaceRegistryOptions{
+		ProtoFiles: proto.HybridResolver,
+		SigningOptions: signing.Options{
+			AddressCodec: address.Bech32Codec{
+				Bech32Prefix: sdk.GetConfig().GetBech32AccountAddrPrefix(),
+			},
+			ValidatorAddressCodec: address.Bech32Codec{
+				Bech32Prefix: sdk.GetConfig().GetBech32ValidatorAddrPrefix(),
+			},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	codec := codec.NewProtoCodec(interfaceRegistry)
+	txCfg := tx.NewTxConfig(codec, tx.DefaultSignModes)
 
 	return EncodingConfig{
 		InterfaceRegistry: interfaceRegistry,
-		Marshaler:         marshaler,
+		Codec:             codec,
 		TxConfig:          txCfg,
-		Amino:             cdc,
+		Amino:             amino,
 	}
 }

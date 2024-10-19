@@ -42,6 +42,6 @@ _(example:)_
 Where is the change documented?
 
 - [ ] Specification (`x/{module}/README.md`)
-- [ ] Osmosis documentation site
+- [ ] Ixo documentation site
 - [ ] Code comments?
 - [ ] N/A

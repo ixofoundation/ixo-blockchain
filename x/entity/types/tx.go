@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	iidante "github.com/ixofoundation/ixo-blockchain/v3/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v4/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 // func didToAddressSplitter(did string) (sdk.AccAddress, error) {
@@ -76,18 +76,6 @@ func (msg MsgCreateEntity) Type() string {
 
 func (msg MsgCreateEntity) GetIidController() iidtypes.DIDFragment { return msg.OwnerDid }
 
-func (msg MsgCreateEntity) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgCreateEntity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgCreateEntity) Route() string { return RouterKey }
 
 // --------------------------
@@ -123,18 +111,6 @@ func (msg MsgUpdateEntity) Type() string {
 
 func (msg MsgUpdateEntity) GetIidController() iidtypes.DIDFragment { return msg.ControllerDid }
 
-func (msg MsgUpdateEntity) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.ControllerAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgUpdateEntity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgUpdateEntity) Route() string { return RouterKey }
 
 // --------------------------
@@ -163,18 +139,6 @@ func (msg MsgUpdateEntityVerified) Type() string {
 }
 
 func (msg MsgUpdateEntityVerified) GetIidController() iidtypes.DIDFragment { return msg.RelayerNodeDid }
-
-func (msg MsgUpdateEntityVerified) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.RelayerNodeAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgUpdateEntityVerified) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
 
 func (msg MsgUpdateEntityVerified) Route() string { return RouterKey }
 
@@ -205,18 +169,6 @@ func (msg MsgTransferEntity) Type() string {
 
 func (msg MsgTransferEntity) GetIidController() iidtypes.DIDFragment { return msg.OwnerDid }
 
-func (msg MsgTransferEntity) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgTransferEntity) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgTransferEntity) Route() string { return RouterKey }
 
 // --------------------------
@@ -241,18 +193,6 @@ func (msg MsgCreateEntityAccount) Type() string {
 	return TypeMsgCreateEntityAccount
 }
 
-func (msg MsgCreateEntityAccount) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgCreateEntityAccount) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 func (msg MsgCreateEntityAccount) Route() string { return RouterKey }
 
 // --------------------------
@@ -264,31 +204,19 @@ var _ sdk.Msg = &MsgGrantEntityAccountAuthz{}
 
 func NewMsgGrantEntityAccountAuthz(
 	id, name, ownerAddress, granteeAddress string,
-	grant Grant,
+	grant authz.Grant,
 ) *MsgGrantEntityAccountAuthz {
 	return &MsgGrantEntityAccountAuthz{
 		Id:             id,
 		Name:           name,
 		OwnerAddress:   ownerAddress,
 		GranteeAddress: granteeAddress,
-		Grant:          authz.Grant(grant),
+		Grant:          grant,
 	}
 }
 
 func (msg MsgGrantEntityAccountAuthz) Type() string {
 	return TypeMsgGrantEntityAccountAuthz
-}
-
-func (msg MsgGrantEntityAccountAuthz) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgGrantEntityAccountAuthz) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgGrantEntityAccountAuthz) Route() string { return RouterKey }
@@ -314,18 +242,6 @@ func NewMsgRevokeEntityAccountAuthz(
 
 func (msg MsgRevokeEntityAccountAuthz) Type() string {
 	return TypeMsgRevokeEntityAccountAuthz
-}
-
-func (msg MsgRevokeEntityAccountAuthz) GetSigners() []sdk.AccAddress {
-	address, err := sdk.AccAddressFromBech32(msg.OwnerAddress)
-	if err != nil {
-		return []sdk.AccAddress{}
-	}
-	return []sdk.AccAddress{address}
-}
-
-func (msg MsgRevokeEntityAccountAuthz) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }
 
 func (msg MsgRevokeEntityAccountAuthz) Route() string { return RouterKey }

@@ -1,14 +1,14 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"cosmossdk.io/math"
 )
 
 var (
-	StartingPublicAlpha = sdk.MustNewDecFromStr("0.5")
+	StartingPublicAlpha = math.LegacyMustNewDecFromStr("0.5")
 )
 
-func SystemAlpha(publicAlpha sdk.Dec, S0, S1, R, C sdk.Int) sdk.Dec {
+func SystemAlpha(publicAlpha math.LegacyDec, S0, S1, R, C math.Int) math.LegacyDec {
 	// S0/S1: negative and positive attestations, measured in bond tokens
 	// C: outcome payment
 	// R: current reserve
@@ -17,13 +17,13 @@ func SystemAlpha(publicAlpha sdk.Dec, S0, S1, R, C sdk.Int) sdk.Dec {
 	S1R := R.Mul(S1)
 	S0C := C.Mul(S0)
 
-	x := sdk.NewDecFromInt(S1R)
-	y := sdk.NewDecFromInt(S1R.Sub(S0R).Add(S0C))
+	x := math.LegacyNewDecFromInt(S1R)
+	y := math.LegacyNewDecFromInt(S1R.Sub(S0R).Add(S0C))
 	return publicAlpha.Mul(x.Quo(y))
 	// return sdk.NewDecWithPrec(05, 1)
 }
 
-func Kappa(I sdk.Dec, C sdk.Int, alpha sdk.Dec) sdk.Dec {
+func Kappa(I math.LegacyDec, C math.Int, alpha math.LegacyDec) math.LegacyDec {
 	// I: invariant
 	// C: outcome payment
 
@@ -33,17 +33,17 @@ func Kappa(I sdk.Dec, C sdk.Int, alpha sdk.Dec) sdk.Dec {
 	return x.Quo(y)
 }
 
-func InvariantI(C sdk.Int, alpha sdk.Dec, R sdk.Int) sdk.Dec {
+func InvariantI(C math.Int, alpha math.LegacyDec, R math.Int) math.LegacyDec {
 	// C: outcome payment
 	// R: current reserve
 
-	return alpha.MulInt(C).Add(sdk.NewDecFromInt(R))
+	return alpha.MulInt(C).Add(math.LegacyNewDecFromInt(R))
 }
 
-func InvariantIAlt(C sdk.Int, alpha sdk.Dec, kappa sdk.Dec) sdk.Dec {
+func InvariantIAlt(C math.Int, alpha math.LegacyDec, kappa math.LegacyDec) math.LegacyDec {
 	// C: outcome payment
 
 	x := alpha.MulInt(C)
-	y := sdk.OneDec().Sub(sdk.OneDec().Quo(kappa))
+	y := math.LegacyOneDec().Sub(math.LegacyOneDec().Quo(kappa))
 	return x.Quo(y)
 }

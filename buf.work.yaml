@@ -1,5 +1,0 @@
-# Buf Workspace file for ixo-blockchain
-version: v1
-
-directories:
-  - proto

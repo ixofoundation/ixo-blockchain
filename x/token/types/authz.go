@@ -1,10 +1,13 @@
 package types
 
 import (
+	context "context"
+
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 var (
@@ -25,7 +28,7 @@ func (a MintAuthorization) MsgTypeURL() string {
 }
 
 // Accept implements Authorization.Accept.
-func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptResponse, error) {
+func (a MintAuthorization) Accept(_ context.Context, msg sdk.Msg) (authz.AcceptResponse, error) {
 	mMint, ok := msg.(*MsgMintToken)
 	if !ok {
 		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("type mismatch")
@@ -80,7 +83,7 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 				continue
 			}
 
-			// if reaches here it means there is a matching constraint fot the specific batch
+			// if reaches here it means there is a matching constraint for the specific batch
 			matched = true
 		}
 
@@ -94,10 +97,10 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 	}
 
 	if mismatch {
-		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrap("a mint batch doesnt correlate to granted constraints")
+		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrap("a mint batch doesn't correlate to granted constraints")
 	}
 
-	// If no more contraints means no more grants for grantee to mint, so delete authorization
+	// If no more constraints means no more grants for grantee to mint, so delete authorization
 	if len(a.Constraints) == 0 {
 		return authz.AcceptResponse{Accept: true, Delete: true}, nil
 	}
@@ -109,11 +112,11 @@ func (a MintAuthorization) Accept(ctx sdk.Context, msg sdk.Msg) (authz.AcceptRes
 func (a MintAuthorization) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(a.Minter)
 	if err != nil {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid minter address (%s)", err)
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid minter address (%s)", err)
 	}
 
 	if len(a.Constraints) == 0 {
-		return sdkerrors.ErrInvalidRequest.Wrap("mint authorization must contain atleast 1 constraint")
+		return sdkerrors.ErrInvalidRequest.Wrap("mint authorization must contain at least 1 constraint")
 	}
 
 	for _, constraint := range a.Constraints {
@@ -122,7 +125,7 @@ func (a MintAuthorization) ValidateBasic() error {
 		}
 		_, err := sdk.AccAddressFromBech32(constraint.ContractAddress)
 		if err != nil {
-			return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract address (%s)", err)
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid contract address (%s)", err)
 		}
 		if iidtypes.IsEmpty(constraint.Name) {
 			return sdkerrors.ErrInvalidRequest.Wrap("name cannot be empty")

@@ -1,11 +1,12 @@
 syntax = "proto3";
 package ixo.token.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/token/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/token/types";
 
 import "ixo/token/v1beta1/token.proto";
 import "ixo/token/v1beta1/tx.proto";
 import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
 
 // TokenCreatedEvent is an event triggered on a Token creation
 message TokenCreatedEvent { Token token = 1; }
@@ -22,7 +23,8 @@ message TokenMintedEvent {
   // the new tokens owner
   string owner = 3;
   string amount = 4 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (cosmos_proto.scalar) = "cosmos.Uint",
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
     (gogoproto.nullable) = false
   ];
   TokenProperties tokenProperties = 5;

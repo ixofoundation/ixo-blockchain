@@ -4,7 +4,7 @@ package ixo.claims.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/claims/v1beta1/claims.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/claims/types";
 
 // GenesisState defines the claims module's genesis state.
 message GenesisState {
@@ -12,4 +12,5 @@ message GenesisState {
   repeated Collection collections = 2 [ (gogoproto.nullable) = false ];
   repeated Claim claims = 3 [ (gogoproto.nullable) = false ];
   repeated Dispute disputes = 4 [ (gogoproto.nullable) = false ];
+  repeated Intent intents = 5 [ (gogoproto.nullable) = false ];
 }

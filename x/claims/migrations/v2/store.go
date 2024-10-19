@@ -1,24 +1,25 @@
 package v2claims
 
 import (
+	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
 )
 
 // MigrateStore performs in-place store migrations from ConsensusVersion 1 to 2.
-func MigrateStore(ctx sdk.Context, storeKey sdk.StoreKey, cdc codec.BinaryCodec) error {
+func MigrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, cdc codec.BinaryCodec) error {
 	store := ctx.KVStore(storeKey)
 	// Get all existing collections from the store
-	iterator := sdk.KVStorePrefixIterator(store, types.CollectionKey)
+	iterator := storetypes.KVStorePrefixIterator(store, types.CollectionKey)
 	defer iterator.Close()
 
 	for ; iterator.Valid(); iterator.Next() {
 		var oldCollection Collection // Define struct for v1 collections
 		err := cdc.Unmarshal(iterator.Value(), &oldCollection)
 		if err != nil {
-			return sdkerrors.Wrap(err, "failed to unmarshal collection")
+			return errorsmod.Wrap(err, "failed to unmarshal collection")
 		}
 
 		// Convert v1 collection to v2 collection
@@ -45,7 +46,7 @@ func MigrateStore(ctx sdk.Context, storeKey sdk.StoreKey, cdc codec.BinaryCodec)
 		// Marshal the new collection and store it with the same key
 		marshaled, err := cdc.Marshal(&newCollection)
 		if err != nil {
-			return sdkerrors.Wrap(err, "failed to marshal new collection")
+			return errorsmod.Wrap(err, "failed to marshal new collection")
 		}
 		store.Set(iterator.Key(), marshaled)
 	}

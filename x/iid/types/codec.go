@@ -8,6 +8,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
+// RegisterCodec registers the necessary x/iid interfaces and concrete types on the provided
+// LegacyAmino codec. These types are used for Amino JSON serialization.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateIidDocument{}, "iid/CreateIidDocument", nil)
 	cdc.RegisterConcrete(&MsgUpdateIidDocument{}, "iid/UpdateIidDocument", nil)
@@ -29,6 +31,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgDeactivateIID{}, "iid/DeactivateIID", nil)
 }
 
+// RegisterInterfaces registers interfaces and implementations of the x/iid module.
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateIidDocument{},
@@ -55,15 +58,12 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 }
 
 var (
-	amino = codec.NewLegacyAmino()
-
-	// ModuleCdc codec used by the module (protobuf)
+	ModuleAminoCdc = codec.NewLegacyAmino()
 	ModuleCdc      = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry())
-	ModuleAminoCdc = codec.NewAminoCodec(amino)
 )
 
 func init() {
-	RegisterLegacyAminoCodec(amino)
-	cryptocodec.RegisterCrypto(amino)
-	amino.Seal()
+	RegisterLegacyAminoCodec(ModuleAminoCdc)
+	cryptocodec.RegisterCrypto(ModuleAminoCdc)
+	ModuleAminoCdc.Seal()
 }

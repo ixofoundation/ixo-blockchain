@@ -1,26 +1,11 @@
 package types
 
 import (
-	fmt "fmt"
-
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/ixo1155"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/token/types/contracts/ixo1155"
 )
-
-var (
-	KeyIxo1155ContractCode = []byte("Ixo1155ContractCode")
-)
-
-func validateContractCode(i interface{}) error {
-	_, ok := i.(uint64)
-	if !ok {
-		return fmt.Errorf("invalid parameter type: %T expected uint64", i)
-	}
-
-	return nil
-}
 
 // IsValidToken tells if a Token is valid,
 func IsValidToken(token *Token) bool {
@@ -58,36 +43,12 @@ func IsValidTokenProperties(tokenProperties *TokenProperties) bool {
 	return true
 }
 
-// ParamTable for module.
-func ParamKeyTable() paramstypes.KeyTable {
-	return paramstypes.NewKeyTable().RegisterParamSet(&Params{})
-}
-
-func NewParams(ixo1155ContractCode uint64) Params {
-	return Params{
-		Ixo1155ContractCode: ixo1155ContractCode,
-	}
-}
-
-func DefaultParams() Params {
-	return Params{
-		Ixo1155ContractCode: 0,
-	}
-}
-
-// Implements params.ParamSet
-func (p *Params) ParamSetPairs() paramstypes.ParamSetPairs {
-	return paramstypes.ParamSetPairs{
-		paramstypes.ParamSetPair{Key: KeyIxo1155ContractCode, Value: &p.Ixo1155ContractCode, ValidatorFn: validateContractCode},
-	}
-}
-
 type MintBatchData struct {
 	Id         string
 	Uri        string
 	Name       string
 	Index      string
-	Amount     sdk.Uint
+	Amount     math.Uint
 	Collection string
 	TokenData  []*TokenData
 }

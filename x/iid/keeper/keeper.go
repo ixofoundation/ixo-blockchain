@@ -3,11 +3,12 @@ package keeper
 import (
 	"fmt"
 
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/tendermint/tendermint/libs/log"
 
-	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 // UnmarshalFn is a generic function to unmarshal bytes
@@ -18,15 +19,13 @@ type MarshalFn func(value interface{}) []byte
 
 type Keeper struct {
 	cdc      codec.Codec
-	storeKey sdk.StoreKey
-	memKey   sdk.StoreKey
+	storeKey storetypes.StoreKey
 }
 
-func NewKeeper(cdc codec.Codec, storeKey, memKey sdk.StoreKey) *Keeper {
-	return &Keeper{
+func NewKeeper(cdc codec.Codec, storeKey storetypes.StoreKey) Keeper {
+	return Keeper{
 		cdc:      cdc,
 		storeKey: storeKey,
-		memKey:   memKey,
 	}
 }
 
@@ -72,7 +71,7 @@ func (k Keeper) Get(
 func (k Keeper) GetAll(
 	ctx sdk.Context,
 	prefix []byte,
-) sdk.Iterator {
+) storetypes.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, prefix)
+	return storetypes.KVStorePrefixIterator(store, prefix)
 }

@@ -2,105 +2,187 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
+	"cosmossdk.io/log"
+	"cosmossdk.io/store"
+	"cosmossdk.io/store/snapshots"
+	snapshottypes "cosmossdk.io/store/snapshots/types"
+	storetypes "cosmossdk.io/store/types"
+	confixcmd "cosmossdk.io/tools/confix/cmd"
+	rosettaCmd "cosmossdk.io/tools/rosetta/cmd"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	cmtcfg "github.com/cometbft/cometbft/config"
+	cmtcli "github.com/cometbft/cometbft/libs/cli"
+	cosmosdb "github.com/cosmos/cosmos-db"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
+	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
+	"github.com/cosmos/cosmos-sdk/client/snapshot"
+	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/snapshots"
-	"github.com/cosmos/cosmos-sdk/store"
+	sims "github.com/cosmos/cosmos-sdk/testutil/sims"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/mempool"
+	"github.com/cosmos/cosmos-sdk/types/module"
+	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authcmd "github.com/cosmos/cosmos-sdk/x/auth/client/cli"
+	"github.com/cosmos/cosmos-sdk/x/auth/tx"
+	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v3/app"
-	"github.com/ixofoundation/ixo-blockchain/v3/app/params"
+	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/app"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	tmcli "github.com/tendermint/tendermint/libs/cli"
-	"github.com/tendermint/tendermint/libs/log"
-	dbm "github.com/tendermint/tm-db"
 )
 
-// NewRootCmd creates a new root command for simd. It is called once in the
-// main function.
-func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
-	encodingConfig := app.MakeEncodingConfig()
+// NewRootCmd creates a new root command for simd. It is called once in the main function.
+func NewRootCmd() *cobra.Command {
+	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
+	tempDir := tempDir()
+	tempApp := app.NewIxoApp(
+		log.NewNopLogger(),
+		cosmosdb.NewMemDB(),
+		nil,
+		true,
+		map[int64]bool{},
+		tempDir,
+		sims.EmptyAppOptions{},
+		app.EmptyWasmOpts,
+	)
+	// defer closing the app to ensure that the DB is closed
+	defer func() {
+		if err := tempApp.Close(); err != nil {
+			panic(err)
+		}
+		if tempDir != app.DefaultNodeHome {
+			os.RemoveAll(tempDir)
+		}
+	}()
 
 	initClientCtx := client.Context{}.
-		WithCodec(encodingConfig.Marshaler).
-		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
-		WithTxConfig(encodingConfig.TxConfig).
-		WithLegacyAmino(encodingConfig.Amino).
+		WithCodec(tempApp.AppCodec()).
+		WithInterfaceRegistry(tempApp.InterfaceRegistry()).
+		WithTxConfig(tempApp.TxConfig()).
+		WithLegacyAmino(tempApp.LegacyAmino()).
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
-		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(app.DefaultNodeHome)
-		// TODO add on sdk upgrade
-		// WithViper("IXO")
+		WithBroadcastMode(flags.BroadcastSync).
+		WithHomeDir(app.DefaultNodeHome).
+		WithViper("IXO")
 
-	// TODO add .toml config file
+	// consider adding .toml custom config in next cosmos upgrade
 	// Allows you to add extra params to your client.toml
 	// gas, gas-price, gas-adjustment, fees, note, etc.
 	// SetCustomEnvVariablesFromClientToml(initClientCtx)
 
 	rootCmd := &cobra.Command{
-		Use:   "ixod",
-		Short: "Start ixo app",
+		Use:          "ixod",
+		Short:        "Start ixo app",
+		SilenceUsage: true,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-
 			// set the default command outputs
 			cmd.SetOut(cmd.OutOrStdout())
 			cmd.SetErr(cmd.ErrOrStderr())
 
+			initClientCtx = initClientCtx.WithCmdContext(cmd.Context())
 			initClientCtx, err := client.ReadPersistentCommandFlags(initClientCtx, cmd.Flags())
 			if err != nil {
 				return err
 			}
+			initClientCtx, err = config.ReadFromClientConfig(initClientCtx)
+			if err != nil {
+				return err
+			}
 
-			// TODO add on sdk upgrade
-			// initClientCtx, err = config.ReadFromClientConfig(initClientCtx)
-			// if err != nil {
-			// 	return err
-			// }
+			// This needs to go after ReadFromClientConfig, as that function
+			// sets the RPC client needed for SIGN_MODE_TEXTUAL. This sign mode
+			// is only available if the client is online.
+			if !initClientCtx.Offline {
+				txConfigOpts := tx.ConfigOptions{
+					EnabledSignModes:           append(tx.DefaultSignModes, signing.SignMode_SIGN_MODE_TEXTUAL),
+					TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
+				}
+				txConfig, err := tx.NewTxConfigWithOptions(
+					initClientCtx.Codec,
+					txConfigOpts,
+				)
+				if err != nil {
+					return err
+				}
+
+				initClientCtx = initClientCtx.WithTxConfig(txConfig)
+			}
 
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
 				return err
 			}
 
 			customAppTemplate, customAppConfig := initAppConfig()
+			customCMTConfig := initCometBFTConfig()
 
-			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig)
+			return server.InterceptConfigsPreRunHandler(cmd, customAppTemplate, customAppConfig, customCMTConfig)
 		},
-		SilenceUsage: true,
 	}
 
-	initRootCmd(rootCmd, encodingConfig)
+	initRootCmd(rootCmd, tempApp.BasicModuleManager, tempApp.AppCodec(), tempApp.InterfaceRegistry(), tempApp.TxConfig())
 
-	return rootCmd, encodingConfig
+	// add keyring to autocli opts
+	autoCliOpts := tempApp.AutoCliOpts()
+	autoCliOpts.ClientCtx = initClientCtx
+	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
+		panic(err)
+	}
+
+	return rootCmd
 }
 
-// TODO add wasm config once upgraded wasmd
+// tempDir create a temporary directory to initialize the command line client
+func tempDir() string {
+	dir, err := os.MkdirTemp("", "ixod")
+	if err != nil {
+		panic(fmt.Sprintf("failed creating temp directory: %s", err.Error()))
+	}
+	defer os.RemoveAll(dir)
+
+	return dir
+}
+
+// initCometBFTConfig helps to override default CometBFT Config values.
+// return cmtcfg.DefaultConfig if no custom configuration is required for the application.
+func initCometBFTConfig() *cmtcfg.Config {
+	cfg := cmtcfg.DefaultConfig()
+
+	// these values put a higher strain on node memory
+	// cfg.P2P.MaxNumInboundPeers = 100
+	// cfg.P2P.MaxNumOutboundPeers = 40
+
+	return cfg
+}
+
 // initAppConfig helps to override default appConfig template and configs.
 // return "", nil if no custom configuration is required for the application.
 func initAppConfig() (string, interface{}) {
 	type CustomAppConfig struct {
 		serverconfig.Config
-		// Wasm wasmtypes.WasmConfig `mapstructure:"wasm"`
+		WasmConfig wasmtypes.WasmConfig `mapstructure:"wasm"`
 	}
 
 	// Optionally allow the chain developer to overwrite the SDK's default
@@ -108,61 +190,90 @@ func initAppConfig() (string, interface{}) {
 	srvCfg := serverconfig.DefaultConfig()
 	srvCfg.MinGasPrices = "0uixo"
 
-	customAppConfig := CustomAppConfig{
-		Config: *srvCfg,
-		// Wasm:   wasmtypes.DefaultWasmConfig(),
+	IxoAppConfig := CustomAppConfig{
+		Config:     *srvCfg,
+		WasmConfig: wasmtypes.DefaultWasmConfig(),
 	}
 
-	// customAppTemplate := serverconfig.DefaultConfigTemplate + wasmtypes.DefaultConfigTemplate()
-	customAppTemplate := serverconfig.DefaultConfigTemplate
+	IxoAppTemplate := serverconfig.DefaultConfigTemplate + `
+###############################################################################
+###                            Wasm Configuration                           ###
+###############################################################################
+	` + wasmtypes.DefaultConfigTemplate()
 
-	return customAppTemplate, customAppConfig
+	return IxoAppTemplate, IxoAppConfig
 }
 
 // initRootCmd initializes root commands when creating a new root command for simd.
-func initRootCmd(rootCmd *cobra.Command, encodingConfig params.EncodingConfig) {
+
+func initRootCmd(rootCmd *cobra.Command,
+	basicManager module.BasicManager,
+	cdc codec.Codec,
+	interfaceRegistry codectypes.InterfaceRegistry,
+	txConfig client.TxConfig,
+) {
 	cfg := sdk.GetConfig()
 	cfg.Seal()
 
 	rootCmd.AddCommand(
-		genutilcli.InitCmd(app.ModuleBasics, app.DefaultNodeHome),
-		genutilcli.CollectGenTxsCmd(banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		genutilcli.MigrateGenesisCmd(),
-		genutilcli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, banktypes.GenesisBalancesIterator{}, app.DefaultNodeHome),
-		genutilcli.ValidateGenesisCmd(app.ModuleBasics),
-		AddGenesisAccountCmd(app.DefaultNodeHome),
-		tmcli.NewCompletionCmd(rootCmd, true),
-		testnetCmd(app.ModuleBasics, banktypes.GenesisBalancesIterator{}),
+		genutilcli.InitCmd(basicManager, app.DefaultNodeHome),
+		cmtcli.NewCompletionCmd(rootCmd, true),
+		NewTestnetCmd(basicManager, banktypes.GenesisBalancesIterator{}),
 		debug.Cmd(),
-		config.Cmd(),
+		confixcmd.ConfigCommand(),
+		snapshot.Cmd(newApp),
+		pruning.Cmd(newApp, app.DefaultNodeHome),
 	)
 
-	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, appExport, addModuleInitFlags)
+	server.AddCommands(rootCmd, app.DefaultNodeHome, newApp, createIxoAppAndExport, addModuleInitFlags)
 
 	// add keybase, auxiliary RPC, query, and tx child commands
 	rootCmd.AddCommand(
-		rpc.StatusCommand(),
+		server.StatusCommand(),
+		genesisCommand(txConfig, basicManager),
 		queryCommand(),
-		txCommand(),
-		keys.Commands(app.DefaultNodeHome),
+		txCommand(basicManager),
+		keys.Commands(),
 	)
+
+	// add rosetta
+	rootCmd.AddCommand(rosettaCmd.RosettaCommand(interfaceRegistry, cdc))
 }
-
-// TODO use below after sdk upgrade
-// genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
-// func genesisCommand(encodingConfig params.EncodingConfig, cmds ...*cobra.Command) *cobra.Command {
-// 	cmd := genutilcli.GenesisCoreCommand(encodingConfig.TxConfig, app.ModuleBasics, app.DefaultNodeHome)
-
-// 	for _, subCmd := range cmds {
-// 		cmd.AddCommand(subCmd)
-// 	}
-// 	return cmd
-// }
 
 func addModuleInitFlags(startCmd *cobra.Command) {
 	crisis.AddModuleInitFlags(startCmd)
+	wasm.AddModuleInitFlags(startCmd)
 }
 
+// Throws error for moduleBasics[genutiltypes.ModuleName].(genutil.AppModuleBasic) conversion, check if fixed in future versions
+// genesisCommand builds genesis-related `simd genesis` command. Users may provide application specific commands as a parameter
+func genesisCommand(txConfig client.TxConfig, basicManager module.BasicManager, cmds ...*cobra.Command) *cobra.Command {
+	cmd := genutilcli.Commands(txConfig, basicManager, app.DefaultNodeHome)
+
+	for _, subCmd := range cmds {
+		cmd.AddCommand(subCmd)
+	}
+	return cmd
+}
+
+func CmdModuleNameToAddress() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "module-name-to-address [module-name]",
+		Short: "module name to address",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			address := types.NewModuleAddress(args[0])
+			return clientCtx.PrintString(address.String())
+		},
+	}
+
+	flags.AddPaginationFlagsToCmd(cmd, cmd.Use)
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// queryCommand adds transaction and account querying commands.
 func queryCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "query",
@@ -174,20 +285,22 @@ func queryCommand() *cobra.Command {
 	}
 
 	cmd.AddCommand(
-		authcmd.GetAccountCmd(),
+		rpc.WaitTxCmd(),
 		rpc.ValidatorCommand(),
-		rpc.BlockCommand(),
+		server.QueryBlocksCmd(),
+		server.QueryBlockCmd(),
+		server.QueryBlockResultsCmd(),
 		authcmd.QueryTxsByEventsCmd(),
 		authcmd.QueryTxCmd(),
+		CmdModuleNameToAddress(),
 	)
 
-	app.ModuleBasics.AddQueryCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
-
 	return cmd
 }
 
-func txCommand() *cobra.Command {
+// txCommand adds transaction signing, encoding / decoding, and broadcasting commands.
+func txCommand(moduleBasics module.BasicManager) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        "tx",
 		Short:                      "Transactions subcommands",
@@ -200,23 +313,31 @@ func txCommand() *cobra.Command {
 		authcmd.GetSignCommand(),
 		authcmd.GetSignBatchCommand(),
 		authcmd.GetMultiSignCommand(),
+		authcmd.GetMultiSignBatchCmd(),
 		authcmd.GetValidateSignaturesCommand(),
-		flags.LineBreak,
 		authcmd.GetBroadcastCommand(),
 		authcmd.GetEncodeCommand(),
 		authcmd.GetDecodeCommand(),
-		flags.LineBreak,
+		authcmd.GetSimulateCmd(),
 	)
 
-	app.ModuleBasics.AddTxCommands(cmd)
-	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
+	// consider removing below, and use `gov draft-proposal` instead, need to convert ixo modules also before can remove this.
+	// NOTE: this must be registered for now so that submit-legacy-proposal
+	// message (e.g. consumer-addition proposal) can be routed to the its handler and processed correctly.
+	moduleBasics.AddTxCommands(cmd)
 
+	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
 	return cmd
 }
 
-// newApp initializes and returns a new ixo app.
-func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts servertypes.AppOptions) servertypes.Application {
-	var cache sdk.MultiStorePersistentCache
+// newApp initializes and returns a new Ixo app.
+func newApp(
+	logger log.Logger,
+	db cosmosdb.DB,
+	traceStore io.Writer,
+	appOpts servertypes.AppOptions,
+) servertypes.Application {
+	var cache storetypes.MultiStorePersistentCache
 
 	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
 		cache = store.NewCommitKVStoreCacheManager()
@@ -232,9 +353,9 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 		panic(err)
 	}
 
-	// TODO change to data but have to inform validators
+	// consider change path to data but have to inform validators
 	snapshotDir := filepath.Join(cast.ToString(appOpts.Get(flags.FlagHome)), "iid", "snapshots")
-	snapshotDB, err := sdk.NewLevelDB("metadata", snapshotDir)
+	snapshotDB, err := cosmosdb.NewGoLevelDB("metadata", snapshotDir, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -242,42 +363,81 @@ func newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, appOpts serverty
 	if err != nil {
 		panic(err)
 	}
+	snapshotOptions := snapshottypes.NewSnapshotOptions(
+		cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval)),
+		cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent)),
+	)
 
-	var wasmOpts []wasm.Option
+	homeDir := cast.ToString(appOpts.Get(flags.FlagHome))
+	chainID := cast.ToString(appOpts.Get(flags.FlagChainID))
+	if chainID == "" {
+		// fallback to genesis chain-id
+		appGenesis, err := genutiltypes.AppGenesisFromFile(filepath.Join(homeDir, "config", "genesis.json"))
+		if err != nil {
+			panic(err)
+		}
+
+		chainID = appGenesis.ChainID
+	}
+
+	var wasmOpts []wasmkeeper.Option
 	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
-	return app.NewIxoApp(logger, db, traceStore, true, skipUpgradeHeights,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
-		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
-		appOpts,
-		wasmOpts,
+	defaultMempool := baseapp.SetMempool(mempool.NoOpMempool{})
+	if maxTxs := cast.ToInt(appOpts.Get(server.FlagMempoolMaxTxs)); maxTxs >= 0 {
+		defaultMempool = baseapp.SetMempool(
+			mempool.NewSenderNonceMempool(
+				mempool.SenderNonceMaxTxOpt(maxTxs),
+			),
+		)
+	}
+
+	baseAppOptions := []func(*baseapp.BaseApp){
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
+		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
 		baseapp.SetHaltHeight(cast.ToUint64(appOpts.Get(server.FlagHaltHeight))),
 		baseapp.SetHaltTime(cast.ToUint64(appOpts.Get(server.FlagHaltTime))),
-		baseapp.SetMinRetainBlocks(cast.ToUint64(appOpts.Get(server.FlagMinRetainBlocks))),
 		baseapp.SetInterBlockCache(cache),
 		baseapp.SetTrace(cast.ToBool(appOpts.Get(server.FlagTrace))),
 		baseapp.SetIndexEvents(cast.ToStringSlice(appOpts.Get(server.FlagIndexEvents))),
-		baseapp.SetSnapshotStore(snapshotStore),
-		baseapp.SetSnapshotInterval(cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval))),
-		baseapp.SetSnapshotKeepRecent(cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))),
+		baseapp.SetSnapshot(snapshotStore, snapshotOptions),
+		baseapp.SetIAVLCacheSize(cast.ToInt(appOpts.Get(server.FlagIAVLCacheSize))),
+		baseapp.SetIAVLDisableFastNode(cast.ToBool(appOpts.Get(server.FlagDisableIAVLFastNode))),
+		defaultMempool,
+		baseapp.SetChainID(chainID),
+		baseapp.SetQueryGasLimit(cast.ToUint64(appOpts.Get(server.FlagQueryGasLimit))),
+	}
+
+	return app.NewIxoApp(
+		logger, db, traceStore, true, skipUpgradeHeights,
+		cast.ToString(appOpts.Get(flags.FlagHome)),
+		appOpts,
+		wasmOpts,
+		baseAppOptions...,
 	)
 }
 
-// appExport creates and exports the new ixo app, returns the state of the new ixo app for a genesis file.
-func appExport(
-	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
-	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
+// createIxoAppAndExport creates and exports the new ixo app, returns the state of the new IXO app for a genesis file.
+func createIxoAppAndExport(
+	logger log.Logger,
+	db cosmosdb.DB,
+	traceStore io.Writer,
+	height int64,
+	forZeroHeight bool,
+	jailAllowedAddrs []string,
+	appOpts servertypes.AppOptions,
+	modulesToExport []string,
+) (servertypes.ExportedApp, error) {
 	homePath, ok := appOpts.Get(flags.FlagHome).(string)
 	if !ok || homePath == "" {
 		return servertypes.ExportedApp{}, errors.New("application home not set")
 	}
 
 	loadLatest := height == -1
-	ixoApp := app.NewIxoApp(logger, db, traceStore, loadLatest, map[int64]bool{}, homePath, uint(1), appOpts, []wasm.Option{})
+	ixoApp := app.NewIxoApp(logger, db, traceStore, loadLatest, map[int64]bool{}, homePath, appOpts, app.EmptyWasmOpts)
 
 	if !loadLatest {
 		if err := ixoApp.LoadHeight(height); err != nil {
@@ -285,5 +445,5 @@ func appExport(
 		}
 	}
 
-	return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
+	return ixoApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }

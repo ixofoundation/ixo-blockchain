@@ -4,7 +4,7 @@ The bonds module emits the following typed events:
 
 ### BondCreatedEvent
 
-Emitted after a successfull `MsgCreateBond`
+Emitted after a successful `MsgCreateBond`
 
 | **Field** | **Type** | **Description** |
 | :-------- | :------- | :-------------- |
@@ -18,7 +18,7 @@ type BondCreatedEvent struct {
 
 ### BondUpdatedEvent
 
-Emitted after a successfull `MsgEditBond`, `MsgUpdateBondState`
+Emitted after a successful `MsgEditBond`, `MsgUpdateBondState`
 
 | **Field** | **Type** | **Description** |
 | :-------- | :------- | :-------------- |
@@ -32,7 +32,7 @@ type BondUpdatedEvent struct {
 
 ### BondSetNextAlphaEvent
 
-Emitted after a successfull `MsgSetNextAlpha`. Note this doesn't mean the alpha has been updated, it has only been added to the batch for next batch update.
+Emitted after a successful `MsgSetNextAlpha`. Note this doesn't mean the alpha has been updated, it has only been added to the batch for next batch update.
 
 | **Field** | **Type** | **Description** |
 | :-------- | :------- | :-------------- |
@@ -50,7 +50,7 @@ type BondSetNextAlphaEvent struct {
 
 ### BondBuyOrderEvent
 
-Emitted after a successfull `MsgBuy`. Note this doesn't mean the buy has been executed, it has only been added to the batch.
+Emitted after a successful `MsgBuy`. Note this doesn't mean the buy has been executed, it has only been added to the batch.
 
 | **Field** | **Type**    | **Description** |
 | :-------- | :---------- | :-------------- |
@@ -66,7 +66,7 @@ type BondBuyOrderEvent struct {
 
 ### BondSellOrderEvent
 
-Emitted after a successfull `MsgSell`. Note this doesn't mean the sell has been executed, it has only been added to the batch.
+Emitted after a successful `MsgSell`. Note this doesn't mean the sell has been executed, it has only been added to the batch.
 
 | **Field** | **Type**     | **Description** |
 | :-------- | :----------- | :-------------- |
@@ -82,7 +82,7 @@ type BondSellOrderEvent struct {
 
 ### BondSwapOrderEvent
 
-Emitted after a successfull `MsgSwap`. Note this doesn't mean the swap has been executed, it has only been added to the batch.
+Emitted after a successful `MsgSwap`. Note this doesn't mean the swap has been executed, it has only been added to the batch.
 
 | **Field** | **Type**     | **Description** |
 | :-------- | :----------- | :-------------- |
@@ -98,7 +98,7 @@ type BondSwapOrderEvent struct {
 
 ### BondMakeOutcomePaymentEvent
 
-Emitted after a successfull `MsgMakeOutcomePayment`
+Emitted after a successful `MsgMakeOutcomePayment`
 
 | **Field**      | **Type**                                   | **Description** |
 | :------------- | :----------------------------------------- | :-------------- |
@@ -118,7 +118,7 @@ type BondMakeOutcomePaymentEvent struct {
 
 ### BondWithdrawShareEvent
 
-Emitted after a successfull `MsgWithdrawShare`
+Emitted after a successful `MsgWithdrawShare`
 
 | **Field**        | **Type**                                   | **Description** |
 | :--------------- | :----------------------------------------- | :-------------- |
@@ -138,7 +138,7 @@ type BondWithdrawShareEvent struct {
 
 ### BondWithdrawReserveEvent
 
-Emitted after a successfull `MsgWithdrawReserve`
+Emitted after a successful `MsgWithdrawReserve`
 
 | **Field**                | **Type**                                   | **Description** |
 | :----------------------- | :----------------------------------------- | :-------------- |
@@ -160,7 +160,7 @@ type BondWithdrawReserveEvent struct {
 
 ### BondEditAlphaSuccessEvent
 
-Emitted after a successfull update of the Alpha state which is done in `EndBlock`
+Emitted after a successful update of the Alpha state which is done in `EndBlock`
 
 | **Field**   | **Type** | **Description** |
 | :---------- | :------- | :-------------- |
@@ -198,7 +198,7 @@ type BondEditAlphaFailedEvent struct {
 
 ### BondBuyOrderFulfilledEvent
 
-Emitted after a successfull `BuyOrder` has been executed which is done in `EndBlock`
+Emitted after a successful `BuyOrder` has been executed which is done in `EndBlock`
 
 | **Field**                   | **Type**                                   | **Description** |
 | :-------------------------- | :----------------------------------------- | :-------------- |
@@ -226,7 +226,7 @@ type BondBuyOrderFulfilledEvent struct {
 
 ### BondSellOrderFulfilledEvent
 
-Emitted after a successfull `SellOrder` has been executed which is done in `EndBlock`
+Emitted after a successful `SellOrder` has been executed which is done in `EndBlock`
 
 | **Field**           | **Type**                                   | **Description** |
 | :------------------ | :----------------------------------------- | :-------------- |
@@ -248,7 +248,7 @@ type BondSellOrderFulfilledEvent struct {
 
 ### BondSwapOrderFulfilledEvent
 
-Emitted after a successfull `SwapOrder` has been executed which is done in `EndBlock`
+Emitted after a successful `SwapOrder` has been executed which is done in `EndBlock`
 
 | **Field**         | **Type**                                   | **Description** |
 | :---------------- | :----------------------------------------- | :-------------- |

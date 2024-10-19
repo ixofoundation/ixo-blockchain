@@ -3,14 +3,15 @@ package keeper
 import (
 	"fmt"
 
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types"
 	"github.com/tendermint/go-amino"
 )
 
-func (k Keeper) GetBondIterator(ctx sdk.Context) sdk.Iterator {
+func (k Keeper) GetBondIterator(ctx sdk.Context) storetypes.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, types.BondsKeyPrefix)
+	return storetypes.KVStorePrefixIterator(store, types.BondsKeyPrefix)
 }
 
 func (k Keeper) GetBond(ctx sdk.Context, bondDid string) (bond types.Bond, found bool) {
@@ -78,7 +79,6 @@ func (k Keeper) SetBondDid(ctx sdk.Context, bondToken string, bondDid string) {
 
 func (k Keeper) DepositIntoReserve(ctx sdk.Context, bondDid string,
 	from sdk.AccAddress, amount sdk.Coins) error {
-
 	// Send tokens to bonds reserve account
 	err := k.BankKeeper.SendCoinsFromAccountToModule(
 		ctx, from, types.BondsReserveAccount, amount)
@@ -95,7 +95,6 @@ func (k Keeper) DepositIntoReserve(ctx sdk.Context, bondDid string,
 
 func (k Keeper) DepositOutcomePayment(ctx sdk.Context, bondDid string,
 	from sdk.AccAddress, amount sdk.Coins) error {
-
 	// Send tokens to bonds reserve account
 	err := k.BankKeeper.SendCoinsFromAccountToModule(
 		ctx, from, types.BondsReserveAccount, amount)
@@ -111,7 +110,6 @@ func (k Keeper) DepositOutcomePayment(ctx sdk.Context, bondDid string,
 
 func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid string,
 	fromModule string, amount sdk.Coins) error {
-
 	// Send tokens to bonds reserve account
 	err := k.BankKeeper.SendCoinsFromModuleToModule(
 		ctx, fromModule, types.BondsReserveAccount, amount)
@@ -128,7 +126,6 @@ func (k Keeper) DepositReserveFromModule(ctx sdk.Context, bondDid string,
 
 func (k Keeper) WithdrawFromReserve(ctx sdk.Context, bondDid string,
 	to sdk.AccAddress, amount sdk.Coins) error {
-
 	// Send tokens from bonds reserve account
 	err := k.BankKeeper.SendCoinsFromModuleToAccount(
 		ctx, types.BondsReserveAccount, to, amount)
@@ -138,13 +135,12 @@ func (k Keeper) WithdrawFromReserve(ctx sdk.Context, bondDid string,
 
 	// Update bond reserve and available reserve
 	bond := k.MustGetBond(ctx, bondDid)
-	k.setReserveBalances(ctx, bondDid, bond.CurrentReserve.Sub(amount))
-	k.setAvailableReserve(ctx, bondDid, bond.AvailableReserve.Sub(amount))
+	k.setReserveBalances(ctx, bondDid, bond.CurrentReserve.Sub(amount...))
+	k.setAvailableReserve(ctx, bondDid, bond.AvailableReserve.Sub(amount...))
 	return nil
 }
 
 func (k Keeper) MoveOutcomePaymentToReserve(ctx sdk.Context, bondDid string) {
-
 	bond := k.MustGetBond(ctx, bondDid)
 	newReserve := bond.CurrentReserve.Add(bond.CurrentOutcomePaymentReserve...)
 	newAvailableReserve := bond.AvailableReserve.Add(bond.CurrentOutcomePaymentReserve...)
@@ -221,11 +217,14 @@ func (k Keeper) SetBondState(ctx sdk.Context, bondDid string, newState string) {
 	logger.Info(fmt.Sprintf("updated state for %s from %s to %s", bond.Token, previousState, newState))
 
 	// emit the events
-	ctx.EventManager().EmitTypedEvents(
+	err := ctx.EventManager().EmitTypedEvents(
 		&types.BondUpdatedEvent{
 			Bond: &bond,
 		},
 	)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func (k Keeper) ReservedBondToken(ctx sdk.Context, bondToken string) bool {

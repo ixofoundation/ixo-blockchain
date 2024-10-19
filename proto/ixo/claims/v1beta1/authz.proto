@@ -6,12 +6,14 @@ import "cosmos_proto/cosmos.proto";
 import "google/protobuf/timestamp.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "ixo/claims/v1beta1/claims.proto";
-import "ixo/claims/v1beta1/cosmos.proto";
+import "google/protobuf/duration.proto";
+import "cosmos/bank/v1beta1/bank.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/claims/types";
 
 message SubmitClaimAuthorization {
-  option (cosmos_proto.implements_interface) = "Authorization";
+  option (cosmos_proto.implements_interface) =
+      "cosmos.authz.v1beta1.Authorization";
 
   // address of admin
   string admin = 1;
@@ -22,10 +24,24 @@ message SubmitClaimConstraints {
   // collection_id indicates to which Collection this claim belongs
   string collection_id = 1;
   uint64 agent_quota = 2;
+  // custom max_amount allowed to be specified by service agent for claim
+  // approval, if empty then no custom amount is allowed
+  repeated cosmos.base.v1beta1.Coin max_amount = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // custom max_cw20_payment allowed to be specified by service agent for claim
+  // approval, if empty then no custom amount is allowed
+  repeated CW20Payment max_cw20_payment = 4;
+  // intent_duration_ns is the duration for which the intent is active, after
+  // which it will expire (in nanoseconds)
+  google.protobuf.Duration intent_duration_ns = 5
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
 }
 
 message EvaluateClaimAuthorization {
-  option (cosmos_proto.implements_interface) = "Authorization";
+  option (cosmos_proto.implements_interface) =
+      "cosmos.authz.v1beta1.Authorization";
 
   // address of admin
   string admin = 1;
@@ -46,10 +62,14 @@ message EvaluateClaimConstraints {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // max custom cw20 payment evaluator can change, if empty list must use amount
+  // defined in Token payments
+  repeated CW20Payment max_custom_cw20_payment = 11;
 }
 
 message WithdrawPaymentAuthorization {
-  option (cosmos_proto.implements_interface) = "Authorization";
+  option (cosmos_proto.implements_interface) =
+      "cosmos.authz.v1beta1.Authorization";
 
   // address of admin
   string admin = 1;
@@ -60,15 +80,11 @@ message WithdrawPaymentConstraints {
   // claim_id the withdrawal is for
   string claim_id = 1;
   // Inputs to the multisend tx to run to withdraw payment
-  repeated Input inputs = 2 [
-    (gogoproto.nullable) = false,
-    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Input"
-  ];
+  repeated cosmos.bank.v1beta1.Input inputs = 2
+      [ (gogoproto.nullable) = false ];
   // Outputs for the multisend tx to run to withdraw payment
-  repeated Output outputs = 3 [
-    (gogoproto.nullable) = false,
-    (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/x/bank/types.Output"
-  ];
+  repeated cosmos.bank.v1beta1.Output outputs = 3
+      [ (gogoproto.nullable) = false ];
   // payment type to keep track what payment is for and mark claim payment
   // accordingly
   PaymentType payment_type = 4;
@@ -81,4 +97,6 @@ message WithdrawPaymentConstraints {
   // date that grantee can execute authorization, calculated from created date
   // plus the timeout on Collection payments, if null then none
   google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
+  // cw20 payments, can be empty or multiple
+  repeated CW20Payment cw20_payment = 9;
 }

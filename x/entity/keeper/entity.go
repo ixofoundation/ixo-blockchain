@@ -3,12 +3,13 @@ package keeper
 import (
 	"encoding/json"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
-	nft "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types/contracts"
-	iidTypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
+	nft "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types/contracts"
+	iidTypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 func (k Keeper) SetEntity(ctx sdk.Context, key []byte, meta types.Entity) {
@@ -17,7 +18,14 @@ func (k Keeper) SetEntity(ctx sdk.Context, key []byte, meta types.Entity) {
 
 func (k Keeper) GetEntity(ctx sdk.Context, key []byte) (types.Entity, bool) {
 	val, found := k.Get(ctx, key, types.EntityKey, k.UnmarshalEntity)
-	return val.(types.Entity), found
+	if !found {
+		return types.Entity{}, false
+	}
+	entity, ok := val.(types.Entity)
+	if !ok {
+		return types.Entity{}, false
+	}
+	return entity, true
 }
 
 func (k Keeper) UnmarshalEntity(value []byte) (interface{}, bool) {
@@ -48,6 +56,7 @@ func (k Keeper) Marshal(value interface{}) (bytes []byte) {
 	return
 }
 
+// nolint:staticcheck
 // Unmarshal unmarshal a byte slice to a struct, return false in case of errors
 func (k Keeper) Unmarshal(data []byte, val codec.ProtoMarshaler) bool {
 	if len(data) == 0 {
@@ -60,7 +69,7 @@ func (k Keeper) Unmarshal(data []byte, val codec.ProtoMarshaler) bool {
 }
 
 // GetAllEntityWithCondition retrieve a list of
-// entitiy docs by some arbitrary criteria.
+// entity docs by some arbitrary criteria.
 func (k Keeper) GetAllEntityWithCondition(
 	ctx sdk.Context,
 	key []byte,
@@ -72,7 +81,10 @@ func (k Keeper) GetAllEntityWithCondition(
 
 	for ; iterator.Valid(); iterator.Next() {
 		entity, _ := k.UnmarshalEntity(iterator.Value())
-		entityTyped := entity.(types.Entity)
+		entityTyped, ok := entity.(types.Entity)
+		if !ok {
+			continue
+		}
 
 		if entitySelector(entityTyped) {
 			entities = append(entities, entityTyped)
@@ -96,7 +108,7 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.Ac
 	address := types.GetModuleAccountAddress(entityId, name)
 
 	if k.AccountKeeper.GetAccount(ctx, address) != nil {
-		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidAddress, "account already exists")
 	}
 
 	account := k.AccountKeeper.NewAccountWithAddress(ctx, address)
@@ -130,7 +142,7 @@ func (k Keeper) CheckIfOwner(ctx sdk.Context, entityId, ownerAddress string) err
 		return err
 	}
 	var ownerOf nft.OwnerOfResponse
-	if err := json.Unmarshal([]byte(ownerOfBytes), &ownerOf); err != nil {
+	if err := json.Unmarshal(ownerOfBytes, &ownerOf); err != nil {
 		return err
 	}
 

@@ -2,12 +2,14 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/codec/types"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
+// RegisterCodec registers the necessary x/bonds interfaces and concrete types on the provided
+// LegacyAmino codec. These types are used for Amino JSON serialization.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&Bond{}, "bonds/Bond", nil)
 	cdc.RegisterConcrete(&FunctionParam{}, "bonds/FunctionParam", nil)
@@ -28,7 +30,8 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgWithdrawReserve{}, "bonds/MsgWithdrawReserve", nil)
 }
 
-func RegisterInterfaces(registry types.InterfaceRegistry) {
+// RegisterInterfaces registers interfaces and implementations of the x/bonds module.
+func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateBond{},
 		&MsgEditBond{},
@@ -46,15 +49,8 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 }
 
 var (
-	amino = codec.NewLegacyAmino()
-
-	// ModuleCdc references the global x/did module codec. Note, the codec should
-	// ONLY be used in certain instances of tests and for JSON encoding as Amino is
-	// still used for that purpose.
-	//
-	// The actual codec used for serialization should be provided to x/did and
-	// defined at the application level.
-	ModuleCdc = codec.NewAminoCodec(amino)
+	amino     = codec.NewLegacyAmino()
+	ModuleCdc = codec.NewProtoCodec(cdctypes.NewInterfaceRegistry())
 )
 
 func init() {

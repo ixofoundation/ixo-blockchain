@@ -2,21 +2,20 @@ package cli
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
 )
 
 // GetTxCmd returns the transaction commands for this module
 func NewTxCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      fmt.Sprintf("%s transactions subcommands", types.ModuleName),
+		Short:                      "Claims transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -136,6 +135,30 @@ func NewCmdWithdrawPayment() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var msg types.MsgWithdrawPayment
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdSubmitIntent() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "submit-intent [claim-intent-doc]",
+		Short: "Submit a claim - flag is raw json with struct of MsgClaimIntent",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgClaimIntent
 			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
 				return err
 			}

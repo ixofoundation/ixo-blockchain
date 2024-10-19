@@ -17,19 +17,19 @@ Bonds can be created by any address using `MsgCreateBond`.
 | CreatorDid               | `did.Did`        | DID of the bond creator (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                                                           |
 | ControllerDid            | `did.Did`        | DID of the bond controller (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                                                        |
 | ReserveTokens            | `[]string`       | The token denominations that will be used as reserve (e.g. `res,rez`)                                                     |
-| TxFeePercentage          | `sdk.Dec`        | The percentage fee charged for buys/sells/swaps (e.g. `0.3`)                                                              |
-| ExitFeePercentage        | `sdk.Dec`        | The percentage fee charged for sells on top of the tx fee (e.g. `0.2`)                                                    |
+| TxFeePercentage          | `math.LegacyDec` | The percentage fee charged for buys/sells/swaps (e.g. `0.3`)                                                              |
+| ExitFeePercentage        | `math.LegacyDec` | The percentage fee charged for sells on top of the tx fee (e.g. `0.2`)                                                    |
 | FeeAddress               | `sdk.AccAddress` | The address of the account that will store charged fees                                                                   |
 | ReserveWithdrawalAddress | `sdk.AccAddress` | The address of the account that will receive any reserve withdrawn by the controller                                      |
 | MaxSupply                | `sdk.Coin`       | The maximum number of bond tokens that can be minted                                                                      |
 | OrderQuantityLimits      | `sdk.Coins`      | The maximum number of tokens that one can buy/sell/swap in a single order (e.g. `100abc,200res,300rez`)                   |
-| SanityRate               | `sdk.Dec`        | For a swapper, restricts conversion rate (`r1/r2`) to `sanity rate ± sanity margin percentage`. `0` for no sanity checks. |
-| SanityMarginPercentage   | `sdk.Dec`        | Used as described above. `0` for no sanity checks                                                                         |
+| SanityRate               | `math.LegacyDec` | For a swapper, restricts conversion rate (`r1/r2`) to `sanity rate ± sanity margin percentage`. `0` for no sanity checks. |
+| SanityMarginPercentage   | `math.LegacyDec` | Used as described above. `0` for no sanity checks                                                                         |
 | AllowSells               | `bool`           | Whether or not selling is allowed (cannot be True if AllowReserveWithdrawals is True)                                     |
 | AllowReserveWithdrawals  | `bool`           | Whether or not reserve withdrawals are allowed (cannot be True if AllowSells is True)                                     |
 | AlphaBond                | `bool`           | Whether or not bond is an alpha bond                                                                                      |
-| BatchBlocks              | `sdk.Uint`       | The lifespan of each orders batch in blocks                                                                               |
-| OutcomePayment           | `sdk.Int`        | The approximate total payment required to be made in order to transition a bond from OPEN to SETTLE                       |
+| BatchBlocks              | `math.Uint`      | The lifespan of each orders batch in blocks                                                                               |
+| OutcomePayment           | `math.Int`       | The approximate total payment required to be made in order to transition a bond from OPEN to SETTLE                       |
 
 ```go
 type MsgCreateBond struct {
@@ -42,19 +42,19 @@ type MsgCreateBond struct {
     CreatorDid               string
     ControllerDid            string
     ReserveTokens            []string
-    TxFeePercentage          sdk.Dec
-    ExitFeePercentage        sdk.Dec
+    TxFeePercentage          math.LegacyDec
+    ExitFeePercentage        math.LegacyDec
     FeeAddress               string
     ReserveWithdrawalAddress string
     MaxSupply                sdk.Coin
     OrderQuantityLimits      sdk.Coins
-    SanityRate               sdk.Dec
-    SanityMarginPercentage   sdk.Dec
+    SanityRate               math.LegacyDec
+    SanityMarginPercentage   math.LegacyDec
     AllowSells               bool
     AllowReserveWithdrawals  bool
     AlphaBond                bool
-    BatchBlocks              sdk.Uint
-    OutcomePayment           sdk.Int
+    BatchBlocks              math.Uint
+    OutcomePayment           math.Int
 }
 ```
 
@@ -138,11 +138,11 @@ This message stores the updated `Bond` object.
 
 The controller of a bond can set the next public alpha value for Augmented Bonding Curve type bonds using `MsgSetNextAlpha`.
 
-| **Field** | **Type**  | **Description**                                                                 |
-| :-------- | :-------- | :------------------------------------------------------------------------------ |
-| BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
-| Alpha     | `sdk.Dec` | Public alpha value to be set (e.g. `0.5`)                                       |
-| EditorDid | `did.Did` | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                  |
+| **Field** | **Type**         | **Description**                                                                 |
+| :-------- | :--------------- | :------------------------------------------------------------------------------ |
+| BondDid   | `did.Did`        | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
+| Alpha     | `math.LegacyDec` | Public alpha value to be set (e.g. `0.5`)                                       |
+| EditorDid | `did.Did`        | DID of the bond editor (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                  |
 
 This message is expected to fail if:
 
@@ -160,7 +160,7 @@ This message is expected to fail if:
 ```go
 type MsgSetNextAlpha struct {
     BondDid   string
-    Alpha     sdk.Dec
+    Alpha     math.LegacyDec
     EditorDid string
 }
 ```
@@ -315,11 +315,11 @@ This message adds the swap order to the current batch.
 
 If a bond was created with an outcome payment field, then any token holder can make an outcome payment to the bond. If the token holder has enough tokens to pay the outcome payment, the tokens are sent to the bond's reserve and the bond's state gets set to SETTLE. The only action possible by bond token holders after the outcome payment has been made is a share withdrawal (using [MsgWithdrawShare](#MsgWithdrawShare)).
 
-| **Field** | **Type**  | **Description**                                                                 |
-| :-------- | :-------- | :------------------------------------------------------------------------------ |
-| SenderDid | `did.Did` | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                       |
-| Amount    | `sdk.Int` | Amount of payment sender is making (e.g. `100000`)                              |
-| BondDid   | `did.Did` | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
+| **Field** | **Type**   | **Description**                                                                 |
+| :-------- | :--------- | :------------------------------------------------------------------------------ |
+| SenderDid | `did.Did`  | DID of the sender (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`)                       |
+| Amount    | `math.Int` | Amount of payment sender is making (e.g. `100000`)                              |
+| BondDid   | `did.Did`  | DID of the bond we are interacting with (e.g. `did:ixo:U7GK8p8rVhJMKhBVRCJJ8c`) |
 
 This message is expected to fail if:
 
@@ -331,7 +331,7 @@ This message is expected to fail if:
 ```go
 type MsgMakeOutcomePayment struct {
     SenderDid string
-    Amount    sdk.Int
+    Amount    math.Int
     BondDid   string
 }
 ```

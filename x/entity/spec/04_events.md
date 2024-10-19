@@ -4,7 +4,7 @@ The entity module emits the following typed events:
 
 ### EntityCreatedEvent
 
-Emitted after a successfull `MsgCreateEntity`
+Emitted after a successful `MsgCreateEntity`
 
 ```go
 type EntityCreatedEvent struct {
@@ -20,7 +20,7 @@ The field's descriptions is as follows:
 
 ### EntityUpdatedEvent
 
-Emitted after a successfull `MsgUpdateEntity`, `MsgUpdateEntityVerified`, `MsgTransferEntity`, `MsgCreateEntityAccount` whereby a field of the entity struct gets updated.
+Emitted after a successful `MsgUpdateEntity`, `MsgUpdateEntityVerified`, `MsgTransferEntity`, `MsgCreateEntityAccount` whereby a field of the entity struct gets updated.
 
 ```go
 type EntityUpdatedEvent struct {
@@ -36,7 +36,7 @@ The field's descriptions is as follows:
 
 ### EntityVerifiedUpdatedEvent
 
-Emitted after a successfull `MsgUpdateEntityVerified`
+Emitted after a successful `MsgUpdateEntityVerified`
 
 ```go
 type EntityVerifiedUpdatedEvent struct {
@@ -54,7 +54,7 @@ The field's descriptions is as follows:
 
 ### EntityTransferredEvent
 
-Emitted after a successfull `MsgTransferEntity`
+Emitted after a successful `MsgTransferEntity`
 
 ```go
 type EntityTransferredEvent struct {
@@ -72,7 +72,7 @@ The field's descriptions is as follows:
 
 ### EntityAccountCreatedEvent
 
-Emitted after a successfull `MsgCreateEntityAccount`
+Emitted after a successful `MsgCreateEntityAccount`
 
 ```go
 type EntityAccountCreatedEvent struct {
@@ -92,7 +92,7 @@ The field's descriptions is as follows:
 
 ### EntityAccountAuthzCreatedEvent
 
-Emitted after a successfull `MsgGrantEntityAccountAuthz`
+Emitted after a successful `MsgGrantEntityAccountAuthz`
 
 ```go
 type EntityAccountAuthzCreatedEvent struct {
@@ -116,7 +116,7 @@ The field's descriptions is as follows:
 
 ### EntityAccountAuthzRevokedEvent
 
-Emitted after a successfull `MsgRevokeEntityAccountAuthz`
+Emitted after a successful `MsgRevokeEntityAccountAuthz`
 
 ```go
 type EntityAccountAuthzRevokedEvent struct {

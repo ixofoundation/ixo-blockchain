@@ -1,11 +1,12 @@
 package ante
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v4/x/entity/keeper"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
 )
 
 type BlockNftContractTransferForEntityDecorator struct {
@@ -26,11 +27,12 @@ func (dec BlockNftContractTransferForEntityDecorator) AnteHandle(ctx sdk.Context
 			continue
 		}
 
+		// Can get only the NftContractAddress param for performance
 		var params entitytypes.Params
 		dec.entityKeeper.ParamSpace.GetParamSetIfExists(ctx, &params)
 
 		if wasmMsg.Contract == params.NftContractAddress {
-			return ctx, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, "cannot execute contract set as the entity nft contract address")
+			return ctx, errorsmod.Wrap(sdkerrors.ErrUnauthorized, "cannot execute contract set as the entity nft contract address")
 		}
 	}
 

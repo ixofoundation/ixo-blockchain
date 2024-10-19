@@ -1,10 +1,5 @@
 package types
 
-var (
-	// DidDocumentKey prefix for each key to a DidDocument
-	DidDocumentKey = []byte{0x01}
-)
-
 const (
 	// ModuleName defines the module name
 	ModuleName = "iid"
@@ -15,15 +10,11 @@ const (
 	// RouterKey is the message route for slashing
 	RouterKey = ModuleName
 
-	// QuerierRoute defines the module's query routing key
-	QuerierRoute = ModuleName
-
 	// DidChainPrefix defines the did prefix for this chain
-	DidChainPrefix = "did:earth:"
+	DidChainPrefix = "did:x:"
+)
 
-	// DidKeyPrefix defines the did key prefix
-	// DidKeyPrefix = "did:cosmos:key:"
-
-	// MemStoreKey defines the in-memory store key
-	MemStoreKey = "mem_capability_did"
+var (
+	// DidDocumentKey prefix for each key to a DidDocument
+	DidDocumentKey = []byte{0x01}
 )

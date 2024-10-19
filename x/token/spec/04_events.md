@@ -4,7 +4,7 @@ The token module emits the following typed events:
 
 ### TokenCreatedEvent
 
-Emitted after a successfull `MsgCreateToken`
+Emitted after a successful `MsgCreateToken`
 
 ```go
 type TokenCreatedEvent struct {
@@ -18,7 +18,7 @@ The field's descriptions is as follows:
 
 ### TokenUpdatedEvent
 
-Emitted after a successfull `MsgMintToken`, `RetireToken`, `CancelToken`, `PauseToken`, `StopToken`
+Emitted after a successful `MsgMintToken`, `RetireToken`, `CancelToken`, `PauseToken`, `StopToken`
 
 ```go
 type TokenUpdatedEvent struct {
@@ -32,7 +32,7 @@ The field's descriptions is as follows:
 
 ### TokenMintedEvent
 
-Emitted for every batch in `MintBatch` after a successfull `MsgMintToken`
+Emitted for every batch in `MintBatch` after a successful `MsgMintToken`
 
 ```go
 type TokenMintedEvent struct {
@@ -54,7 +54,7 @@ The field's descriptions is as follows:
 
 ### TokenTransferredEvent
 
-Emitted after a successfull `TransferToken`
+Emitted after a successful `TransferToken`
 
 ```go
 type TokenTransferredEvent struct {
@@ -68,11 +68,11 @@ The field's descriptions is as follows:
 
 - `owner` - a string containing the address of the owner the tokens was transferred from
 - `recipient` - a string containing the address of the new owner the tokens was transferred to
-- `tokens` - a list of [TokenBatch](#tokenbatch). All the tokens that was trasnferred
+- `tokens` - a list of [TokenBatch](#tokenbatch). All the tokens that was transferred
 
 ### TokenCancelledEvent
 
-Emitted after a successfull `MsgCancelToken`
+Emitted after a successful `MsgCancelToken`
 
 ```go
 type TokenCancelledEvent struct {
@@ -88,7 +88,7 @@ The field's descriptions is as follows:
 
 ### TokenRetiredEvent
 
-Emitted after a successfull `MsgRetireToken`
+Emitted after a successful `MsgRetireToken`
 
 ```go
 type TokenRetiredEvent struct {
@@ -104,7 +104,7 @@ The field's descriptions is as follows:
 
 ### TokenPausedEvent
 
-Emitted after a successfull `MsgPauseToken`
+Emitted after a successful `MsgPauseToken`
 
 ```go
 type TokenPausedEvent struct {
@@ -122,7 +122,7 @@ The field's descriptions is as follows:
 
 ### TokenStoppedEvent
 
-Emitted after a successfull `MsgStopToken`
+Emitted after a successful `MsgStopToken`
 
 ```go
 type TokenStoppedEvent struct {

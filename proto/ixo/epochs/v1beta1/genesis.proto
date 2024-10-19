@@ -1,0 +1,12 @@
+syntax = "proto3";
+package ixo.epochs.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "ixo/epochs/v1beta1/epoch.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types";
+
+// GenesisState defines the epochs module's genesis state.
+message GenesisState {
+  repeated EpochInfo epochs = 1 [ (gogoproto.nullable) = false ];
+}

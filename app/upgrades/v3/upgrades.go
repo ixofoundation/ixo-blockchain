@@ -1,16 +1,21 @@
 package v3
 
 import (
+	"context"
+
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/app/keepers"
 )
 
 func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
+	_ keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+	return func(context context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		ctx.Logger().Info("🚀 executing Ixo v3 upgrade 🚀")
 
 		// Run migrations before applying any other state changes.

@@ -6,23 +6,24 @@ import (
 	"errors"
 	"fmt"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
-	nft "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types/contracts"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
+	nft "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types/contracts"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v4/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 type msgServer struct {
-	Keeper
+	Keeper *Keeper
 }
 
 var _ types.MsgServer = msgServer{}
 
 // NewMsgServerImpl returns an implementation of the module MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(k Keeper) types.MsgServer {
+func NewMsgServerImpl(k *Keeper) types.MsgServer {
 	return &msgServer{
 		Keeper: k,
 	}
@@ -44,7 +45,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	// check that relayerNode did exists
 	_, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(msg.RelayerNode))
 	if !found {
-		return nil, sdkerrors.Wrapf(iidtypes.ErrDidDocumentNotFound, "relayer node did document not found for %s", msg.RelayerNode)
+		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "relayer node did document not found for %s", msg.RelayerNode)
 	}
 
 	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
@@ -63,7 +64,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 	// check that the did is not already taken
 	_, found = s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(entityId))
 	if found {
-		err := sdkerrors.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", entityId)
+		err := errorsmod.Wrapf(iidtypes.ErrDidDocumentFound, "a document with did %s already exists", entityId)
 		return nil, err
 	}
 
@@ -127,7 +128,7 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 		return nil, err
 	}
 
-	_, err = s.Keeper.WasmKeeper.Execute(ctx, nftContractAddress, minterAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	_, err = s.Keeper.WasmKeeper.Execute(ctx, nftContractAddress, minterAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", math.ZeroInt())))
 	if err != nil {
 		return nil, err
 	}
@@ -156,14 +157,14 @@ func (s msgServer) CreateEntity(goCtx context.Context, msg *types.MsgCreateEntit
 func (s msgServer) UpdateEntity(goCtx context.Context, msg *types.MsgUpdateEntity) (*types.MsgUpdateEntityResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	_, entity, err := s.Keeper.ResolveEntity(ctx, msg.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	if err := iidkeeper.ExecuteOnDidWithRelationships(
 		ctx,
-		&s.Keeper.IidKeeper,
+		s.Keeper.IidKeeper,
 		[]string{iidtypes.Authentication},
 		msg.Id,
 		msg.ControllerDid.Did(),
@@ -227,7 +228,7 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 
 	err = iidkeeper.ExecuteOnDidWithRelationships(
 		ctx,
-		&s.Keeper.IidKeeper,
+		s.Keeper.IidKeeper,
 		[]string{iidtypes.Authentication},
 		msg.Id,
 		msg.OwnerDid.Did(),
@@ -240,16 +241,22 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 
 			// remove old verification methods
 			for _, vm := range document.VerificationMethod {
-				document.RevokeVerification(vm.Id)
+				err := document.RevokeVerification(vm.Id)
+				if err != nil {
+					return err
+				}
 			}
 
 			// Add recipient did as verification method
 			vm := iidtypes.NewBlockchainAccountID(recipientAddress.String())
-			document.AddVerifications(iidtypes.NewVerification(
+			err := document.AddVerifications(iidtypes.NewVerification(
 				iidtypes.NewVerificationMethod(msg.RecipientDid.Did(), iidtypes.DID(msg.RecipientDid), vm),
 				[]string{iidtypes.Authentication},
 				nil,
 			))
+			if err != nil {
+				return err
+			}
 
 			return nil
 		},
@@ -268,7 +275,7 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 		return nil, err
 	}
 
-	_, err = s.Keeper.WasmKeeper.Execute(ctx, nftContractAddress, controllerAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", sdk.ZeroInt())))
+	_, err = s.Keeper.WasmKeeper.Execute(ctx, nftContractAddress, controllerAddress, finalMessage, sdk.NewCoins(sdk.NewCoin("uixo", math.ZeroInt())))
 	if err != nil {
 		return nil, err
 	}
@@ -293,13 +300,13 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 func (s msgServer) UpdateEntityVerified(goCtx context.Context, msg *types.MsgUpdateEntityVerified) (*types.MsgUpdateEntityVerifiedResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	_, entity, err := s.Keeper.ResolveEntity(ctx, msg.Id)
 	if err != nil {
 		return nil, err
 	}
 
 	if msg.RelayerNodeDid.Did() != entity.RelayerNode {
-		return nil, sdkerrors.Wrapf(types.ErrUpdateVerifiedFailed, "invalid relayer node did (%s)", msg.RelayerNodeDid.String())
+		return nil, errorsmod.Wrapf(types.ErrUpdateVerifiedFailed, "invalid relayer node did (%s)", msg.RelayerNodeDid.String())
 	}
 
 	entity.EntityVerified = msg.EntityVerified
@@ -332,7 +339,7 @@ func (s msgServer) CreateEntityAccount(goCtx context.Context, msg *types.MsgCrea
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// get entity doc
-	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	_, entity, err := s.Keeper.ResolveEntity(ctx, msg.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -340,13 +347,13 @@ func (s msgServer) CreateEntityAccount(goCtx context.Context, msg *types.MsgCrea
 	// check if entity account with name already exists
 	nameExists := entity.ContainsAccountName(msg.Name)
 	if nameExists {
-		return nil, sdkerrors.Wrapf(types.ErrAccountDuplicate, "name %s", msg.Name)
+		return nil, errorsmod.Wrapf(types.ErrAccountDuplicate, "name %s", msg.Name)
 	}
 
 	// check that owner is nft owner
 	err = s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "unauthorized")
+		return nil, errorsmod.Wrapf(err, "unauthorized")
 	}
 
 	// create module account
@@ -386,7 +393,7 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// get entity doc
-	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	_, entity, err := s.Keeper.ResolveEntity(ctx, msg.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -394,7 +401,7 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 	// check that owner is entity owner
 	err = s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "unauthorized")
+		return nil, errorsmod.Wrapf(err, "unauthorized")
 	}
 
 	// get entity account with same name
@@ -410,7 +417,7 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 
 	// if no account with name throw
 	if account == nil {
-		return nil, sdkerrors.Wrapf(types.ErrAccountNotFound, "name %s", msg.Name)
+		return nil, errorsmod.Wrapf(types.ErrAccountNotFound, "name %s", msg.Name)
 	}
 
 	// get addresses
@@ -424,7 +431,7 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 	}
 
 	// Unpack interface to both have concrete type and add to cache for validation method
-	err = msg.Grant.UnpackInterfaces(s.cdc)
+	err = msg.Grant.UnpackInterfaces(s.Keeper.cdc)
 	if err != nil {
 		return nil, err
 	}
@@ -435,9 +442,9 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 	}
 
 	// get authorization
-	authorization := msg.Grant.GetAuthorization()
-	if authorization == nil {
-		return nil, sdkerrors.ErrUnpackAny.Wrap("Authorization is not present in the msg")
+	authorization, err := msg.Grant.GetAuthorization()
+	if err != nil {
+		return nil, err
 	}
 
 	// persist new grant
@@ -453,7 +460,7 @@ func (s msgServer) GrantEntityAccountAuthz(goCtx context.Context, msg *types.Msg
 			AccountName: msg.Name,
 			Granter:     granter.String(),
 			Grantee:     grantee.String(),
-			Grant:       (*types.Grant)(&msg.Grant),
+			Grant:       &msg.Grant,
 		},
 	); err != nil {
 		return nil, err
@@ -469,7 +476,7 @@ func (s msgServer) RevokeEntityAccountAuthz(goCtx context.Context, msg *types.Ms
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	// get entity doc
-	_, entity, err := s.ResolveEntity(ctx, msg.Id)
+	_, entity, err := s.Keeper.ResolveEntity(ctx, msg.Id)
 	if err != nil {
 		return nil, err
 	}
@@ -477,7 +484,7 @@ func (s msgServer) RevokeEntityAccountAuthz(goCtx context.Context, msg *types.Ms
 	// check that owner is entity owner
 	err = s.Keeper.CheckIfOwner(ctx, msg.Id, msg.OwnerAddress)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(err, "unauthorized")
+		return nil, errorsmod.Wrapf(err, "unauthorized")
 	}
 
 	// get entity account with same name
@@ -493,7 +500,7 @@ func (s msgServer) RevokeEntityAccountAuthz(goCtx context.Context, msg *types.Ms
 
 	// if no account with name throw
 	if account == nil {
-		return nil, sdkerrors.Wrapf(types.ErrAccountNotFound, "name %s", msg.Name)
+		return nil, errorsmod.Wrapf(types.ErrAccountNotFound, "name %s", msg.Name)
 	}
 
 	// get addresses

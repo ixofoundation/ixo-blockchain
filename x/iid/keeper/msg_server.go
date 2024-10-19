@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 type msgServer struct {
@@ -28,7 +28,7 @@ func (k msgServer) CreateIidDocument(goCtx context.Context, msg *types.MsgCreate
 	// check that the did is not already taken
 	_, found := k.Keeper.GetDidDocument(ctx, []byte(msg.Id))
 	if found {
-		err := sdkerrors.Wrapf(types.ErrDidDocumentFound, "a document with did %s already exists", msg.Id)
+		err := errorsmod.Wrapf(types.ErrDidDocumentFound, "a document with did %s already exists", msg.Id)
 		return nil, err
 	}
 
@@ -82,6 +82,7 @@ func (k msgServer) UpdateIidDocument(goCtx context.Context, msg *types.MsgUpdate
 				return err
 			}
 			// Keep old iid doc metadata
+			// nolint
 			did.Metadata = didDoc.Metadata
 			return nil
 		}); err != nil {
@@ -142,7 +143,7 @@ func (k msgServer) DeleteLinkedResource(goCtx context.Context, msg *types.MsgDel
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
 			if len(didDoc.LinkedResource) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have resources associated")
+				return errorsmod.Wrapf(types.ErrInvalidState, "the did document doesn't have resources associated")
 			}
 			didDoc.DeleteLinkedResource(msg.ResourceId)
 			return nil
@@ -176,7 +177,7 @@ func (k msgServer) DeleteLinkedClaim(goCtx context.Context, msg *types.MsgDelete
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
 			if len(didDoc.LinkedClaim) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have Claims associated")
+				return errorsmod.Wrapf(types.ErrInvalidState, "the did document doesn't have Claims associated")
 			}
 			didDoc.DeleteLinkedClaim(msg.ClaimId)
 			return nil
@@ -210,7 +211,7 @@ func (k msgServer) DeleteLinkedEntity(goCtx context.Context, msg *types.MsgDelet
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
 			if len(didDoc.LinkedEntity) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have entities associated")
+				return errorsmod.Wrapf(types.ErrInvalidState, "the did document doesn't have entities associated")
 			}
 			didDoc.DeleteLinkedEntity(msg.EntityId)
 			return nil
@@ -244,7 +245,7 @@ func (k msgServer) DeleteAccordedRight(goCtx context.Context, msg *types.MsgDele
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
 			if len(didDoc.AccordedRight) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have rights associated")
+				return errorsmod.Wrapf(types.ErrInvalidState, "the did document doesn't have rights associated")
 			}
 			didDoc.DeleteAccordedRight(msg.RightId)
 			return nil
@@ -278,7 +279,7 @@ func (k msgServer) DeleteIidContext(goCtx context.Context, msg *types.MsgDeleteI
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
 			if len(didDoc.Context) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have contexts associated")
+				return errorsmod.Wrapf(types.ErrInvalidState, "the did document doesn't have contexts associated")
 			}
 			didDoc.DeleteDidContext(msg.ContextKey)
 			return nil
@@ -312,7 +313,7 @@ func (k msgServer) DeleteService(goCtx context.Context, msg *types.MsgDeleteServ
 		msg.Id, msg.Signer,
 		func(didDoc *types.IidDocument) error {
 			if len(didDoc.Service) == 0 {
-				return sdkerrors.Wrapf(types.ErrInvalidState, "the did document doesn't have services associated")
+				return errorsmod.Wrapf(types.ErrInvalidState, "the did document doesn't have services associated")
 			}
 			didDoc.DeleteService(msg.ServiceId)
 			return nil
@@ -388,12 +389,12 @@ func newConstraints(relationships ...string) VerificationRelationships {
 }
 
 // Check the relations/controllers for did if have capabilities to modify did doc, do modifications and emit doc_updated event
-func ExecuteOnDidWithRelationships(ctx sdk.Context, k *Keeper, constraints VerificationRelationships, did, signer string, update func(document *types.IidDocument) error) (err error) {
+func ExecuteOnDidWithRelationships(ctx sdk.Context, k types.IidKeeper, constraints VerificationRelationships, did, signer string, update func(document *types.IidDocument) error) (err error) {
 	// get the did document
 	didDoc, found := k.GetDidDocument(ctx, []byte(did))
 	if !found {
-		err = sdkerrors.Wrapf(types.ErrDidDocumentNotFound, "did document at %s not found", did)
-		return
+		err = errorsmod.Wrapf(types.ErrDidDocumentNotFound, "did document at %s not found", did)
+		return err
 	}
 
 	// Any verification method in the authentication relationship can update the DID document
@@ -401,19 +402,19 @@ func ExecuteOnDidWithRelationships(ctx sdk.Context, k *Keeper, constraints Verif
 		// check also the controllers
 		if !didDoc.HasController(types.DID(signer)) {
 			// if also the controller was not set the error
-			err = sdkerrors.Wrapf(
+			err = errorsmod.Wrapf(
 				types.ErrUnauthorized,
 				"signer account %s not authorized to update the target did document at %s",
 				signer, did,
 			)
-			return
+			return err
 		}
 	}
 
 	// apply the update
 	err = update(&didDoc)
 	if err != nil {
-		return
+		return err
 	}
 
 	// update the Metadata
@@ -424,5 +425,8 @@ func ExecuteOnDidWithRelationships(ctx sdk.Context, k *Keeper, constraints Verif
 
 	// fire the event
 	err = ctx.EventManager().EmitTypedEvent(types.NewIidDocumentUpdatedEvent(&didDoc))
-	return
+	if err != nil {
+		return err
+	}
+	return nil
 }
