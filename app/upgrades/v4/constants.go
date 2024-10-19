@@ -15,7 +15,7 @@ import (
 
 // UpgradeName defines the on-chain upgrade name for the Ixo v4 upgrade.
 const (
-	UpgradeName = "v4"
+	UpgradeName = "Dominia"
 
 	// BlockMaxBytes is the max bytes for a block, 10mb (current 22020096)
 	BlockMaxBytes = int64(10000000)
