@@ -1,16 +1,17 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 type DistributionShare struct {
 	address    string
-	percentage sdk.Dec
+	percentage math.LegacyDec
 }
 
-var OneHundred = sdk.NewDec(100)
+var OneHundred = math.LegacyNewDec(100)
 
 type Distribution []DistributionShare
 
@@ -30,14 +31,14 @@ func (d Distribution) GetDistributionsFor(amount sdk.Coins) ([]sdk.DecCoins, err
 	}
 
 	// Distributed amount should equal original amount
-	if !distributed.IsEqual(decAmount) {
-		return nil, sdkerrors.Wrap(ErrDistributionFailed, "distributing more or less than original amount")
+	if !distributed.Equal(decAmount) {
+		return nil, errorsmod.Wrap(ErrDistributionFailed, "distributing more or less than original amount")
 	}
 
 	return distributions, nil
 }
 
-func NewDistributionShare(address sdk.AccAddress, percentage sdk.Dec) DistributionShare {
+func NewDistributionShare(address sdk.AccAddress, percentage math.LegacyDec) DistributionShare {
 	return DistributionShare{
 		address:    address.String(),
 		percentage: percentage,

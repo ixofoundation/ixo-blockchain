@@ -91,6 +91,7 @@
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
 - [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
+    - [CW20Payment](#ixo.claims.v1beta1.CW20Payment)
     - [Claim](#ixo.claims.v1beta1.Claim)
     - [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments)
     - [Collection](#ixo.claims.v1beta1.Collection)
@@ -98,18 +99,17 @@
     - [Dispute](#ixo.claims.v1beta1.Dispute)
     - [DisputeData](#ixo.claims.v1beta1.DisputeData)
     - [Evaluation](#ixo.claims.v1beta1.Evaluation)
+    - [Intent](#ixo.claims.v1beta1.Intent)
     - [Params](#ixo.claims.v1beta1.Params)
     - [Payment](#ixo.claims.v1beta1.Payment)
     - [Payments](#ixo.claims.v1beta1.Payments)
   
+    - [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions)
     - [CollectionState](#ixo.claims.v1beta1.CollectionState)
     - [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus)
+    - [IntentStatus](#ixo.claims.v1beta1.IntentStatus)
     - [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus)
     - [PaymentType](#ixo.claims.v1beta1.PaymentType)
-  
-- [ixo/claims/v1beta1/cosmos.proto](#ixo/claims/v1beta1/cosmos.proto)
-    - [Input](#ixo.claims.v1beta1.Input)
-    - [Output](#ixo.claims.v1beta1.Output)
   
 - [ixo/claims/v1beta1/authz.proto](#ixo/claims/v1beta1/authz.proto)
     - [EvaluateClaimAuthorization](#ixo.claims.v1beta1.EvaluateClaimAuthorization)
@@ -126,6 +126,8 @@
     - [ClaimUpdatedEvent](#ixo.claims.v1beta1.ClaimUpdatedEvent)
     - [CollectionCreatedEvent](#ixo.claims.v1beta1.CollectionCreatedEvent)
     - [CollectionUpdatedEvent](#ixo.claims.v1beta1.CollectionUpdatedEvent)
+    - [IntentSubmittedEvent](#ixo.claims.v1beta1.IntentSubmittedEvent)
+    - [IntentUpdatedEvent](#ixo.claims.v1beta1.IntentUpdatedEvent)
     - [PaymentWithdrawCreatedEvent](#ixo.claims.v1beta1.PaymentWithdrawCreatedEvent)
     - [PaymentWithdrawnEvent](#ixo.claims.v1beta1.PaymentWithdrawnEvent)
   
@@ -145,12 +147,18 @@
     - [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse)
     - [QueryDisputeRequest](#ixo.claims.v1beta1.QueryDisputeRequest)
     - [QueryDisputeResponse](#ixo.claims.v1beta1.QueryDisputeResponse)
+    - [QueryIntentListRequest](#ixo.claims.v1beta1.QueryIntentListRequest)
+    - [QueryIntentListResponse](#ixo.claims.v1beta1.QueryIntentListResponse)
+    - [QueryIntentRequest](#ixo.claims.v1beta1.QueryIntentRequest)
+    - [QueryIntentResponse](#ixo.claims.v1beta1.QueryIntentResponse)
     - [QueryParamsRequest](#ixo.claims.v1beta1.QueryParamsRequest)
     - [QueryParamsResponse](#ixo.claims.v1beta1.QueryParamsResponse)
   
     - [Query](#ixo.claims.v1beta1.Query)
   
 - [ixo/claims/v1beta1/tx.proto](#ixo/claims/v1beta1/tx.proto)
+    - [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent)
+    - [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse)
     - [MsgCreateCollection](#ixo.claims.v1beta1.MsgCreateCollection)
     - [MsgCreateCollectionResponse](#ixo.claims.v1beta1.MsgCreateCollectionResponse)
     - [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim)
@@ -161,6 +169,8 @@
     - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
     - [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates)
     - [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse)
+    - [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents)
+    - [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse)
     - [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments)
     - [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse)
     - [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState)
@@ -169,9 +179,6 @@
     - [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse)
   
     - [Msg](#ixo.claims.v1beta1.Msg)
-  
-- [ixo/entity/v1beta1/cosmos.proto](#ixo/entity/v1beta1/cosmos.proto)
-    - [Grant](#ixo.entity.v1beta1.Grant)
   
 - [ixo/iid/v1beta1/types.proto](#ixo/iid/v1beta1/types.proto)
     - [AccordedRight](#ixo.iid.v1beta1.AccordedRight)
@@ -286,6 +293,24 @@
   
     - [Msg](#ixo.entity.v1beta1.Msg)
   
+- [ixo/epochs/v1beta1/epoch.proto](#ixo/epochs/v1beta1/epoch.proto)
+    - [EpochInfo](#ixo.epochs.v1beta1.EpochInfo)
+  
+- [ixo/epochs/v1beta1/event.proto](#ixo/epochs/v1beta1/event.proto)
+    - [EpochEndEvent](#ixo.epochs.v1beta1.EpochEndEvent)
+    - [EpochStartEvent](#ixo.epochs.v1beta1.EpochStartEvent)
+  
+- [ixo/epochs/v1beta1/genesis.proto](#ixo/epochs/v1beta1/genesis.proto)
+    - [GenesisState](#ixo.epochs.v1beta1.GenesisState)
+  
+- [ixo/epochs/v1beta1/query.proto](#ixo/epochs/v1beta1/query.proto)
+    - [QueryCurrentEpochRequest](#ixo.epochs.v1beta1.QueryCurrentEpochRequest)
+    - [QueryCurrentEpochResponse](#ixo.epochs.v1beta1.QueryCurrentEpochResponse)
+    - [QueryEpochsInfoRequest](#ixo.epochs.v1beta1.QueryEpochsInfoRequest)
+    - [QueryEpochsInfoResponse](#ixo.epochs.v1beta1.QueryEpochsInfoResponse)
+  
+    - [Query](#ixo.epochs.v1beta1.Query)
+  
 - [ixo/iid/v1beta1/event.proto](#ixo/iid/v1beta1/event.proto)
     - [IidDocumentCreatedEvent](#ixo.iid.v1beta1.IidDocumentCreatedEvent)
     - [IidDocumentUpdatedEvent](#ixo.iid.v1beta1.IidDocumentUpdatedEvent)
@@ -301,6 +326,23 @@
   
     - [Query](#ixo.iid.v1beta1.Query)
   
+- [ixo/mint/v1beta1/mint.proto](#ixo/mint/v1beta1/mint.proto)
+    - [DistributionProportions](#ixo.mint.v1beta1.DistributionProportions)
+    - [Minter](#ixo.mint.v1beta1.Minter)
+    - [Params](#ixo.mint.v1beta1.Params)
+    - [WeightedAddress](#ixo.mint.v1beta1.WeightedAddress)
+  
+- [ixo/mint/v1beta1/genesis.proto](#ixo/mint/v1beta1/genesis.proto)
+    - [GenesisState](#ixo.mint.v1beta1.GenesisState)
+  
+- [ixo/mint/v1beta1/query.proto](#ixo/mint/v1beta1/query.proto)
+    - [QueryEpochProvisionsRequest](#ixo.mint.v1beta1.QueryEpochProvisionsRequest)
+    - [QueryEpochProvisionsResponse](#ixo.mint.v1beta1.QueryEpochProvisionsResponse)
+    - [QueryParamsRequest](#ixo.mint.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.mint.v1beta1.QueryParamsResponse)
+  
+    - [Query](#ixo.mint.v1beta1.Query)
+  
 - [ixo/token/v1beta1/token.proto](#ixo/token/v1beta1/token.proto)
     - [Params](#ixo.token.v1beta1.Params)
     - [Token](#ixo.token.v1beta1.Token)
@@ -308,10 +350,6 @@
     - [TokenProperties](#ixo.token.v1beta1.TokenProperties)
     - [TokensCancelled](#ixo.token.v1beta1.TokensCancelled)
     - [TokensRetired](#ixo.token.v1beta1.TokensRetired)
-  
-- [ixo/token/v1beta1/authz.proto](#ixo/token/v1beta1/authz.proto)
-    - [MintAuthorization](#ixo.token.v1beta1.MintAuthorization)
-    - [MintConstraints](#ixo.token.v1beta1.MintConstraints)
   
 - [ixo/token/v1beta1/tx.proto](#ixo/token/v1beta1/tx.proto)
     - [MintBatch](#ixo.token.v1beta1.MintBatch)
@@ -332,6 +370,46 @@
     - [TokenBatch](#ixo.token.v1beta1.TokenBatch)
   
     - [Msg](#ixo.token.v1beta1.Msg)
+  
+- [ixo/smartaccount/v1beta1/event.proto](#ixo/smartaccount/v1beta1/event.proto)
+    - [AuthenticatorAddedEvent](#ixo.smartaccount.v1beta1.AuthenticatorAddedEvent)
+    - [AuthenticatorRemovedEvent](#ixo.smartaccount.v1beta1.AuthenticatorRemovedEvent)
+    - [AuthenticatorSetActiveStateEvent](#ixo.smartaccount.v1beta1.AuthenticatorSetActiveStateEvent)
+  
+- [ixo/smartaccount/v1beta1/params.proto](#ixo/smartaccount/v1beta1/params.proto)
+    - [Params](#ixo.smartaccount.v1beta1.Params)
+  
+- [ixo/smartaccount/v1beta1/models.proto](#ixo/smartaccount/v1beta1/models.proto)
+    - [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator)
+  
+- [ixo/smartaccount/v1beta1/genesis.proto](#ixo/smartaccount/v1beta1/genesis.proto)
+    - [AuthenticatorData](#ixo.smartaccount.v1beta1.AuthenticatorData)
+    - [GenesisState](#ixo.smartaccount.v1beta1.GenesisState)
+  
+- [ixo/smartaccount/v1beta1/query.proto](#ixo/smartaccount/v1beta1/query.proto)
+    - [GetAuthenticatorRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorRequest)
+    - [GetAuthenticatorResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorResponse)
+    - [GetAuthenticatorsRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorsRequest)
+    - [GetAuthenticatorsResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorsResponse)
+    - [QueryParamsRequest](#ixo.smartaccount.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.smartaccount.v1beta1.QueryParamsResponse)
+  
+    - [Query](#ixo.smartaccount.v1beta1.Query)
+  
+- [ixo/smartaccount/v1beta1/tx.proto](#ixo/smartaccount/v1beta1/tx.proto)
+    - [MsgAddAuthenticator](#ixo.smartaccount.v1beta1.MsgAddAuthenticator)
+    - [MsgAddAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse)
+    - [MsgRemoveAuthenticator](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticator)
+    - [MsgRemoveAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse)
+    - [MsgSetActiveState](#ixo.smartaccount.v1beta1.MsgSetActiveState)
+    - [MsgSetActiveStateResponse](#ixo.smartaccount.v1beta1.MsgSetActiveStateResponse)
+    - [TxExtension](#ixo.smartaccount.v1beta1.TxExtension)
+  
+    - [Msg](#ixo.smartaccount.v1beta1.Msg)
+  
+- [ixo/token/v1beta1/authz.proto](#ixo/token/v1beta1/authz.proto)
+    - [MintAuthorization](#ixo.token.v1beta1.MintAuthorization)
+    - [MintConstraints](#ixo.token.v1beta1.MintConstraints)
   
 - [ixo/token/v1beta1/event.proto](#ixo/token/v1beta1/event.proto)
     - [TokenCancelledEvent](#ixo.token.v1beta1.TokenCancelledEvent)
@@ -1346,7 +1424,7 @@ Query defines the gRPC querier service.
 | ----------- | ------------ | ------------- | ------------|
 | Bonds | [QueryBondsRequest](#ixo.bonds.v1beta1.QueryBondsRequest) | [QueryBondsResponse](#ixo.bonds.v1beta1.QueryBondsResponse) | Bonds returns all existing bonds. |
 | BondsDetailed | [QueryBondsDetailedRequest](#ixo.bonds.v1beta1.QueryBondsDetailedRequest) | [QueryBondsDetailedResponse](#ixo.bonds.v1beta1.QueryBondsDetailedResponse) | BondsDetailed returns a list of all existing bonds with some details about their current state. |
-| Params | [QueryParamsRequest](#ixo.bonds.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.bonds.v1beta1.QueryParamsResponse) | Params queries the paramaters of x/bonds module. |
+| Params | [QueryParamsRequest](#ixo.bonds.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.bonds.v1beta1.QueryParamsResponse) | Params queries the parameters of x/bonds module. |
 | Bond | [QueryBondRequest](#ixo.bonds.v1beta1.QueryBondRequest) | [QueryBondResponse](#ixo.bonds.v1beta1.QueryBondResponse) | Bond queries info of a specific bond. |
 | Batch | [QueryBatchRequest](#ixo.bonds.v1beta1.QueryBatchRequest) | [QueryBatchResponse](#ixo.bonds.v1beta1.QueryBatchResponse) | Batch queries info of a specific bond&#39;s current batch. |
 | LastBatch | [QueryLastBatchRequest](#ixo.bonds.v1beta1.QueryLastBatchRequest) | [QueryLastBatchResponse](#ixo.bonds.v1beta1.QueryLastBatchResponse) | LastBatch queries info of a specific bond&#39;s last batch. |
@@ -1715,6 +1793,22 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.CW20Payment"></a>
+
+### CW20Payment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| amount | [uint64](#uint64) |  | chose uint64 for now as amounts should be small enough to fit in a uint64(max 18446744073709551615) |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.Claim"></a>
 
 ### Claim
@@ -1729,7 +1823,10 @@ Msg defines the bonds Msg service.
 | submission_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | submissionDate is the date and time that the claim was submitted on-chain |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim in the cid hash format |
 | evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations |
-| payments_status | [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments) |  |  |
+| payments_status | [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments) |  | payments_status is the status of the payments for the claim |
+| use_intent | [bool](#bool) |  | intent_id is the id of the intent for this claim, if any |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20 amount are empty then use default by Collection custom amount specified by service agent for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then use default by Collection custom cw20 payments specified by service agent for claim approval |
 
 
 
@@ -1778,6 +1875,8 @@ Msg defines the bonds Msg service.
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
 | signer | [string](#string) |  | signer address |
 | invalidated | [uint64](#uint64) |  | invalidated is the number of claims that have been evaluated as invalid (internally calculated) |
+| escrow_account | [string](#string) |  | escrow_account is the escrow account address for this collection created at collection creation, current purpose is to transfer payments to escrow account for GUARANTEED payments through intents |
+| intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
 
 
 
@@ -1853,7 +1952,34 @@ Msg defines the bonds Msg service.
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
 | evaluation_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | evaluationDate is the date and time that the claim evaluation was submitted on-chain |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | if both amount and cw20 amount are empty then use default by Collection custom amount specified by evaluator for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.Intent"></a>
+
+### Intent
+Intent defines the structure for a service agent&#39;s claim intent.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  | id is the incremented internal id for the intent |
+| agent_did | [string](#string) |  | The service agent&#39;s DID (Decentralized Identifier). |
+| agent_address | [string](#string) |  | The service agent&#39;s address. |
+| collection_id | [string](#string) |  | The id of the collection this intent is linked to. |
+| claim_id | [string](#string) |  | claim_id (optional, set when claim is submitted) |
+| created_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | The time the intent was created. |
+| expire_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Timeout period for the intent. If the claim is not submitted by this time, the intent expires. |
+| status | [IntentStatus](#ixo.claims.v1beta1.IntentStatus) |  | Status of the intent (e.g., &#34;ACTIVE&#34; or &#34;FULFILLED&#34;). |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | The payment amount the agent intends to claim, if any. |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | The CW20Payment amount the agent intends to claim, if any. |
+| from_address | [string](#string) |  | the address the escrow payment came from |
+| escrow_address | [string](#string) |  | the escrow account address |
 
 
 
@@ -1872,6 +1998,7 @@ Msg defines the bonds Msg service.
 | ixo_account | [string](#string) |  |  |
 | network_fee_percentage | [string](#string) |  |  |
 | node_fee_percentage | [string](#string) |  |  |
+| intent_sequence | [uint64](#uint64) |  |  |
 
 
 
@@ -1889,7 +2016,9 @@ Msg defines the bonds Msg service.
 | account | [string](#string) |  | account is the entity account address from which the payment will be made |
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment, not allowed for Evaluation Payment |
-| timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immidiate direct payment |
+| timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immediate direct payment |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
+| is_oracle_payment | [bool](#bool) |  | boolean to indicate if the payment is for oracle payments, aka it will go through network fees split NOTE: if true the payment can only have amount values(Native coins), no cw20 payments allowed then |
 
 
 
@@ -1914,6 +2043,19 @@ Msg defines the bonds Msg service.
 
 
  
+
+
+<a name="ixo.claims.v1beta1.CollectionIntentOptions"></a>
+
+### CollectionIntentOptions
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ALLOW | 0 | Allow: Intents can be made for claims, but claims can also be made without intents. |
+| DENY | 1 | Deny: Intents cannot be made for claims for the collection. |
+| REQUIRED | 2 | Required: Claims cannot be made without an associated intent. An intent is mandatory before a claim can be submitted. |
+
 
 
 <a name="ixo.claims.v1beta1.CollectionState"></a>
@@ -1944,6 +2086,19 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.IntentStatus"></a>
+
+### IntentStatus
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ACTIVE | 0 | Active: Intent is created and active, payments have been transferred to escrow if there is any |
+| FULFILLED | 1 | Fulfilled: Intent is fulfilled, was used to create a claim and funds will be released on claim APPROVAL, or funds will be reverted on claim REJECTION or DISPUTE |
+| EXPIRED | 2 | Expired: Intent has expired, payments have been transferred back out of escrow |
+
+
+
 <a name="ixo.claims.v1beta1.PaymentStatus"></a>
 
 ### PaymentStatus
@@ -1952,12 +2107,12 @@ Msg defines the bonds Msg service.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | NO_PAYMENT | 0 |  |
-| PROMISED | 1 | agent is contracted to receive payment |
-| AUTHORIZED | 2 | authz set up, no guarantee |
-| GAURANTEED | 3 | escrow set up with funds blocked |
-| PAID | 4 |  |
-| FAILED | 5 |  |
-| DISPUTED | 6 |  |
+| PROMISED | 1 | Promised: Agent is contracted to receive payment |
+| AUTHORIZED | 2 | Authorized: Authz set up, no guarantee |
+| GUARANTEED | 3 | Guaranteed: Escrow set up with funds blocked |
+| PAID | 4 | Paid: Funds have been paid |
+| FAILED | 5 | Failed: Payment failed, most probably due to insufficient funds |
+| DISPUTED_PAYMENT | 6 | DisputedPayment: Payment disputed |
 
 
 
@@ -1973,54 +2128,6 @@ Msg defines the bonds Msg service.
 | EVALUATION | 2 |  |
 | REJECTION | 3 |  |
 
-
- 
-
- 
-
- 
-
-
-
-<a name="ixo/claims/v1beta1/cosmos.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/claims/v1beta1/cosmos.proto
-
-
-
-<a name="ixo.claims.v1beta1.Input"></a>
-
-### Input
-Input models transaction input.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  |  |
-| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.claims.v1beta1.Output"></a>
-
-### Output
-Output models transaction outputs.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| address | [string](#string) |  |  |
-| coins | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-
-
-
-
-
- 
 
  
 
@@ -2066,6 +2173,7 @@ Output models transaction outputs.
 | agent_quota | [uint64](#uint64) |  |  |
 | before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done |
 | max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, if empty list must use amount defined in Token payments |
+| max_custom_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | max custom cw20 payment evaluator can change, if empty list must use amount defined in Token payments |
 
 
 
@@ -2098,6 +2206,9 @@ Output models transaction outputs.
 | ----- | ---- | ----- | ----------- |
 | collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
 | agent_quota | [uint64](#uint64) |  |  |
+| max_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom max_amount allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed |
+| max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom max_cw20_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed |
+| intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | intent_duration_ns is the duration for which the intent is active, after which it will expire (in nanoseconds) |
 
 
 
@@ -2129,13 +2240,14 @@ Output models transaction outputs.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | claim_id | [string](#string) |  | claim_id the withdrawal is for |
-| inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
-| outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
+| inputs | [cosmos.bank.v1beta1.Input](#cosmos.bank.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
+| outputs | [cosmos.bank.v1beta1.Output](#cosmos.bank.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
 | toAddress | [string](#string) |  | for contract payment |
 | fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments, if null then none |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
 
 
 
@@ -2248,6 +2360,36 @@ CollectionUpdatedEvent is an event triggered on a Collection update
 
 
 
+<a name="ixo.claims.v1beta1.IntentSubmittedEvent"></a>
+
+### IntentSubmittedEvent
+IntentSubmittedEvent is an event triggered on an Intent submission
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent | [Intent](#ixo.claims.v1beta1.Intent) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.IntentUpdatedEvent"></a>
+
+### IntentUpdatedEvent
+IntentUpdatedEvent is an event triggered on an Intent update
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent | [Intent](#ixo.claims.v1beta1.Intent) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.PaymentWithdrawCreatedEvent"></a>
 
 ### PaymentWithdrawCreatedEvent
@@ -2306,6 +2448,7 @@ GenesisState defines the claims module&#39;s genesis state.
 | collections | [Collection](#ixo.claims.v1beta1.Collection) | repeated |  |
 | claims | [Claim](#ixo.claims.v1beta1.Claim) | repeated |  |
 | disputes | [Dispute](#ixo.claims.v1beta1.Dispute) | repeated |  |
+| intents | [Intent](#ixo.claims.v1beta1.Intent) | repeated |  |
 
 
 
@@ -2511,6 +2654,69 @@ GenesisState defines the claims module&#39;s genesis state.
 
 
 
+<a name="ixo.claims.v1beta1.QueryIntentListRequest"></a>
+
+### QueryIntentListRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryIntentListResponse"></a>
+
+### QueryIntentListResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intents | [Intent](#ixo.claims.v1beta1.Intent) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryIntentRequest"></a>
+
+### QueryIntentRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| agentAddress | [string](#string) |  |  |
+| collectionId | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryIntentResponse"></a>
+
+### QueryIntentResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent | [Intent](#ixo.claims.v1beta1.Intent) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
@@ -2556,6 +2762,8 @@ Query defines the gRPC querier service.
 | ClaimList | [QueryClaimListRequest](#ixo.claims.v1beta1.QueryClaimListRequest) | [QueryClaimListResponse](#ixo.claims.v1beta1.QueryClaimListResponse) |  |
 | Dispute | [QueryDisputeRequest](#ixo.claims.v1beta1.QueryDisputeRequest) | [QueryDisputeResponse](#ixo.claims.v1beta1.QueryDisputeResponse) |  |
 | DisputeList | [QueryDisputeListRequest](#ixo.claims.v1beta1.QueryDisputeListRequest) | [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse) |  |
+| Intent | [QueryIntentRequest](#ixo.claims.v1beta1.QueryIntentRequest) | [QueryIntentResponse](#ixo.claims.v1beta1.QueryIntentResponse) |  |
+| IntentList | [QueryIntentListRequest](#ixo.claims.v1beta1.QueryIntentListRequest) | [QueryIntentListResponse](#ixo.claims.v1beta1.QueryIntentListResponse) |  |
 
  
 
@@ -2565,6 +2773,41 @@ Query defines the gRPC querier service.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/claims/v1beta1/tx.proto
+
+
+
+<a name="ixo.claims.v1beta1.MsgClaimIntent"></a>
+
+### MsgClaimIntent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| agent_did | [string](#string) |  | The service agent&#39;s DID (Decentralized Identifier). |
+| agent_address | [string](#string) |  | The service agent&#39;s address (who submits this message). |
+| collection_id | [string](#string) |  | The id of the collection this intent is linked to. |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20 amount are empty then default by Collection is used (APPROVAL payment). The desired claim amount, if any. |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then default by Collection is used (APPROVAL payment). The custom CW20 payment, if any. |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgClaimIntentResponse"></a>
+
+### MsgClaimIntentResponse
+MsgClaimIntentResponse defines the response after submitting an intent.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| intent_id | [string](#string) |  | Resulting intent id. |
+| expire_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Timeout period for the intent. If the claim is not submitted by this time, the intent expires. |
+
+
+
 
 
 
@@ -2584,6 +2827,7 @@ Query defines the gRPC querier service.
 | quota | [uint64](#uint64) |  | quota is the maximum number of claims that may be submitted, 0 is unlimited |
 | state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
+| intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
 
 
 
@@ -2610,7 +2854,7 @@ Collection entity, or have authz cap, aka is agent
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | subject_id | [string](#string) |  | subject_id for which this dispute is against, for now can only lay disputes against claims |
-| agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim, agent detials wont be saved in kvStore |
+| agent_did | [string](#string) |  | agent is the DID of the agent disputing the claim, agent details won&#39;t be saved in kvStore |
 | agent_address | [string](#string) |  |  |
 | dispute_type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
 | data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
@@ -2647,7 +2891,8 @@ Collection entity, or have authz cap, aka is agent
 | status | [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus) |  | status is the evaluation status expressed as an integer (2=approved, 3=rejected, ...) |
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval, if empty list then use default by Collection |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts NOTE: if both amount and cw20 amount are empty then use collection default custom amount specified by evaluator for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if claim is using intent, then amount and cw20 amount are ignored and overriden with intent amounts NOTE: if both amount and cw20 amount are empty then use collection default custom cw20 payments specified by evaluator for claim approval |
 
 
 
@@ -2677,6 +2922,9 @@ Collection entity, or have authz cap, aka is agent
 | agent_did | [string](#string) |  | agent is the DID of the agent submitting the claim |
 | agent_address | [string](#string) |  |  |
 | admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+| use_intent | [bool](#bool) |  | use_intent is the option for using intent for this claim if it exists and is active. NOTE: if use_intent is true then amount and cw20 amount are ignored and overriden with intent amounts. NOTE: if use_intent is true and there is no active intent then will error |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | NOTE: if both amount and cw20_payment are empty then use default by Collection custom amount specified by service agent for claim approval |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | NOTE: if both amount and cw20 amount are empty then use default by Collection custom cw20 payments specified by service agent for claim approval |
 
 
 
@@ -2714,6 +2962,33 @@ Collection entity, or have authz cap, aka is agent
 <a name="ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse"></a>
 
 ### MsgUpdateCollectionDatesResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionIntents"></a>
+
+### MsgUpdateCollectionIntents
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse"></a>
+
+### MsgUpdateCollectionIntentsResponse
 
 
 
@@ -2784,14 +3059,15 @@ Collection entity, or have authz cap, aka is agent
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | claim_id | [string](#string) |  | claim_id the withdrawal is for |
-| inputs | [Input](#ixo.claims.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
-| outputs | [Output](#ixo.claims.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
+| inputs | [cosmos.bank.v1beta1.Input](#cosmos.bank.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
+| outputs | [cosmos.bank.v1beta1.Output](#cosmos.bank.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
 | contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
 | toAddress | [string](#string) |  | for contract payment |
 | fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments |
 | admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
 
 
 
@@ -2829,39 +3105,8 @@ Msg defines the Msg service.
 | UpdateCollectionState | [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState) | [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse) |  |
 | UpdateCollectionDates | [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates) | [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse) |  |
 | UpdateCollectionPayments | [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments) | [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse) |  |
-
- 
-
-
-
-<a name="ixo/entity/v1beta1/cosmos.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/entity/v1beta1/cosmos.proto
-
-
-
-<a name="ixo.entity.v1beta1.Grant"></a>
-
-### Grant
-Grant gives permissions to execute
-the provide method with expiration time.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| authorization | [google.protobuf.Any](#google.protobuf.Any) |  |  |
-| expiration | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
-
-
-
-
-
- 
-
- 
-
- 
+| UpdateCollectionIntents | [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents) | [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse) |  |
+| ClaimIntent | [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent) | [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse) |  |
 
  
 
@@ -3103,7 +3348,7 @@ relationship entity account
 | end_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | End Date of the Entity as defined by the implementer and interpreted by Client applications |
 | status | [int32](#int32) |  | Status of the Entity as defined by the implementer and interpreted by Client applications |
 | relayer_node | [string](#string) |  | Did of the operator through which the Entity was created |
-| credentials | [string](#string) | repeated | Credentials of the enitity to be verified |
+| credentials | [string](#string) | repeated | Credentials of the entity to be verified |
 | entity_verified | [bool](#bool) |  | Used as check whether the credentials of entity is verified |
 | metadata | [EntityMetadata](#ixo.entity.v1beta1.EntityMetadata) |  | Metadata concerning the Entity such as versionId, created, updated and deactivated |
 | accounts | [EntityAccount](#ixo.entity.v1beta1.EntityAccount) | repeated | module accounts created for entity |
@@ -3193,7 +3438,7 @@ creation
 | account_name | [string](#string) |  |  |
 | granter | [string](#string) |  |  |
 | grantee | [string](#string) |  |  |
-| grant | [Grant](#ixo.entity.v1beta1.Grant) |  |  |
+| grant | [cosmos.authz.v1beta1.Grant](#cosmos.authz.v1beta1.Grant) |  |  |
 
 
 
@@ -4240,7 +4485,7 @@ Msg defines the identity Msg service.
 | credentials | [string](#string) | repeated | Content ID or Hash of public Verifiable Credentials associated with the subject |
 | owner_did | [string](#string) |  | Owner of the Entity NFT | The ownersdid used to sign this transaction. |
 | owner_address | [string](#string) |  | The ownersdid address used to sign this transaction. |
-| data | [bytes](#bytes) |  | Extention data |
+| data | [bytes](#bytes) |  | Extension data |
 | alsoKnownAs | [string](#string) |  |  |
 | linked_claim | [ixo.iid.v1beta1.LinkedClaim](#ixo.iid.v1beta1.LinkedClaim) | repeated | Digital claims associated with the Subject |
 
@@ -4310,7 +4555,7 @@ grantee for the specific authorization
 | id | [string](#string) |  | entity id (did) which has the account |
 | name | [string](#string) |  | name of account |
 | grantee_address | [string](#string) |  | the grantee address that will be able to execute the authz authorization |
-| grant | [Grant](#ixo.entity.v1beta1.Grant) |  | grant to be Authorized in authz grant |
+| grant | [cosmos.authz.v1beta1.Grant](#cosmos.authz.v1beta1.Grant) |  | grant to be Authorized in authz grant |
 | owner_address | [string](#string) |  | the owner_address used to sign this transaction. |
 
 
@@ -4465,6 +4710,206 @@ Msg defines the project Msg service.
 | CreateEntityAccount | [MsgCreateEntityAccount](#ixo.entity.v1beta1.MsgCreateEntityAccount) | [MsgCreateEntityAccountResponse](#ixo.entity.v1beta1.MsgCreateEntityAccountResponse) | Create a module account for an entity, |
 | GrantEntityAccountAuthz | [MsgGrantEntityAccountAuthz](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthz) | [MsgGrantEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgGrantEntityAccountAuthzResponse) | Create an authz grant from entity account |
 | RevokeEntityAccountAuthz | [MsgRevokeEntityAccountAuthz](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthz) | [MsgRevokeEntityAccountAuthzResponse](#ixo.entity.v1beta1.MsgRevokeEntityAccountAuthzResponse) | Revoke an authz grant from entity account |
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/epoch.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/epoch.proto
+
+
+
+<a name="ixo.epochs.v1beta1.EpochInfo"></a>
+
+### EpochInfo
+EpochInfo is a struct that describes the data going into
+a timer defined by the x/epochs module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifier | [string](#string) |  | identifier is a unique reference to this particular timer. |
+| start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | start_time is the time at which the timer first ever ticks. If start_time is in the future, the epoch will not begin until the start time. |
+| duration | [google.protobuf.Duration](#google.protobuf.Duration) |  | duration is the time in between epoch ticks. In order for intended behavior to be met, duration should be greater than the chains expected block time. Duration must be non-zero. |
+| current_epoch | [int64](#int64) |  | current_epoch is the current epoch number, or in other words, how many times has the timer &#39;ticked&#39;. The first tick (current_epoch=1) is defined as the first block whose blocktime is greater than the EpochInfo start_time. |
+| current_epoch_start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | current_epoch_start_time describes the start time of the current timer interval. The interval is (current_epoch_start_time, current_epoch_start_time &#43; duration] When the timer ticks, this is set to current_epoch_start_time = last_epoch_start_time &#43; duration only one timer tick for a given identifier can occur per block.
+
+NOTE! The current_epoch_start_time may diverge significantly from the wall-clock time the epoch began at. Wall-clock time of epoch start may be &gt;&gt; current_epoch_start_time. Suppose current_epoch_start_time = 10, duration = 5. Suppose the chain goes offline at t=14, and comes back online at t=30, and produces blocks at every successive time. (t=31, 32, etc.) * The t=30 block will start the epoch for (10, 15] * The t=31 block will start the epoch for (15, 20] * The t=32 block will start the epoch for (20, 25] * The t=33 block will start the epoch for (25, 30] * The t=34 block will start the epoch for (30, 35] * The **t=36** block will start the epoch for (35, 40] |
+| epoch_counting_started | [bool](#bool) |  | epoch_counting_started is a boolean, that indicates whether this epoch timer has began yet. |
+| current_epoch_start_height | [int64](#int64) |  | current_epoch_start_height is the block height at which the current epoch started. (The block height at which the timer last ticked) |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/event.proto
+
+
+
+<a name="ixo.epochs.v1beta1.EpochEndEvent"></a>
+
+### EpochEndEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_number | [int64](#int64) |  | Epoch number, starting from 1. |
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.EpochStartEvent"></a>
+
+### EpochStartEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_number | [int64](#int64) |  | Epoch number, starting from 1. |
+| start_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | The start timestamp of the epoch. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/genesis.proto
+
+
+
+<a name="ixo.epochs.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the epochs module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epochs | [EpochInfo](#ixo.epochs.v1beta1.EpochInfo) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/epochs/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/epochs/v1beta1/query.proto
+
+
+
+<a name="ixo.epochs.v1beta1.QueryCurrentEpochRequest"></a>
+
+### QueryCurrentEpochRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| identifier | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.QueryCurrentEpochResponse"></a>
+
+### QueryCurrentEpochResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| current_epoch | [int64](#int64) |  |  |
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.QueryEpochsInfoRequest"></a>
+
+### QueryEpochsInfoRequest
+
+
+
+
+
+
+
+<a name="ixo.epochs.v1beta1.QueryEpochsInfoResponse"></a>
+
+### QueryEpochsInfoResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epochs | [EpochInfo](#ixo.epochs.v1beta1.EpochInfo) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.epochs.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| EpochInfos | [QueryEpochsInfoRequest](#ixo.epochs.v1beta1.QueryEpochsInfoRequest) | [QueryEpochsInfoResponse](#ixo.epochs.v1beta1.QueryEpochsInfoResponse) | EpochInfos provide running epochInfos |
+| CurrentEpoch | [QueryCurrentEpochRequest](#ixo.epochs.v1beta1.QueryCurrentEpochRequest) | [QueryCurrentEpochResponse](#ixo.epochs.v1beta1.QueryCurrentEpochResponse) | CurrentEpoch provide current epoch of specified identifier |
 
  
 
@@ -4635,6 +5080,208 @@ Query defines the gRPC querier service.
 
 
 
+<a name="ixo/mint/v1beta1/mint.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/mint/v1beta1/mint.proto
+
+
+
+<a name="ixo.mint.v1beta1.DistributionProportions"></a>
+
+### DistributionProportions
+DistributionProportions defines the distribution proportions of the minted
+denom. In other words, defines which stakeholders will receive the minted
+denoms and how much.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| staking | [string](#string) |  | staking defines the proportion of the minted mint_denom that is to be allocated as staking rewards. |
+| impact_rewards | [string](#string) |  | impact_rewards defines the proportion of the minted mint_denom that is to be allocated to impact rewards addresses. |
+| community_pool | [string](#string) |  | community_pool defines the proportion of the minted mint_denom that is to be allocated to the community pool. |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.Minter"></a>
+
+### Minter
+Minter represents the minting state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_provisions | [string](#string) |  | epoch_provisions represent rewards for the current epoch. |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.Params"></a>
+
+### Params
+Params holds parameters for the x/mint module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| mint_denom | [string](#string) |  | mint_denom is the denom of the coin to mint. |
+| genesis_epoch_provisions | [string](#string) |  | genesis_epoch_provisions epoch provisions from the first epoch. |
+| epoch_identifier | [string](#string) |  | epoch_identifier mint epoch identifier e.g. (day, week). |
+| reduction_period_in_epochs | [int64](#int64) |  | reduction_period_in_epochs the number of epochs it takes to reduce the rewards. |
+| reduction_factor | [string](#string) |  | reduction_factor is the reduction multiplier to execute at the end of each period set by reduction_period_in_epochs. |
+| distribution_proportions | [DistributionProportions](#ixo.mint.v1beta1.DistributionProportions) |  | distribution_proportions defines the distribution proportions of the minted denom. In other words, defines which stakeholders will receive the minted denoms and how much. |
+| weighted_impact_rewards_receivers | [WeightedAddress](#ixo.mint.v1beta1.WeightedAddress) | repeated | weighted_impact_rewards_receivers is the address to receive impact rewards with weights assigned to each address. The final amount that each address receives is: epoch_provisions * distribution_proportions.impact_rewards * Address&#39;s Weight. |
+| minting_rewards_distribution_start_epoch | [int64](#int64) |  | minting_rewards_distribution_start_epoch start epoch to distribute minting rewards |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.WeightedAddress"></a>
+
+### WeightedAddress
+WeightedAddress represents an address with a weight assigned to it.
+The weight is used to determine the proportion of the total minted
+tokens to be minted to the address.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| weight | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/mint/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/mint/v1beta1/genesis.proto
+
+
+
+<a name="ixo.mint.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the mint module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [Minter](#ixo.mint.v1beta1.Minter) |  | minter is an abstraction for holding current rewards information. |
+| params | [Params](#ixo.mint.v1beta1.Params) |  | params defines all the parameters of the mint module. |
+| reduction_started_epoch | [int64](#int64) |  | reduction_started_epoch is the first epoch in which the reduction of mint begins. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/mint/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/mint/v1beta1/query.proto
+
+
+
+<a name="ixo.mint.v1beta1.QueryEpochProvisionsRequest"></a>
+
+### QueryEpochProvisionsRequest
+QueryEpochProvisionsRequest is the request type for the
+Query/EpochProvisions RPC method.
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.QueryEpochProvisionsResponse"></a>
+
+### QueryEpochProvisionsResponse
+QueryEpochProvisionsResponse is the response type for the
+Query/EpochProvisions RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_provisions | [string](#string) |  | epoch_provisions is the current minting per epoch provisions value. |
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is the request type for the Query/Params RPC method.
+
+
+
+
+
+
+<a name="ixo.mint.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is the response type for the Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.mint.v1beta1.Params) |  | params defines the parameters of the module. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.mint.v1beta1.Query"></a>
+
+### Query
+Query provides defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.mint.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.mint.v1beta1.QueryParamsResponse) | Params returns the total set of minting parameters. |
+| EpochProvisions | [QueryEpochProvisionsRequest](#ixo.mint.v1beta1.QueryEpochProvisionsRequest) | [QueryEpochProvisionsResponse](#ixo.mint.v1beta1.QueryEpochProvisionsResponse) | EpochProvisions returns the current minting epoch provisions value. |
+
+ 
+
+
+
 <a name="ixo/token/v1beta1/token.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -4755,58 +5402,6 @@ credential link ***.ipfs |
 | jurisdiction | [string](#string) |  |  |
 | amount | [string](#string) |  |  |
 | owner | [string](#string) |  |  |
-
-
-
-
-
- 
-
- 
-
- 
-
- 
-
-
-
-<a name="ixo/token/v1beta1/authz.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## ixo/token/v1beta1/authz.proto
-
-
-
-<a name="ixo.token.v1beta1.MintAuthorization"></a>
-
-### MintAuthorization
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| minter | [string](#string) |  | address of minter |
-| constraints | [MintConstraints](#ixo.token.v1beta1.MintConstraints) | repeated |  |
-
-
-
-
-
-
-<a name="ixo.token.v1beta1.MintConstraints"></a>
-
-### MintConstraints
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| contract_address | [string](#string) |  |  |
-| amount | [string](#string) |  |  |
-| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
-| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
-| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
-| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
 
 
 
@@ -5078,6 +5673,492 @@ Msg defines the project Msg service.
 | CancelToken | [MsgCancelToken](#ixo.token.v1beta1.MsgCancelToken) | [MsgCancelTokenResponse](#ixo.token.v1beta1.MsgCancelTokenResponse) |  |
 | PauseToken | [MsgPauseToken](#ixo.token.v1beta1.MsgPauseToken) | [MsgPauseTokenResponse](#ixo.token.v1beta1.MsgPauseTokenResponse) |  |
 | StopToken | [MsgStopToken](#ixo.token.v1beta1.MsgStopToken) | [MsgStopTokenResponse](#ixo.token.v1beta1.MsgStopTokenResponse) |  |
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/event.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorAddedEvent"></a>
+
+### AuthenticatorAddedEvent
+AuthenticatorAddedEvent is an event triggered on Authenticator addition
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  | sender is the address of the account that added the authenticator |
+| authenticator_type | [string](#string) |  | authenticator_type is the type of the authenticator that was added |
+| authenticator_id | [string](#string) |  | authenticator_id is the id of the authenticator that was added |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorRemovedEvent"></a>
+
+### AuthenticatorRemovedEvent
+AuthenticatorRemovedEvent is an event triggered on Authenticator removal
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  | sender is the address of the account that removed the authenticator |
+| authenticator_id | [string](#string) |  | authenticator_id is the id of the authenticator that was removed |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorSetActiveStateEvent"></a>
+
+### AuthenticatorSetActiveStateEvent
+AuthenticatorSetActiveStateEvent is an event triggered on Authenticator
+active state change
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  | sender is the address of the account that changed the active state |
+| is_smart_account_active | [bool](#bool) |  | active is the new active state |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/params.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/params.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.Params"></a>
+
+### Params
+Params defines the parameters for the module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| maximum_unauthenticated_gas | [uint64](#uint64) |  | MaximumUnauthenticatedGas defines the maximum amount of gas that can be used to authenticate a transaction in ante handler without having fee payer authenticated. |
+| is_smart_account_active | [bool](#bool) |  | IsSmartAccountActive defines the state of the authenticator. If set to false, the authenticator module will not be used and the classic cosmos sdk authentication will be used instead. |
+| circuit_breaker_controllers | [string](#string) | repeated | CircuitBreakerControllers defines list of addresses that are allowed to set is_smart_account_active without going through governance. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/models.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/models.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.AccountAuthenticator"></a>
+
+### AccountAuthenticator
+AccountAuthenticator represents a foundational model for all authenticators.
+It provides extensibility by allowing concrete types to interpret and
+validate transactions based on the encapsulated data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [uint64](#uint64) |  | ID uniquely identifies the authenticator instance. |
+| type | [string](#string) |  | Type specifies the category of the AccountAuthenticator. This type information is essential for differentiating authenticators and ensuring precise data retrieval from the storage layer. |
+| config | [bytes](#bytes) |  | Config is a versatile field used in conjunction with the specific type of account authenticator to facilitate complex authentication processes. The interpretation of this field is overloaded, enabling multiple authenticators to utilize it for their respective purposes. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/genesis.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.AuthenticatorData"></a>
+
+### AuthenticatorData
+AuthenticatorData represents a genesis exported account with Authenticators.
+The address is used as the key, and the account authenticators are stored in
+the authenticators field.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  | address is an account address, one address can have many authenticators |
+| authenticators | [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator) | repeated | authenticators are the account&#39;s authenticators, these can be multiple types including SignatureVerification, AllOfs, CosmWasmAuthenticators, etc |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the authenticator module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.smartaccount.v1beta1.Params) |  | params define the parameters for the authenticator module. |
+| next_authenticator_id | [uint64](#uint64) |  | next_authenticator_id is the next available authenticator ID. |
+| authenticator_data | [AuthenticatorData](#ixo.smartaccount.v1beta1.AuthenticatorData) | repeated | authenticator_data contains the data for multiple accounts, each with their authenticators. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/query.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorRequest"></a>
+
+### GetAuthenticatorRequest
+MsgGetAuthenticatorRequest defines the Msg/GetAuthenticator request type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account | [string](#string) |  |  |
+| authenticator_id | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorResponse"></a>
+
+### GetAuthenticatorResponse
+MsgGetAuthenticatorResponse defines the Msg/GetAuthenticator response type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account_authenticator | [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorsRequest"></a>
+
+### GetAuthenticatorsRequest
+MsgGetAuthenticatorsRequest defines the Msg/GetAuthenticators request type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.GetAuthenticatorsResponse"></a>
+
+### GetAuthenticatorsResponse
+MsgGetAuthenticatorsResponse defines the Msg/GetAuthenticators response type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account_authenticators | [AccountAuthenticator](#ixo.smartaccount.v1beta1.AccountAuthenticator) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is request type for the Query/Params RPC method.
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is response type for the Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.smartaccount.v1beta1.Params) |  | params holds all the parameters of this module. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.smartaccount.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.smartaccount.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.smartaccount.v1beta1.QueryParamsResponse) | Parameters queries the parameters of the module. |
+| GetAuthenticator | [GetAuthenticatorRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorRequest) | [GetAuthenticatorResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorResponse) |  |
+| GetAuthenticators | [GetAuthenticatorsRequest](#ixo.smartaccount.v1beta1.GetAuthenticatorsRequest) | [GetAuthenticatorsResponse](#ixo.smartaccount.v1beta1.GetAuthenticatorsResponse) |  |
+
+ 
+
+
+
+<a name="ixo/smartaccount/v1beta1/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/v1beta1/tx.proto
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgAddAuthenticator"></a>
+
+### MsgAddAuthenticator
+MsgAddAuthenticatorRequest defines the Msg/AddAuthenticator request type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  |  |
+| authenticator_type | [string](#string) |  |  |
+| data | [bytes](#bytes) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse"></a>
+
+### MsgAddAuthenticatorResponse
+MsgAddAuthenticatorResponse defines the Msg/AddAuthenticator response type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgRemoveAuthenticator"></a>
+
+### MsgRemoveAuthenticator
+MsgRemoveAuthenticatorRequest defines the Msg/RemoveAuthenticator request
+type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  |  |
+| id | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse"></a>
+
+### MsgRemoveAuthenticatorResponse
+MsgRemoveAuthenticatorResponse defines the Msg/RemoveAuthenticator response
+type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| success | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgSetActiveState"></a>
+
+### MsgSetActiveState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sender | [string](#string) |  |  |
+| active | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.MsgSetActiveStateResponse"></a>
+
+### MsgSetActiveStateResponse
+
+
+
+
+
+
+
+<a name="ixo.smartaccount.v1beta1.TxExtension"></a>
+
+### TxExtension
+TxExtension allows for additional authenticator-specific data in
+transactions.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| selected_authenticators | [uint64](#uint64) | repeated | selected_authenticators holds the authenticator_id for the chosen authenticator per message. |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.smartaccount.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the Msg service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| AddAuthenticator | [MsgAddAuthenticator](#ixo.smartaccount.v1beta1.MsgAddAuthenticator) | [MsgAddAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgAddAuthenticatorResponse) |  |
+| RemoveAuthenticator | [MsgRemoveAuthenticator](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticator) | [MsgRemoveAuthenticatorResponse](#ixo.smartaccount.v1beta1.MsgRemoveAuthenticatorResponse) |  |
+| SetActiveState | [MsgSetActiveState](#ixo.smartaccount.v1beta1.MsgSetActiveState) | [MsgSetActiveStateResponse](#ixo.smartaccount.v1beta1.MsgSetActiveStateResponse) | SetActiveState sets the active state of the authenticator. Primarily used for circuit breaking. |
+
+ 
+
+
+
+<a name="ixo/token/v1beta1/authz.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/token/v1beta1/authz.proto
+
+
+
+<a name="ixo.token.v1beta1.MintAuthorization"></a>
+
+### MintAuthorization
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| minter | [string](#string) |  | address of minter |
+| constraints | [MintConstraints](#ixo.token.v1beta1.MintConstraints) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MintConstraints"></a>
+
+### MintConstraints
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| contract_address | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+| name | [string](#string) |  | name is the token name, which must be unique (namespace), will be verified against Token name provided on msgCreateToken |
+| index | [string](#string) |  | index is the unique identifier hexstring that identifies the token |
+| collection | [string](#string) |  | did of collection (eg Supamoto Malawi) |
+| tokenData | [TokenData](#ixo.token.v1beta1.TokenData) | repeated | tokenData is the linkedResources added to tokenMetadata when queried eg (credential link ***.ipfs) |
+
+
+
+
+
+ 
+
+ 
+
+ 
 
  
 

@@ -13,7 +13,11 @@ func (k Keeper) SetDidDocument(ctx sdk.Context, key []byte, document types.IidDo
 
 func (k Keeper) GetDidDocument(ctx sdk.Context, key []byte) (types.IidDocument, bool) {
 	val, found := k.Get(ctx, key, types.DidDocumentKey, k.UnmarshalDidDocument)
-	return val.(types.IidDocument), found
+	iid, ok := val.(types.IidDocument)
+	if !ok {
+		return types.IidDocument{}, false
+	}
+	return iid, found
 }
 
 func (k Keeper) UnmarshalDidDocument(value []byte) (interface{}, bool) {
@@ -40,6 +44,7 @@ func (k Keeper) Marshal(value interface{}) (bytes []byte) {
 	return
 }
 
+// nolint
 // Unmarshal unmarshal a byte slice to a struct, return false in case of errors
 func (k Keeper) Unmarshal(data []byte, val codec.ProtoMarshaler) bool {
 	if len(data) == 0 {
@@ -63,7 +68,10 @@ func (k Keeper) GetAllDidDocumentsWithCondition(
 
 	for ; iterator.Valid(); iterator.Next() {
 		did, _ := k.UnmarshalDidDocument(iterator.Value())
-		didTyped := did.(types.IidDocument)
+		didTyped, ok := did.(types.IidDocument)
+		if !ok {
+			continue
+		}
 
 		if didSelector(didTyped) {
 			didDocs = append(didDocs, didTyped)

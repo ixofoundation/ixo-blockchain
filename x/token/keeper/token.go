@@ -1,9 +1,10 @@
 package keeper
 
 import (
-	"github.com/cosmos/cosmos-sdk/store/prefix"
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/store/prefix"
+	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
 )
 
@@ -14,16 +15,20 @@ func tokenKey(minter, contract_address string) []byte {
 
 func (k Keeper) SetToken(ctx sdk.Context, value types.Token) {
 	key := tokenKey(value.Minter, value.ContractAddress)
-	k.Set(ctx, []byte(key), types.TokenKey, value, k.Marshal)
+	k.Set(ctx, key, types.TokenKey, value, k.Marshal)
 }
 
 func (k Keeper) GetToken(ctx sdk.Context, minter, contractAddress string) (types.Token, error) {
 	key := tokenKey(minter, contractAddress)
-	val, found := k.Get(ctx, []byte(key), types.TokenKey, k.UnmarshalToken)
+	val, found := k.Get(ctx, key, types.TokenKey, k.UnmarshalToken)
 	if !found {
-		return types.Token{}, sdkerrors.Wrapf(types.ErrTokenNotFound, "token not found minter %s and contract address %s", minter, contractAddress)
+		return types.Token{}, errorsmod.Wrapf(types.ErrTokenNotFound, "token not found minter %s and contract address %s", minter, contractAddress)
 	}
-	return val.(types.Token), nil
+	token, ok := val.(types.Token)
+	if !ok {
+		return types.Token{}, errorsmod.Wrapf(types.ErrTokenNotFound, "token not found minter %s and contract address %s", minter, contractAddress)
+	}
+	return token, nil
 }
 
 func (k Keeper) UnmarshalToken(value []byte) (interface{}, bool) {
@@ -49,9 +54,13 @@ func (k Keeper) SetTokenProperties(ctx sdk.Context, value types.TokenProperties)
 func (k Keeper) GetTokenProperties(ctx sdk.Context, id string) (types.TokenProperties, error) {
 	val, found := k.Get(ctx, []byte(id), types.TokenPropertiesKey, k.UnmarshalTokenProperties)
 	if !found {
-		return types.TokenProperties{}, sdkerrors.Wrapf(types.ErrTokenPropertiesNotFound, "token properties not found for %s", id)
+		return types.TokenProperties{}, errorsmod.Wrapf(types.ErrTokenPropertiesNotFound, "token properties not found for %s", id)
 	}
-	return val.(types.TokenProperties), nil
+	tokenProperties, ok := val.(types.TokenProperties)
+	if !ok {
+		return types.TokenProperties{}, errorsmod.Wrapf(types.ErrTokenPropertiesNotFound, "token properties not found for %s", id)
+	}
+	return tokenProperties, nil
 }
 
 func (k Keeper) UnmarshalTokenProperties(value []byte) (interface{}, bool) {
@@ -61,7 +70,7 @@ func (k Keeper) UnmarshalTokenProperties(value []byte) (interface{}, bool) {
 }
 
 func (k Keeper) GetMinterTokens(ctx sdk.Context, minter string) []*types.Token {
-	iterator := k.GetAll(ctx, append([]byte(types.TokenKey), []byte(minter)...))
+	iterator := k.GetAll(ctx, append(types.TokenKey, []byte(minter)...))
 	minterTokens := []*types.Token{}
 	defer iterator.Close()
 	for ; iterator.Valid(); iterator.Next() {
@@ -77,18 +86,18 @@ func (k Keeper) GetMinterTokens(ctx sdk.Context, minter string) []*types.Token {
 func (k Keeper) GetTokenById(ctx sdk.Context, id string) (*types.TokenProperties, *types.Token, error) {
 	tokenProperties, err := k.GetTokenProperties(ctx, id)
 	if err != nil {
-		return nil, nil, sdkerrors.Wrapf(err, "no TokenProperties for token %s", id)
+		return nil, nil, errorsmod.Wrapf(err, "no TokenProperties for token %s", id)
 	}
 
 	token, found := k.GetTokenByName(ctx, tokenProperties.Name)
 	if !found {
-		return nil, nil, sdkerrors.Wrapf(types.ErrTokenNotFound, "no Token found for name %s", tokenProperties.Name)
+		return nil, nil, errorsmod.Wrapf(types.ErrTokenNotFound, "no Token found for name %s", tokenProperties.Name)
 	}
 
 	return &tokenProperties, token, err
 }
 
-// helper function to get the token with provded name
+// helper function to get the token with provided name
 func (k Keeper) GetTokenByName(ctx sdk.Context, name string) (*types.Token, bool) {
 	iterator := k.GetTokenIterator(ctx)
 	defer iterator.Close()
@@ -102,7 +111,7 @@ func (k Keeper) GetTokenByName(ctx sdk.Context, name string) (*types.Token, bool
 	return nil, false
 }
 
-// helper function to check if there are any tokens with provded name, return true if it is a duplicate name
+// helper function to check if there are any tokens with provided name, return true if it is a duplicate name
 func (k Keeper) CheckTokensDuplicateName(ctx sdk.Context, name string) bool {
 	iterator := k.GetTokenIterator(ctx)
 	defer iterator.Close()
@@ -129,12 +138,12 @@ func (k Keeper) GetTokens(ctx sdk.Context) []types.Token {
 	return tokens
 }
 
-func (k Keeper) GetTokenIterator(ctx sdk.Context) sdk.Iterator {
-	return k.GetAll(ctx, append([]byte(types.TokenKey)))
+func (k Keeper) GetTokenIterator(ctx sdk.Context) storetypes.Iterator {
+	return k.GetAll(ctx, types.TokenKey)
 }
 
-func (k Keeper) GetMinterTokensIterator(ctx sdk.Context, minter string) sdk.Iterator {
-	return k.GetAll(ctx, append([]byte(types.TokenKey), []byte(minter)...))
+func (k Keeper) GetMinterTokensIterator(ctx sdk.Context, minter string) storetypes.Iterator {
+	return k.GetAll(ctx, append(types.TokenKey, []byte(minter)...))
 }
 
 func (k Keeper) GetMinterTokensStore(ctx sdk.Context, minter string) prefix.Store {
@@ -154,6 +163,6 @@ func (k Keeper) GetTokenPropertiesAll(ctx sdk.Context) []types.TokenProperties {
 	return tokenProperties
 }
 
-func (k Keeper) GetTokenPropertiesAllIterator(ctx sdk.Context) sdk.Iterator {
+func (k Keeper) GetTokenPropertiesAllIterator(ctx sdk.Context) storetypes.Iterator {
 	return k.GetAll(ctx, types.TokenPropertiesKey)
 }

@@ -22,7 +22,7 @@ for ((i = 0; i < ${#USERS[@]}; ++i)); do
     echo $PASSWORD
   ) | ixod keys add ${USERS[i]} --recover
   # add as genesis-account with fees
-  yes $PASSWORD | ixod add-genesis-account $(ixod keys show ${USERS[i]} -a) 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
+  yes $PASSWORD | ixod genesis add-genesis-account $(ixod keys show ${USERS[i]} -a) 1000000000000uixo,1000000000000res,1000000000000rez,1000000000000uxgbp
 done
 
 # Add ixo did
@@ -63,19 +63,31 @@ FROM="minimum-gas-prices = \"\""
 TO="minimum-gas-prices = \"0.025$FEE_TOKEN\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
 
+# Make voting period short
 MAX_VOTING_PERIOD="90s" # example: "172800s"
 FROM="\"voting_period\": \"172800s\""
 TO="\"voting_period\": \"$MAX_VOTING_PERIOD\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
+EXPEDITED_VOTING_PERIOD="60s" # example: "172800s"
+FROM="\"expedited_voting_period\": \"86400s\""
+TO="\"expedited_voting_period\": \"$EXPEDITED_VOTING_PERIOD\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/genesis.json
 
-yes $PASSWORD | ixod gentx miguel 1000000uixo --chain-id $CHAIN_ID
-ixod collect-gentxs
-ixod validate-genesis
+yes $PASSWORD | ixod genesis gentx miguel 1000000uixo --chain-id $CHAIN_ID
+ixod genesis collect-gentxs
+ixod genesis validate-genesis
 
-# Enable REST API
+# Enable REST API, RPC, and gRPC
 FROM="enable = false"
 TO="enable = true"
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+FROM="address = \"tcp:\/\/localhost:1317\""
+TO="address = \"tcp:\/\/0.0.0.0:1317\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+FROM="address = \"localhost:9090\""
+TO="address = \"0.0.0.0:9090\""
+sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/app.toml
+
 # Enable cors
 FROM="enabled-unsafe-cors = false"
 TO="enabled-unsafe-cors = true"

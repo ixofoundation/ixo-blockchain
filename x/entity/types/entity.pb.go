@@ -5,9 +5,9 @@ package types
 
 import (
 	fmt "fmt"
-	_ "github.com/gogo/protobuf/gogoproto"
-	proto "github.com/gogo/protobuf/proto"
-	github_com_gogo_protobuf_types "github.com/gogo/protobuf/types"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	proto "github.com/cosmos/gogoproto/proto"
+	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
 	_ "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
@@ -104,7 +104,7 @@ type Entity struct {
 	Status int32 `protobuf:"varint,5,opt,name=status,proto3" json:"status,omitempty"`
 	// Did of the operator through which the Entity was created
 	RelayerNode string `protobuf:"bytes,6,opt,name=relayer_node,json=relayerNode,proto3" json:"relayer_node,omitempty"`
-	// Credentials of the enitity to be verified
+	// Credentials of the entity to be verified
 	Credentials []string `protobuf:"bytes,7,rep,name=credentials,proto3" json:"credentials,omitempty"`
 	// Used as check whether the credentials of entity is verified
 	EntityVerified bool `protobuf:"varint,8,opt,name=entity_verified,json=entityVerified,proto3" json:"entity_verified,omitempty"`
@@ -634,7 +634,7 @@ func (m *Entity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x28
 	}
 	if m.EndDate != nil {
-		n2, err2 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate):])
+		n2, err2 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.EndDate, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.EndDate):])
 		if err2 != nil {
 			return 0, err2
 		}
@@ -644,7 +644,7 @@ func (m *Entity) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x22
 	}
 	if m.StartDate != nil {
-		n3, err3 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate):])
+		n3, err3 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.StartDate, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.StartDate):])
 		if err3 != nil {
 			return 0, err3
 		}
@@ -728,7 +728,7 @@ func (m *EntityMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	var l int
 	_ = l
 	if m.Updated != nil {
-		n4, err4 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Updated, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated):])
+		n4, err4 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.Updated, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Updated):])
 		if err4 != nil {
 			return 0, err4
 		}
@@ -738,7 +738,7 @@ func (m *EntityMetadata) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		dAtA[i] = 0x1a
 	}
 	if m.Created != nil {
-		n5, err5 := github_com_gogo_protobuf_types.StdTimeMarshalTo(*m.Created, dAtA[i-github_com_gogo_protobuf_types.SizeOfStdTime(*m.Created):])
+		n5, err5 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(*m.Created, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Created):])
 		if err5 != nil {
 			return 0, err5
 		}
@@ -803,11 +803,11 @@ func (m *Entity) Size() (n int) {
 		n += 1 + l + sovEntity(uint64(l))
 	}
 	if m.StartDate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.StartDate)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.StartDate)
 		n += 1 + l + sovEntity(uint64(l))
 	}
 	if m.EndDate != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.EndDate)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.EndDate)
 		n += 1 + l + sovEntity(uint64(l))
 	}
 	if m.Status != 0 {
@@ -867,11 +867,11 @@ func (m *EntityMetadata) Size() (n int) {
 		n += 1 + l + sovEntity(uint64(l))
 	}
 	if m.Created != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Created)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Created)
 		n += 1 + l + sovEntity(uint64(l))
 	}
 	if m.Updated != nil {
-		l = github_com_gogo_protobuf_types.SizeOfStdTime(*m.Updated)
+		l = github_com_cosmos_gogoproto_types.SizeOfStdTime(*m.Updated)
 		n += 1 + l + sovEntity(uint64(l))
 	}
 	return n
@@ -1141,7 +1141,7 @@ func (m *Entity) Unmarshal(dAtA []byte) error {
 			if m.StartDate == nil {
 				m.StartDate = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.StartDate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1177,7 +1177,7 @@ func (m *Entity) Unmarshal(dAtA []byte) error {
 			if m.EndDate == nil {
 				m.EndDate = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.EndDate, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1582,7 +1582,7 @@ func (m *EntityMetadata) Unmarshal(dAtA []byte) error {
 			if m.Created == nil {
 				m.Created = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Created, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.Created, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -1618,7 +1618,7 @@ func (m *EntityMetadata) Unmarshal(dAtA []byte) error {
 			if m.Updated == nil {
 				m.Updated = new(time.Time)
 			}
-			if err := github_com_gogo_protobuf_types.StdTimeUnmarshal(m.Updated, dAtA[iNdEx:postIndex]); err != nil {
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(m.Updated, dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex

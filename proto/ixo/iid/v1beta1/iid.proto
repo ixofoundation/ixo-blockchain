@@ -10,7 +10,7 @@ import "ixo/iid/v1beta1/types.proto";
 This represents a minimal self-managed did document
 definition: https://w3c.github.io/did-core/
 */
-// DidDocument represents a dencentralised identifer.
+// DidDocument represents a dencentralised identifier.
 
 message IidDocument {
   option (gogoproto.equal) = true;

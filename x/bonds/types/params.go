@@ -20,7 +20,6 @@ func NewParams(reservedBondTokens []string) Params {
 	return Params{
 		ReservedBondTokens: reservedBondTokens,
 	}
-
 }
 
 // default bonds module parameters

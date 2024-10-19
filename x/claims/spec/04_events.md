@@ -4,7 +4,7 @@ The bonds module emits the following typed events:
 
 ### CollectionCreatedEvent
 
-Emitted after a successfull `MsgCreateCollection`
+Emitted after a successful `MsgCreateCollection`
 
 ```go
 type CollectionCreatedEvent struct {
@@ -18,7 +18,7 @@ The field's descriptions is as follows:
 
 ### CollectionUpdatedEvent
 
-Emitted after a successfull collection update event or `MsgSubmitClaim` and `EvaluateClaim` since collection holds a count of claims
+Emitted after a successful collection update event or `MsgSubmitClaim` and `EvaluateClaim` since collection holds a count of claims
 
 ```go
 type CollectionUpdatedEvent struct {
@@ -32,7 +32,7 @@ The field's descriptions is as follows:
 
 ### ClaimSubmittedEvent
 
-Emitted after a successfull `MsgSubmitClaim`
+Emitted after a successful `MsgSubmitClaim`
 
 ```go
 type ClaimSubmittedEvent struct {
@@ -46,7 +46,7 @@ The field's descriptions is as follows:
 
 ### ClaimUpdatedEvent
 
-Emitted after a successfull `MsgEvaluateClaim` or when the state for the `ClaimPayments` changes.
+Emitted after a successful `MsgEvaluateClaim` or when the state for the `ClaimPayments` changes.
 
 ```go
 type ClaimUpdatedEvent struct {
@@ -60,7 +60,7 @@ The field's descriptions is as follows:
 
 ### ClaimEvaluatedEvent
 
-Emitted after a successfull `MsgEvaluateClaim`
+Emitted after a successful `MsgEvaluateClaim`
 
 ```go
 type ClaimEvaluatedEvent struct {
@@ -74,7 +74,7 @@ The field's descriptions is as follows:
 
 ### ClaimDisputedEvent
 
-Emitted after a successfull `MsgDisputeClaim`
+Emitted after a successful `MsgDisputeClaim`
 
 ```go
 type ClaimDisputedEvent struct {
@@ -88,7 +88,7 @@ The field's descriptions is as follows:
 
 ### PaymentWithdrawnEvent
 
-Emitted after a successfull `MsgWithdrawPayment` or when a payment gets withdrawn through another trigger like payments on evaluation with 0 timeout.
+Emitted after a successful `MsgWithdrawPayment` or when a payment gets withdrawn through another trigger like payments on evaluation with 0 timeout.
 
 ```go
 type PaymentWithdrawnEvent struct {
@@ -102,7 +102,7 @@ The field's descriptions is as follows:
 
 ### PaymentWithdrawCreatedEvent
 
-Emitted after a successfull payment withdrawal authz gets created on chain if the `Payments` `timeout_ns` is not 0, and a [WithdrawPaymentAuthorization](02_state.md#withdrawpaymentauthorization) is created with the receiver as the grantee
+Emitted after a successful payment withdrawal authz gets created on chain if the `Payments` `timeout_ns` is not 0, and a [WithdrawPaymentAuthorization](02_state.md#withdrawpaymentauthorization) is created with the receiver as the grantee
 
 ```go
 type PaymentWithdrawCreatedEvent struct {

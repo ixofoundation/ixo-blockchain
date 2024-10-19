@@ -1,12 +1,17 @@
 package types
 
 const (
-	ModuleName        = "entity"
+	// ModuleName is the name of this module
+	ModuleName = "entity"
+
+	// DefaultParamspace is the default param space for this module
 	DefaultParamspace = ModuleName
-	StoreKey          = ModuleName
-	RouterKey         = ModuleName
-	QuerierRoute      = ModuleName
-	MemStoreKey       = "mem_entity"
+
+	// StoreKey is the default store key for this module
+	StoreKey = ModuleName
+
+	// RouterKey is the message route for this module
+	RouterKey = ModuleName
 )
 
 func KeyPrefix(p string) []byte {
@@ -17,6 +22,6 @@ var (
 	EntityKey = []byte{0x01}
 )
 
-var (
+const (
 	EntityAdminAccountName = "admin"
 )

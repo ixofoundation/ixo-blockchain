@@ -1,16 +1,21 @@
 package v2
 
 import (
+	"context"
+
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/app/keepers"
 )
 
 func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
+	_ keepers.AppKeepers,
 ) upgradetypes.UpgradeHandler {
-	return func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
+	return func(context context.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
+		ctx := sdk.UnwrapSDKContext(context)
 		ctx.Logger().Info("🚀 executing Ixo v2 upgrade 🚀")
 
 		// 1st-time running in-store migrations, setting fromVersion to
@@ -47,29 +52,6 @@ func CreateUpgradeHandler(
 
 		// Run migrations before applying any other state changes.
 		migrations, err := mm.RunMigrations(ctx, configurator, fromVM)
-
-		// ctx.Logger().Info("set ICQKeeper params")
-		// setICQParams(ctx, keepers.ICQKeeper)
-
-		// ctx.Logger().Info("update ICAHostKeeper params to allow all messages")
-		// setICAHostParams(ctx, &keepers.ICAHostKeeper)
-
 		return migrations, err
 	}
 }
-
-// TODO pass keepers through with cosmos sdk upgrade and implement this, not needed for now
-// func setICQParams(ctx sdk.Context, icqKeeper *icqkeeper.Keeper) {
-// 	icqparams := icqtypes.DefaultParams()
-// 	icqparams.AllowQueries = wasmbinding.GetStargateWhitelistedPaths()
-// 	// Adding SmartContractState query to allowlist
-// 	icqparams.AllowQueries = append(icqparams.AllowQueries, "/cosmwasm.wasm.v1.Query/SmartContractState")
-// 	icqKeeper.SetParams(ctx, icqparams)
-// }
-
-// func setICAHostParams(ctx sdk.Context, icahostkeeper *icahostkeeper.Keeper) {
-// 	icahostkeeper.SetParams(ctx, icahosttypes.Params{
-// 		HostEnabled:   true,
-// 		AllowMessages: []string{"*"},
-// 	})
-// }

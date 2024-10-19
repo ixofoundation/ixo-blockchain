@@ -1,6 +1,6 @@
 run:
   tests: false
-  timeout: 5m # timeout for analysis, e.g. 30s, 5m, default is 1m
+  timeout: 30s # timeout for analysis, e.g. 30s, 5m, default is 1m
 
 linters:
   disable-all: true
@@ -9,7 +9,6 @@ linters:
   enable:
     - asciicheck
     - bidichk
-    - depguard
     - durationcheck
     - errcheck
     - errname
@@ -19,7 +18,6 @@ linters:
     - gofmt
     - goimports
     - goheader
-    - gomodguard
     - goprintffuncname
     - gosimple
     - govet
@@ -40,6 +38,17 @@ linters:
     - unconvert
     - unused
     - whitespace
+    - unparam
+    - revive
+
+linters-settings:
+  revive:
+    rules:
+      - name: function-result-limit
+        severity: warning
+        disabled: false
+        # limits the number of returns to 4
+        arguments: [4]
 
 issues:
   exclude-rules:
@@ -55,5 +64,11 @@ issues:
     - linters:
         - stylecheck
       text: "ST1005:" # punctuation in error messages
-  max-issues-per-linter: 0
-  max-same-issues: 0
+  max-issues-per-linter: 10000
+  max-same-issues: 10000
+  # Enables the use of custom exclude directories and files.
+  exclude-dirs-use-default: true
+  # Exclude files with the extension ".pb.gw.go"
+  exclude-files:
+    - '.*\.pb\.gw\.go$'
+    - "node_modules/**"

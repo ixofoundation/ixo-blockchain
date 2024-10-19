@@ -3,9 +3,9 @@ package v2
 import (
 	"github.com/ixofoundation/ixo-blockchain/v3/app/upgrades"
 
-	store "github.com/cosmos/cosmos-sdk/store/types"
-	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v4/types"
-	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
+	store "cosmossdk.io/store/types"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
+	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v8/types"
 )
 
 // UpgradeName defines the on-chain upgrade name for the Ixo v2 upgrade.

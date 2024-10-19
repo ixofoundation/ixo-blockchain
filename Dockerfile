@@ -1,18 +1,26 @@
 # echo $(git describe --tags) | sed 's/^v//'
-ARG GIT_VERSION="2.0.0-rc.0"
-# git log -1 --format='%H'
-ARG GIT_COMMIT="ca9e64cf2f8c29b8bb001281abcdcb942dc9fa01"
+
+ARG GO_VERSION="1.22"
+# ARG RUNNER_IMAGE="ubuntu:latest"
+ARG RUNNER_IMAGE="gcr.io/distroless/static-debian11"
+ARG BUILD_TAGS="netgo,ledger,muslc"
 
 # --------------------------------------------------------
 # Builder
 # --------------------------------------------------------
 
-FROM golang:1.19.4-alpine as builder
+FROM golang:${GO_VERSION}-alpine3.18 AS builder
+
+# TODO: maybe extract below args to where called in cicd?
+# git log -1 --format='%H'
+ARG GIT_VERSION="2.0.0-rc.0"
+ARG GIT_COMMIT="ca9e64cf2f8c29b8bb001281abcdcb942dc9fa01"
 
 RUN apk add --no-cache \
   ca-certificates \
   build-base \
-  linux-headers
+  linux-headers \
+  binutils-gold
 
 # Download go dependencies
 WORKDIR /ixo
@@ -31,7 +39,6 @@ RUN ARCH=x86_64 WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | sed 's/
 # Copy the remaining files
 COPY . .
 
-# RUN make build
 # Build ixod binary
 RUN --mount=type=cache,target=/root/.cache/go-build \
   --mount=type=cache,target=/root/go/pkg/mod \
@@ -53,12 +60,11 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 # Runner
 # --------------------------------------------------------
 
-FROM ubuntu:20.04 as runner
-# FROM gcr.io/distroless/base-debian11 as run
+FROM ${RUNNER_IMAGE}
 
 COPY --from=builder /ixo/build/ixod /bin/ixod
 
-ENV HOME /ixo
+ENV HOME=/ixo
 WORKDIR $HOME
 
 EXPOSE 26656

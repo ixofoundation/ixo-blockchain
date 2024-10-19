@@ -1,19 +1,17 @@
 #!/usr/bin/env bash
+SWAGGER_DIR=./swagger-proto
 
 set -eo pipefail
 
-# protoc_install_proto_gen_doc() {
-#   echo "Installing protobuf protoc-gen-doc plugin"
-#   (go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest 2>/dev/null)
-# }
-# protoc_install_proto_gen_doc
-
 echo "Generating proto docs"
+
+# wait 2 seconds
+sleep 2
 
 # command to generate docs using protoc-gen-doc (Markdown)
 buf protoc \
   -I "proto" \
-  -I "third_party/proto" \
+  -I "$SWAGGER_DIR/third_party" \
   --doc_out=./docs/core \
   --doc_opt=markdown,proto-docs.md \
   $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
@@ -21,7 +19,7 @@ buf protoc \
 # command to generate docs using protoc-gen-doc (HTML)
 buf protoc \
   -I "proto" \
-  -I "third_party/proto" \
+  -I "$SWAGGER_DIR/third_party" \
   --doc_out=./docs/core \
   --doc_opt=html,proto-docs.html \
   $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
@@ -29,7 +27,10 @@ buf protoc \
 # command to generate docs using protoc-gen-doc (JSON)
 buf protoc \
   -I "proto" \
-  -I "third_party/proto" \
+  -I "$SWAGGER_DIR/third_party" \
   --doc_out=./docs/core \
   --doc_opt=json,proto-docs.json \
   $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
+
+# clean files
+rm -rf "$SWAGGER_DIR"

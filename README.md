@@ -20,13 +20,16 @@ Have a look at [go.mod](https://github.com/ixofoundation/ixo-blockchain/blob/mai
 
 The ixo Blockchain powers client applications for coordinating, financing and verifying impacts. The [Impacts Wallet](https://github.com/ixofoundation/ixo-Mobile-dev), [JAMBO](https://github.com/ixofoundation/jambo), and [Launchpad](https://github.com/ixofoundation/ixo-webclient) are examples of client applications that use the ixo Blockchain. The [Impacts SDK](https://www.npmjs.com/package/@ixo/impactxclient-sdk) makes it simple to interact with the ixo Blockchain.
 
-Ixo has 5 custom cosmos modules which help to reach the Ixo goals and missions:
+Ixo has 8 custom cosmos modules which help to reach the Ixo goals and missions:
 
 - [Bonds](/x/bonds/spec/README.md)
 - [Iid](/x/iid/spec/README.md)
 - [Entity](/x/entity/spec/README.md)
 - [Claims](/x/claims/spec/README.md)
 - [Token](/x/token/spec/README.md)
+- [Epochs](/x/epochs/README.md)
+- [Mint](/x/mint/README.md)
+- [Smart Account](/x/smart-account/README.md)
 
 ## 🤝 How to contribute
 

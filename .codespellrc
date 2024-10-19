@@ -1,0 +1,4 @@
+[codespell]
+skip = *.rs,*.json,*.js,*.html,*.d,*.sum,go.mod,*/statik.go,./x/claims/migrations/v2/legacy_types.go,./docs/swagger-ui/*,./yarn.lock
+quiet-level = 2
+ignore-words = .github/workflows/ignore-words.txt

@@ -50,14 +50,14 @@ type Bond struct {
     FunctionType                 string
     FunctionParameters           FunctionParams
     ReserveTokens                []string
-    TxFeePercentage              sdk.Dec
-    ExitFeePercentage            sdk.Dec
+    TxFeePercentage              math.LegacyDec
+    ExitFeePercentage            math.LegacyDec
     FeeAddress                   string
     ReserveWithdrawalAddress     string
     MaxSupply                    sdk.Coin
     OrderQuantityLimits          sdk.Coins
-    SanityRate                   sdk.Dec
-    SanityMarginPercentage       sdk.Dec
+    SanityRate                   math.LegacyDec
+    SanityMarginPercentage       math.LegacyDec
     CurrentSupply                sdk.Coin
     CurrentReserve               sdk.Coins
     AvailableReserve             sdk.Coins
@@ -65,8 +65,8 @@ type Bond struct {
     AllowSells                   bool
     AllowReserveWithdrawals      bool
     AlphaBond                    bool
-    BatchBlocks                  sdk.Uint
-    OutcomePayment               sdk.Int
+    BatchBlocks                  math.Uint
+    OutcomePayment               math.Int
     State                        string
     BondDid                      string
 }
@@ -102,8 +102,8 @@ For alpha bonds, the batch also stores the next alpha value, if it was changed t
 ```go
 type Batch struct {
     BondDid         string
-    BlocksRemaining sdk.Uint
-    NextPublicAlpha sdk.Dec
+    BlocksRemaining math.Uint
+    NextPublicAlpha math.LegacyDec
     TotalBuyAmount  sdk.Coin
     TotalSellAmount sdk.Coin
     BuyPrices       sdk.DecCoins

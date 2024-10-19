@@ -3,11 +3,11 @@ package types
 import (
 	"encoding/json"
 	fmt "fmt"
-
 	"sort"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 )
 
@@ -44,10 +44,10 @@ func initStateTransitions() BondStateTransitionMap {
 	}
 }
 
-func (next BondState) IsValidProgressionFrom(prev BondState) bool {
+func (s BondState) IsValidProgressionFrom(prev BondState) bool {
 	validStatuses := StateTransitions[prev]
 	for _, v := range validStatuses {
-		if v == next {
+		if v == s {
 			return true
 		}
 	}
@@ -62,7 +62,7 @@ func BondStateFromString(s string) BondState {
 	return BondState(s)
 }
 
-type FunctionParamRestrictions func(paramsMap map[string]sdk.Dec) error
+type FunctionParamRestrictions func(paramsMap map[string]math.LegacyDec) error
 
 var (
 	RequiredParamsForFunctionType = map[string][]string{
@@ -87,7 +87,7 @@ var (
 	}
 )
 
-func NewFunctionParam(param string, value sdk.Dec) FunctionParam {
+func NewFunctionParam(param string, value math.LegacyDec) FunctionParam {
 	return FunctionParam{
 		Param: param,
 		Value: value,
@@ -96,7 +96,7 @@ func NewFunctionParam(param string, value sdk.Dec) FunctionParam {
 
 type FunctionParams []FunctionParam
 
-func (fps FunctionParams) ReplaceParam(param string, value sdk.Dec) {
+func (fps FunctionParams) ReplaceParam(param string, value math.LegacyDec) {
 	for i, fp := range fps {
 		if fp.Param == param {
 			fps[i] = NewFunctionParam(param, value)
@@ -105,7 +105,7 @@ func (fps FunctionParams) ReplaceParam(param string, value sdk.Dec) {
 	}
 }
 
-func (fps FunctionParams) AddParam(param string, value sdk.Dec) FunctionParams {
+func (fps FunctionParams) AddParam(param string, value math.LegacyDec) FunctionParams {
 	return append(fps, NewFunctionParam(param, value))
 }
 
@@ -122,7 +122,7 @@ func (fps FunctionParams) Validate(functionType string) error {
 
 	// Check that number of params is as expected
 	if len(fps) != len(expectedParams) {
-		return sdkerrors.Wrapf(ErrIncorrectNumberOfFunctionParameters, "expected: %d", len(expectedParams))
+		return errorsmod.Wrapf(ErrIncorrectNumberOfFunctionParameters, "expected: %d", len(expectedParams))
 	}
 
 	// Check that params match and all values are non-negative
@@ -130,9 +130,9 @@ func (fps FunctionParams) Validate(functionType string) error {
 	for _, p := range expectedParams {
 		val, ok := paramsMap[p]
 		if !ok {
-			return sdkerrors.Wrapf(ErrFunctionParameterMissingOrNonFloat, p)
+			return errorsmod.Wrapf(ErrFunctionParameterMissingOrNonFloat, p)
 		} else if val.IsNegative() {
-			return sdkerrors.Wrapf(ErrArgumentCannotBeNegative, p)
+			return errorsmod.Wrapf(ErrArgumentCannotBeNegative, p)
 		}
 	}
 
@@ -159,26 +159,26 @@ func (fps FunctionParams) String() (result string) {
 	return string(output)
 }
 
-func (fps FunctionParams) AsMap() (paramsMap map[string]sdk.Dec) {
-	paramsMap = make(map[string]sdk.Dec)
+func (fps FunctionParams) AsMap() (paramsMap map[string]math.LegacyDec) {
+	paramsMap = make(map[string]math.LegacyDec)
 	for _, fp := range fps {
 		paramsMap[fp.Param] = fp.Value
 	}
 	return paramsMap
 }
 
-func sigmoidParameterRestrictions(paramsMap map[string]sdk.Dec) error {
+func sigmoidParameterRestrictions(paramsMap map[string]math.LegacyDec) error {
 	// Sigmoid exception 1: c != 0, otherwise we run into divisions by zero
 	val, ok := paramsMap["c"]
 	if !ok {
 		panic("did not find parameter c for sigmoid function")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "c")
+		return errorsmod.Wrap(ErrArgumentMustBePositive, "c")
 	}
 	return nil
 }
 
-func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
+func augmentedParameterRestrictions(paramsMap map[string]math.LegacyDec) error {
 	// Augmented exception 1.1: d0 must be an integer, since it is a token amount
 	// Augmented exception 1.2: d0 > 0, since a negative raise is not valid, but
 	// also to avoid division by zero
@@ -186,9 +186,9 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter d0 for augmented function")
 	} else if !val.TruncateDec().Equal(val) {
-		return sdkerrors.Wrap(ErrArgumentMustBeInteger, "d0")
+		return errorsmod.Wrap(ErrArgumentMustBeInteger, "d0")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "d0")
+		return errorsmod.Wrap(ErrArgumentMustBePositive, "d0")
 	}
 
 	// Augmented exception 2: p0 > 0, since a negative price is not valid, but
@@ -197,7 +197,7 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter p0 for augmented function")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "p0")
+		return errorsmod.Wrap(ErrArgumentMustBePositive, "p0")
 	}
 
 	// Augmented exception 3: theta must be from 0 to 1 (excluding 1), since
@@ -205,10 +205,10 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	val, ok = paramsMap["theta"]
 	if !ok {
 		panic("did not find parameter theta for augmented function")
-	} else if val.LT(sdk.ZeroDec()) || val.GTE(sdk.OneDec()) {
-		return sdkerrors.Wrapf(ErrArgumentMustBeBetween,
+	} else if val.LT(math.LegacyZeroDec()) || val.GTE(math.LegacyOneDec()) {
+		return errorsmod.Wrapf(ErrArgumentMustBeBetween,
 			"argument theta must be between %s and %s",
-			sdk.ZeroDec().String(), sdk.OneDec().String())
+			math.LegacyZeroDec().String(), math.LegacyOneDec().String())
 	}
 
 	// Augmented exception 4: kappa > 0, since negative exponents are not
@@ -217,7 +217,7 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 	if !ok {
 		panic("did not find parameter kappa for augmented function")
 	} else if !val.IsPositive() {
-		return sdkerrors.Wrap(ErrArgumentMustBePositive, "kappa")
+		return errorsmod.Wrap(ErrArgumentMustBePositive, "kappa")
 	}
 
 	return nil
@@ -225,11 +225,10 @@ func augmentedParameterRestrictions(paramsMap map[string]sdk.Dec) error {
 
 func NewBond(token, name, description string, creatorDid, controllerDid, orcaleDid iidtypes.DIDFragment,
 	functionType string, functionParameters FunctionParams, reserveTokens []string,
-	txFeePercentage, exitFeePercentage sdk.Dec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
-	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage sdk.Dec,
-	allowSells, allowReserveWithdrawals, alphaBond bool, batchBlocks sdk.Uint, outcomePayment sdk.Int,
+	txFeePercentage, exitFeePercentage math.LegacyDec, feeAddress, reserveWithdrawalAddress sdk.AccAddress,
+	maxSupply sdk.Coin, orderQuantityLimits sdk.Coins, sanityRate, sanityMarginPercentage math.LegacyDec,
+	allowSells, allowReserveWithdrawals, alphaBond bool, batchBlocks math.Uint, outcomePayment math.Int,
 	state BondState, bondDid string) Bond {
-
 	// Ensure tokens and coins are sorted
 	sort.Strings(reserveTokens)
 	orderQuantityLimits = orderQuantityLimits.Sort()
@@ -252,7 +251,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid, orcaleD
 		OrderQuantityLimits:          orderQuantityLimits,
 		SanityRate:                   sanityRate,
 		SanityMarginPercentage:       sanityMarginPercentage,
-		CurrentSupply:                sdk.NewCoin(token, sdk.ZeroInt()),
+		CurrentSupply:                sdk.NewCoin(token, math.ZeroInt()),
 		CurrentReserve:               nil,
 		AvailableReserve:             nil,
 		CurrentOutcomePaymentReserve: nil,
@@ -266,7 +265,7 @@ func NewBond(token, name, description string, creatorDid, controllerDid, orcaleD
 	}
 }
 
-func (bond Bond) GetNewReserveCoins(amount sdk.Int) (coins sdk.Coins) {
+func (bond Bond) GetNewReserveCoins(amount math.Int) (coins sdk.Coins) {
 	coins = sdk.Coins{}
 	for _, r := range bond.ReserveTokens {
 		coins = coins.Add(sdk.NewCoin(r, amount))
@@ -274,7 +273,7 @@ func (bond Bond) GetNewReserveCoins(amount sdk.Int) (coins sdk.Coins) {
 	return coins
 }
 
-func (bond Bond) GetNewReserveDecCoins(amount sdk.Dec) (coins sdk.DecCoins) {
+func (bond Bond) GetNewReserveDecCoins(amount math.LegacyDec) (coins sdk.DecCoins) {
 	coins = sdk.DecCoins{}
 	for _, r := range bond.ReserveTokens {
 		coins = coins.Add(sdk.NewDecCoinFromDec(r, amount))
@@ -282,13 +281,13 @@ func (bond Bond) GetNewReserveDecCoins(amount sdk.Dec) (coins sdk.DecCoins) {
 	return coins
 }
 
-func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err error) {
+func (bond Bond) GetPricesAtSupply(supply math.Int) (result sdk.DecCoins, err error) {
 	if supply.IsNegative() {
 		panic(fmt.Sprintf("negative supply for bond %s", bond.Token))
 	}
 
 	args := bond.FunctionParameters.AsMap()
-	x := supply.ToDec()
+	x := supply.ToLegacyDec()
 	switch bond.FunctionType {
 	case PowerFunction:
 		m := args["m"]
@@ -305,12 +304,12 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 		c := args["c"]
 		temp1 := x.Sub(b)
 		temp2 := temp1.Mul(temp1).Add(c)
-		temp3, err := ApproxRoot(temp2, sdk.NewDec(2))
+		temp3, err := ApproxRoot(temp2, math.LegacyNewDec(2))
 		if err != nil {
 			return nil, err
 		}
 		result = bond.GetNewReserveDecCoins(
-			a.Mul(temp1.Quo(temp3).Add(sdk.OneDec())))
+			a.Mul(temp1.Quo(temp3).Add(math.LegacyOneDec())))
 	case AugmentedFunction:
 		// Note: during the hatch phase, this function returns the hatch price
 		// p0 even if the supply argument is greater than the initial supply S0
@@ -325,8 +324,8 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 			}
 
 			// If reserve < 1, default to zero price to avoid calculation issues
-			if res.LT(sdk.OneDec()) {
-				result = bond.GetNewReserveDecCoins(sdk.ZeroDec())
+			if res.LT(math.LegacyOneDec()) {
+				result = bond.GetNewReserveDecCoins(math.LegacyZeroDec())
 			} else {
 				spotPriceDec, err := SpotPrice(res, kappa, args["V0"])
 				if err != nil {
@@ -353,7 +352,10 @@ func (bond Bond) GetPricesAtSupply(supply sdk.Int) (result sdk.DecCoins, err err
 			algo = new(AugmentedBondRevision1)
 		}
 
-		algo.Init(bond)
+		err := algo.Init(bond)
+		if err != nil {
+			return nil, err
+		}
 
 		price, err := algo.CalculateTokensForPrice(sdk.NewInt64Coin(bond.Token, 1))
 		if err != nil {
@@ -381,7 +383,7 @@ func (bond Bond) GetCurrentPricesPT(reserveBalances sdk.Coins) (sdk.DecCoins, er
 	case AugmentedFunction:
 		return bond.GetPricesAtSupply(bond.CurrentSupply.Amount)
 	case SwapperFunction:
-		return bond.GetPricesToMint(sdk.OneInt(), reserveBalances)
+		return bond.GetPricesToMint(math.OneInt(), reserveBalances)
 	case BondingFunction:
 		args := bond.FunctionParameters.AsMap()
 		var algo BondingAlgorithm
@@ -393,7 +395,10 @@ func (bond Bond) GetCurrentPricesPT(reserveBalances sdk.Coins) (sdk.DecCoins, er
 			algo = new(AugmentedBondRevision1)
 		}
 
-		algo.Init(bond)
+		err := algo.Init(bond)
+		if err != nil {
+			return nil, err
+		}
 
 		price, err := algo.CalculateTokensForPrice(sdk.NewInt64Coin(bond.Token, 1))
 		if err != nil {
@@ -405,23 +410,23 @@ func (bond Bond) GetCurrentPricesPT(reserveBalances sdk.Coins) (sdk.DecCoins, er
 	}
 }
 
-func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec, err error) {
+func (bond Bond) ReserveAtSupply(supply math.Int) (result math.LegacyDec, err error) {
 	if supply.IsNegative() {
 		panic(fmt.Sprintf("negative supply for bond %s", bond.Token))
 	}
 
 	args := bond.FunctionParameters.AsMap()
-	x := supply.ToDec()
+	x := supply.ToLegacyDec()
 	switch bond.FunctionType {
 	case PowerFunction:
 		m := args["m"]
 		n := args["n"]
 		c := args["c"]
-		temp1, err := ApproxPower(x, n.Add(sdk.OneDec()))
+		temp1, err := ApproxPower(x, n.Add(math.LegacyOneDec()))
 		if err != nil {
-			return sdk.Dec{}, err
+			return math.LegacyDec{}, err
 		}
-		temp2 := temp1.Mul(m).Quo(n.Add(sdk.OneDec()))
+		temp2 := temp1.Mul(m).Quo(n.Add(math.LegacyOneDec()))
 		temp3 := x.Mul(c)
 		result = temp2.Add(temp3)
 	case SigmoidFunction:
@@ -430,12 +435,12 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec, err error) {
 		c := args["c"]
 		temp1 := x.Sub(b)
 		temp2 := temp1.Mul(temp1).Add(c)
-		temp3, err := ApproxRoot(temp2, sdk.NewDec(2))
+		temp3, err := ApproxRoot(temp2, math.LegacyNewDec(2))
 		if err != nil {
 			panic(err) // mathematical problem // TODO: consider returning err
 		}
 		temp5 := a.Mul(temp3.Add(x))
-		temp6, err := ApproxRoot(b.Mul(b).Add(c), sdk.NewDec(2))
+		temp6, err := ApproxRoot(b.Mul(b).Add(c), math.LegacyNewDec(2))
 		if err != nil {
 			panic(err) // mathematical problem // TODO: consider returning err
 		}
@@ -446,7 +451,7 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec, err error) {
 		V0 := args["V0"]
 		result, err = Reserve(x, kappa, V0)
 		if err != nil {
-			return sdk.Dec{}, err
+			return math.LegacyDec{}, err
 		}
 	case SwapperFunction:
 		panic("invalid function for function type")
@@ -462,7 +467,7 @@ func (bond Bond) ReserveAtSupply(supply sdk.Int) (result sdk.Dec, err error) {
 	return result, nil
 }
 
-func (bond Bond) GetReserveDeltaForLiquidityDelta(mintOrBurn sdk.Int, reserveBalances sdk.Coins) sdk.DecCoins {
+func (bond Bond) GetReserveDeltaForLiquidityDelta(mintOrBurn math.Int, reserveBalances sdk.Coins) sdk.DecCoins {
 	if mintOrBurn.IsNegative() {
 		panic(fmt.Sprintf("negative liquidity delta for bond %s", bond.Token))
 	} else if reserveBalances.IsAnyNegative() {
@@ -479,14 +484,14 @@ func (bond Bond) GetReserveDeltaForLiquidityDelta(mintOrBurn sdk.Int, reserveBal
 	case SwapperFunction:
 		resToken1 := bond.ReserveTokens[0]
 		resToken2 := bond.ReserveTokens[1]
-		resBalance1 := reserveBalances.AmountOf(resToken1).ToDec()
-		resBalance2 := reserveBalances.AmountOf(resToken2).ToDec()
+		resBalance1 := reserveBalances.AmountOf(resToken1).ToLegacyDec()
+		resBalance2 := reserveBalances.AmountOf(resToken2).ToLegacyDec()
 
 		// Using Uniswap formulae: x' = (1+-α)x = x +- Δx, where α = Δx/x
 		// Where x is any of the two reserve balances or the current supply
 		// and x' is any of the updated reserve balances or the updated supply
 		// By making Δx subject of the formula: Δx = αx
-		alpha := mintOrBurn.ToDec().Quo(bond.CurrentSupply.Amount.ToDec())
+		alpha := mintOrBurn.ToLegacyDec().Quo(bond.CurrentSupply.Amount.ToLegacyDec())
 
 		result := sdk.DecCoins{
 			sdk.NewDecCoinFromDec(resToken1, alpha.Mul(resBalance1)),
@@ -501,7 +506,7 @@ func (bond Bond) GetReserveDeltaForLiquidityDelta(mintOrBurn sdk.Int, reserveBal
 	}
 }
 
-func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.DecCoins, error) {
+func (bond Bond) GetPricesToMint(mint math.Int, reserveBalances sdk.Coins) (sdk.DecCoins, error) {
 	if mint.IsNegative() {
 		panic(fmt.Sprintf("negative mint amount for bond %s", bond.Token))
 	} else if reserveBalances.IsAnyNegative() {
@@ -512,7 +517,7 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	if bond.FunctionType == AugmentedFunction && bond.State == HatchState.String() {
 		args := bond.FunctionParameters.AsMap()
 		if bond.State == HatchState.String() {
-			price := args["p0"].Mul(mint.ToDec())
+			price := args["p0"].Mul(mint.ToLegacyDec())
 			return bond.GetNewReserveDecCoins(price), nil
 		}
 	}
@@ -528,21 +533,21 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 			return nil, err
 		}
 
-		var priceToMint sdk.Dec
+		var priceToMint math.LegacyDec
 		if reserveBalances.Empty() {
 			priceToMint = reserve
 		} else {
 			// Reserve balances should all be equal given that we are always
 			// applying the same additions/subtractions to all reserve balances.
 			// Thus we can pick the first reserve balance as the global balance.
-			commonReserveBalance := reserveBalances[0].Amount.ToDec()
+			commonReserveBalance := reserveBalances[0].Amount.ToLegacyDec()
 			priceToMint = reserve.Sub(commonReserveBalance)
 		}
 		if priceToMint.IsNegative() {
 			// Negative priceToMint means that the previous buyer overpaid
 			// to the point that the price for this buyer is covered. However,
 			// we still charge this buyer at least one token.
-			priceToMint = sdk.OneDec()
+			priceToMint = math.LegacyOneDec()
 		}
 		return bond.GetNewReserveDecCoins(priceToMint), nil
 	case SwapperFunction:
@@ -556,7 +561,7 @@ func (bond Bond) GetPricesToMint(mint sdk.Int, reserveBalances sdk.Coins) (sdk.D
 	// Note: fees have to be added to these prices to get actual prices
 }
 
-func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) (sdk.DecCoins, error) {
+func (bond Bond) GetReturnsForBurn(burn math.Int, reserveBalances sdk.Coins) (sdk.DecCoins, error) {
 	if burn.IsNegative() {
 		panic(fmt.Sprintf("negative burn amount for bond %s", bond.Token))
 	} else if reserveBalances.IsAnyNegative() {
@@ -574,14 +579,14 @@ func (bond Bond) GetReturnsForBurn(burn sdk.Int, reserveBalances sdk.Coins) (sdk
 			return nil, err
 		}
 
-		var reserveBalance sdk.Dec
+		var reserveBalance math.LegacyDec
 		if reserveBalances.Empty() {
-			reserveBalance = sdk.ZeroDec()
+			reserveBalance = math.LegacyZeroDec()
 		} else {
 			// Reserve balances should all be equal given that we are always
 			// applying the same additions/subtractions to all reserve balances.
 			// Thus we can pick the first reserve balance as the global balance.
-			reserveBalance = reserveBalances[0].Amount.ToDec()
+			reserveBalance = reserveBalances[0].Amount.ToLegacyDec()
 		}
 
 		if reserve.GT(reserveBalance) {
@@ -616,9 +621,9 @@ func (bond Bond) GetReturnsForSwap(from sdk.Coin, toToken string, reserveBalance
 	case SwapperFunction:
 		// Check that from and to are reserve tokens
 		if from.Denom != bond.ReserveTokens[0] && from.Denom != bond.ReserveTokens[1] {
-			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrTokenIsNotAValidReserveToken, from.Denom)
+			return nil, sdk.Coin{}, errorsmod.Wrap(ErrTokenIsNotAValidReserveToken, from.Denom)
 		} else if toToken != bond.ReserveTokens[0] && toToken != bond.ReserveTokens[1] {
-			return nil, sdk.Coin{}, sdkerrors.Wrap(ErrTokenIsNotAValidReserveToken, toToken)
+			return nil, sdk.Coin{}, errorsmod.Wrap(ErrTokenIsNotAValidReserveToken, toToken)
 		}
 
 		inAmt := from.Amount
@@ -652,7 +657,7 @@ func (bond Bond) GetReturnsForSwap(from sdk.Coin, toToken string, reserveBalance
 	}
 }
 
-func (bond Bond) GetFee(reserveAmount sdk.DecCoin, percentage sdk.Dec) sdk.Coin {
+func (bond Bond) GetFee(reserveAmount sdk.DecCoin, percentage math.LegacyDec) sdk.Coin {
 	feeAmount := percentage.QuoInt64(100).Mul(reserveAmount.Amount)
 	return RoundFee(sdk.NewDecCoinFromDec(reserveAmount.Denom, feeAmount))
 }
@@ -665,7 +670,7 @@ func (bond Bond) GetExitFee(reserveAmount sdk.DecCoin) sdk.Coin {
 	return bond.GetFee(reserveAmount, bond.ExitFeePercentage)
 }
 
-func (bond Bond) GetFees(reserveAmounts sdk.DecCoins, percentage sdk.Dec) (fees sdk.Coins) {
+func (bond Bond) GetFees(reserveAmounts sdk.DecCoins, percentage math.LegacyDec) (fees sdk.Coins) {
 	for _, r := range reserveAmounts {
 		fees = fees.Add(bond.GetFee(r, percentage))
 	}
@@ -701,7 +706,6 @@ func (bond Bond) AnyOrderQuantityLimitsExceeded(amounts sdk.Coins) bool {
 }
 
 func (bond Bond) ReservesViolateSanityRate(newReserves sdk.Coins) bool {
-
 	if bond.SanityRate.IsZero() {
 		return false
 	}
@@ -709,20 +713,20 @@ func (bond Bond) ReservesViolateSanityRate(newReserves sdk.Coins) bool {
 	// Get new rate from new balances
 	resToken1 := bond.ReserveTokens[0]
 	resToken2 := bond.ReserveTokens[1]
-	resBalance1 := newReserves.AmountOf(resToken1).ToDec()
-	resBalance2 := newReserves.AmountOf(resToken2).ToDec()
+	resBalance1 := newReserves.AmountOf(resToken1).ToLegacyDec()
+	resBalance2 := newReserves.AmountOf(resToken2).ToLegacyDec()
 	exchangeRate := resBalance1.Quo(resBalance2)
 
 	// Get max and min acceptable rates
-	sanityMarginDecimal := bond.SanityMarginPercentage.Quo(sdk.NewDec(100))
-	upperPercentage := sdk.OneDec().Add(sanityMarginDecimal)
-	lowerPercentage := sdk.OneDec().Sub(sanityMarginDecimal)
+	sanityMarginDecimal := bond.SanityMarginPercentage.Quo(math.LegacyNewDec(100))
+	upperPercentage := math.LegacyOneDec().Add(sanityMarginDecimal)
+	lowerPercentage := math.LegacyOneDec().Sub(sanityMarginDecimal)
 	maxRate := bond.SanityRate.Mul(upperPercentage)
 	minRate := bond.SanityRate.Mul(lowerPercentage)
 
 	// If min rate is negative, change to zero
 	if minRate.IsNegative() {
-		minRate = sdk.ZeroDec()
+		minRate = math.LegacyZeroDec()
 	}
 
 	return exchangeRate.LT(minRate) || exchangeRate.GT(maxRate)

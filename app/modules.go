@@ -1,8 +1,16 @@
 package app
 
 import (
+	"cosmossdk.io/x/evidence"
+	evidencetypes "cosmossdk.io/x/evidence/types"
+	"cosmossdk.io/x/feegrant"
+	feegrantmodule "cosmossdk.io/x/feegrant/module"
+	"cosmossdk.io/x/upgrade"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/CosmWasm/wasmd/x/wasm"
-	wasmclient "github.com/CosmWasm/wasmd/x/wasm/client"
+	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth"
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
@@ -13,23 +21,17 @@ import (
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/cosmos/cosmos-sdk/x/capability"
-	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
+	"github.com/cosmos/cosmos-sdk/x/consensus"
+	consensusparamtypes "github.com/cosmos/cosmos-sdk/x/consensus/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	"github.com/cosmos/cosmos-sdk/x/evidence"
-	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
-	"github.com/cosmos/cosmos-sdk/x/feegrant"
-	feegrantmodule "github.com/cosmos/cosmos-sdk/x/feegrant/module"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
+	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/cosmos/cosmos-sdk/x/mint"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	sdkparams "github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
@@ -37,23 +39,23 @@ import (
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/cosmos/cosmos-sdk/x/upgrade"
-	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	icq "github.com/cosmos/ibc-apps/modules/async-icq/v4"
-	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v4/types"
-	ica "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts"
-	icatypes "github.com/cosmos/ibc-go/v4/modules/apps/27-interchain-accounts/types"
-	ibcfee "github.com/cosmos/ibc-go/v4/modules/apps/29-fee"
-	ibcfeetypes "github.com/cosmos/ibc-go/v4/modules/apps/29-fee/types"
-	"github.com/cosmos/ibc-go/v4/modules/apps/transfer"
-	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-	ibc "github.com/cosmos/ibc-go/v4/modules/core"
-	ibcclientclient "github.com/cosmos/ibc-go/v4/modules/core/02-client/client"
-	ibchost "github.com/cosmos/ibc-go/v4/modules/core/24-host"
-	intertx "github.com/cosmos/interchain-accounts/x/inter-tx"
-	intertxtypes "github.com/cosmos/interchain-accounts/x/inter-tx/types"
-	appparams "github.com/ixofoundation/ixo-blockchain/v3/app/params"
+	packetforward "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward"
+	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"
+	icq "github.com/cosmos/ibc-apps/modules/async-icq/v8"
+	icqtypes "github.com/cosmos/ibc-apps/modules/async-icq/v8/types"
+	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8"
+	ibchookstypes "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
+	"github.com/cosmos/ibc-go/modules/capability"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	ica "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts"
+	icatypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/types"
+	ibcfee "github.com/cosmos/ibc-go/v8/modules/apps/29-fee"
+	ibcfeetypes "github.com/cosmos/ibc-go/v8/modules/apps/29-fee/types"
+	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	ibc "github.com/cosmos/ibc-go/v8/modules/core"
+	ibchost "github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
 	claimsmodule "github.com/ixofoundation/ixo-blockchain/v3/x/claims"
@@ -61,17 +63,21 @@ import (
 	entitymodule "github.com/ixofoundation/ixo-blockchain/v3/x/entity"
 	entityclient "github.com/ixofoundation/ixo-blockchain/v3/x/entity/client"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/epochs"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/v3/x/iid"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/mint"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
+	smartaccount "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
 	tokenmodule "github.com/ixofoundation/ixo-blockchain/v3/x/token"
 	tokenclient "github.com/ixofoundation/ixo-blockchain/v3/x/token/client"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
-	packetforward "github.com/strangelove-ventures/packet-forward-middleware/v4/router"
-	packetforwardtypes "github.com/strangelove-ventures/packet-forward-middleware/v4/router/types"
 )
 
-// module account permissions
-var maccPerms = map[string][]string{
+// moduleAccountPermissions defines module account permissions
+var moduleAccountPermissions = map[string][]string{
 	// Standard Cosmos module accounts
 	authtypes.FeeCollectorName:     nil,
 	distrtypes.ModuleName:          nil,
@@ -83,161 +89,138 @@ var maccPerms = map[string][]string{
 	ibcfeetypes.ModuleName:         nil,
 	icatypes.ModuleName:            nil,
 	icqtypes.ModuleName:            nil,
-	wasm.ModuleName:                {authtypes.Burner},
+	wasmtypes.ModuleName:           {authtypes.Burner},
 
 	// Custom ixo module accounts
 	bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
 	bondstypes.BatchesIntermediaryAccount: nil,
 	bondstypes.BondsReserveAccount:        nil,
+	smartaccounttypes.ModuleName:          nil,
 }
-
-// ModuleBasics defines the module BasicManager is in charge of setting up basic,
-// non-dependant module elements, such as codec registration
-// and genesis verification.
-var ModuleBasics = module.NewBasicManager(
-	// Standard Cosmos modules
-	auth.AppModuleBasic{},
-	genutil.AppModuleBasic{},
-	authzmodule.AppModuleBasic{},
-	bank.AppModuleBasic{},
-	capability.AppModuleBasic{},
-	staking.AppModuleBasic{},
-	mint.AppModuleBasic{},
-	distr.AppModuleBasic{},
-	sdkparams.AppModuleBasic{},
-	crisis.AppModuleBasic{},
-	slashing.AppModuleBasic{},
-	ibc.AppModuleBasic{},
-	upgrade.AppModuleBasic{},
-	evidence.AppModuleBasic{},
-	transfer.AppModuleBasic{},
-	vesting.AppModuleBasic{},
-	feegrantmodule.AppModuleBasic{},
-	gov.NewAppModuleBasic(
-		append(
-			wasmclient.ProposalHandlers,
-			paramsclient.ProposalHandler,
-			distrclient.ProposalHandler,
-			upgradeclient.ProposalHandler,
-			upgradeclient.CancelProposalHandler,
-			entityclient.ProposalHandler,
-			tokenclient.ProposalHandler,
-			ibcclientclient.UpdateClientProposalHandler,
-			ibcclientclient.UpgradeProposalHandler,
-		)...,
-	),
-	wasm.AppModuleBasic{},
-	ica.AppModuleBasic{},
-	intertx.AppModuleBasic{},
-	ibcfee.AppModuleBasic{},
-	icq.AppModuleBasic{},
-	packetforward.AppModuleBasic{},
-
-	// Custom ixo modules
-	iidmodule.AppModuleBasic{},
-	bonds.AppModuleBasic{},
-	entitymodule.AppModuleBasic{},
-	tokenmodule.AppModuleBasic{},
-	claimsmodule.AppModuleBasic{},
-)
 
 // appModules return modules to initialize module manager.
 func appModules(
 	app *IxoApp,
-	encodingConfig appparams.EncodingConfig,
+	appCodec codec.Codec,
+	txConfig client.TxConfig,
 	skipGenesisInvariants bool,
 ) []module.AppModule {
-	appCodec := encodingConfig.Marshaler
-
 	return []module.AppModule{
 		// Standard Cosmos AppModules
-		genutil.NewAppModule(
-			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
-			encodingConfig.TxConfig,
-		),
-		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
+		genutil.NewAppModule(app.AccountKeeper, app.StakingKeeper, app.BaseApp, txConfig),
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
-		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
-		crisis.NewAppModule(&app.CrisisKeeper, skipGenesisInvariants),
-		gov.NewAppModule(appCodec, *app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		staking.NewAppModule(appCodec, *app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-		upgrade.NewAppModule(app.UpgradeKeeper),
-		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
+		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
+		mint.NewAppModule(appCodec, *app.MintKeeper),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(slashingtypes.ModuleName), app.interfaceRegistry),
+		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(distrtypes.ModuleName)),
+		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
+		upgrade.NewAppModule(app.UpgradeKeeper, app.AccountKeeper.AddressCodec()),
 		evidence.NewAppModule(app.EvidenceKeeper),
-		ibc.NewAppModule(app.IBCKeeper),
-		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
-		intertx.NewAppModule(appCodec, app.InterTxKeeper),
-		sdkparams.NewAppModule(app.ParamsKeeper),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
 		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		transfer.NewAppModule(app.TransferKeeper),
+		ibc.NewAppModule(app.IBCKeeper),
+		ibctm.NewAppModule(),
+		sdkparams.NewAppModule(app.ParamsKeeper),
+		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.BaseApp.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
-		packetforward.NewAppModule(app.PacketForwardKeeper),
-		icq.NewAppModule(*app.ICQKeeper),
+		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
+		icq.NewAppModule(app.ICQKeeper, app.GetSubspace(icqtypes.ModuleName)),
+		packetforward.NewAppModule(app.PacketForwardKeeper, app.GetSubspace(packetforwardtypes.ModuleName)),
+		crisis.NewAppModule(app.CrisisKeeper, skipGenesisInvariants, app.GetSubspace(crisistypes.ModuleName)),
+		transfer.NewAppModule(app.TransferKeeper),
+		ibchooks.NewAppModule(app.AccountKeeper),
 
 		// Custom ixo AppModules
-		iidmodule.NewAppModule(app.appCodec, app.IidKeeper),
-		bonds.NewAppModule(app.BondsKeeper, app.AccountKeeper),
+		iidmodule.NewAppModule(app.IidKeeper),
+		bonds.NewAppModule(app.BondsKeeper),
 		entitymodule.NewAppModule(app.EntityKeeper),
 		tokenmodule.NewAppModule(app.TokenKeeper),
-		claimsmodule.NewAppModule(app.ClaimsKeeper),
+		claimsmodule.NewAppModule(app.ClaimsKeeper, app.GetSubspace(claimsmoduletypes.ModuleName)),
+		smartaccount.NewAppModule(*app.SmartAccountKeeper),
+		epochs.NewAppModule(*app.EpochsKeeper),
 	}
+}
+
+// ModuleBasics defines the module BasicManager that is in charge of setting up basic,
+// non-dependant module elements, such as codec registration
+// and genesis verification.
+func newBasicManagerFromManager(app *IxoApp) module.BasicManager {
+	basicManager := module.NewBasicManagerFromManager(
+		app.ModuleManager,
+		map[string]module.AppModuleBasic{
+			genutiltypes.ModuleName: genutil.NewAppModuleBasic(genutiltypes.DefaultMessageValidator),
+			govtypes.ModuleName: gov.NewAppModuleBasic(
+				[]govclient.ProposalHandler{
+					paramsclient.ProposalHandler,
+					entityclient.ProposalHandler,
+					tokenclient.ProposalHandler,
+				},
+			),
+		})
+	basicManager.RegisterLegacyAminoCodec(app.legacyAmino)
+	basicManager.RegisterInterfaces(app.interfaceRegistry)
+	return basicManager
 }
 
 // simulationModules returns modules for simulation manager
-// define the order of the modules for deterministic simulationss
+// define the order of the modules for deterministic simulations
 func simulationModules(
 	app *IxoApp,
-	encodingConfig appparams.EncodingConfig,
+	appCodec codec.Codec,
 	_ bool,
 ) []module.AppModuleSimulation {
-	appCodec := encodingConfig.Marshaler
-
 	return []module.AppModuleSimulation{
-		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
-		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
-		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
-		gov.NewAppModule(appCodec, *app.GovKeeper, app.AccountKeeper, app.BankKeeper),
-		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
-		staking.NewAppModule(appCodec, *app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
-		sdkparams.NewAppModule(app.ParamsKeeper),
-		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
-		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
-		evidence.NewAppModule(app.EvidenceKeeper),
-		ibc.NewAppModule(app.IBCKeeper),
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts, app.GetSubspace(authtypes.ModuleName)),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper, app.GetSubspace(banktypes.ModuleName)),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
 		feegrantmodule.NewAppModule(appCodec, app.AccountKeeper, app.BankKeeper, app.FeeGrantKeeper, app.interfaceRegistry),
-		transfer.NewAppModule(app.AppKeepers.TransferKeeper),
+		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(govtypes.ModuleName)),
+		mint.NewAppModule(appCodec, *app.MintKeeper),
+		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName)),
+		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(distrtypes.ModuleName)),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper, app.GetSubspace(slashingtypes.ModuleName), app.interfaceRegistry),
+		sdkparams.NewAppModule(app.ParamsKeeper),
+		evidence.NewAppModule(app.EvidenceKeeper),
+		authzmodule.NewAppModule(appCodec, app.AuthzKeeper, app.AccountKeeper, app.BankKeeper, app.interfaceRegistry),
+		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper, app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
+		ibc.NewAppModule(app.IBCKeeper),
+		transfer.NewAppModule(app.TransferKeeper),
+		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
+		ibcfee.NewAppModule(app.IBCFeeKeeper),
 	}
 }
 
-// orderBeginBlockers returns the order of BeginBlockers, by module name.
-func orderBeginBlockers() []string {
+// OrderBeginBlockers returns the order of BeginBlockers, by module name.
+func OrderBeginBlockers() []string {
 	// During begin block slashing happens after distr.BeginBlocker so that
 	// there is nothing left over in the validator fee pool, so as to keep the
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	return []string{
-		// Standard Cosmos modules
-		// Upgrades should be run VERY first
-		upgradetypes.ModuleName,
+		// Epochs is set to be first right now, this in principle could change to come later / be at the end,
+		// but would have to be a holistic change with other pipelines taken into account.
+		// Epochs must come before staking, because txfees epoch hook sends fees to the auth "fee collector"
+		// module account, which is then distributed to stakers. If staking comes before epochs, then the
+		// funds will not be distributed to stakers as expected.
+		epochstypes.ModuleName,
+
+		// Next 7 is Staking ordering, dont change
 		minttypes.ModuleName,
-		// Next 4 is Staking ordering
 		distrtypes.ModuleName,
 		slashingtypes.ModuleName,
 		evidencetypes.ModuleName,
 		stakingtypes.ModuleName,
+		authtypes.ModuleName,
 		ibchost.ModuleName,
+
 		banktypes.ModuleName,
 		genutiltypes.ModuleName,
 		crisistypes.ModuleName,
 		paramstypes.ModuleName,
-		authtypes.ModuleName,
 		capabilitytypes.ModuleName,
 		govtypes.ModuleName,
 		ibctransfertypes.ModuleName,
@@ -246,12 +229,14 @@ func orderBeginBlockers() []string {
 		feegrant.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
-		intertxtypes.ModuleName,
-		wasm.ModuleName,
+		wasmtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		icqtypes.ModuleName,
+		consensusparamtypes.ModuleName,
+		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		smartaccounttypes.ModuleName,
 		bondstypes.ModuleName,
 		iidtypes.ModuleName,
 		entitytypes.ModuleName,
@@ -260,14 +245,17 @@ func orderBeginBlockers() []string {
 	}
 }
 
-// orderEndBlockers returns EndBlockers (crisis, govtypes, staking) with no relative order.
-func orderEndBlockers() []string {
+// OrderEndBlockers returns EndBlockers (crisis, govtypes, staking) with no relative order.
+func OrderEndBlockers() []string {
 	return []string{
-		// Standard Cosmos modules
 		crisistypes.ModuleName,
+		// Standard Cosmos modules
 		// Staking must be after gov.
 		govtypes.ModuleName,
 		stakingtypes.ModuleName,
+
+		genutiltypes.ModuleName,
+		feegrant.ModuleName,
 		distrtypes.ModuleName,
 		evidencetypes.ModuleName,
 		banktypes.ModuleName,
@@ -276,21 +264,22 @@ func orderEndBlockers() []string {
 		paramstypes.ModuleName,
 		authtypes.ModuleName,
 		minttypes.ModuleName,
-		genutiltypes.ModuleName,
 		vestingtypes.ModuleName,
 		capabilitytypes.ModuleName,
 		slashingtypes.ModuleName,
 		ibctransfertypes.ModuleName,
 		authz.ModuleName,
-		feegrant.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
-		intertxtypes.ModuleName,
-		wasm.ModuleName,
+		wasmtypes.ModuleName,
 		packetforwardtypes.ModuleName,
 		icqtypes.ModuleName,
+		consensusparamtypes.ModuleName,
+		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		epochstypes.ModuleName,
+		smartaccounttypes.ModuleName,
 		iidtypes.ModuleName,
 		entitytypes.ModuleName,
 		tokentypes.ModuleName,
@@ -299,14 +288,18 @@ func orderEndBlockers() []string {
 	}
 }
 
-// orderInitGenesis returns module names in order for init genesis calls.
-func orderInitBlockers() []string {
+// OrderInitGenesis returns module names in order for init genesis calls.
+func OrderInitGenesis() []string {
 	return []string{
 		// Standard Cosmos modules
 		// Capability module must occur first so that it can initialize any capabilities
 		// so that other modules that want to create or claim capabilities afterwards in InitChain
 		// can do so safely.
 		capabilitytypes.ModuleName,
+
+		// NOTE: The genutils module must occur after staking so that pools are
+		// properly initialized with tokens from genesis accounts.
+		// NOTE: The genutils module must also occur after auth so that it can access the params from auth.
 		authtypes.ModuleName,
 		banktypes.ModuleName,
 		distrtypes.ModuleName,
@@ -319,6 +312,7 @@ func orderInitBlockers() []string {
 		genutiltypes.ModuleName,
 		evidencetypes.ModuleName,
 		ibctransfertypes.ModuleName,
+		consensusparamtypes.ModuleName,
 		upgradetypes.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
@@ -326,13 +320,15 @@ func orderInitBlockers() []string {
 		feegrant.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
-		intertxtypes.ModuleName,
 		// wasm after ibc transfer
-		wasm.ModuleName,
+		wasmtypes.ModuleName,
 		icqtypes.ModuleName,
 		packetforwardtypes.ModuleName,
+		ibchookstypes.ModuleName,
 
 		// Custom ixo modules
+		epochstypes.ModuleName,
+		smartaccounttypes.ModuleName,
 		iidtypes.ModuleName,
 		bondstypes.ModuleName,
 		tokentypes.ModuleName,

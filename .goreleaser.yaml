@@ -1,3 +1,5 @@
+version: 2
+
 project_name: ixod
 
 env:
@@ -161,7 +163,7 @@ checksum:
 
 # Docs: https://goreleaser.com/customization/changelog/
 changelog:
-  skip: true
+  disable: true
 
 # Docs: https://goreleaser.com/customization/release/
 release:

@@ -6,11 +6,12 @@ import (
 
 	"github.com/spf13/cobra"
 
+	errorsmod "cosmossdk.io/errors"
+	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	bondsclient "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/client"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
@@ -80,15 +81,15 @@ func NewCmdCreateBond() *cobra.Command {
 			reserveTokens := strings.Split(_reserveTokens, ",")
 
 			// Parse tx fee percentage
-			txFeePercentage, err := sdk.NewDecFromStr(_txFeePercentage)
+			txFeePercentage, err := math.LegacyNewDecFromStr(_txFeePercentage)
 			if err != nil {
-				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "tx fee percentage")
+				return errorsmod.Wrap(types.ErrArgumentMissingOrNonFloat, "tx fee percentage")
 			}
 
 			// Parse exit fee percentage
-			exitFeePercentage, err := sdk.NewDecFromStr(_exitFeePercentage)
+			exitFeePercentage, err := math.LegacyNewDecFromStr(_exitFeePercentage)
 			if err != nil {
-				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "exit fee percentage")
+				return errorsmod.Wrap(types.ErrArgumentMissingOrNonFloat, "exit fee percentage")
 			}
 
 			// Parse fee address
@@ -116,32 +117,32 @@ func NewCmdCreateBond() *cobra.Command {
 			}
 
 			// Parse sanity rate
-			sanityRate, err := sdk.NewDecFromStr(_sanityRate)
+			sanityRate, err := math.LegacyNewDecFromStr(_sanityRate)
 			if err != nil {
 				return fmt.Errorf(err.Error())
 			}
 
 			// Parse sanity margin percentage
-			sanityMarginPercentage, err := sdk.NewDecFromStr(_sanityMarginPercentage)
+			sanityMarginPercentage, err := math.LegacyNewDecFromStr(_sanityMarginPercentage)
 			if err != nil {
 				return fmt.Errorf(err.Error())
 			}
 
 			// Parse batch blocks
-			batchBlocks, err := sdk.ParseUint(_batchBlocks)
+			batchBlocks, err := math.ParseUint(_batchBlocks)
 			if err != nil {
-				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonUInteger, "max batch blocks")
+				return errorsmod.Wrap(types.ErrArgumentMissingOrNonUInteger, "max batch blocks")
 			}
 
 			// Parse outcome payment
-			var outcomePayment sdk.Int
+			var outcomePayment math.Int
 			if len(_outcomePayment) == 0 {
-				outcomePayment = sdk.ZeroInt()
+				outcomePayment = math.ZeroInt()
 			} else {
 				var ok bool
-				outcomePayment, ok = sdk.NewIntFromString(_outcomePayment)
+				outcomePayment, ok = math.NewIntFromString(_outcomePayment)
 				if !ok {
-					return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+					return errorsmod.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
 				}
 			}
 
@@ -235,9 +236,9 @@ func NewCmdSetNextAlpha() *cobra.Command {
 			_editorDid := args[2]
 
 			// Parse alpha
-			alpha, err := sdk.NewDecFromStr(_alpha)
+			alpha, err := math.LegacyNewDecFromStr(_alpha)
 			if err != nil {
-				return sdkerrors.Wrap(types.ErrArgumentMissingOrNonFloat, "alpha")
+				return errorsmod.Wrap(types.ErrArgumentMissingOrNonFloat, "alpha")
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)
@@ -290,7 +291,6 @@ func NewCmdBuy() *cobra.Command {
 		Short: "Buy from a bond",
 		Args:  cobra.ExactArgs(4),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			bondCoinWithAmount, err := sdk.ParseCoinNormalized(args[0])
 			if err != nil {
 				return err
@@ -324,7 +324,6 @@ func NewCmdSell() *cobra.Command {
 		Short:   "Sell from a bond",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			bondCoinWithAmount, err := sdk.ParseCoinNormalized(args[0])
 			if err != nil {
 				return err
@@ -354,7 +353,6 @@ func NewCmdSwap() *cobra.Command {
 		Short: "Perform a swap between two tokens",
 		Args:  cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			// Check that from amount and token can be parsed to a coin
 			from, err := bondsclient.ParseTwoPartCoin(args[0], args[1])
 			if err != nil {
@@ -383,9 +381,9 @@ func NewCmdMakeOutcomePayment() *cobra.Command {
 		Short:   "Make an outcome payment to a bond",
 		Args:    cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			amount, ok := sdk.NewIntFromString(args[1])
+			amount, ok := math.NewIntFromString(args[1])
 			if !ok {
-				return sdkerrors.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
+				return errorsmod.Wrap(types.ErrArgumentMustBeInteger, "outcome payment")
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)

@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/duration.proto";
+import "cosmos_proto/cosmos.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types";
 
@@ -12,13 +13,16 @@ message Params {
   uint64 collection_sequence = 1;
   string ixo_account = 2;
   string network_fee_percentage = 3 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
   string node_fee_percentage = 4 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
+  uint64 intent_sequence = 5;
 }
 
 enum CollectionState {
@@ -27,12 +31,36 @@ enum CollectionState {
   CLOSED = 2 [ (gogoproto.enumvalue_customname) = "closed" ];
 }
 
+enum CollectionIntentOptions {
+  // Allow: Intents can be made for claims, but claims can also be made without
+  // intents.
+  ALLOW = 0 [ (gogoproto.enumvalue_customname) = "allow" ];
+  // Deny: Intents cannot be made for claims for the collection.
+  DENY = 1 [ (gogoproto.enumvalue_customname) = "deny" ];
+  // Required: Claims cannot be made without an associated intent. An intent is
+  // mandatory before a claim can be submitted.
+  REQUIRED = 2 [ (gogoproto.enumvalue_customname) = "required" ];
+}
+
 enum EvaluationStatus {
   PENDING = 0 [ (gogoproto.enumvalue_customname) = "pending" ];
   APPROVED = 1 [ (gogoproto.enumvalue_customname) = "approved" ];
   REJECTED = 2 [ (gogoproto.enumvalue_customname) = "rejected" ];
   DISPUTED = 3 [ (gogoproto.enumvalue_customname) = "disputed" ];
   INVALIDATED = 4 [ (gogoproto.enumvalue_customname) = "invalidated" ];
+}
+
+enum IntentStatus {
+  // Active: Intent is created and active, payments have been transferred to
+  // escrow if there is any
+  ACTIVE = 0 [ (gogoproto.enumvalue_customname) = "active" ];
+  // Fulfilled: Intent is fulfilled, was used to create a claim and funds will
+  // be released on claim APPROVAL, or funds will be reverted on claim REJECTION
+  // or DISPUTE
+  FULFILLED = 1 [ (gogoproto.enumvalue_customname) = "fulfilled" ];
+  // Expired: Intent has expired, payments have been transferred back out of
+  // escrow
+  EXPIRED = 2 [ (gogoproto.enumvalue_customname) = "expired" ];
 }
 
 enum PaymentType {
@@ -44,15 +72,18 @@ enum PaymentType {
 
 enum PaymentStatus {
   NO_PAYMENT = 0 [ (gogoproto.enumvalue_customname) = "no_payment" ];
-  PROMISED = 1 [ (gogoproto.enumvalue_customname) =
-                     "promised" ]; // agent is contracted to receive payment
-  AUTHORIZED = 2 [ (gogoproto.enumvalue_customname) =
-                       "authorized" ]; // authz set up, no guarantee
-  GAURANTEED = 3 [ (gogoproto.enumvalue_customname) =
-                       "gauranteed" ]; // escrow set up with funds blocked
+  // Promised: Agent is contracted to receive payment
+  PROMISED = 1 [ (gogoproto.enumvalue_customname) = "promised" ];
+  // Authorized: Authz set up, no guarantee
+  AUTHORIZED = 2 [ (gogoproto.enumvalue_customname) = "authorized" ];
+  // Guaranteed: Escrow set up with funds blocked
+  GUARANTEED = 3 [ (gogoproto.enumvalue_customname) = "guaranteed" ];
+  // Paid: Funds have been paid
   PAID = 4 [ (gogoproto.enumvalue_customname) = "paid" ];
+  // Failed: Payment failed, most probably due to insufficient funds
   FAILED = 5 [ (gogoproto.enumvalue_customname) = "failed" ];
-  DISPUTED = 6 [ (gogoproto.enumvalue_customname) = "disputed" ];
+  // DisputedPayment: Payment disputed
+  DISPUTED_PAYMENT = 6 [ (gogoproto.enumvalue_customname) = "disputed" ];
 }
 
 message Collection {
@@ -96,6 +127,13 @@ message Collection {
   // invalidated is the number of claims that have been evaluated as invalid
   // (internally calculated)
   uint64 invalidated = 16;
+  // escrow_account is the escrow account address for this collection created at
+  // collection creation, current purpose is to transfer payments to escrow
+  // account for GUARANTEED payments through intents
+  string escrow_account = 17;
+  // intents is the option for intents for this collection (allow, deny,
+  // required)
+  CollectionIntentOptions intents = 18;
 }
 
 message Payments {
@@ -116,9 +154,15 @@ message Payment {
   // if empty(nil) then no contract payment, not allowed for Evaluation Payment
   Contract1155Payment contract_1155_payment = 3;
   // timeout after claim/evaluation to create authZ for payment, if 0 then
-  // immidiate direct payment
+  // immediate direct payment
   google.protobuf.Duration timeout_ns = 4
       [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // cw20 payments, can be empty or multiple
+  repeated CW20Payment cw20_payment = 5;
+  // boolean to indicate if the payment is for oracle payments, aka it will go
+  // through network fees split NOTE: if true the payment can only have amount
+  // values(Native coins), no cw20 payments allowed then
+  bool is_oracle_payment = 6;
 }
 
 message Contract1155Payment {
@@ -127,6 +171,15 @@ message Contract1155Payment {
   string address = 1;
   string token_id = 2;
   uint32 amount = 3;
+}
+
+message CW20Payment {
+  option (gogoproto.equal) = true;
+
+  string address = 1;
+  // chose uint64 for now as amounts should be small enough to fit in a
+  // uint64(max 18446744073709551615)
+  uint64 amount = 3;
 }
 
 message Claim {
@@ -141,7 +194,20 @@ message Claim {
   string claim_id = 5;
   // evaluation is the result of one or more claim evaluations
   Evaluation evaluation = 6;
+  // payments_status is the status of the payments for the claim
   ClaimPayments payments_status = 7;
+  // intent_id is the id of the intent for this claim, if any
+  bool use_intent = 8;
+  // NOTE: if both amount and cw20 amount are empty then use default by
+  // Collection custom amount specified by service agent for claim approval
+  repeated cosmos.base.v1beta1.Coin amount = 9 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // NOTE: if both amount and cw20 amount are empty then use default by
+  // Collection custom cw20 payments specified by service agent for claim
+  // approval
+  repeated CW20Payment cw20_payment = 10;
 }
 
 message ClaimPayments {
@@ -174,12 +240,14 @@ message Evaluation {
   // evaluationDate is the date and time that the claim evaluation was submitted
   // on-chain
   google.protobuf.Timestamp evaluation_date = 9 [ (gogoproto.stdtime) = true ];
-  // custom amount specified by evaluator for claim approval, if empty list then
-  // use default by Collection
+  // if both amount and cw20 amount are empty then use default by Collection
+  // custom amount specified by evaluator for claim approval
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // custom cw20 payments specified by evaluator for claim approval
+  repeated CW20Payment cw20_payment = 11;
 }
 
 message Dispute {
@@ -194,4 +262,36 @@ message DisputeData {
   string type = 2;
   string proof = 3;
   bool encrypted = 4;
+}
+
+// Intent defines the structure for a service agent's claim intent.
+message Intent {
+  // id is the incremented internal id for the intent
+  string id = 1;
+  // The service agent's DID (Decentralized Identifier).
+  string agent_did = 2;
+  // The service agent's address.
+  string agent_address = 3;
+  // The id of the collection this intent is linked to.
+  string collection_id = 4;
+  // claim_id (optional, set when claim is submitted)
+  string claim_id = 5;
+  // The time the intent was created.
+  google.protobuf.Timestamp created_at = 6 [ (gogoproto.stdtime) = true ];
+  // Timeout period for the intent. If the claim is not submitted by this time,
+  // the intent expires.
+  google.protobuf.Timestamp expire_at = 7 [ (gogoproto.stdtime) = true ];
+  // Status of the intent (e.g., "ACTIVE" or "FULFILLED").
+  IntentStatus status = 8;
+  // The payment amount the agent intends to claim, if any.
+  repeated cosmos.base.v1beta1.Coin amount = 9 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // The CW20Payment amount the agent intends to claim, if any.
+  repeated CW20Payment cw20_payment = 10;
+  // the address the escrow payment came from
+  string from_address = 11;
+  // the escrow account address
+  string escrow_address = 12;
 }

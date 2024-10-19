@@ -3,17 +3,12 @@ package keeper
 import (
 	"fmt"
 
-	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
-	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"cosmossdk.io/log"
+	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
-	"github.com/tendermint/tendermint/libs/log"
 )
 
 // UnmarshalFn is a generic function to unmarshal bytes
@@ -24,28 +19,28 @@ type MarshalFn func(value interface{}) []byte
 
 type (
 	Keeper struct {
-		cdc          codec.BinaryCodec
-		storeKey     sdk.StoreKey
-		memKey       sdk.StoreKey
-		paramstore   paramtypes.Subspace
-		AuthzKeeper  authzkeeper.Keeper
-		IidKeeper    iidkeeper.Keeper
-		BankKeeper   bankkeeper.Keeper
-		EntityKeeper entitykeeper.Keeper
-		WasmKeeper   wasmtypes.ContractOpsKeeper
+		cdc           codec.BinaryCodec
+		storeKey      storetypes.StoreKey
+		paramstore    paramtypes.Subspace
+		AuthzKeeper   types.AuthzKeeper
+		IidKeeper     types.IidKeeper
+		BankKeeper    types.BankKeeper
+		EntityKeeper  types.EntityKeeper
+		WasmKeeper    types.WasmKeeper
+		AccountKeeper types.AccountKeeper
 	}
 )
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
-	storeKey,
-	memKey sdk.StoreKey,
+	storeKey storetypes.StoreKey,
 	ps paramtypes.Subspace,
-	iidKeeper iidkeeper.Keeper,
-	authzKeeper authzkeeper.Keeper,
-	bankKeeper bankkeeper.Keeper,
-	entityKeeper entitykeeper.Keeper,
-	wasmKeeper wasmkeeper.Keeper,
+	iidKeeper types.IidKeeper,
+	authzKeeper types.AuthzKeeper,
+	bankKeeper types.BankKeeper,
+	entityKeeper types.EntityKeeper,
+	wasmKeeper types.WasmKeeper,
+	accountKeeper types.AccountKeeper,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -53,15 +48,15 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		cdc:          cdc,
-		storeKey:     storeKey,
-		memKey:       memKey,
-		paramstore:   ps,
-		IidKeeper:    iidKeeper,
-		AuthzKeeper:  authzKeeper,
-		BankKeeper:   bankKeeper,
-		EntityKeeper: entityKeeper,
-		WasmKeeper:   wasmkeeper.NewDefaultPermissionKeeper(wasmKeeper),
+		cdc:           cdc,
+		storeKey:      storeKey,
+		paramstore:    ps,
+		IidKeeper:     iidKeeper,
+		AuthzKeeper:   authzKeeper,
+		BankKeeper:    bankKeeper,
+		EntityKeeper:  entityKeeper,
+		WasmKeeper:    wasmKeeper,
+		AccountKeeper: accountKeeper,
 	}
 }
 
@@ -118,7 +113,7 @@ func (k Keeper) Get(
 func (k Keeper) GetAll(
 	ctx sdk.Context,
 	prefix []byte,
-) sdk.Iterator {
+) storetypes.Iterator {
 	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, prefix)
+	return storetypes.KVStorePrefixIterator(store, prefix)
 }

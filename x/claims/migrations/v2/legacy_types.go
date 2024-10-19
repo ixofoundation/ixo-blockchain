@@ -1,3 +1,4 @@
+//nolint:all
 package v2claims
 
 import (
@@ -6,6 +7,7 @@ import (
 	math_bits "math/bits"
 	time "time"
 
+	"cosmossdk.io/math"
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/gogo/protobuf/gogoproto"
 	proto "github.com/gogo/protobuf/proto"
@@ -145,10 +147,10 @@ func (PaymentStatus) EnumDescriptor() ([]byte, []int) {
 }
 
 type Params struct {
-	CollectionSequence   uint64    `protobuf:"varint,1,opt,name=collection_sequence,json=collectionSequence,proto3" json:"collection_sequence,omitempty"`
-	IxoAccount           string    `protobuf:"bytes,2,opt,name=ixo_account,json=ixoAccount,proto3" json:"ixo_account,omitempty"`
-	NetworkFeePercentage types.Dec `protobuf:"bytes,3,opt,name=network_fee_percentage,json=networkFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"network_fee_percentage"`
-	NodeFeePercentage    types.Dec `protobuf:"bytes,4,opt,name=node_fee_percentage,json=nodeFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"node_fee_percentage"`
+	CollectionSequence   uint64         `protobuf:"varint,1,opt,name=collection_sequence,json=collectionSequence,proto3" json:"collection_sequence,omitempty"`
+	IxoAccount           string         `protobuf:"bytes,2,opt,name=ixo_account,json=ixoAccount,proto3" json:"ixo_account,omitempty"`
+	NetworkFeePercentage math.LegacyDec `protobuf:"bytes,3,opt,name=network_fee_percentage,json=networkFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"network_fee_percentage"`
+	NodeFeePercentage    math.LegacyDec `protobuf:"bytes,4,opt,name=node_fee_percentage,json=nodeFeePercentage,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"node_fee_percentage"`
 }
 
 func (m *Params) Reset()         { *m = Params{} }

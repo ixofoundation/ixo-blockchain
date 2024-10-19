@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"strconv"
 
+	errorsmod "cosmossdk.io/errors"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
 	"github.com/spf13/cobra"
@@ -19,7 +19,7 @@ import (
 func NewTxCmd() *cobra.Command {
 	entityTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
-		Short:                      "entity transaction sub commands",
+		Short:                      "Entity transaction subcommands",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
 		RunE:                       client.ValidateCmd,
@@ -30,6 +30,7 @@ func NewTxCmd() *cobra.Command {
 		NewCmdUpdateEntity(),
 		NewCmdUpdateEntityVerified(),
 		NewCmdTransferEntity(),
+		NewCmdCreateEntityAccount(),
 	)
 
 	return entityTxCmd
@@ -65,7 +66,7 @@ func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 				return err
 			}
 
-			msg, err := govtypes.NewMsgSubmitProposal(&content, deposit, from)
+			msg, err := govtypesv1.NewMsgSubmitProposal(&content, deposit, from)
 			if err != nil {
 				return err
 			}
@@ -75,6 +76,7 @@ func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 	}
 
 	cmd.Flags().String(govcli.FlagTitle, "", "title of proposal")
+	// nolint:staticcheck
 	cmd.Flags().String(govcli.FlagDescription, "", "description of proposal")
 	cmd.Flags().String(govcli.FlagDeposit, "", "deposit of proposal")
 
@@ -156,7 +158,7 @@ func NewCmdUpdateEntityVerified() *cobra.Command {
 			argRelayerDid := args[1]
 			argVerified, err := strconv.ParseBool(args[2])
 			if err != nil {
-				return sdkerrors.Wrapf(err, "verified must be a boolean value")
+				return errorsmod.Wrapf(err, "verified must be a boolean value")
 			}
 
 			clientCtx, err := client.GetClientTxContext(cmd)

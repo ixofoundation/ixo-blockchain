@@ -10,34 +10,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ types.QueryServer = Querier{}
+var _ types.QueryServer = Keeper{}
 
-// Querier defines a wrapper around the x/token keeper providing gRPC method
-// handlers.
-type Querier struct {
-	Keeper
-}
-
-func NewQuerier(k Keeper) Querier {
-	return Querier{Keeper: k}
-}
-
-func (q Querier) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+func (k Keeper) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
 
-	return &types.QueryParamsResponse{Params: q.Keeper.GetParams(ctx)}, nil
+	return &types.QueryParamsResponse{Params: k.GetParams(ctx)}, nil
 }
 
-func (q Querier) TokenDoc(c context.Context, req *types.QueryTokenDocRequest) (*types.QueryTokenDocResponse, error) {
+func (k Keeper) TokenDoc(c context.Context, req *types.QueryTokenDocRequest) (*types.QueryTokenDocResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	token, err := q.Keeper.GetToken(ctx, req.Minter, req.ContractAddress)
+	token, err := k.GetToken(ctx, req.Minter, req.ContractAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -45,18 +35,18 @@ func (q Querier) TokenDoc(c context.Context, req *types.QueryTokenDocRequest) (*
 	return &types.QueryTokenDocResponse{TokenDoc: token}, nil
 }
 
-func (q Querier) TokenList(c context.Context, req *types.QueryTokenListRequest) (*types.QueryTokenListResponse, error) {
+func (k Keeper) TokenList(c context.Context, req *types.QueryTokenListRequest) (*types.QueryTokenListResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	var tokens []types.Token
 	ctx := sdk.UnwrapSDKContext(c)
-	tokensStore := q.Keeper.GetMinterTokensStore(ctx, req.Minter)
+	tokensStore := k.GetMinterTokensStore(ctx, req.Minter)
 
 	pageRes, err := query.Paginate(tokensStore, req.Pagination, func(key []byte, value []byte) error {
 		var token types.Token
-		if err := q.Keeper.cdc.Unmarshal(value, &token); err != nil {
+		if err := k.cdc.Unmarshal(value, &token); err != nil {
 			return err
 		}
 
@@ -71,14 +61,14 @@ func (q Querier) TokenList(c context.Context, req *types.QueryTokenListRequest) 
 	return &types.QueryTokenListResponse{TokenDocs: tokens, Pagination: pageRes}, nil
 }
 
-func (q Querier) TokenMetadata(c context.Context, req *types.QueryTokenMetadataRequest) (*types.QueryTokenMetadataResponse, error) {
+func (k Keeper) TokenMetadata(c context.Context, req *types.QueryTokenMetadataRequest) (*types.QueryTokenMetadataResponse, error) {
 	if req == nil {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
 
-	tokenProperties, token, err := q.Keeper.GetTokenById(ctx, req.Id)
+	tokenProperties, token, err := k.GetTokenById(ctx, req.Id)
 	if err != nil {
 		return nil, err
 	}

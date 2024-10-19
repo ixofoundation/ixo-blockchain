@@ -1,6 +1,7 @@
 package types
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -35,12 +36,12 @@ func CheckNoOfReserveTokens(resTokens []string, fnType string) error {
 	// Come up with number of expected reserve tokens
 	expectedNoOfTokens, ok := NoOfReserveTokensForFunctionType[fnType]
 	if !ok {
-		return sdkerrors.Wrap(ErrUnrecognizedFunctionType, fnType)
+		return errorsmod.Wrap(ErrUnrecognizedFunctionType, fnType)
 	}
 
 	// Check that number of reserve tokens is correct (if expecting a specific number of tokens)
 	if expectedNoOfTokens != AnyNumberOfReserveTokens && len(resTokens) != expectedNoOfTokens {
-		return sdkerrors.Wrapf(ErrIncorrectNumberOfReserveTokens, "expected: %d", expectedNoOfTokens)
+		return errorsmod.Wrapf(ErrIncorrectNumberOfReserveTokens, "expected: %d", expectedNoOfTokens)
 	}
 
 	return nil
@@ -51,7 +52,7 @@ func CheckCoinDenom(denom string) (err error) {
 	if err != nil {
 		return err
 	} else if denom != coin.Denom {
-		return sdkerrors.Wrapf(sdkerrors.ErrInvalidCoins, coin.String())
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidCoins, coin.String())
 	}
 	return nil
 }
@@ -59,7 +60,7 @@ func CheckCoinDenom(denom string) (err error) {
 func GetRequiredParamsForFunctionType(fnType string) (fnParams []string, err error) {
 	expectedParams, ok := RequiredParamsForFunctionType[fnType]
 	if !ok {
-		return nil, sdkerrors.Wrap(ErrUnrecognizedFunctionType, fnType)
+		return nil, errorsmod.Wrap(ErrUnrecognizedFunctionType, fnType)
 	}
 	return expectedParams, nil
 }
@@ -67,7 +68,7 @@ func GetRequiredParamsForFunctionType(fnType string) (fnParams []string, err err
 func GetExceptionsForFunctionType(fnType string) (restrictions FunctionParamRestrictions, err error) {
 	restrictions, ok := ExtraParameterRestrictions[fnType]
 	if !ok {
-		return nil, sdkerrors.Wrap(ErrUnrecognizedFunctionType, fnType)
+		return nil, errorsmod.Wrap(ErrUnrecognizedFunctionType, fnType)
 	}
 	return restrictions, nil
 }

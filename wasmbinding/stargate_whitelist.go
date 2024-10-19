@@ -2,22 +2,25 @@ package wasmbinding
 
 import (
 	"fmt"
+	"sort"
 	"sync"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
-	"github.com/cosmos/cosmos-sdk/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v4/modules/apps/transfer/types"
-
+	"github.com/cosmos/gogoproto/proto"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 	bondstypes "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
 	claimstypes "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	epochtypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
 )
 
@@ -42,10 +45,10 @@ func init() {
 
 	// cosmos-sdk queries
 	// =============================
-
 	// auth
 	setWhitelistedQuery("/cosmos.auth.v1beta1.Query/Account", &authtypes.QueryAccountResponse{})
 	setWhitelistedQuery("/cosmos.auth.v1beta1.Query/Params", &authtypes.QueryParamsResponse{})
+	setWhitelistedQuery("/cosmos.auth.v1beta1.Query/ModuleAccounts", &authtypes.QueryModuleAccountsResponse{})
 
 	// bank
 	setWhitelistedQuery("/cosmos.bank.v1beta1.Query/Balance", &banktypes.QueryBalanceResponse{})
@@ -61,9 +64,9 @@ func init() {
 	setWhitelistedQuery("/cosmos.distribution.v1beta1.Query/ValidatorCommission", &distributiontypes.QueryValidatorCommissionResponse{})
 
 	// gov
-	setWhitelistedQuery("/cosmos.gov.v1beta1.Query/Deposit", &govtypes.QueryDepositResponse{})
-	setWhitelistedQuery("/cosmos.gov.v1beta1.Query/Params", &govtypes.QueryParamsResponse{})
-	setWhitelistedQuery("/cosmos.gov.v1beta1.Query/Vote", &govtypes.QueryVoteResponse{})
+	setWhitelistedQuery("/cosmos.gov.v1beta1.Query/Deposit", &govtypesv1.QueryDepositResponse{})
+	setWhitelistedQuery("/cosmos.gov.v1beta1.Query/Params", &govtypesv1.QueryParamsResponse{})
+	setWhitelistedQuery("/cosmos.gov.v1beta1.Query/Vote", &govtypesv1.QueryVoteResponse{})
 
 	// slashing
 	setWhitelistedQuery("/cosmos.slashing.v1beta1.Query/Params", &slashingtypes.QueryParamsResponse{})
@@ -76,7 +79,6 @@ func init() {
 
 	// ixo queries
 	// =============================
-
 	// bonds
 	setWhitelistedQuery("/ixo.bonds.v1beta1.Query/Params", &bondstypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.bonds.v1beta1.Query/Bond", &bondstypes.QueryBondResponse{})
@@ -96,6 +98,8 @@ func init() {
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Collection", &claimstypes.QueryCollectionResponse{})
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Claim", &claimstypes.QueryClaimResponse{})
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Dispute", &claimstypes.QueryDisputeResponse{})
+	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Intent", &claimstypes.QueryIntentResponse{})
+	setWhitelistedQuery("/ixo.claims.v1beta1.Query/IntentList", &claimstypes.QueryIntentListResponse{})
 
 	// entity
 	setWhitelistedQuery("/ixo.entity.v1beta1.Query/Params", &entitytypes.QueryParamsResponse{})
@@ -108,6 +112,20 @@ func init() {
 	// token
 	setWhitelistedQuery("/ixo.token.v1beta1.Query/Params", &tokentypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.token.v1beta1.Query/TokenMetadata", &tokentypes.QueryTokenMetadataResponse{})
+	setWhitelistedQuery("/ixo.token.v1beta1.Query/TokenDoc", &tokentypes.QueryTokenDocResponse{})
+
+	// smartaccount
+	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/Params", &smartaccounttypes.QueryParamsResponse{})
+	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/GetAuthenticator", &smartaccounttypes.GetAuthenticatorResponse{})
+	setWhitelistedQuery("/ixo.smartaccount.v1beta1.Query/GetAuthenticators", &smartaccounttypes.GetAuthenticatorsResponse{})
+
+	// epochs
+	setWhitelistedQuery("/ixo.epochs.v1beta1.Query/EpochInfos", &epochtypes.QueryEpochsInfoResponse{})
+	setWhitelistedQuery("/ixo.epochs.v1beta1.Query/CurrentEpoch", &epochtypes.QueryCurrentEpochResponse{})
+
+	// mint
+	setWhitelistedQuery("/ixo.mint.v1beta1.Query/Params", &minttypes.QueryParamsResponse{})
+	setWhitelistedQuery("/ixo.mint.v1beta1.Query/EpochProvisions", &minttypes.QueryEpochProvisionsResponse{})
 }
 
 // IsWhitelistedQuery returns if the query is not whitelisted.
@@ -122,12 +140,12 @@ func IsWhitelistedQuery(queryPath string) error {
 // getWhitelistedQuery returns the whitelisted query at the provided path.
 // If the query does not exist, or it was setup wrong by the chain, this returns an error.
 // CONTRACT: must call returnStargateResponseToPool in order to avoid pointless allocs.
-func getWhitelistedQuery(queryPath string) (codec.ProtoMarshaler, error) {
+func getWhitelistedQuery(queryPath string) (proto.Message, error) {
 	protoResponseAny, isWhitelisted := stargateResponsePools[queryPath]
 	if !isWhitelisted {
 		return nil, wasmvmtypes.UnsupportedRequest{Kind: fmt.Sprintf("'%s' path is not allowed from the contract", queryPath)}
 	}
-	protoMarshaler, ok := protoResponseAny.Get().(codec.ProtoMarshaler)
+	protoMarshaler, ok := protoResponseAny.Get().(proto.Message)
 	if !ok {
 		return nil, fmt.Errorf("failed to assert type to codec.ProtoMarshaler")
 	}
@@ -136,7 +154,7 @@ func getWhitelistedQuery(queryPath string) (codec.ProtoMarshaler, error) {
 
 type protoTypeG[T any] interface {
 	*T
-	codec.ProtoMarshaler
+	proto.Message
 }
 
 // setWhitelistedQuery sets the whitelisted query at the provided path.
@@ -152,7 +170,7 @@ func setWhitelistedQuery[T any, PT protoTypeG[T]](queryPath string, _ PT) {
 }
 
 // returnStargateResponseToPool returns the provided protoMarshaler to the appropriate pool based on it's query path.
-func returnStargateResponseToPool(queryPath string, pb codec.ProtoMarshaler) {
+func returnStargateResponseToPool(queryPath string, pb proto.Message) {
 	stargateResponsePools[queryPath].Put(pb)
 }
 
@@ -162,5 +180,8 @@ func GetStargateWhitelistedPaths() (keys []string) {
 	for k := range stargateResponsePools {
 		keys = append(keys, k)
 	}
+
+	// Sort the keys to ensure determinism
+	sort.Strings(keys)
 	return keys
 }

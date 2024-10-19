@@ -166,7 +166,7 @@ The field's descriptions is as follows:
 
 ### TokenBatch
 
-A TokenBatch allows batching tokens for transfering and retiring
+A TokenBatch allows batching tokens for transferring and retiring
 
 ```go
 type TokenBatch struct {
