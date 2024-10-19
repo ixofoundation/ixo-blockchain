@@ -14,9 +14,9 @@ import ( // this line is used by starport scaffolding # 1
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/iid/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/iid/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 // Type check to ensure the interface is properly implemented

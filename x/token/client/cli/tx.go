@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/token/types"
 	"github.com/spf13/cobra"
 )
 

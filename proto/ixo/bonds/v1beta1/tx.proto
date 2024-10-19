@@ -7,7 +7,7 @@ import "cosmos_proto/cosmos.proto";
 import "ixo/bonds/v1beta1/bonds.proto";
 import "cosmos/msg/v1/msg.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types";
 
 // Msg defines the bonds Msg service.
 service Msg {
@@ -60,15 +60,15 @@ message MsgCreateBond {
   ];
   string creator_did = 7 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string controller_did = 8 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string oracle_did = 9 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   repeated string reserve_tokens = 10;
   string tx_fee_percentage = 11 [
@@ -129,7 +129,7 @@ message MsgEditBond {
   string sanity_margin_percentage = 6;
   string editor_did = 7 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string editor_address = 8;
 }
@@ -154,7 +154,7 @@ message MsgSetNextAlpha {
   ];
   string oracle_did = 4 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string oracle_address = 5;
 }
@@ -169,7 +169,7 @@ message MsgUpdateBondState {
   string state = 2;
   string editor_did = 3 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string editor_address = 4;
 }
@@ -183,7 +183,7 @@ message MsgBuy {
 
   string buyer_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
   repeated cosmos.base.v1beta1.Coin max_prices = 3 [
@@ -203,7 +203,7 @@ message MsgSell {
 
   string seller_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
   string bond_did = 3;
@@ -220,7 +220,7 @@ message MsgSwap {
 
   string swapper_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string bond_did = 2;
   cosmos.base.v1beta1.Coin from = 3 [ (gogoproto.nullable) = false ];
@@ -238,7 +238,7 @@ message MsgMakeOutcomePayment {
 
   string sender_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string amount = 2 [
     (cosmos_proto.scalar) = "cosmos.Int",
@@ -260,7 +260,7 @@ message MsgWithdrawShare {
 
   string recipient_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string bond_did = 2;
   string recipient_address = 3;
@@ -275,7 +275,7 @@ message MsgWithdrawReserve {
 
   string withdrawer_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   repeated cosmos.base.v1beta1.Coin amount = 2 [
     (gogoproto.nullable) = false,

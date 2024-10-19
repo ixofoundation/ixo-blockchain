@@ -9,10 +9,10 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
-	nft "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types/contracts"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
+	nft "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types/contracts"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v4/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 type msgServer struct {

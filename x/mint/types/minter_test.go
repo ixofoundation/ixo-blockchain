@@ -4,8 +4,8 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ixofoundation/ixo-blockchain/v3/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
 	"github.com/stretchr/testify/require"
 )
 

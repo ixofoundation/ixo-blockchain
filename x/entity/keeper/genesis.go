@@ -2,7 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
 )
 
 // InitGenesis initializes the x/entity module's state from a provided genesis state.

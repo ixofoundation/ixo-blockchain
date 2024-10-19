@@ -3,8 +3,8 @@ package keeper
 import (
 	"fmt"
 
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"

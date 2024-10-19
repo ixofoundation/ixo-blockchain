@@ -3,7 +3,7 @@ package types
 import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 func (b Batch) MoreBuysThanSells() bool { return b.TotalSellAmount.IsLT(b.TotalBuyAmount) }

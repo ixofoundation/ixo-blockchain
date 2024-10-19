@@ -3,8 +3,8 @@ package types
 import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/ixo1155"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/token/types/contracts/ixo1155"
 )
 
 // IsValidToken tells if a Token is valid,

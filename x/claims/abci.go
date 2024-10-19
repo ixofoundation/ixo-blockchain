@@ -2,8 +2,8 @@ package claims
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
 )
 
 // NOTE: if performance becomes an issue, we can consider using a similar approach to cosmos sdk grants queue

@@ -12,9 +12,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
 	"github.com/spf13/cobra"
 )
 

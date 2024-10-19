@@ -2,8 +2,8 @@ package bonds
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types"
 )
 
 func EndBlocker(ctx sdk.Context, keeper keeper.Keeper) {

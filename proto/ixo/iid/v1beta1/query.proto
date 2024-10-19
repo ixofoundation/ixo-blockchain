@@ -6,7 +6,7 @@ import "ixo/iid/v1beta1/iid.proto";
 import "gogoproto/gogo.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types";
 
 // Query defines the gRPC querier service.
 service Query {

@@ -13,10 +13,10 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	smartaccountante "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/ante"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/authenticator"
-	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
+	smartaccountante "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/ante"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/authenticator"
+	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/types"
 )
 
 // AuthenticatorPostDecorator handles post-transaction tasks for smart accounts.

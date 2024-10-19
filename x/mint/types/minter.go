@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v4/ixomath"
 )
 
 var (

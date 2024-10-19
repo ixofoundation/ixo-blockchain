@@ -3,7 +3,7 @@ package util
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 // nolint:deprecated

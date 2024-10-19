@@ -4,7 +4,7 @@ package ixo.token.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/token/v1beta1/token.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/token/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/token/types";
 
 // GenesisState defines the module's genesis state.
 message GenesisState {
