@@ -540,6 +540,7 @@ func NewAppKeepers(
 		authenticator.NewPartitionedAnyOf(appKeepers.AuthenticatorManager),
 		authenticator.NewPartitionedAllOf(appKeepers.AuthenticatorManager),
 		authenticator.NewCosmwasmAuthenticator(appKeepers.ContractKeeper, appKeepers.AccountKeeper, appCodec),
+		authenticator.NewAuthnVerification(appKeepers.AccountKeeper),
 	})
 
 	smartAccountKeeper := smartaccountkeeper.NewKeeper(

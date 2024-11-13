@@ -3,8 +3,10 @@ package types
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	"github.com/cosmos/cosmos-sdk/types/tx"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/crypto"
 )
 
 // AuthenticatorTxOptions
@@ -22,6 +24,12 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		(*AuthenticatorTxOptions)(nil),
 		&TxExtension{},
 	)
+
+	registry.RegisterImplementations(
+		(*cryptotypes.PubKey)(nil),
+		&crypto.AuthnPubKey{},
+	)
+
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
 }
 

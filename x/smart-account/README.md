@@ -11,9 +11,9 @@ each with their own set of rules and conditions for transaction approval.
 
 ### Circuit Breaker
 
-The module is designed to be used as a replacement for the default Cosmos SDK authentication mechanism. This is 
+The module is designed to be used as a replacement for the default Cosmos SDK authentication mechanism. This is
 configured as an ante handler (executed before the transaction messages are processed). For safety, we have included
-a circuit breaker that allows the module to be disabled if necessary. Once the module is enabled, the user needs to 
+a circuit breaker that allows the module to be disabled if necessary. Once the module is enabled, the user needs to
 opt-in into using authenticators by selecting the authenticators it wants to use for each message. This is specified
 in the `selected_authenticators` field of the transaction extension. If selected_authenticators are not provided, the
 transaction defaults to the classic Cosmos SDK authentication method.
@@ -28,37 +28,37 @@ After passing the circuit breaker, if the transaction uses authenticators, the f
 
 The authenticator ante handler iterates over each message in the transaction. For each message, the following steps occur:
 
- * The message signer is selected as the "account" for this message. The authenticator for that account is selected based on the selected_authenticator provided in the tx
-    * Validation occurs to ensure that the selected authenticator is valid and that the account has the authenticator.
- * The selected authenticator attempts to authenticate the message by calling its Authenticate() function. 
-   * If authentication fails, the process stops and the transaction is rejected. No changes to state are made.
-   * If authentication succeeds, closure is generated for the message.
-     * This closure remembers which authenticator was used and will be called later if the whole tx (all messages) are authenticated. 
- * Fees for the transaction are collected
+- The message signer is selected as the "account" for this message. The authenticator for that account is selected based on the selected_authenticator provided in the tx
+  - Validation occurs to ensure that the selected authenticator is valid and that the account has the authenticator.
+- The selected authenticator attempts to authenticate the message by calling its Authenticate() function.
+  - If authentication fails, the process stops and the transaction is rejected. No changes to state are made.
+  - If authentication succeeds, closure is generated for the message.
+    - This closure remembers which authenticator was used and will be called later if the whole tx (all messages) are authenticated.
+- Fees for the transaction are collected
 
- After all messages are authenticated successfully:
+After all messages are authenticated successfully:
 
- * The Call Track() on all messages step is executed, notifying the authenticators involved.
- * If all track calls finish successfully, the changes are written to the data store.
+- The Call Track() on all messages step is executed, notifying the authenticators involved.
+- If all track calls finish successfully, the changes are written to the data store.
 
-The process then executes all the authenticated messages. If the transaction fails at this point, the execution 
+The process then executes all the authenticated messages. If the transaction fails at this point, the execution
 changes are discarded. Please note that the authenticator changes (committed in track) are not reverted!
 
 If the execution is successful, we continue in the post handler:
 
- * For each message, an account and authenticator are selected again.
- * The ConfirmExecution() function is called on the selected authenticator, allowing it to enforce post-execution rules.
-   * If ConfirmExecution() succeeds for all authenticators, the changes are written to the data store.
-   * If ConfirmExecution() fails for any authenticator, or if the "Execute All Messages" step fails, the changes are discarded.
+- For each message, an account and authenticator are selected again.
+- The ConfirmExecution() function is called on the selected authenticator, allowing it to enforce post-execution rules.
+  - If ConfirmExecution() succeeds for all authenticators, the changes are written to the data store.
+  - If ConfirmExecution() fails for any authenticator, or if the "Execute All Messages" step fails, the changes are discarded.
 
 ![Authenticator Flow](/x/smart-account/images/authentication_flow.jpg)
 
 ### Authenticator Implementations
 
-The implementation of each authenticator type is done by a Go struct that implements the `Authenticator` interface. 
-This interface defines the functions that need to be implemented and will be described in detail in the next section. 
+The implementation of each authenticator type is done by a Go struct that implements the `Authenticator` interface.
+This interface defines the functions that need to be implemented and will be described in detail in the next section.
 
-For authenticators to be available, they need to be registered with the `AuthenticatorManager`. This manager is 
+For authenticators to be available, they need to be registered with the `AuthenticatorManager`. This manager is
 responsible for retrieving authenticators by their unique type.
 
 ![Authenticator Implementations](/x/smart-account/images/authenticator_manager.jpg)
@@ -68,30 +68,28 @@ calling cosmwasm contracts to authenticate the messages.
 
 ### Authenticator configuration for accounts
 
-Accounts have the flexibility to be linked with multiple authenticators, a setup maintained in the system's storage 
-and managed by the module's Keeper. The keeper is responsible for adding and removing 
-authenticators, as well as storing any user data that the authenticators may need. 
+Accounts have the flexibility to be linked with multiple authenticators, a setup maintained in the system's storage
+and managed by the module's Keeper. The keeper is responsible for adding and removing
+authenticators, as well as storing any user data that the authenticators may need.
 
-This is where the association of specific authenticators with accounts is stored. 
+This is where the association of specific authenticators with accounts is stored.
 
 ![Account Authenticator Configuration](/x/smart-account/images/keeper.jpg)
 
-One way of seeing this data is as the instantiation information necessary to use the authenticator for a specific 
+One way of seeing this data is as the instantiation information necessary to use the authenticator for a specific
 account. For example, a `SignatureVerification` contains the code necessary to verify a signature, but
-it needs to know which public key to use when verifying it. An account can configure the 
-`SignatureVerification` to be one of their authenticators and would need to provide the public key it wants 
+it needs to know which public key to use when verifying it. An account can configure the
+`SignatureVerification` to be one of their authenticators and would need to provide the public key it wants
 to use for verification in the configuration data.
 
-
-To make an authenticator work for a specific account, you just need to feed it the right information. For example, 
-the `SignatureVerification` needs to know which public key to check when verifying a signature. 
-So, if you're setting this up for your account, you have to configure it with the public key you want as part of the 
+To make an authenticator work for a specific account, you just need to feed it the right information. For example,
+the `SignatureVerification` needs to know which public key to check when verifying a signature.
+So, if you're setting this up for your account, you have to configure it with the public key you want as part of the
 account-authenticator link.
 
-This is done by using the `MsgAddAuthenticator` message, which is covered in detail in a later section. When 
+This is done by using the `MsgAddAuthenticator` message, which is covered in detail in a later section. When
 authenticators are added to accounts, they should validate that the necessary data is available and correct in their
 `OnAuthenticatorAdded` function.
-
 
 ## Authenticator Interface
 
@@ -153,7 +151,7 @@ Provides the fixed gas amount that is consumed with each invocation of this auth
 
 #### `Initialize`
 
-Initializes the authenticator when retrieved from storage. It takes the stored config (e.g., PublicKey for signature 
+Initializes the authenticator when retrieved from storage. It takes the stored config (e.g., PublicKey for signature
 verification) as an argument to set up the authenticator.
 
 #### `Authenticate`
@@ -175,7 +173,7 @@ Used in post-handler functions to enforce transaction rules like spending and tr
 
 ## Authenticator Manager
 
-The authenticator manager allows the chain to register authenticators and retrieve them by type. Each authenticator 
+The authenticator manager allows the chain to register authenticators and retrieve them by type. Each authenticator
 type represents the code to be executed.
 
 To determine which authenticators will be used for each account, this module's keeper stores a mapping
@@ -245,7 +243,7 @@ The allOf authenticator allows you to specify a list of authenticators. All auth
 ### MessageFilter Authenticator
 
 The message filter authenticator allows you to match the incoming message against a message pattern specified in the
-authenticator configuration for the user. If the message matches the pattern, the message is authenticated. Otherwise, 
+authenticator configuration for the user. If the message matches the pattern, the message is authenticated. Otherwise,
 the message is rejected.
 
 #### Patterns
@@ -256,12 +254,12 @@ and recipient, the pattern would look like this:
 
 ```json
 {
-  "@type": "/cosmos.bank.v1beta1.MsgSend",
-  "amount": [
-    {
-      "denom": "uatom"
-    }
-  ]
+	"@type": "/cosmos.bank.v1beta1.MsgSend",
+	"amount": [
+		{
+			"denom": "uatom"
+		}
+	]
 }
 ```
 
@@ -272,11 +270,11 @@ Similarly, to match a `MsgSwapExactIn` message with a specific sender and token,
 
 ```json
 {
-   "@type":"/osmosis.poolmanager.v1beta1.MsgSwapExactAmountIn",
-   "sender":"osmo1...", 
-   "token_in":{
-      "denom":"inputDenom"
-   }
+	"@type": "/osmosis.poolmanager.v1beta1.MsgSwapExactAmountIn",
+	"sender": "osmo1...",
+	"token_in": {
+		"denom": "inputDenom"
+	}
 }
 ```
 
@@ -322,6 +320,12 @@ two messages are used to handle the addition and removal of the authenticator.
 
 Request types are defined [here](https://docs.rs/osmosis-authenticators/latest/osmosis_authenticators).
 
+### AuthnVerification Authenticator
+
+The authn verification authenticator enables users to authenticate transactions using **WebAuthn passkeys**, providing a secure, passwordless authentication mechanism based on public key cryptography.
+
+More about the authenticator can be read [here](README_authn_authenticator.md#authnverification-authenticator).
+
 ## Queries
 
 TODO: Add examples of queries and how to read them
@@ -335,7 +339,7 @@ TODO: Add examples of queries and how to read them
 ### Different authenticators for each message
 
 The classic cosmos sdk authentication authenticates the tx as a whole by verifying the signatures of each signer. This
-can be done because authentication logic is the same for all messages.  
+can be done because authentication logic is the same for all messages.
 This module allows for more fine-grained control over the authentication process, which means users can
 configure how messages for their account are authenticated. Because of this, on a multi-message transaction, each
 message will go through its own authentication process:
@@ -433,17 +437,17 @@ the sub-authenticator at position `j` will receive the id `a.i.j`.
 
 ### Confirm Execution call order
 
-The call logic on confirm execution behaves the same way as the call logic on authenticate and is stateless, i.e.: it 
-does not have any information about which authenticators were called during the authenticate call. 
+The call logic on confirm execution behaves the same way as the call logic on authenticate and is stateless, i.e.: it
+does not have any information about which authenticators were called during the authenticate call.
 
 This may lead to a situation where two authenticators inside an AnyOf (or a more complex composition logic) get called
 in a way that makes it so that after the transaction only one of the methods have been called on each.
 
-For example, if the user's authenticators are `AnyOf(A,B)`, you could have a case where Authenticate fails on A and 
+For example, if the user's authenticators are `AnyOf(A,B)`, you could have a case where Authenticate fails on A and
 succeeds on B, whereas ConfirmExecution succeeds on A. There will then never be a call to ConfirmExecution on B.
 
-This is the expected behaviour and authenticator authors should be aware that *there is no guarantee that both methods
-will be called on their authenticator*. There is a proposal to improve this in the future tracked in 
+This is the expected behaviour and authenticator authors should be aware that _there is no guarantee that both methods
+will be called on their authenticator_. There is a proposal to improve this in the future tracked in
 [#8373](https://github.com/osmosis-labs/osmosis/issues/8373)
 
 ### Composition Logic

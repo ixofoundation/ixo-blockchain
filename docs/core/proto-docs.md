@@ -343,6 +343,9 @@
   
     - [Query](#ixo.mint.v1beta1.Query)
   
+- [ixo/smartaccount/crypto/crypto.proto](#ixo/smartaccount/crypto/crypto.proto)
+    - [AuthnPubKey](#ixo.smartaccount.crypto.AuthnPubKey)
+  
 - [ixo/token/v1beta1/token.proto](#ixo/token/v1beta1/token.proto)
     - [Params](#ixo.token.v1beta1.Params)
     - [Token](#ixo.token.v1beta1.Token)
@@ -5277,6 +5280,40 @@ Query provides defines the gRPC querier service.
 | ----------- | ------------ | ------------- | ------------|
 | Params | [QueryParamsRequest](#ixo.mint.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.mint.v1beta1.QueryParamsResponse) | Params returns the total set of minting parameters. |
 | EpochProvisions | [QueryEpochProvisionsRequest](#ixo.mint.v1beta1.QueryEpochProvisionsRequest) | [QueryEpochProvisionsResponse](#ixo.mint.v1beta1.QueryEpochProvisionsResponse) | EpochProvisions returns the current minting epoch provisions value. |
+
+ 
+
+
+
+<a name="ixo/smartaccount/crypto/crypto.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/crypto/crypto.proto
+
+
+
+<a name="ixo.smartaccount.crypto.AuthnPubKey"></a>
+
+### AuthnPubKey
+PubKey defines an authn public key
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key_id | [string](#string) |  | The key_id (or credential ID) is a unique identifier for a passkey. This ID is provided by the authenticator when the passkey is created. As it is not possible to retrieve the public key from the authenticator after the passkey is created, if the user loses the public key - id association, the key_id can be used to retrieve the public key. |
+| cose_algorithm | [int32](#int32) |  | Store the COSE algorithm identifier. Since authn allows multiple different public key credential algorithm, eg. -7(ES256) - ECDSA with SHA-256 on the P-256 curve -257(RS256) - RSASSA-PKCS1-v1_5 with SHA-256 we need to store the algorithm identifier to be able to verify the signature according to the algorithm the public key is using. |
+| key | [bytes](#bytes) |  | The public key bytes |
+| relaying_party_id | [bytes](#bytes) |  | The relaying party id is the id of the relaying party against which the authn key pair is registered. We store it as binary of sha256 hash. |
+
+
+
+
+
+ 
+
+ 
+
+ 
 
  
 

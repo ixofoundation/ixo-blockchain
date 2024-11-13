@@ -13547,6 +13547,80 @@
       ]
     },
     {
+      "name": "ixo/smartaccount/crypto/crypto.proto",
+      "description": "",
+      "package": "ixo.smartaccount.crypto",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "AuthnPubKey",
+          "longName": "AuthnPubKey",
+          "fullName": "ixo.smartaccount.crypto.AuthnPubKey",
+          "description": "PubKey defines an authn public key",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key_id",
+              "description": "The key_id (or credential ID) is a unique identifier for a passkey.\nThis ID is provided by the authenticator when the passkey is created.\nAs it is not possible to retrieve the public key from the authenticator\nafter the passkey is created, if the user loses the public key - id\nassociation, the key_id can be used to retrieve the public key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cose_algorithm",
+              "description": "Store the COSE algorithm identifier. Since authn allows multiple different\npublic key credential algorithm, eg.\n-7(ES256) - ECDSA with SHA-256 on the P-256 curve\n-257(RS256) - RSASSA-PKCS1-v1_5 with SHA-256\nwe need to store the algorithm identifier to be able to verify the\nsignature according to the algorithm the public key is using.",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "key",
+              "description": "The public key bytes",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "relaying_party_id",
+              "description": "The relaying party id is the id of the relaying party against which the\nauthn key pair is registered. We store it as binary of sha256 hash.",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "ixo/token/v1beta1/token.proto",
       "description": "",
       "package": "ixo.token.v1beta1",
