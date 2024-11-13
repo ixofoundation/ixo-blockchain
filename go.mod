@@ -1,6 +1,6 @@
 module github.com/ixofoundation/ixo-blockchain/v4
 
-go 1.22.3
+go 1.22.4
 
 require (
 	cosmossdk.io/api v0.7.6
