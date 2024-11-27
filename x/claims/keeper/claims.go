@@ -8,8 +8,8 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/cw20"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/token/types/contracts/cw20"
 )
 
 func (k Keeper) SetCollection(ctx sdk.Context, data types.Collection) {

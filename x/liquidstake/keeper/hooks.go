@@ -2,8 +2,8 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/liquidstake/types"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/types"
 )
 
 // AfterEpochEnd is a hook which is executed after the end of an epoch. It is a no-op for liquidstake module.

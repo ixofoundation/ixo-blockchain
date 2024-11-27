@@ -14,14 +14,14 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/cosmos/gogoproto/proto"
 	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types"
-	claimstypes "github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
-	epochtypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
-	minttypes "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/v3/x/token/types"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types"
+	claimstypes "github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
+	epochtypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/types"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v4/x/token/types"
 )
 
 // stargateResponsePools keeps whitelist and its deterministic

@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/crypto"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/crypto"
 )
 
 // Ensure AuthnVerification implements the Authenticator interface

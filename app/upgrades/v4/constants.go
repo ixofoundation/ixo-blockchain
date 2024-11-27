@@ -8,11 +8,11 @@ import (
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	cosmosminttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
-	"github.com/ixofoundation/ixo-blockchain/v3/app/upgrades"
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
-	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v3/x/liquidstake/types"
-	minttypes "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/app/upgrades"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/types"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/types"
 )
 
 // TODO: need details below!!

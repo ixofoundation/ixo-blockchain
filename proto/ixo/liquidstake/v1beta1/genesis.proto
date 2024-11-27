@@ -4,7 +4,7 @@ package ixo.liquidstake.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/liquidstake/v1beta1/liquidstake.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/liquidstake/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/types";
 
 // GenesisState defines the liquidstake module's genesis state.
 message GenesisState {

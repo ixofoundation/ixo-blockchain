@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/bonds/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types";
 
 // FunctionParam is a key-value pair used for specifying a specific bond
 // parameter.
@@ -39,11 +39,11 @@ message Bond {
   string description = 3;
   string creator_did = 4 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string controller_did = 5 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   string function_type = 6;
   repeated FunctionParam function_parameters = 7 [
@@ -108,7 +108,7 @@ message Bond {
   string bond_did = 27;
   string oracle_did = 28 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
 }
 
@@ -117,7 +117,7 @@ message Bond {
 message BaseOrder {
   string account_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
   ];
   cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
   bool cancelled = 3;

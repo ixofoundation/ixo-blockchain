@@ -7,10 +7,10 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v3/lib/ixo"
-	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
 type msgServer struct {

@@ -5,9 +5,9 @@ import (
 	"os"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/ixofoundation/ixo-blockchain/v3/app"
-	"github.com/ixofoundation/ixo-blockchain/v3/app/params"
-	"github.com/ixofoundation/ixo-blockchain/v3/cmd/ixod/cmd"
+	"github.com/ixofoundation/ixo-blockchain/v4/app"
+	"github.com/ixofoundation/ixo-blockchain/v4/app/params"
+	"github.com/ixofoundation/ixo-blockchain/v4/cmd/ixod/cmd"
 )
 
 func main() {
