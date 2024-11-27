@@ -30,7 +30,10 @@ func (k Keeper) GetEntity(ctx sdk.Context, key []byte) (types.Entity, bool) {
 
 func (k Keeper) UnmarshalEntity(value []byte) (interface{}, bool) {
 	data := types.Entity{}
-	k.Unmarshal(value, &data)
+	unmarshalled := k.Unmarshal(value, &data)
+	if !unmarshalled {
+		return types.Entity{}, false
+	}
 	return data, types.IsValidEntity(&data)
 }
 

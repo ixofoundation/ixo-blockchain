@@ -9,6 +9,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/ixofoundation/ixo-blockchain/v4/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
 )
 
@@ -64,7 +65,7 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	}
 
 	// get entity admin account
-	admin, err := entity.GetAdminAccount()
+	admin, err := entity.GetEntityAccountByName(entitytypes.EntityAdminAccountName)
 	if err != nil {
 		return nil, errorsmod.Wrapf(err, "for admin")
 	}
@@ -79,7 +80,7 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 	collection := types.Collection{
 		Id:          fmt.Sprint(collectionSequence),
 		Entity:      msg.Entity,
-		Admin:       admin.Address,
+		Admin:       admin,
 		Protocol:    msg.Protocol,
 		StartDate:   msg.StartDate,
 		EndDate:     msg.EndDate,

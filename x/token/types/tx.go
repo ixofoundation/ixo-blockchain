@@ -58,6 +58,17 @@ func (msg MsgRetireToken) Type() string { return TypeMsgRetireToken }
 func (msg MsgRetireToken) Route() string { return RouterKey }
 
 // --------------------------
+// RETIRE TOKEN
+// --------------------------
+const TypeMsgTransferCredit = "transfer_credit"
+
+var _ sdk.Msg = &MsgTransferCredit{}
+
+func (msg MsgTransferCredit) Type() string { return TypeMsgTransferCredit }
+
+func (msg MsgTransferCredit) Route() string { return RouterKey }
+
+// --------------------------
 // CANCEL TOKEN
 // --------------------------
 const TypeMsgCancelToken = "cancel_token"

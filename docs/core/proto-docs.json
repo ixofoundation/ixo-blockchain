@@ -13118,6 +13118,1462 @@
       ]
     },
     {
+      "name": "ixo/liquidstake/v1beta1/liquidstake.proto",
+      "description": "",
+      "package": "ixo.liquidstake.v1beta1",
+      "hasEnums": true,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [
+        {
+          "name": "ValidatorStatus",
+          "longName": "ValidatorStatus",
+          "fullName": "ixo.liquidstake.v1beta1.ValidatorStatus",
+          "description": "ValidatorStatus enumerates the status of a liquid validator.",
+          "values": [
+            {
+              "name": "VALIDATOR_STATUS_UNSPECIFIED",
+              "number": "0",
+              "description": "VALIDATOR_STATUS_UNSPECIFIED defines the unspecified invalid status."
+            },
+            {
+              "name": "VALIDATOR_STATUS_ACTIVE",
+              "number": "1",
+              "description": "VALIDATOR_STATUS_ACTIVE defines the active, valid status"
+            },
+            {
+              "name": "VALIDATOR_STATUS_INACTIVE",
+              "number": "2",
+              "description": "VALIDATOR_STATUS_INACTIVE defines the inactive, invalid status"
+            }
+          ]
+        }
+      ],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "LiquidValidator",
+          "longName": "LiquidValidator",
+          "fullName": "ixo.liquidstake.v1beta1.LiquidValidator",
+          "description": "LiquidValidator defines a Validator that can be the target of LiquidStaking\nand LiquidUnstaking, Active, Weight, etc. fields are derived as functions to\ndeal with by maintaining consistency with the state of the staking module.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "operator_address",
+              "description": "operator_address defines the address of the validator's operator; bech\nencoded in JSON.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LiquidValidatorState",
+          "longName": "LiquidValidatorState",
+          "fullName": "ixo.liquidstake.v1beta1.LiquidValidatorState",
+          "description": "LiquidValidatorState is type LiquidValidator with state added to return to\nquery results.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "operator_address",
+              "description": "operator_address defines the address of the validator's operator; bech\nencoded in JSON.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "weight",
+              "description": "weight specifies the weight for liquid staking, unstaking amount",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "status is the liquid validator status",
+              "label": "",
+              "type": "ValidatorStatus",
+              "longType": "ValidatorStatus",
+              "fullType": "ixo.liquidstake.v1beta1.ValidatorStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "del_shares",
+              "description": "del_shares define the delegation shares of the validator",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "liquid_tokens",
+              "description": "liquid_tokens define the token amount worth of delegation shares of the\nvalidator (slashing applied amount)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NetAmountState",
+          "longName": "NetAmountState",
+          "fullName": "ixo.liquidstake.v1beta1.NetAmountState",
+          "description": "NetAmountState is type for net amount raw data and mint rate, This is a value\nthat depends on the several module state every time, so it is used only for\ncalculation and query and is not stored in kv.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "stake_rate",
+              "description": "stake_rate is the rate at which the liquid staking module mints stkIXO",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unstake_rate",
+              "description": "unstake_rate is the rate at which the liquid staking module burns stkIXO",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "stkixo_total_supply",
+              "description": "btoken_total_supply returns the total supply of uzero (stkIXO denom)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "net_amount",
+              "description": "net_amount is proxy account's total liquid tokens + total unbonding balance",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "total_del_shares",
+              "description": "total_del_shares define the delegation shares of all liquid validators",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "total_liquid_tokens",
+              "description": "total_liquid_tokens define the token amount worth of delegation shares of\nall liquid validator (slashing applied amount)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "total_remaining_rewards",
+              "description": "total_remaining_rewards define the sum of remaining rewards of proxy\naccount by all liquid validators",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "total_unbonding_balance",
+              "description": "total_unbonding_balance define the unbonding balance of proxy account by\nall liquid validator (slashing applied amount)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "proxy_acc_balance",
+              "description": "proxy_acc_balance define the balance of proxy account for the native token",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Params",
+          "longName": "Params",
+          "fullName": "ixo.liquidstake.v1beta1.Params",
+          "description": "Params defines the set of params for the liquidstake module.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "liquid_bond_denom",
+              "description": "LiquidBondDenom specifies the denomination of the token receiving after\nliquid stake, The value is calculated through NetAmount.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "whitelisted_validators",
+              "description": "WhitelistedValidators specifies the validators elected to become Active\nLiquid Validators.",
+              "label": "repeated",
+              "type": "WhitelistedValidator",
+              "longType": "WhitelistedValidator",
+              "fullType": "ixo.liquidstake.v1beta1.WhitelistedValidator",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unstake_fee_rate",
+              "description": "UnstakeFeeRate specifies the fee rate when liquid unstake is requested,\nunbonded by subtracting it from unbondingAmount",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_liquid_stake_amount",
+              "description": "MinLiquidStakingAmount specifies the minimum number of coins to be staked\nto the active liquid validators on liquid staking to minimize decimal loss\nand consider gas efficiency.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "fee_account_address",
+              "description": "FeeAccountAddress defines the bech32-encoded address of\nan account responsible for accumulating protocol fees.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "autocompound_fee_rate",
+              "description": "AutocompoundFeeRate specifies the fee rate for auto redelegating the stake\nrewards. The fee is taken in favour of the fee account (see\nFeeAccountAddress).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "whitelist_admin_address",
+              "description": "WhitelistAdminAddress the bech32-encoded address of an admin authority\nthat is allowed to update whitelisted validators or pause liquidstaking\nmodule entirely. It is also the only address that can update the\nweighted_rewards_receivers.\nThe key is controlled by the ZERO dao.\nPausing of the module can be required during important migrations or\nfailures.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "module_paused",
+              "description": "ModulePaused is a safety toggle that allows to stop main module functions\nsuch as stake/unstake/stake-to-lp and the BeginBlocker logic.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "weighted_rewards_receivers",
+              "description": "weighted_rewards_receivers is the addresses to receive the staking\nrewards on autocompounding with weights assigned to each address.\nThe total of weights in the list in not allowed to be greater than 1.\n\nEg. if the list has 1 address with weight 0.2, then on autocompounding\nthe staking rewards will be split between 0.2 for the weighted receiver\nand 0.8 gets auto-compounded to the proxy account.",
+              "label": "repeated",
+              "type": "WeightedAddress",
+              "longType": "WeightedAddress",
+              "fullType": "ixo.liquidstake.v1beta1.WeightedAddress",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "WeightedAddress",
+          "longName": "WeightedAddress",
+          "fullName": "ixo.liquidstake.v1beta1.WeightedAddress",
+          "description": "WeightedAddress represents an address with a weight assigned to it.\nThe weight is used to determine the proportion of autocompounding\nrewards to be paid to the address.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "weight",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "WhitelistedValidator",
+          "longName": "WhitelistedValidator",
+          "fullName": "ixo.liquidstake.v1beta1.WhitelistedValidator",
+          "description": "WhitelistedValidator consists of the validator operator address and the\ntarget weight, which is a value for calculating the real weight to be derived\naccording to the active status.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "validator_address",
+              "description": "validator_address defines the bech32-encoded address of the whitelisted\nvalidator",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "target_weight",
+              "description": "target_weight specifies the target weight for liquid staking, unstaking\namount, which is a value for calculating the real weight to be derived\naccording to the active status",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/liquidstake/v1beta1/event.proto",
+      "description": "",
+      "package": "ixo.liquidstake.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "AddLiquidValidatorEvent",
+          "longName": "AddLiquidValidatorEvent",
+          "fullName": "ixo.liquidstake.v1beta1.AddLiquidValidatorEvent",
+          "description": "LiquidRedelegateEvent is triggered when a liquid validator is added.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "validator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AutocompoundStakingRewardsEvent",
+          "longName": "AutocompoundStakingRewardsEvent",
+          "fullName": "ixo.liquidstake.v1beta1.AutocompoundStakingRewardsEvent",
+          "description": "AutocompoundEvent is triggered after a epoch is triggered for autocompound.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "delegator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "total_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "fee_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "redelegate_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "weighted_rewards_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LiquidStakeEvent",
+          "longName": "LiquidStakeEvent",
+          "fullName": "ixo.liquidstake.v1beta1.LiquidStakeEvent",
+          "description": "LiquidStakeEvent is triggered when a liquid stake is performed.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "delegator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "liquid_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "stk_ixo_minted_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LiquidStakeParamsUpdatedEvent",
+          "longName": "LiquidStakeParamsUpdatedEvent",
+          "fullName": "ixo.liquidstake.v1beta1.LiquidStakeParamsUpdatedEvent",
+          "description": "LiquidStakeParamsUpdatedEvent is triggered when a the Params is updated.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authority",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "LiquidUnstakeEvent",
+          "longName": "LiquidUnstakeEvent",
+          "fullName": "ixo.liquidstake.v1beta1.LiquidUnstakeEvent",
+          "description": "LiquidUnstakeEvent is triggered when a liquid unstake is performed.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "delegator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unstake_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unbonding_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unbonded_amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "completion_time",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RebalancedLiquidStakeEvent",
+          "longName": "RebalancedLiquidStakeEvent",
+          "fullName": "ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent",
+          "description": "RebalancedEvent is triggered after a rebalance is performed.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "delegator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "redelegation_count",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "redelegation_fail_count",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/liquidstake/v1beta1/genesis.proto",
+      "description": "",
+      "package": "ixo.liquidstake.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GenesisState",
+          "longName": "GenesisState",
+          "fullName": "ixo.liquidstake.v1beta1.GenesisState",
+          "description": "GenesisState defines the liquidstake module's genesis state.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "liquid_validators",
+              "description": "",
+              "label": "repeated",
+              "type": "LiquidValidator",
+              "longType": "LiquidValidator",
+              "fullType": "ixo.liquidstake.v1beta1.LiquidValidator",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/liquidstake/v1beta1/query.proto",
+      "description": "",
+      "package": "ixo.liquidstake.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "QueryLiquidValidatorsRequest",
+          "longName": "QueryLiquidValidatorsRequest",
+          "fullName": "ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryLiquidValidatorsResponse",
+          "longName": "QueryLiquidValidatorsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "liquid_validators",
+              "description": "",
+              "label": "repeated",
+              "type": "LiquidValidatorState",
+              "longType": "LiquidValidatorState",
+              "fullType": "ixo.liquidstake.v1beta1.LiquidValidatorState",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryParamsRequest",
+          "longName": "QueryParamsRequest",
+          "fullName": "ixo.liquidstake.v1beta1.QueryParamsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryParamsResponse",
+          "longName": "QueryParamsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.QueryParamsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "params",
+              "description": "",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryStatesRequest",
+          "longName": "QueryStatesRequest",
+          "fullName": "ixo.liquidstake.v1beta1.QueryStatesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "QueryStatesResponse",
+          "longName": "QueryStatesResponse",
+          "fullName": "ixo.liquidstake.v1beta1.QueryStatesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "net_amount_state",
+              "description": "",
+              "label": "",
+              "type": "NetAmountState",
+              "longType": "NetAmountState",
+              "fullType": "ixo.liquidstake.v1beta1.NetAmountState",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Query",
+          "longName": "Query",
+          "fullName": "ixo.liquidstake.v1beta1.Query",
+          "description": "Query defines the gRPC query service for the liquidstake module.",
+          "methods": [
+            {
+              "name": "Params",
+              "description": "Params returns parameters of the liquidstake module.",
+              "requestType": "QueryParamsRequest",
+              "requestLongType": "QueryParamsRequest",
+              "requestFullType": "ixo.liquidstake.v1beta1.QueryParamsRequest",
+              "requestStreaming": false,
+              "responseType": "QueryParamsResponse",
+              "responseLongType": "QueryParamsResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.QueryParamsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/liquidstake/v1beta1/params"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "LiquidValidators",
+              "description": "LiquidValidators returns liquid validators with states of the liquidstake\nmodule.",
+              "requestType": "QueryLiquidValidatorsRequest",
+              "requestLongType": "QueryLiquidValidatorsRequest",
+              "requestFullType": "ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest",
+              "requestStreaming": false,
+              "responseType": "QueryLiquidValidatorsResponse",
+              "responseLongType": "QueryLiquidValidatorsResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/liquidstake/v1beta1/validators"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "States",
+              "description": "States returns states of the liquidstake module.",
+              "requestType": "QueryStatesRequest",
+              "requestLongType": "QueryStatesRequest",
+              "requestFullType": "ixo.liquidstake.v1beta1.QueryStatesRequest",
+              "requestStreaming": false,
+              "responseType": "QueryStatesResponse",
+              "responseLongType": "QueryStatesResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.QueryStatesResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/liquidstake/v1beta1/states"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ixo/liquidstake/v1beta1/tx.proto",
+      "description": "",
+      "package": "ixo.liquidstake.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MsgLiquidStake",
+          "longName": "MsgLiquidStake",
+          "fullName": "ixo.liquidstake.v1beta1.MsgLiquidStake",
+          "description": "MsgLiquidStake defines a SDK message for performing a liquid stake of coins\nfrom a delegator to whitelisted validators.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "delegator_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgLiquidStakeResponse",
+          "longName": "MsgLiquidStakeResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgLiquidStakeResponse",
+          "description": "MsgLiquidStakeResponse defines the MsgLiquidStake response type.",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgLiquidUnstake",
+          "longName": "MsgLiquidUnstake",
+          "fullName": "ixo.liquidstake.v1beta1.MsgLiquidUnstake",
+          "description": "MsgLiquidUnstake defines a SDK message for performing an undelegation of\nliquid staking from a delegate.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "delegator_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgLiquidUnstakeResponse",
+          "longName": "MsgLiquidUnstakeResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse",
+          "description": "MsgLiquidUnstakeResponse defines the MsgLiquidUnstake response type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "completion_time",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgSetModulePaused",
+          "longName": "MsgSetModulePaused",
+          "fullName": "ixo.liquidstake.v1beta1.MsgSetModulePaused",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "Authority is the address that is allowed to update module's paused state,\ndefined as admin address in params (WhitelistAdminAddress).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "is_paused",
+              "description": "IsPaused represents the target state of the paused flag.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgSetModulePausedResponse",
+          "longName": "MsgSetModulePausedResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgSetModulePausedResponse",
+          "description": "MsgSetModulePausedResponse defines the response structure for\nexecuting a",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateParams",
+          "longName": "MsgUpdateParams",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateParams",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "authority is the address that controls the module (defaults to x/gov unless\noverwritten).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "params",
+              "description": "params defines the parameters to update.\nNOTE: denom and whitelisted_validators and weighted_rewards_receivers are\nnot updated.",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateParamsResponse",
+          "longName": "MsgUpdateParamsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateParamsResponse",
+          "description": "MsgUpdateParamsResponse defines the response structure for executing a",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateWeightedRewardsReceivers",
+          "longName": "MsgUpdateWeightedRewardsReceivers",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "Authority is the address that is allowed to update wieghted rewards\nreceivers, defined as admin address in params (WhitelistAdminAddress).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "weighted_rewards_receivers",
+              "description": "WhitelistedValidators specifies the validators elected to become Active\nLiquid Validators.",
+              "label": "repeated",
+              "type": "WeightedAddress",
+              "longType": "WeightedAddress",
+              "fullType": "ixo.liquidstake.v1beta1.WeightedAddress",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateWeightedRewardsReceiversResponse",
+          "longName": "MsgUpdateWeightedRewardsReceiversResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse",
+          "description": "MsgUpdateWeightedRewardsReceiversResponse defines the response structure for\nexecuting a",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateWhitelistedValidators",
+          "longName": "MsgUpdateWhitelistedValidators",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "Authority is the address that is allowed to update whitelisted validators,\ndefined as admin address in params (WhitelistAdminAddress).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "whitelisted_validators",
+              "description": "WhitelistedValidators specifies the validators elected to become Active\nLiquid Validators.",
+              "label": "repeated",
+              "type": "WhitelistedValidator",
+              "longType": "WhitelistedValidator",
+              "fullType": "ixo.liquidstake.v1beta1.WhitelistedValidator",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateWhitelistedValidatorsResponse",
+          "longName": "MsgUpdateWhitelistedValidatorsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse",
+          "description": "MsgUpdateWhitelistedValidatorsResponse defines the response structure for\nexecuting a",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        }
+      ],
+      "services": [
+        {
+          "name": "Msg",
+          "longName": "Msg",
+          "fullName": "ixo.liquidstake.v1beta1.Msg",
+          "description": "Msg defines the liquid staking Msg service.",
+          "methods": [
+            {
+              "name": "LiquidStake",
+              "description": "LiquidStake defines a method for performing a delegation of coins\nfrom a delegator to whitelisted validators.",
+              "requestType": "MsgLiquidStake",
+              "requestLongType": "MsgLiquidStake",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgLiquidStake",
+              "requestStreaming": false,
+              "responseType": "MsgLiquidStakeResponse",
+              "responseLongType": "MsgLiquidStakeResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgLiquidStakeResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "LiquidUnstake",
+              "description": "LiquidUnstake defines a method for performing an undelegation of liquid\nstaking from a delegate.",
+              "requestType": "MsgLiquidUnstake",
+              "requestLongType": "MsgLiquidUnstake",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgLiquidUnstake",
+              "requestStreaming": false,
+              "responseType": "MsgLiquidUnstakeResponse",
+              "responseLongType": "MsgLiquidUnstakeResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateParams",
+              "description": "UpdateParams defines a method to update the module params.",
+              "requestType": "MsgUpdateParams",
+              "requestLongType": "MsgUpdateParams",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdateParams",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateParamsResponse",
+              "responseLongType": "MsgUpdateParamsResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgUpdateParamsResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateWhitelistedValidators",
+              "description": "UpdateWhitelistedValidators defines a method to update the whitelisted\nvalidators list.",
+              "requestType": "MsgUpdateWhitelistedValidators",
+              "requestLongType": "MsgUpdateWhitelistedValidators",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateWhitelistedValidatorsResponse",
+              "responseLongType": "MsgUpdateWhitelistedValidatorsResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateWeightedRewardsReceivers",
+              "description": "UpdateWhitelistedValidators defines a method to update the whitelisted\nvalidators list. Only the whitelist admin address can update this list.",
+              "requestType": "MsgUpdateWeightedRewardsReceivers",
+              "requestLongType": "MsgUpdateWeightedRewardsReceivers",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateWeightedRewardsReceiversResponse",
+              "responseLongType": "MsgUpdateWeightedRewardsReceiversResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "SetModulePaused",
+              "description": "SetModulePaused  defines a method to update the module's pause status,\nsetting value of the safety flag in params.",
+              "requestType": "MsgSetModulePaused",
+              "requestLongType": "MsgSetModulePaused",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgSetModulePaused",
+              "requestStreaming": false,
+              "responseType": "MsgSetModulePausedResponse",
+              "responseLongType": "MsgSetModulePausedResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgSetModulePausedResponse",
+              "responseStreaming": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ixo/mint/v1beta1/event.proto",
+      "description": "",
+      "package": "ixo.mint.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MintEpochProvisionsMintedEvent",
+          "longName": "MintEpochProvisionsMintedEvent",
+          "fullName": "ixo.mint.v1beta1.MintEpochProvisionsMintedEvent",
+          "description": "MintEpochProvisionsMintedEvent is triggered after a epoch is triggered\nminting module for inflation.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "epoch_number",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "epoch_provisions",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "ixo/mint/v1beta1/mint.proto",
       "description": "",
       "package": "ixo.mint.v1beta1",
@@ -13547,6 +15003,68 @@
       ]
     },
     {
+      "name": "ixo/smartaccount/crypto/crypto.proto",
+      "description": "",
+      "package": "ixo.smartaccount.crypto",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "AuthnPubKey",
+          "longName": "AuthnPubKey",
+          "fullName": "ixo.smartaccount.crypto.AuthnPubKey",
+          "description": "PubKey defines an authn public key",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "key_id",
+              "description": "The key_id (or credential ID) is a unique identifier for a passkey.\nThis ID is provided by the authenticator when the passkey is created.\nAs it is not possible to retrieve the public key from the authenticator\nafter the passkey is created, if the user loses the public key - id\nassociation, the key_id can be used to retrieve the public key.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cose_algorithm",
+              "description": "Store the COSE algorithm identifier. Since authn allows multiple different\npublic key credential algorithm, eg.\n-7(ES256) - ECDSA with SHA-256 on the P-256 curve\n-257(RS256) - RSASSA-PKCS1-v1_5 with SHA-256\nwe need to store the algorithm identifier to be able to verify the\nsignature according to the algorithm the public key is using.",
+              "label": "",
+              "type": "int32",
+              "longType": "int32",
+              "fullType": "int32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "key",
+              "description": "The public key bytes",
+              "label": "",
+              "type": "bytes",
+              "longType": "bytes",
+              "fullType": "bytes",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
       "name": "ixo/token/v1beta1/token.proto",
       "description": "",
       "package": "ixo.token.v1beta1",
@@ -13557,6 +15075,90 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "CreditsTransferred",
+          "longName": "CreditsTransferred",
+          "fullName": "ixo.token.v1beta1.CreditsTransferred",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "jurisdiction",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authorization_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "Params",
           "longName": "Params",
@@ -13742,6 +15344,18 @@
               "type": "TokensCancelled",
               "longType": "TokensCancelled",
               "fullType": "ixo.token.v1beta1.TokensCancelled",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "transferred",
+              "description": "credits that has been transferred for this Token with specific name and\ncontract address",
+              "label": "repeated",
+              "type": "CreditsTransferred",
+              "longType": "CreditsTransferred",
+              "fullType": "ixo.token.v1beta1.CreditsTransferred",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -14526,6 +16140,89 @@
           "fields": []
         },
         {
+          "name": "MsgTransferCredit",
+          "longName": "MsgTransferCredit",
+          "fullName": "ixo.token.v1beta1.MsgTransferCredit",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "address of owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "tokens to retire, all tokens must be in same smart contract",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "jurisdiction",
+              "description": "jurisdiction is the jurisdiction of the token owner. A jurisdiction has\nthe format: \u003ccountry-code\u003e[-\u003csub-national-code\u003e[ \u003cpostal-code\u003e]]\nThe country-code must be 2 alphabetic characters, the sub-national-code\ncan be 1-3 alphanumeric characters, and the postal-code can be up to 64\nalphanumeric characters. Only the country-code is required, while the\nsub-national-code and postal-code are optional and can be added for\nincreased precision. See the valid format for this below.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "reason is any arbitrary string that specifies the reason for retiring\ntokens.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authorization_id",
+              "description": "authorization_id is the id of the authorization that was used for the\ncredit transfer",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgTransferCreditResponse",
+          "longName": "MsgTransferCreditResponse",
+          "fullName": "ixo.token.v1beta1.MsgTransferCreditResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
           "name": "MsgTransferToken",
           "longName": "MsgTransferToken",
           "fullName": "ixo.token.v1beta1.MsgTransferToken",
@@ -14674,6 +16371,18 @@
               "responseType": "MsgRetireTokenResponse",
               "responseLongType": "MsgRetireTokenResponse",
               "responseFullType": "ixo.token.v1beta1.MsgRetireTokenResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "TransferCredit",
+              "description": "",
+              "requestType": "MsgTransferCredit",
+              "requestLongType": "MsgTransferCredit",
+              "requestFullType": "ixo.token.v1beta1.MsgTransferCredit",
+              "requestStreaming": false,
+              "responseType": "MsgTransferCreditResponse",
+              "responseLongType": "MsgTransferCreditResponse",
+              "responseFullType": "ixo.token.v1beta1.MsgTransferCreditResponse",
               "responseStreaming": false
             },
             {
@@ -15711,6 +17420,42 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "CreditsTransferredEvent",
+          "longName": "CreditsTransferredEvent",
+          "fullName": "ixo.token.v1beta1.CreditsTransferredEvent",
+          "description": "CreditsTransferredEvent is an event triggered on a Credit transfer\nexecution",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner",
+              "description": "the token owner",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "",
+              "label": "repeated",
+              "type": "TokenBatch",
+              "longType": "TokenBatch",
+              "fullType": "ixo.token.v1beta1.TokenBatch",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "TokenCancelledEvent",
           "longName": "TokenCancelledEvent",

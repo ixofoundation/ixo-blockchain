@@ -216,11 +216,18 @@ require (
 )
 
 replace (
+	// Use version with lsm changes
+	cosmossdk.io/api => github.com/informalsystems/cosmos-sdk/api v0.7.5-lsm
+
 	// TODO(https://github.com/cosmos/rosetta/issues/76): Rosetta requires cosmossdk.io/core v0.12.0 erroneously but
 	// should use v0.11.0. The Cosmos build fails with types/context.go:65:29: undefined: comet.BlockInfo otherwise.
 	cosmossdk.io/core => cosmossdk.io/core v0.11.0
+
 	// Use cosmos keyring
 	github.com/99designs/keyring => github.com/cosmos/keyring v1.2.0
+
+	// Use special SDK v0.50.x release with support for both ICS and LSM
+	github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.50.10-lsm
 
 	github.com/cosmos/ibc-apps/modules/ibc-hooks/v8 => github.com/public-awesome/ibc-apps/modules/ibc-hooks/v8 v8.0.0-20240112154558-ac156266345d
 

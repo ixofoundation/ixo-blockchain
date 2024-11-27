@@ -324,3 +324,7 @@ func CreateNewCollectionEscrow(ctx sdk.Context, accKeeper AccountKeeper, collect
 
 	return account.GetAddress(), nil
 }
+
+// func CreateNewEntityAccountAndEmitEvents(ctx sdk.Context, entityKeeper EntityKeeper, entityId string) (sdk.AccAddress, error) {
+
+// }

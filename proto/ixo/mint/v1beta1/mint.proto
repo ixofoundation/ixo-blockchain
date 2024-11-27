@@ -13,7 +13,6 @@ message Minter {
   // epoch_provisions represent rewards for the current epoch.
   string epoch_provisions = 1 [
     (gogoproto.moretags) = "yaml:\"epoch_provisions\"",
-
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
@@ -38,7 +37,6 @@ message DistributionProportions {
   // staking defines the proportion of the minted mint_denom that is to be
   // allocated as staking rewards.
   string staking = 1 [
-
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.moretags) = "yaml:\"staking\"",
     (gogoproto.nullable) = false
@@ -46,7 +44,6 @@ message DistributionProportions {
   // impact_rewards defines the proportion of the minted mint_denom that is
   // to be allocated to impact rewards addresses.
   string impact_rewards = 3 [
-
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.moretags) = "yaml:\"impact_rewards\"",
     (gogoproto.nullable) = false
@@ -54,7 +51,6 @@ message DistributionProportions {
   // community_pool defines the proportion of the minted mint_denom that is
   // to be allocated to the community pool.
   string community_pool = 4 [
-
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.moretags) = "yaml:\"community_pool\"",
     (gogoproto.nullable) = false
@@ -70,7 +66,6 @@ message Params {
   // genesis_epoch_provisions epoch provisions from the first epoch.
   string genesis_epoch_provisions = 2 [
     (gogoproto.moretags) = "yaml:\"genesis_epoch_provisions\"",
-
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];

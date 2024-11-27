@@ -91,6 +91,8 @@ import (
 	epochstypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
 	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/v4/x/iid/keeper"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	liquidstakekeeper "github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/keeper"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/types"
 	mintkeeper "github.com/ixofoundation/ixo-blockchain/v4/x/mint/keeper"
 	minttypes "github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
 	"github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/authenticator"
@@ -147,6 +149,7 @@ type AppKeepers struct {
 	AuthenticatorManager *authenticator.AuthenticatorManager
 	EpochsKeeper         *epochskeeper.Keeper
 	MintKeeper           *mintkeeper.Keeper
+	LiquidStakeKeeper    liquidstakekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
@@ -540,6 +543,7 @@ func NewAppKeepers(
 		authenticator.NewPartitionedAnyOf(appKeepers.AuthenticatorManager),
 		authenticator.NewPartitionedAllOf(appKeepers.AuthenticatorManager),
 		authenticator.NewCosmwasmAuthenticator(appKeepers.ContractKeeper, appKeepers.AccountKeeper, appCodec),
+		authenticator.NewAuthnVerification(appKeepers.AccountKeeper),
 	})
 
 	smartAccountKeeper := smartaccountkeeper.NewKeeper(
@@ -550,6 +554,18 @@ func NewAppKeepers(
 		appKeepers.AuthenticatorManager,
 	)
 	appKeepers.SmartAccountKeeper = &smartAccountKeeper
+
+	appKeepers.LiquidStakeKeeper = liquidstakekeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[liquidstaketypes.StoreKey],
+		appKeepers.AccountKeeper,
+		appKeepers.BankKeeper,
+		appKeepers.StakingKeeper,
+		appKeepers.DistrKeeper,
+		appKeepers.SlashingKeeper,
+		bApp.MsgServiceRouter(),
+		govModAddress,
+	)
 
 	// GOV Keeper
 	// =============================
@@ -663,6 +679,7 @@ func (appKeepers *AppKeepers) SetupHooks() {
 		epochstypes.NewMultiEpochHooks(
 			// insert epoch hooks receivers here
 			appKeepers.MintKeeper.Hooks(),
+			appKeepers.LiquidStakeKeeper.Hooks(),
 		),
 	)
 
@@ -745,5 +762,6 @@ func KVStoreKeys() []string {
 		claimsmoduletypes.StoreKey,
 		smartaccounttypes.StoreKey,
 		epochstypes.StoreKey,
+		liquidstaketypes.StoreKey,
 	}
 }

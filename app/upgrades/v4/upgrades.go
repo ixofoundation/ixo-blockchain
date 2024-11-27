@@ -52,7 +52,7 @@ func CreateUpgradeHandler(
 ) upgradetypes.UpgradeHandler {
 	return func(context context.Context, plan upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
 		ctx := sdk.UnwrapSDKContext(context)
-		ctx.Logger().Info("🚀 executing Ixo " + UpgradeName + "upgrade 🚀")
+		ctx.Logger().Info("🚀 executing Ixo " + UpgradeName + " upgrade 🚀")
 
 		// -------------------------------------------------
 		// Migrate Params
@@ -114,6 +114,7 @@ func CreateUpgradeHandler(
 				keyTable = entitytypes.ParamKeyTable() //nolint:staticcheck
 			// epochs doesn't have params
 			// iidtypes doesn't have params
+			// liquidstake doesn't have params
 			case tokentypes.ModuleName:
 				keyTable = tokentypes.ParamKeyTable() //nolint:staticcheck
 			case smartaccounttypes.ModuleName:
@@ -125,6 +126,16 @@ func CreateUpgradeHandler(
 
 			if !subspace.HasKeyTable() {
 				subspace.WithKeyTable(keyTable)
+			}
+
+			// If the subspace is for staking, set the new stake params from cosmos-sdk-lsm in the store
+			// before the migration, since the LSM migration was removed in cosmos-sdk-lsm v0.50 and
+			// RunMigrations fail otherwise.
+			if subspace.Name() == stakingtypes.ModuleName {
+				ctx.Logger().Info("Set new stake params before migration")
+				subspace.Set(ctx, stakingtypes.KeyValidatorBondFactor, ValidatorBondFactor)
+				subspace.Set(ctx, stakingtypes.KeyGlobalLiquidStakingCap, ValidatorLiquidStakingCap)
+				subspace.Set(ctx, stakingtypes.KeyValidatorLiquidStakingCap, GlobalLiquidStakingCap)
 			}
 		}
 
@@ -149,7 +160,7 @@ func CreateUpgradeHandler(
 		}
 
 		// -------------------------------------------------
-		// Set proposal param:
+		// Set governance params:
 		// -------------------------------------------------
 		ctx.Logger().Info("Set expedited proposal params")
 		govParams, err := keepers.GovKeeper.Params.Get(ctx)
@@ -169,8 +180,8 @@ func CreateUpgradeHandler(
 		// -------------------------------------------------
 		ctx.Logger().Info("Set consensus params")
 		defaultConsensusParams := cmttypes.DefaultConsensusParams().ToProto()
-		defaultConsensusParams.Block.MaxBytes = BlockMaxBytes // previously 5000000
-		defaultConsensusParams.Block.MaxGas = BlockMaxGas     // unchanged
+		defaultConsensusParams.Block.MaxBytes = BlockMaxBytes
+		defaultConsensusParams.Block.MaxGas = BlockMaxGas
 		err = keepers.ConsensusParamsKeeper.ParamsStore.Set(ctx, defaultConsensusParams)
 		if err != nil {
 			return nil, err
@@ -183,7 +194,21 @@ func CreateUpgradeHandler(
 		authenticatorParams := keepers.SmartAccountKeeper.GetParams(ctx)
 		authenticatorParams.MaximumUnauthenticatedGas = MaximumUnauthenticatedGas
 		authenticatorParams.IsSmartAccountActive = IsSmartAccountActive
+		authenticatorParams.CircuitBreakerControllers = append(authenticatorParams.CircuitBreakerControllers, CircuitBreakerController)
 		keepers.SmartAccountKeeper.SetParams(ctx, authenticatorParams)
+
+		// -------------------------------------------------
+		// Set the liquid stake params in the store
+		// -------------------------------------------------
+		ctx.Logger().Info("Set liquid stake params")
+		liquidStakeParams := keepers.LiquidStakeKeeper.GetParams(ctx)
+		liquidStakeParams.WhitelistedValidators = WhitelistedValidators
+		liquidStakeParams.UnstakeFeeRate = LSMUnstakeFeeRate
+		liquidStakeParams.AutocompoundFeeRate = LSMAutocompoundFeeRate
+		liquidStakeParams.WhitelistAdminAddress = LSMWhitelistAdminAddress
+		liquidStakeParams.WeightedRewardsReceivers = LSMWeightedRewardsReceivers
+		liquidStakeParams.FeeAccountAddress = LSMFeeAccountAddress
+		keepers.LiquidStakeKeeper.SetParams(ctx, liquidStakeParams)
 
 		// -------------------------------------------------
 		// Set the ICQ params in the store
@@ -208,6 +233,12 @@ func CreateUpgradeHandler(
 			AllowMessages: []string{"*"},
 		}
 		keepers.ICAHostKeeper.SetParams(ctx, hostParams)
+
+		// -------------------------------------------------
+		// Migrate Cosmos LSM module
+		// -------------------------------------------------
+		ctx.Logger().Info("Migrate Cosmos LSM module")
+		migrateCosmosLSMModule(ctx, keepers.StakingKeeper)
 
 		return migrations, nil
 	}

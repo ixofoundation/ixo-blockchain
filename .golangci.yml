@@ -43,12 +43,33 @@ linters:
 
 linters-settings:
   revive:
+    ignore-generated-header: true
+    severity: warning
     rules:
-      - name: function-result-limit
-        severity: warning
-        disabled: false
-        # limits the number of returns to 4
-        arguments: [4]
+      - name: unused-parameter
+        disabled: true
+      - name: blank-imports
+      - name: context-as-argument
+      - name: context-keys-type
+      - name: dot-imports
+      - name: error-return
+      - name: error-strings
+      - name: error-naming
+      - name: exported
+      - name: if-return
+      - name: increment-decrement
+      - name: var-naming
+      - name: var-declaration
+      - name: range
+      - name: receiver-naming
+      - name: time-naming
+      - name: unexported-return
+      - name: indent-error-flow
+      - name: errorf
+      - name: empty-block
+      - name: superfluous-else
+      - name: unreachable-code
+      - name: redefines-builtin-id
 
 issues:
   exclude-rules:
@@ -64,8 +85,10 @@ issues:
     - linters:
         - stylecheck
       text: "ST1005:" # punctuation in error messages
+
   max-issues-per-linter: 10000
   max-same-issues: 10000
+
   # Enables the use of custom exclude directories and files.
   exclude-dirs-use-default: true
   # Exclude files with the extension ".pb.gw.go"

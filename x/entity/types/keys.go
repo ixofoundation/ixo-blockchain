@@ -23,5 +23,6 @@ var (
 )
 
 const (
-	EntityAdminAccountName = "admin"
+	EntityAdminAccountName         = "admin"
+	EntityOracleRevenueAccountName = "oracle revenue"
 )

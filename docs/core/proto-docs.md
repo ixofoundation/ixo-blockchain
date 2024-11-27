@@ -326,6 +326,56 @@
   
     - [Query](#ixo.iid.v1beta1.Query)
   
+- [ixo/liquidstake/v1beta1/liquidstake.proto](#ixo/liquidstake/v1beta1/liquidstake.proto)
+    - [LiquidValidator](#ixo.liquidstake.v1beta1.LiquidValidator)
+    - [LiquidValidatorState](#ixo.liquidstake.v1beta1.LiquidValidatorState)
+    - [NetAmountState](#ixo.liquidstake.v1beta1.NetAmountState)
+    - [Params](#ixo.liquidstake.v1beta1.Params)
+    - [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress)
+    - [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator)
+  
+    - [ValidatorStatus](#ixo.liquidstake.v1beta1.ValidatorStatus)
+  
+- [ixo/liquidstake/v1beta1/event.proto](#ixo/liquidstake/v1beta1/event.proto)
+    - [AddLiquidValidatorEvent](#ixo.liquidstake.v1beta1.AddLiquidValidatorEvent)
+    - [AutocompoundStakingRewardsEvent](#ixo.liquidstake.v1beta1.AutocompoundStakingRewardsEvent)
+    - [LiquidStakeEvent](#ixo.liquidstake.v1beta1.LiquidStakeEvent)
+    - [LiquidStakeParamsUpdatedEvent](#ixo.liquidstake.v1beta1.LiquidStakeParamsUpdatedEvent)
+    - [LiquidUnstakeEvent](#ixo.liquidstake.v1beta1.LiquidUnstakeEvent)
+    - [RebalancedLiquidStakeEvent](#ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent)
+  
+- [ixo/liquidstake/v1beta1/genesis.proto](#ixo/liquidstake/v1beta1/genesis.proto)
+    - [GenesisState](#ixo.liquidstake.v1beta1.GenesisState)
+  
+- [ixo/liquidstake/v1beta1/query.proto](#ixo/liquidstake/v1beta1/query.proto)
+    - [QueryLiquidValidatorsRequest](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest)
+    - [QueryLiquidValidatorsResponse](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse)
+    - [QueryParamsRequest](#ixo.liquidstake.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#ixo.liquidstake.v1beta1.QueryParamsResponse)
+    - [QueryStatesRequest](#ixo.liquidstake.v1beta1.QueryStatesRequest)
+    - [QueryStatesResponse](#ixo.liquidstake.v1beta1.QueryStatesResponse)
+  
+    - [Query](#ixo.liquidstake.v1beta1.Query)
+  
+- [ixo/liquidstake/v1beta1/tx.proto](#ixo/liquidstake/v1beta1/tx.proto)
+    - [MsgLiquidStake](#ixo.liquidstake.v1beta1.MsgLiquidStake)
+    - [MsgLiquidStakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidStakeResponse)
+    - [MsgLiquidUnstake](#ixo.liquidstake.v1beta1.MsgLiquidUnstake)
+    - [MsgLiquidUnstakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse)
+    - [MsgSetModulePaused](#ixo.liquidstake.v1beta1.MsgSetModulePaused)
+    - [MsgSetModulePausedResponse](#ixo.liquidstake.v1beta1.MsgSetModulePausedResponse)
+    - [MsgUpdateParams](#ixo.liquidstake.v1beta1.MsgUpdateParams)
+    - [MsgUpdateParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateParamsResponse)
+    - [MsgUpdateWeightedRewardsReceivers](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers)
+    - [MsgUpdateWeightedRewardsReceiversResponse](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse)
+    - [MsgUpdateWhitelistedValidators](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators)
+    - [MsgUpdateWhitelistedValidatorsResponse](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse)
+  
+    - [Msg](#ixo.liquidstake.v1beta1.Msg)
+  
+- [ixo/mint/v1beta1/event.proto](#ixo/mint/v1beta1/event.proto)
+    - [MintEpochProvisionsMintedEvent](#ixo.mint.v1beta1.MintEpochProvisionsMintedEvent)
+  
 - [ixo/mint/v1beta1/mint.proto](#ixo/mint/v1beta1/mint.proto)
     - [DistributionProportions](#ixo.mint.v1beta1.DistributionProportions)
     - [Minter](#ixo.mint.v1beta1.Minter)
@@ -343,7 +393,11 @@
   
     - [Query](#ixo.mint.v1beta1.Query)
   
+- [ixo/smartaccount/crypto/crypto.proto](#ixo/smartaccount/crypto/crypto.proto)
+    - [AuthnPubKey](#ixo.smartaccount.crypto.AuthnPubKey)
+  
 - [ixo/token/v1beta1/token.proto](#ixo/token/v1beta1/token.proto)
+    - [CreditsTransferred](#ixo.token.v1beta1.CreditsTransferred)
     - [Params](#ixo.token.v1beta1.Params)
     - [Token](#ixo.token.v1beta1.Token)
     - [TokenData](#ixo.token.v1beta1.TokenData)
@@ -365,6 +419,8 @@
     - [MsgRetireTokenResponse](#ixo.token.v1beta1.MsgRetireTokenResponse)
     - [MsgStopToken](#ixo.token.v1beta1.MsgStopToken)
     - [MsgStopTokenResponse](#ixo.token.v1beta1.MsgStopTokenResponse)
+    - [MsgTransferCredit](#ixo.token.v1beta1.MsgTransferCredit)
+    - [MsgTransferCreditResponse](#ixo.token.v1beta1.MsgTransferCreditResponse)
     - [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken)
     - [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse)
     - [TokenBatch](#ixo.token.v1beta1.TokenBatch)
@@ -412,6 +468,7 @@
     - [MintConstraints](#ixo.token.v1beta1.MintConstraints)
   
 - [ixo/token/v1beta1/event.proto](#ixo/token/v1beta1/event.proto)
+    - [CreditsTransferredEvent](#ixo.token.v1beta1.CreditsTransferredEvent)
     - [TokenCancelledEvent](#ixo.token.v1beta1.TokenCancelledEvent)
     - [TokenCreatedEvent](#ixo.token.v1beta1.TokenCreatedEvent)
     - [TokenMintedEvent](#ixo.token.v1beta1.TokenMintedEvent)
@@ -5080,6 +5137,643 @@ Query defines the gRPC querier service.
 
 
 
+<a name="ixo/liquidstake/v1beta1/liquidstake.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/liquidstake/v1beta1/liquidstake.proto
+
+
+
+<a name="ixo.liquidstake.v1beta1.LiquidValidator"></a>
+
+### LiquidValidator
+LiquidValidator defines a Validator that can be the target of LiquidStaking
+and LiquidUnstaking, Active, Weight, etc. fields are derived as functions to
+deal with by maintaining consistency with the state of the staking module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| operator_address | [string](#string) |  | operator_address defines the address of the validator&#39;s operator; bech encoded in JSON. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.LiquidValidatorState"></a>
+
+### LiquidValidatorState
+LiquidValidatorState is type LiquidValidator with state added to return to
+query results.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| operator_address | [string](#string) |  | operator_address defines the address of the validator&#39;s operator; bech encoded in JSON. |
+| weight | [string](#string) |  | weight specifies the weight for liquid staking, unstaking amount |
+| status | [ValidatorStatus](#ixo.liquidstake.v1beta1.ValidatorStatus) |  | status is the liquid validator status |
+| del_shares | [string](#string) |  | del_shares define the delegation shares of the validator |
+| liquid_tokens | [string](#string) |  | liquid_tokens define the token amount worth of delegation shares of the validator (slashing applied amount) |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.NetAmountState"></a>
+
+### NetAmountState
+NetAmountState is type for net amount raw data and mint rate, This is a value
+that depends on the several module state every time, so it is used only for
+calculation and query and is not stored in kv.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| stake_rate | [string](#string) |  | stake_rate is the rate at which the liquid staking module mints stkIXO |
+| unstake_rate | [string](#string) |  | unstake_rate is the rate at which the liquid staking module burns stkIXO |
+| stkixo_total_supply | [string](#string) |  | btoken_total_supply returns the total supply of uzero (stkIXO denom) |
+| net_amount | [string](#string) |  | net_amount is proxy account&#39;s total liquid tokens &#43; total unbonding balance |
+| total_del_shares | [string](#string) |  | total_del_shares define the delegation shares of all liquid validators |
+| total_liquid_tokens | [string](#string) |  | total_liquid_tokens define the token amount worth of delegation shares of all liquid validator (slashing applied amount) |
+| total_remaining_rewards | [string](#string) |  | total_remaining_rewards define the sum of remaining rewards of proxy account by all liquid validators |
+| total_unbonding_balance | [string](#string) |  | total_unbonding_balance define the unbonding balance of proxy account by all liquid validator (slashing applied amount) |
+| proxy_acc_balance | [string](#string) |  | proxy_acc_balance define the balance of proxy account for the native token |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.Params"></a>
+
+### Params
+Params defines the set of params for the liquidstake module.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| liquid_bond_denom | [string](#string) |  | LiquidBondDenom specifies the denomination of the token receiving after liquid stake, The value is calculated through NetAmount. |
+| whitelisted_validators | [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator) | repeated | WhitelistedValidators specifies the validators elected to become Active Liquid Validators. |
+| unstake_fee_rate | [string](#string) |  | UnstakeFeeRate specifies the fee rate when liquid unstake is requested, unbonded by subtracting it from unbondingAmount |
+| min_liquid_stake_amount | [string](#string) |  | MinLiquidStakingAmount specifies the minimum number of coins to be staked to the active liquid validators on liquid staking to minimize decimal loss and consider gas efficiency. |
+| fee_account_address | [string](#string) |  | FeeAccountAddress defines the bech32-encoded address of an account responsible for accumulating protocol fees. |
+| autocompound_fee_rate | [string](#string) |  | AutocompoundFeeRate specifies the fee rate for auto redelegating the stake rewards. The fee is taken in favour of the fee account (see FeeAccountAddress). |
+| whitelist_admin_address | [string](#string) |  | WhitelistAdminAddress the bech32-encoded address of an admin authority that is allowed to update whitelisted validators or pause liquidstaking module entirely. It is also the only address that can update the weighted_rewards_receivers. The key is controlled by the ZERO dao. Pausing of the module can be required during important migrations or failures. |
+| module_paused | [bool](#bool) |  | ModulePaused is a safety toggle that allows to stop main module functions such as stake/unstake/stake-to-lp and the BeginBlocker logic. |
+| weighted_rewards_receivers | [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress) | repeated | weighted_rewards_receivers is the addresses to receive the staking rewards on autocompounding with weights assigned to each address. The total of weights in the list in not allowed to be greater than 1.
+
+Eg. if the list has 1 address with weight 0.2, then on autocompounding the staking rewards will be split between 0.2 for the weighted receiver and 0.8 gets auto-compounded to the proxy account. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.WeightedAddress"></a>
+
+### WeightedAddress
+WeightedAddress represents an address with a weight assigned to it.
+The weight is used to determine the proportion of autocompounding
+rewards to be paid to the address.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| weight | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.WhitelistedValidator"></a>
+
+### WhitelistedValidator
+WhitelistedValidator consists of the validator operator address and the
+target weight, which is a value for calculating the real weight to be derived
+according to the active status.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| validator_address | [string](#string) |  | validator_address defines the bech32-encoded address of the whitelisted validator |
+| target_weight | [string](#string) |  | target_weight specifies the target weight for liquid staking, unstaking amount, which is a value for calculating the real weight to be derived according to the active status |
+
+
+
+
+
+ 
+
+
+<a name="ixo.liquidstake.v1beta1.ValidatorStatus"></a>
+
+### ValidatorStatus
+ValidatorStatus enumerates the status of a liquid validator.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| VALIDATOR_STATUS_UNSPECIFIED | 0 | VALIDATOR_STATUS_UNSPECIFIED defines the unspecified invalid status. |
+| VALIDATOR_STATUS_ACTIVE | 1 | VALIDATOR_STATUS_ACTIVE defines the active, valid status |
+| VALIDATOR_STATUS_INACTIVE | 2 | VALIDATOR_STATUS_INACTIVE defines the inactive, invalid status |
+
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/liquidstake/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/liquidstake/v1beta1/event.proto
+
+
+
+<a name="ixo.liquidstake.v1beta1.AddLiquidValidatorEvent"></a>
+
+### AddLiquidValidatorEvent
+LiquidRedelegateEvent is triggered when a liquid validator is added.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| validator | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.AutocompoundStakingRewardsEvent"></a>
+
+### AutocompoundStakingRewardsEvent
+AutocompoundEvent is triggered after a epoch is triggered for autocompound.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delegator | [string](#string) |  |  |
+| total_amount | [string](#string) |  |  |
+| fee_amount | [string](#string) |  |  |
+| redelegate_amount | [string](#string) |  |  |
+| weighted_rewards_amount | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.LiquidStakeEvent"></a>
+
+### LiquidStakeEvent
+LiquidStakeEvent is triggered when a liquid stake is performed.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delegator | [string](#string) |  |  |
+| liquid_amount | [string](#string) |  |  |
+| stk_ixo_minted_amount | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.LiquidStakeParamsUpdatedEvent"></a>
+
+### LiquidStakeParamsUpdatedEvent
+LiquidStakeParamsUpdatedEvent is triggered when a the Params is updated.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.liquidstake.v1beta1.Params) |  |  |
+| authority | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.LiquidUnstakeEvent"></a>
+
+### LiquidUnstakeEvent
+LiquidUnstakeEvent is triggered when a liquid unstake is performed.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delegator | [string](#string) |  |  |
+| unstake_amount | [string](#string) |  |  |
+| unbonding_amount | [string](#string) |  |  |
+| unbonded_amount | [string](#string) |  |  |
+| completion_time | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent"></a>
+
+### RebalancedLiquidStakeEvent
+RebalancedEvent is triggered after a rebalance is performed.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delegator | [string](#string) |  |  |
+| redelegation_count | [string](#string) |  |  |
+| redelegation_fail_count | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/liquidstake/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/liquidstake/v1beta1/genesis.proto
+
+
+
+<a name="ixo.liquidstake.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the liquidstake module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.liquidstake.v1beta1.Params) |  |  |
+| liquid_validators | [LiquidValidator](#ixo.liquidstake.v1beta1.LiquidValidator) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/liquidstake/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/liquidstake/v1beta1/query.proto
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest"></a>
+
+### QueryLiquidValidatorsRequest
+
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse"></a>
+
+### QueryLiquidValidatorsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| liquid_validators | [LiquidValidatorState](#ixo.liquidstake.v1beta1.LiquidValidatorState) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| params | [Params](#ixo.liquidstake.v1beta1.Params) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryStatesRequest"></a>
+
+### QueryStatesRequest
+
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryStatesResponse"></a>
+
+### QueryStatesResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| net_amount_state | [NetAmountState](#ixo.liquidstake.v1beta1.NetAmountState) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.liquidstake.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC query service for the liquidstake module.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Params | [QueryParamsRequest](#ixo.liquidstake.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.liquidstake.v1beta1.QueryParamsResponse) | Params returns parameters of the liquidstake module. |
+| LiquidValidators | [QueryLiquidValidatorsRequest](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest) | [QueryLiquidValidatorsResponse](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse) | LiquidValidators returns liquid validators with states of the liquidstake module. |
+| States | [QueryStatesRequest](#ixo.liquidstake.v1beta1.QueryStatesRequest) | [QueryStatesResponse](#ixo.liquidstake.v1beta1.QueryStatesResponse) | States returns states of the liquidstake module. |
+
+ 
+
+
+
+<a name="ixo/liquidstake/v1beta1/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/liquidstake/v1beta1/tx.proto
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgLiquidStake"></a>
+
+### MsgLiquidStake
+MsgLiquidStake defines a SDK message for performing a liquid stake of coins
+from a delegator to whitelisted validators.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delegator_address | [string](#string) |  |  |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgLiquidStakeResponse"></a>
+
+### MsgLiquidStakeResponse
+MsgLiquidStakeResponse defines the MsgLiquidStake response type.
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgLiquidUnstake"></a>
+
+### MsgLiquidUnstake
+MsgLiquidUnstake defines a SDK message for performing an undelegation of
+liquid staking from a delegate.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delegator_address | [string](#string) |  |  |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse"></a>
+
+### MsgLiquidUnstakeResponse
+MsgLiquidUnstakeResponse defines the MsgLiquidUnstake response type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| completion_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgSetModulePaused"></a>
+
+### MsgSetModulePaused
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | Authority is the address that is allowed to update module&#39;s paused state, defined as admin address in params (WhitelistAdminAddress). |
+| is_paused | [bool](#bool) |  | IsPaused represents the target state of the paused flag. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgSetModulePausedResponse"></a>
+
+### MsgSetModulePausedResponse
+MsgSetModulePausedResponse defines the response structure for
+executing a
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateParams"></a>
+
+### MsgUpdateParams
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | authority is the address that controls the module (defaults to x/gov unless overwritten). |
+| params | [Params](#ixo.liquidstake.v1beta1.Params) |  | params defines the parameters to update. NOTE: denom and whitelisted_validators and weighted_rewards_receivers are not updated. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateParamsResponse"></a>
+
+### MsgUpdateParamsResponse
+MsgUpdateParamsResponse defines the response structure for executing a
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers"></a>
+
+### MsgUpdateWeightedRewardsReceivers
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | Authority is the address that is allowed to update wieghted rewards receivers, defined as admin address in params (WhitelistAdminAddress). |
+| weighted_rewards_receivers | [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress) | repeated | WhitelistedValidators specifies the validators elected to become Active Liquid Validators. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse"></a>
+
+### MsgUpdateWeightedRewardsReceiversResponse
+MsgUpdateWeightedRewardsReceiversResponse defines the response structure for
+executing a
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"></a>
+
+### MsgUpdateWhitelistedValidators
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | Authority is the address that is allowed to update whitelisted validators, defined as admin address in params (WhitelistAdminAddress). |
+| whitelisted_validators | [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator) | repeated | WhitelistedValidators specifies the validators elected to become Active Liquid Validators. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"></a>
+
+### MsgUpdateWhitelistedValidatorsResponse
+MsgUpdateWhitelistedValidatorsResponse defines the response structure for
+executing a
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.liquidstake.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the liquid staking Msg service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| LiquidStake | [MsgLiquidStake](#ixo.liquidstake.v1beta1.MsgLiquidStake) | [MsgLiquidStakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidStakeResponse) | LiquidStake defines a method for performing a delegation of coins from a delegator to whitelisted validators. |
+| LiquidUnstake | [MsgLiquidUnstake](#ixo.liquidstake.v1beta1.MsgLiquidUnstake) | [MsgLiquidUnstakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse) | LiquidUnstake defines a method for performing an undelegation of liquid staking from a delegate. |
+| UpdateParams | [MsgUpdateParams](#ixo.liquidstake.v1beta1.MsgUpdateParams) | [MsgUpdateParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateParamsResponse) | UpdateParams defines a method to update the module params. |
+| UpdateWhitelistedValidators | [MsgUpdateWhitelistedValidators](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators) | [MsgUpdateWhitelistedValidatorsResponse](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse) | UpdateWhitelistedValidators defines a method to update the whitelisted validators list. |
+| UpdateWeightedRewardsReceivers | [MsgUpdateWeightedRewardsReceivers](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers) | [MsgUpdateWeightedRewardsReceiversResponse](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse) | UpdateWhitelistedValidators defines a method to update the whitelisted validators list. Only the whitelist admin address can update this list. |
+| SetModulePaused | [MsgSetModulePaused](#ixo.liquidstake.v1beta1.MsgSetModulePaused) | [MsgSetModulePausedResponse](#ixo.liquidstake.v1beta1.MsgSetModulePausedResponse) | SetModulePaused defines a method to update the module&#39;s pause status, setting value of the safety flag in params. |
+
+ 
+
+
+
+<a name="ixo/mint/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/mint/v1beta1/event.proto
+
+
+
+<a name="ixo.mint.v1beta1.MintEpochProvisionsMintedEvent"></a>
+
+### MintEpochProvisionsMintedEvent
+MintEpochProvisionsMintedEvent is triggered after a epoch is triggered
+minting module for inflation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| epoch_number | [string](#string) |  |  |
+| epoch_provisions | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
 <a name="ixo/mint/v1beta1/mint.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -5282,10 +5976,63 @@ Query provides defines the gRPC querier service.
 
 
 
+<a name="ixo/smartaccount/crypto/crypto.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/smartaccount/crypto/crypto.proto
+
+
+
+<a name="ixo.smartaccount.crypto.AuthnPubKey"></a>
+
+### AuthnPubKey
+PubKey defines an authn public key
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| key_id | [string](#string) |  | The key_id (or credential ID) is a unique identifier for a passkey. This ID is provided by the authenticator when the passkey is created. As it is not possible to retrieve the public key from the authenticator after the passkey is created, if the user loses the public key - id association, the key_id can be used to retrieve the public key. |
+| cose_algorithm | [int32](#int32) |  | Store the COSE algorithm identifier. Since authn allows multiple different public key credential algorithm, eg. -7(ES256) - ECDSA with SHA-256 on the P-256 curve -257(RS256) - RSASSA-PKCS1-v1_5 with SHA-256 we need to store the algorithm identifier to be able to verify the signature according to the algorithm the public key is using. |
+| key | [bytes](#bytes) |  | The public key bytes |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
 <a name="ixo/token/v1beta1/token.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/token/v1beta1/token.proto
+
+
+
+<a name="ixo.token.v1beta1.CreditsTransferred"></a>
+
+### CreditsTransferred
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id | [string](#string) |  |  |
+| reason | [string](#string) |  |  |
+| jurisdiction | [string](#string) |  |  |
+| amount | [string](#string) |  |  |
+| owner | [string](#string) |  |  |
+| authorization_id | [string](#string) |  |  |
+
+
+
 
 
 
@@ -5325,6 +6072,7 @@ Query provides defines the gRPC querier service.
 | stopped | [bool](#bool) |  | stop allowance of token minter permanently |
 | retired | [TokensRetired](#ixo.token.v1beta1.TokensRetired) | repeated | tokens that has been retired for this Token with specific name and contract address |
 | cancelled | [TokensCancelled](#ixo.token.v1beta1.TokensCancelled) | repeated | tokens that has been cancelled for this Token with specific name and contract address |
+| transferred | [CreditsTransferred](#ixo.token.v1beta1.CreditsTransferred) | repeated | credits that has been transferred for this Token with specific name and contract address |
 
 
 
@@ -5610,6 +6358,35 @@ credential link ***.ipfs |
 
 
 
+<a name="ixo.token.v1beta1.MsgTransferCredit"></a>
+
+### MsgTransferCredit
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | address of owner |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated | tokens to retire, all tokens must be in same smart contract |
+| jurisdiction | [string](#string) |  | jurisdiction is the jurisdiction of the token owner. A jurisdiction has the format: &lt;country-code&gt;[-&lt;sub-national-code&gt;[ &lt;postal-code&gt;]] The country-code must be 2 alphabetic characters, the sub-national-code can be 1-3 alphanumeric characters, and the postal-code can be up to 64 alphanumeric characters. Only the country-code is required, while the sub-national-code and postal-code are optional and can be added for increased precision. See the valid format for this below. |
+| reason | [string](#string) |  | reason is any arbitrary string that specifies the reason for retiring tokens. |
+| authorization_id | [string](#string) |  | authorization_id is the id of the authorization that was used for the credit transfer |
+
+
+
+
+
+
+<a name="ixo.token.v1beta1.MsgTransferCreditResponse"></a>
+
+### MsgTransferCreditResponse
+
+
+
+
+
+
+
 <a name="ixo.token.v1beta1.MsgTransferToken"></a>
 
 ### MsgTransferToken
@@ -5670,6 +6447,7 @@ Msg defines the project Msg service.
 | MintToken | [MsgMintToken](#ixo.token.v1beta1.MsgMintToken) | [MsgMintTokenResponse](#ixo.token.v1beta1.MsgMintTokenResponse) |  |
 | TransferToken | [MsgTransferToken](#ixo.token.v1beta1.MsgTransferToken) | [MsgTransferTokenResponse](#ixo.token.v1beta1.MsgTransferTokenResponse) |  |
 | RetireToken | [MsgRetireToken](#ixo.token.v1beta1.MsgRetireToken) | [MsgRetireTokenResponse](#ixo.token.v1beta1.MsgRetireTokenResponse) |  |
+| TransferCredit | [MsgTransferCredit](#ixo.token.v1beta1.MsgTransferCredit) | [MsgTransferCreditResponse](#ixo.token.v1beta1.MsgTransferCreditResponse) |  |
 | CancelToken | [MsgCancelToken](#ixo.token.v1beta1.MsgCancelToken) | [MsgCancelTokenResponse](#ixo.token.v1beta1.MsgCancelTokenResponse) |  |
 | PauseToken | [MsgPauseToken](#ixo.token.v1beta1.MsgPauseToken) | [MsgPauseTokenResponse](#ixo.token.v1beta1.MsgPauseTokenResponse) |  |
 | StopToken | [MsgStopToken](#ixo.token.v1beta1.MsgStopToken) | [MsgStopTokenResponse](#ixo.token.v1beta1.MsgStopTokenResponse) |  |
@@ -6168,6 +6946,23 @@ Msg defines the Msg service.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/token/v1beta1/event.proto
+
+
+
+<a name="ixo.token.v1beta1.CreditsTransferredEvent"></a>
+
+### CreditsTransferredEvent
+CreditsTransferredEvent is an event triggered on a Credit transfer
+execution
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner | [string](#string) |  | the token owner |
+| tokens | [TokenBatch](#ixo.token.v1beta1.TokenBatch) | repeated |  |
+
+
+
 
 
 
