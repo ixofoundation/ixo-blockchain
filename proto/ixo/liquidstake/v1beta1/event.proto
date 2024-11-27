@@ -1,0 +1,68 @@
+syntax = "proto3";
+package ixo.liquidstake.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/types";
+
+import "gogoproto/gogo.proto";
+import "ixo/liquidstake/v1beta1/liquidstake.proto";
+
+// LiquidStakeParamsUpdatedEvent is triggered when a the Params is updated.
+message LiquidStakeParamsUpdatedEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  Params params = 1;
+  string authority = 2;
+}
+
+// LiquidStakeEvent is triggered when a liquid stake is performed.
+message LiquidStakeEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string delegator = 1;
+  string liquid_amount = 2;
+  string stk_ixo_minted_amount = 3;
+}
+
+// LiquidUnstakeEvent is triggered when a liquid unstake is performed.
+message LiquidUnstakeEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string delegator = 1;
+  string unstake_amount = 2;
+  string unbonding_amount = 3;
+  string unbonded_amount = 4;
+  string completion_time = 5;
+}
+
+// LiquidRedelegateEvent is triggered when a liquid validator is added.
+message AddLiquidValidatorEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string validator = 1;
+}
+
+// RebalancedEvent is triggered after a rebalance is performed.
+message RebalancedLiquidStakeEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string delegator = 1;
+  string redelegation_count = 2;
+  string redelegation_fail_count = 3;
+}
+
+// AutocompoundEvent is triggered after a epoch is triggered for autocompound.
+message AutocompoundStakingRewardsEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string delegator = 1;
+  string total_amount = 2;
+  string fee_amount = 3;
+  string redelegate_amount = 4;
+  string weighted_rewards_amount = 5;
+}

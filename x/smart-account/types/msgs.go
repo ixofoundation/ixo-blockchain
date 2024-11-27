@@ -42,10 +42,6 @@ func (msg *MsgAddAuthenticator) GetSigners() []sdk.AccAddress {
 	return getSender(msg.Sender)
 }
 
-func (msg MsgAddAuthenticator) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 // --------------------------
 // REMOVE AUTHENTICATOR
 // --------------------------
@@ -65,10 +61,6 @@ func (msg *MsgRemoveAuthenticator) GetSigners() []sdk.AccAddress {
 	return getSender(msg.Sender)
 }
 
-func (msg MsgRemoveAuthenticator) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
-}
-
 // --------------------------
 // SET ACTIVE STATE
 // --------------------------
@@ -86,8 +78,4 @@ func (msg *MsgSetActiveState) ValidateBasic() error {
 
 func (msg *MsgSetActiveState) GetSigners() []sdk.AccAddress {
 	return getSender(msg.Sender)
-}
-
-func (msg MsgSetActiveState) GetSignBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
 }

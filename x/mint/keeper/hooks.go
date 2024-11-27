@@ -3,11 +3,10 @@ package keeper
 import (
 	"fmt"
 
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
-
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
 )
 
 // BeforeEpochStart is a hook which is executed before the start of an epoch. It is a no-op for mint module.
@@ -52,7 +51,6 @@ func (k Keeper) AfterEpochEnd(ctx sdk.Context, epochIdentifier string, epochNumb
 		mintedCoin := minter.EpochProvision(params)
 		mintedCoins := sdk.NewCoins(mintedCoin)
 
-		// We over-allocate by the developer vesting portion, and burn this later
 		err := k.mintCoins(ctx, mintedCoins)
 		if err != nil {
 			return err
@@ -69,14 +67,20 @@ func (k Keeper) AfterEpochEnd(ctx sdk.Context, epochIdentifier string, epochNumb
 			defer telemetry.ModuleSetGauge(types.ModuleName, float32(mintedCoin.Amount.Int64()), "minted_tokens")
 		}
 
-		ctx.EventManager().EmitEvent(
-			sdk.NewEvent(
-				types.ModuleName,
-				sdk.NewAttribute(types.AttributeEpochNumber, fmt.Sprintf("%d", epochNumber)),
-				sdk.NewAttribute(types.AttributeKeyEpochProvisions, minter.EpochProvisions.String()),
-				sdk.NewAttribute(sdk.AttributeKeyAmount, mintedCoin.Amount.String()),
-			),
-		)
+		// Emit the events
+		if err := ctx.EventManager().EmitTypedEvent(
+			&types.MintEpochProvisionsMintedEvent{
+				EpochNumber:     fmt.Sprintf("%d", epochNumber),
+				EpochProvisions: minter.EpochProvisions.String(),
+				Amount:          mintedCoin.Amount.String(),
+			},
+		); err != nil {
+			k.Logger(ctx).Error(
+				"failed to emit mint epoch provisions minted event",
+				"error", err,
+			)
+		}
+
 	}
 	return nil
 }

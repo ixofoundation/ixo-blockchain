@@ -39,6 +39,7 @@ import (
 	entityclient "github.com/ixofoundation/ixo-blockchain/v4/x/entity/client"
 	"github.com/ixofoundation/ixo-blockchain/v4/x/epochs"
 	"github.com/ixofoundation/ixo-blockchain/v4/x/iid"
+	"github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake"
 	"github.com/ixofoundation/ixo-blockchain/v4/x/mint"
 	smartaccount "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account"
 	"github.com/ixofoundation/ixo-blockchain/v4/x/token"
@@ -88,4 +89,5 @@ var AppModuleBasics = module.NewBasicManager(
 	claims.AppModuleBasic{},
 	smartaccount.AppModuleBasic{},
 	epochs.AppModuleBasic{},
+	liquidstake.AppModuleBasic{},
 )

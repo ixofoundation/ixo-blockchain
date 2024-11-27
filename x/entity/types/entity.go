@@ -64,13 +64,13 @@ func (g Grant) UnpackInterfaces(unpacker cdctypes.AnyUnpacker) error {
 	return unpacker.UnpackAny(g.Authorization, &a)
 }
 
-func (e Entity) GetAdminAccount() (*EntityAccount, error) {
+func (e Entity) GetEntityAccountByName(name string) (string, error) {
 	for _, acc := range e.Accounts {
-		if acc.Name == EntityAdminAccountName {
-			return acc, nil
+		if acc.Name == name {
+			return acc.Address, nil
 		}
 	}
-	return nil, ErrAccountNotFound
+	return "", ErrAccountNotFound
 }
 
 func (e Entity) ContainsAccountName(name string) bool {

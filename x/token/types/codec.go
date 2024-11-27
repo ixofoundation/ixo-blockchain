@@ -17,6 +17,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgMintToken{}, "token/MintToken", nil)
 	cdc.RegisterConcrete(&MsgTransferToken{}, "token/TransferToken", nil)
 	cdc.RegisterConcrete(&MsgRetireToken{}, "token/RetireToken", nil)
+	cdc.RegisterConcrete(&MsgTransferCredit{}, "token/TransferCredit", nil)
 	cdc.RegisterConcrete(&MsgCancelToken{}, "token/CancelToken", nil)
 
 	// gov proposals
@@ -30,6 +31,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		&MsgMintToken{},
 		&MsgTransferToken{},
 		&MsgRetireToken{},
+		&MsgTransferCredit{},
 		&MsgCancelToken{},
 	)
 
