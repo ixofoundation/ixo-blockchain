@@ -116,6 +116,36 @@ func (msg MsgRetireToken) ValidateBasic() error {
 	return nil
 }
 
+func (msg MsgTransferCredit) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid owner address (%s)", err)
+	}
+
+	if len(msg.Tokens) == 0 {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "batch cannot be empty")
+	}
+
+	if iidtypes.IsEmpty(msg.Jurisdiction) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "jurisdiction is empty")
+	}
+
+	for _, batch := range msg.Tokens {
+		if iidtypes.IsEmpty(batch.Id) {
+			return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "token id is empty for a batch")
+		}
+		if batch.Amount.IsZero() {
+			return errorsmod.Wrap(ErrTokenAmountIncorrect, "token amount must be bigger than 0")
+		}
+	}
+
+	if iidtypes.IsEmpty(msg.AuthorizationId) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "authorization id is empty")
+	}
+
+	return nil
+}
+
 func (msg MsgCancelToken) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Owner)
 	if err != nil {

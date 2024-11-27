@@ -328,7 +328,6 @@ func (s msgServer) RetireToken(goCtx context.Context, msg *types.MsgRetireToken)
 			Owner:  ownerAddress.String(),
 			Tokens: msg.Tokens,
 		},
-		// TokenUpdatedEvent event since token supply has been update
 		&types.TokenUpdatedEvent{
 			Token: token,
 		},
@@ -337,6 +336,76 @@ func (s msgServer) RetireToken(goCtx context.Context, msg *types.MsgRetireToken)
 	}
 
 	return &types.MsgRetireTokenResponse{}, nil
+}
+
+func (s msgServer) TransferCredit(goCtx context.Context, msg *types.MsgTransferCredit) (*types.MsgTransferCreditResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Token for the first token in tokens field
+	_, token, err := s.Keeper.GetTokenById(ctx, msg.Tokens[0].Id)
+	if err != nil {
+		return nil, err
+	}
+
+	ownerAddress, err := sdk.AccAddressFromBech32(msg.Owner)
+	if err != nil {
+		return nil, err
+	}
+
+	contractAddress, err := sdk.AccAddressFromBech32(token.ContractAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	encodedBurnMessage, err := ixo1155.Marshal(ixo1155.WasmMsgBatchBurn{
+		BatchBurn: ixo1155.BatchBurn{
+			From:  ownerAddress.String(),
+			Batch: types.Map(msg.Tokens, func(b *types.TokenBatch) ixo1155.Batch { return b.GetWasmTransferBatch() }),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.Keeper.WasmKeeper.Execute(
+		ctx,
+		contractAddress,
+		ownerAddress,
+		encodedBurnMessage,
+		sdk.NewCoins(sdk.NewCoin("uixo", math.ZeroInt())),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	// Update Token transferred tokens and persist
+	var transferredCredits []*types.CreditsTransferred
+	for _, batch := range msg.Tokens {
+		transferredCredits = append(transferredCredits, &types.CreditsTransferred{
+			Id:              batch.Id,
+			Amount:          batch.Amount,
+			Reason:          msg.Reason,
+			Jurisdiction:    msg.Jurisdiction,
+			Owner:           msg.Owner,
+			AuthorizationId: msg.AuthorizationId,
+		})
+	}
+	token.Transferred = append(token.Transferred, transferredCredits...)
+	s.Keeper.SetToken(ctx, *token)
+
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.CreditsTransferredEvent{
+			Owner:  ownerAddress.String(),
+			Tokens: msg.Tokens,
+		},
+		&types.TokenUpdatedEvent{
+			Token: token,
+		},
+	); err != nil {
+		return nil, errorsmod.Wrapf(err, "failed to emit itmos transfer token event")
+	}
+
+	return &types.MsgTransferCreditResponse{}, nil
 }
 
 func (s msgServer) CancelToken(goCtx context.Context, msg *types.MsgCancelToken) (*types.MsgCancelTokenResponse, error) {

@@ -19,6 +19,8 @@ type EntityKeeper interface {
 	ResolveEntity(ctx sdk.Context, entityId string) (iidDocument iidtypes.IidDocument, entity entitytypes.Entity, err error)
 	GetEntity(ctx sdk.Context, key []byte) (entitytypes.Entity, bool)
 	CheckIfOwner(ctx sdk.Context, entityId, ownerAddress string) error
+	CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.AccAddress, error)
+	SetEntity(ctx sdk.Context, key []byte, entity entitytypes.Entity)
 }
 
 type AuthzKeeper interface {

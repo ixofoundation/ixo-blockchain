@@ -67,6 +67,8 @@ import (
 	epochstypes "github.com/ixofoundation/ixo-blockchain/v3/x/epochs/types"
 	iidmodule "github.com/ixofoundation/ixo-blockchain/v3/x/iid"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v3/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v3/x/liquidstake"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v3/x/liquidstake/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/mint"
 	minttypes "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types"
 	smartaccount "github.com/ixofoundation/ixo-blockchain/v3/x/smart-account"
@@ -90,6 +92,7 @@ var moduleAccountPermissions = map[string][]string{
 	icatypes.ModuleName:            nil,
 	icqtypes.ModuleName:            nil,
 	wasmtypes.ModuleName:           {authtypes.Burner},
+	liquidstaketypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 
 	// Custom ixo module accounts
 	bondstypes.BondsMintBurnAccount:       {authtypes.Minter, authtypes.Burner},
@@ -142,6 +145,7 @@ func appModules(
 		claimsmodule.NewAppModule(app.ClaimsKeeper, app.GetSubspace(claimsmoduletypes.ModuleName)),
 		smartaccount.NewAppModule(*app.SmartAccountKeeper),
 		epochs.NewAppModule(*app.EpochsKeeper),
+		liquidstake.NewAppModule(app.LiquidStakeKeeper),
 	}
 }
 
@@ -242,6 +246,7 @@ func OrderBeginBlockers() []string {
 		entitytypes.ModuleName,
 		tokentypes.ModuleName,
 		claimsmoduletypes.ModuleName,
+		liquidstaketypes.ModuleName,
 	}
 }
 
@@ -285,6 +290,7 @@ func OrderEndBlockers() []string {
 		tokentypes.ModuleName,
 		bondstypes.ModuleName,
 		claimsmoduletypes.ModuleName,
+		liquidstaketypes.ModuleName,
 	}
 }
 
@@ -334,6 +340,7 @@ func OrderInitGenesis() []string {
 		tokentypes.ModuleName,
 		entitytypes.ModuleName,
 		claimsmoduletypes.ModuleName,
+		liquidstaketypes.ModuleName,
 	}
 }
 

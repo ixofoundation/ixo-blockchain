@@ -54684,6 +54684,28 @@ paths:
                         specific name and
 
                         contract address
+                    transferred:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          reason:
+                            type: string
+                          jurisdiction:
+                            type: string
+                          amount:
+                            type: string
+                          owner:
+                            type: string
+                          authorization_id:
+                            type: string
+                      title: >-
+                        credits that has been transferred for this Token with
+                        specific name and
+
+                        contract address
         default:
           description: An unexpected error response.
           schema:
@@ -54856,6 +54878,28 @@ paths:
                           type: string
                     title: >-
                       tokens that has been cancelled for this Token with
+                      specific name and
+
+                      contract address
+                  transferred:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        reason:
+                          type: string
+                        jurisdiction:
+                          type: string
+                        amount:
+                          type: string
+                        owner:
+                          type: string
+                        authorization_id:
+                          type: string
+                    title: >-
+                      credits that has been transferred for this Token with
                       specific name and
 
                       contract address
@@ -91956,6 +92000,21 @@ definitions:
               PageRequest.count_total
 
               was set, its value is undefined otherwise
+  ixo.token.v1beta1.CreditsTransferred:
+    type: object
+    properties:
+      id:
+        type: string
+      reason:
+        type: string
+      jurisdiction:
+        type: string
+      amount:
+        type: string
+      owner:
+        type: string
+      authorization_id:
+        type: string
   ixo.token.v1beta1.Params:
     type: object
     properties:
@@ -92053,6 +92112,28 @@ definitions:
             title: >-
               tokens that has been cancelled for this Token with specific name
               and
+
+              contract address
+          transferred:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                reason:
+                  type: string
+                jurisdiction:
+                  type: string
+                amount:
+                  type: string
+                owner:
+                  type: string
+                authorization_id:
+                  type: string
+            title: >-
+              credits that has been transferred for this Token with specific
+              name and
 
               contract address
   ixo.token.v1beta1.QueryTokenListResponse:
@@ -92164,6 +92245,28 @@ definitions:
               title: >-
                 tokens that has been cancelled for this Token with specific name
                 and
+
+                contract address
+            transferred:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  reason:
+                    type: string
+                  jurisdiction:
+                    type: string
+                  amount:
+                    type: string
+                  owner:
+                    type: string
+                  authorization_id:
+                    type: string
+              title: >-
+                credits that has been transferred for this Token with specific
+                name and
 
                 contract address
   ixo.token.v1beta1.QueryTokenMetadataResponse:
@@ -92280,6 +92383,28 @@ definitions:
               type: string
         title: |-
           tokens that has been cancelled for this Token with specific name and
+          contract address
+      transferred:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            reason:
+              type: string
+            jurisdiction:
+              type: string
+            amount:
+              type: string
+            owner:
+              type: string
+            authorization_id:
+              type: string
+        title: >-
+          credits that has been transferred for this Token with specific name
+          and
+
           contract address
   ixo.token.v1beta1.TokenData:
     type: object

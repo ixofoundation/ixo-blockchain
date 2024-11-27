@@ -16,6 +16,7 @@ service Msg {
   rpc MintToken(MsgMintToken) returns (MsgMintTokenResponse);
   rpc TransferToken(MsgTransferToken) returns (MsgTransferTokenResponse);
   rpc RetireToken(MsgRetireToken) returns (MsgRetireTokenResponse);
+  rpc TransferCredit(MsgTransferCredit) returns (MsgTransferCreditResponse);
   rpc CancelToken(MsgCancelToken) returns (MsgCancelTokenResponse);
   rpc PauseToken(MsgPauseToken) returns (MsgPauseTokenResponse);
   rpc StopToken(MsgStopToken) returns (MsgStopTokenResponse);
@@ -131,6 +132,31 @@ message MsgRetireToken {
 }
 
 message MsgRetireTokenResponse {}
+
+message MsgTransferCredit {
+  option (cosmos.msg.v1.signer) = "owner";
+
+  // address of owner
+  string owner = 1;
+  // tokens to retire, all tokens must be in same smart contract
+  repeated TokenBatch tokens = 2;
+  // jurisdiction is the jurisdiction of the token owner. A jurisdiction has
+  // the format: <country-code>[-<sub-national-code>[ <postal-code>]]
+  // The country-code must be 2 alphabetic characters, the sub-national-code
+  // can be 1-3 alphanumeric characters, and the postal-code can be up to 64
+  // alphanumeric characters. Only the country-code is required, while the
+  // sub-national-code and postal-code are optional and can be added for
+  // increased precision. See the valid format for this below.
+  string jurisdiction = 3;
+  // reason is any arbitrary string that specifies the reason for retiring
+  // tokens.
+  string reason = 4;
+  // authorization_id is the id of the authorization that was used for the
+  // credit transfer
+  string authorization_id = 5;
+}
+
+message MsgTransferCreditResponse {}
 
 message MsgCancelToken {
   option (cosmos.msg.v1.signer) = "owner";

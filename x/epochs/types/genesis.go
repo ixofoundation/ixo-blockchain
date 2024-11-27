@@ -15,8 +15,8 @@ func NewGenesisState(epochs []EpochInfo) *GenesisState {
 // DefaultGenesis returns the default Capability genesis state.
 func DefaultGenesis() *GenesisState {
 	epochs := []EpochInfo{
-		// comment out 2min, used for testing
-		// NewGenesisEpochInfo("2min", time.Minute*2), // alphabetical order
+		// TODO: comment out 2min, used for testing
+		NewGenesisEpochInfo("2min", time.Minute*2), // alphabetical order
 		NewGenesisEpochInfo("day", time.Hour*24),
 		NewGenesisEpochInfo("hour", time.Hour),
 		NewGenesisEpochInfo("week", time.Hour*24*7),

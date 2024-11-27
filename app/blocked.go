@@ -5,12 +5,14 @@ import (
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v3/x/liquidstake/types"
 )
 
 var (
 	// Module accounts that are allowed to receive tokens
 	allowedReceivingModAcc = map[string]bool{
-		distrtypes.ModuleName: true,
+		distrtypes.ModuleName:       true,
+		liquidstaketypes.ModuleName: true,
 	}
 )
 

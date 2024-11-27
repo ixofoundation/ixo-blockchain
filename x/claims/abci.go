@@ -1,6 +1,9 @@
 package claims
 
 import (
+	"time"
+
+	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/keeper"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
@@ -11,6 +14,8 @@ import (
 
 // EndBlocker is the end blocker function for the claims module
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
+	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
+
 	// Get iterator for active intents
 	iterator := k.GetAll(ctx, types.IntentKey)
 	defer iterator.Close()

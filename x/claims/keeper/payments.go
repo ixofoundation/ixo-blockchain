@@ -10,6 +10,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v3/x/entity/types"
 	"github.com/ixofoundation/ixo-blockchain/v3/x/token/types/contracts/ixo1155"
 )
 
@@ -59,18 +60,50 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 		if paymentType == types.PaymentType_evaluation || payment.IsOraclePayment {
 			params := k.GetParams(ctx)
 
-			// Get node address
+			// Get relayer node address
 			entity, exists := k.EntityKeeper.GetEntity(ctx, []byte(collection.Entity))
 			if !exists {
 				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "entity did doesn't exist for did %s", collection.Entity)
 			}
-			relayerDidDoc, exists := k.IidKeeper.GetDidDocument(ctx, []byte(entity.RelayerNode))
+			relayerEntity, exists := k.EntityKeeper.GetEntity(ctx, []byte(entity.RelayerNode))
 			if !exists {
-				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "relayer node did doesn't exist for did %s", entity.RelayerNode)
+				return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "relayer node entity doesn't exist for did %s", entity.RelayerNode)
 			}
-			relayerAddr, err := relayerDidDoc.GetVerificationMethodBlockchainAddress(entity.RelayerNode)
+
+			// get EntityOracleRevenueAccountName if exists
+			relayerOracleEntityAccount, err := relayerEntity.GetEntityAccountByName(entitytypes.EntityOracleRevenueAccountName)
 			if err != nil {
-				return errorsmod.Wrapf(err, "did not found in iid doc verification methods for %s", entity.RelayerNode)
+				// create module account on relayer entity and emit events
+				address, err := k.EntityKeeper.CreateNewAccount(ctx, relayerEntity.Id, entitytypes.EntityOracleRevenueAccountName)
+				if err != nil {
+					return err
+				}
+
+				// update entity and persist
+				relayerEntity.Accounts = append(relayerEntity.Accounts, &entitytypes.EntityAccount{Name: entitytypes.EntityOracleRevenueAccountName, Address: address.String()})
+				entitytypes.UpdateEntityMetadata(relayerEntity.Metadata, ctx.TxBytes(), ctx.BlockTime())
+				k.EntityKeeper.SetEntity(ctx, []byte(relayerEntity.Id), relayerEntity)
+
+				// emit the events
+				if err := ctx.EventManager().EmitTypedEvents(
+					&entitytypes.EntityUpdatedEvent{
+						Entity: &entity,
+						// leave signer empty as it is not used, and empty indicates programatic update
+						Signer: "",
+					},
+					&entitytypes.EntityAccountCreatedEvent{
+						Id: entity.Id,
+						// leave signer empty as it is not used, and empty indicates programatic update
+						Signer:         "",
+						AccountName:    entitytypes.EntityOracleRevenueAccountName,
+						AccountAddress: address.String(),
+					},
+				); err != nil {
+					return err
+				}
+
+				// set oracle address
+				relayerOracleEntityAccount = address.String()
 			}
 
 			// Calculate evaluator pay share (totals to 100) for ixo, node, and oracle
@@ -88,9 +121,15 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 				return err
 			}
 
+			// Get relayer node address
+			relayerAddress, err := sdk.AccAddressFromBech32(relayerOracleEntityAccount)
+			if err != nil {
+				return err
+			}
+
 			recipients := types.NewDistribution(
 				types.NewDistributionShare(ixoAddress, ixoFeePercentage),
-				types.NewDistributionShare(relayerAddr, nodeFeePercentage),
+				types.NewDistributionShare(relayerAddress, nodeFeePercentage),
 				types.NewDistributionShare(receiver, oracleFeePercentage))
 
 			// Calculate list of outputs and calculate the total output to payees based

@@ -1,0 +1,17 @@
+syntax = "proto3";
+package ixo.mint.v1beta1;
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v3/x/mint/types";
+
+import "gogoproto/gogo.proto";
+
+// MintEpochProvisionsMintedEvent is triggered after a epoch is triggered
+// minting module for inflation.
+message MintEpochProvisionsMintedEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string epoch_number = 1;
+  string epoch_provisions = 2;
+  string amount = 3;
+}

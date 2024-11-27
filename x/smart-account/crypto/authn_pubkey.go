@@ -25,9 +25,6 @@ const (
 
 // Address returns the address of the public key
 func (pubKey *AuthnPubKey) Address() cryptotypes.Address {
-	// if len(pubKey.Key) != AuthnPubKeySize {
-	// 	panic("length of public key is incorrect")
-	// }
 	return address.Hash(pubKey.Type(), pubKey.Key)
 }
 
@@ -36,10 +33,9 @@ func (pubKey *AuthnPubKey) Bytes() []byte {
 	return pubKey.Key
 }
 
-// TODO: add all fields to the String method or just key?
 // String returns a string representation of the public key
 func (pubKey *AuthnPubKey) String() string {
-	return fmt.Sprintf("PubKeyAuthn{KeyId:%s, CoseAlgorithm:%d, Key:%X, relayingPartyId:%X}", pubKey.KeyId, pubKey.CoseAlgorithm, pubKey.Key, pubKey.RelayingPartyId)
+	return fmt.Sprintf("PubKeyAuthn{KeyId:%s, CoseAlgorithm:%d, Key:%X}", pubKey.KeyId, pubKey.CoseAlgorithm, pubKey.Key)
 }
 
 // Type returns the type of the public key

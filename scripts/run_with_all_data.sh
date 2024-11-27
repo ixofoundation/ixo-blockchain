@@ -107,8 +107,8 @@ TO="laddr = \"tcp:\/\/0.0.0.0:26657\""
 sed -i "s/$FROM/$TO/" "$HOME"/.ixod/config/config.toml
 
 # Set timeouts to 1s for shorter block times
-sed -i 's/timeout_commit = "5s"/timeout_commit = "1s"/g' "$HOME"/.ixod/config/config.toml
-sed -i 's/timeout_propose = "3s"/timeout_propose = "1s"/g' "$HOME"/.ixod/config/config.toml
+sed -i 's/timeout_commit = "5s"/timeout_commit = "2s"/g' "$HOME"/.ixod/config/config.toml
+sed -i 's/timeout_propose = "3s"/timeout_propose = "2s"/g' "$HOME"/.ixod/config/config.toml
 
 # ixod start --pruning "nothing" --log_level "trace" --trace
 ixod start --pruning "nothing"

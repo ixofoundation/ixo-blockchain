@@ -17,7 +17,7 @@ func ParamKeyTable() paramtypes.KeyTable {
 // NewParams creates a new Params instance
 func NewParams() Params {
 	return Params{
-		MaximumUnauthenticatedGas: 120_000,
+		MaximumUnauthenticatedGas: 250_000,
 		IsSmartAccountActive:      true,
 		CircuitBreakerControllers: []string{},
 	}

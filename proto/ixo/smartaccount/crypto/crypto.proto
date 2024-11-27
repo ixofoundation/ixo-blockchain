@@ -27,7 +27,4 @@ message AuthnPubKey {
   int32 cose_algorithm = 2;
   // The public key bytes
   bytes key = 3;
-  // The relaying party id is the id of the relaying party against which the
-  // authn key pair is registered. We store it as binary of sha256 hash.
-  bytes relaying_party_id = 4;
 }

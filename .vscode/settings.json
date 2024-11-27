@@ -1,6 +1,6 @@
 {
 	"go.lintOnSave": "workspace",
-	"go.lintTool": "golangci-lint",
+	"go.lintTool": "revive",
 	"go.lintFlags": ["--fast"],
 	"go.formatTool": "goimports",
 	"go.useLanguageServer": true,
@@ -22,5 +22,8 @@
 			"source.organizeImports": "explicit"
 		}
 	},
-	"rust-analyzer.checkOnSave": false
+	"rust-analyzer.checkOnSave": false,
+	"yaml.schemas": {
+		"https://golangci-lint.run/jsonschema/golangci.jsonschema.json": "file:///Users/michael/dev/ixo/ixo-blockchain/.golangci.yml"
+	}
 }

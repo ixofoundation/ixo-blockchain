@@ -111,18 +111,9 @@ func (pva AuthnVerification) OnAuthenticatorAdded(ctx sdk.Context, account sdk.A
 		return errorsmod.Wrap(err, "failed to unmarshal public key")
 	}
 
-	// ctx.Logger().Info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-	// ctx.Logger().Info("OnAuthenticatorAdded", "account", account, "authenticatorId", authenticatorId, "pubKey", pubKey)
-	// ctx.Logger().Info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-
 	// Validate that key_id (credential id) is not empty
 	if len(pubKey.KeyId) == 0 {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidPubKey, "public key id (credential id) is empty")
-	}
-
-	// Validate rpIdHash length (SHA-256 hash length is 32 bytes)
-	if len(pubKey.RelayingPartyId) != 32 {
-		return errorsmod.Wrap(sdkerrors.ErrInvalidPubKey, "invalid rpIdHash length")
 	}
 
 	// Validate the CoseAlgorithm

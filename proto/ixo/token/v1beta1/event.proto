@@ -53,6 +53,14 @@ message TokenRetiredEvent {
   repeated TokenBatch tokens = 2;
 }
 
+// CreditsTransferredEvent is an event triggered on a Credit transfer
+// execution
+message CreditsTransferredEvent {
+  // the token owner
+  string owner = 1;
+  repeated TokenBatch tokens = 2;
+}
+
 // TokenPausedEvent is an event triggered on a Token pause/unpause execution
 message TokenPausedEvent {
   // the minter address
