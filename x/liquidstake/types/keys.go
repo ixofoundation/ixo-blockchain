@@ -16,11 +16,11 @@ const (
 	StoreKey = ModuleName
 
 	// Epoch identifiers
-	// TODO: comment out 2min it is for local testing
-	AutocompoundEpoch = "2min"
-	RebalanceEpoch    = "2min"
-	// AutocompoundEpoch = "hour"
-	// RebalanceEpoch = "day"
+	// TODO: comment out 2min, used for local testing
+	// AutocompoundEpoch = "2min"
+	// RebalanceEpoch    = "2min"
+	AutocompoundEpoch = "hour"
+	RebalanceEpoch    = "day"
 )
 
 var (
