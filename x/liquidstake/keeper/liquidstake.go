@@ -57,6 +57,11 @@ func (k Keeper) LiquidStake(
 ) (stkIXOMintAmount math.Int, err error) {
 	params := k.GetParams(ctx)
 
+	// only allow the whitelistedAdminAddress to do liquid staking, this might be removed later
+	if params.WhitelistAdminAddress != liquidStaker.String() {
+		return math.ZeroInt(), types.ErrRestrictedToWhitelistedAdminAddress
+	}
+
 	if params.ModulePaused {
 		return math.ZeroInt(), types.ErrModulePaused
 	}

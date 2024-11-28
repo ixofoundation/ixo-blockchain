@@ -137,7 +137,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // BeginBlock executes all ABCI BeginBlock logic respective to the capability module.
-func (am AppModule) BeginBlock(context sdk.Context) error {
+func (am AppModule) BeginBlock(context context.Context) error {
 	ctx := sdk.UnwrapSDKContext(context)
 	BeginBlock(ctx, am.keeper)
 	return nil

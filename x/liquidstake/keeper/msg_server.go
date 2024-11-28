@@ -25,7 +25,6 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-// TODO: only zero dao should be able to liquid stake
 // --------------------------
 // LIQUID STAKE
 // --------------------------

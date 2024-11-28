@@ -24,4 +24,5 @@ var (
 	ErrUnstakeFailed                                = errors.Register(ModuleName, 18, "Unstaking failed")
 	ErrRedelegateFailed                             = errors.Register(ModuleName, 19, "Redelegate failed")
 	ErrRatioMoreThanOne                             = errors.Register(ModuleName, 20, "ratio should be less than or equal to 1")
+	ErrRestrictedToWhitelistedAdminAddress          = errors.Register(ModuleName, 21, "this action is restricted to only the whitelisted admin address")
 )

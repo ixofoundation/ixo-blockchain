@@ -44,12 +44,12 @@ func DefaultParams() Params {
 	return Params{
 		MintDenom:              ixo.IxoNativeToken,
 		GenesisEpochProvisions: ixomath.NewDec(43_500_000_000), // 43_500 IXO
-		// TODO: comment out 2min and uncomment day, 2min is for local testing
-		EpochIdentifier:         "2min",  // 2 min
-		ReductionPeriodInEpochs: 1000000, // 14 min
-		// EpochIdentifier:         "day",                                          // 1 day
-		// ReductionPeriodInEpochs: 365,                                            // 1 years
-		ReductionFactor: ixomath.NewDecWithPrec(666666666666666666, 18), // 0.666666666666666666
+		// TODO: comment out 2min, used for local testing
+		// EpochIdentifier:         "2min",  // 2 min
+		// ReductionPeriodInEpochs: 1000000, // 14 min
+		EpochIdentifier:         "day",                                          // 1 day
+		ReductionPeriodInEpochs: 365,                                            // 1 years
+		ReductionFactor:         ixomath.NewDecWithPrec(666666666666666666, 18), // 0.666666666666666666
 		DistributionProportions: DistributionProportions{
 			Staking:       ixomath.NewDecWithPrec(1, 0), // 1.0
 			ImpactRewards: ixomath.NewDecWithPrec(0, 1), // 0.0

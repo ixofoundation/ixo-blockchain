@@ -1,33 +1,28 @@
 # echo $(git describe --tags) | sed 's/^v//'
 
 ARG GO_VERSION="1.22"
-# ARG RUNNER_IMAGE="ubuntu:latest"
-ARG RUNNER_IMAGE="gcr.io/distroless/static-debian11"
+ARG RUNNER_IMAGE="ubuntu:latest"
+# ARG RUNNER_IMAGE="gcr.io/distroless/static-debian11"
 ARG BUILD_TAGS="netgo,ledger,muslc"
 
 # --------------------------------------------------------
 # Builder
 # --------------------------------------------------------
 
-FROM golang:${GO_VERSION}-alpine3.18 AS builder
+FROM golang:${GO_VERSION}-alpine3.20 AS builder
 
 # TODO: maybe extract below args to where called in cicd?
 # git log -1 --format='%H'
-ARG GIT_VERSION="4.0.0-rc.0"
-ARG GIT_COMMIT="ca9e64cf2f8c29b8bb001281abcdcb942dc9fa01"
+ARG GIT_VERSION="v4.0.0"
+ARG GIT_COMMIT="cbfe5c259cad5b192e6b6353879e80b1e8f2abd8"
 
-RUN apk add --no-cache \
-  ca-certificates \
-  build-base \
-  linux-headers \
-  binutils-gold
+ENV PACKAGES="ca-certificates build-base binutils-gold curl make git libc-dev bash file gcc linux-headers eudev-dev"
+RUN apk add --no-cache $PACKAGES
 
 # Download go dependencies
 WORKDIR /ixo
 COPY go.mod go.sum ./
-RUN --mount=type=cache,target=/root/.cache/go-build \
-  --mount=type=cache,target=/root/go/pkg/mod \
-  go mod download
+RUN go mod download
 
 # RUN ARCH=$(uname -m)
 # Cosmwasm - Download correct libwasmvm version
@@ -40,9 +35,7 @@ RUN ARCH=x86_64 && WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | sed 
 COPY . .
 
 # Build ixod binary
-RUN --mount=type=cache,target=/root/.cache/go-build \
-  --mount=type=cache,target=/root/go/pkg/mod \
-  GOWORK=off go build \
+RUN GOWORK=off go build \
   -mod=readonly \
   -tags "netgo,ledger,muslc" \
   -ldflags \
@@ -50,7 +43,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
   -X github.com/cosmos/cosmos-sdk/version.AppName="ixod" \
   -X github.com/cosmos/cosmos-sdk/version.Version=${GIT_VERSION} \
   -X github.com/cosmos/cosmos-sdk/version.Commit=${GIT_COMMIT} \
-  -X github.com/cosmos/cosmos-sdk/version.BuildTags=netgo,ledger,muslc \
+  -X github.com/cosmos/cosmos-sdk/version.BuildTags=${BUILD_TAGS} \
   -w -s -linkmode=external -extldflags '-Wl,-z,muldefs --static -lm'" \
   -trimpath \
   -o /ixo/build/ixod \

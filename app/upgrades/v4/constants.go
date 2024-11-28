@@ -41,8 +41,7 @@ const (
 	// IsSmartAccountActive is used for the smart account circuit breaker, smartaccounts are activated for v4
 	IsSmartAccountActive = true
 	// CircuitBreakerController is a DAODAO address, used only to deactivate the smart account module
-	// https://daodao.zone/dao/osmo1wn58hxkv0869ua7qmz3gvek3sz773l89a778fjqvenl6anwuhgnq6ks7kl/home
-	CircuitBreakerController = "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
+	CircuitBreakerController = "ixo15rwc9v3jfvypve8zemdr7y68dydsrh9m2urvjn"
 )
 
 var (
@@ -50,28 +49,25 @@ var (
 	// -------------------------------------------------
 	// total weights must be 10000
 	WhitelistedValidators = []liquidstaketypes.WhitelistedValidator{
+		// Launchpad Validator to start with
 		{
-			ValidatorAddress: "ixovaloper1n8yrmeatsk74dw0zs95ess9sgzptd6thzncf20",
-			TargetWeight:     math.NewIntFromUint64(5000),
-		},
-		{
-			ValidatorAddress: "ixovaloper1n8yrmeatsk74dw0zs95ess9sgzptd6thzncf20",
-			TargetWeight:     math.NewIntFromUint64(5000),
+			ValidatorAddress: "ixovaloper1kr8v9qt46ysltgmzcrtgyw5ckke83up673u2lu",
+			TargetWeight:     math.NewIntFromUint64(10000),
 		},
 	}
 	// LSMUnstakeFeeRate is the Unstake Fee Rate. (note the fee amount stays as staked amount in proxy account, it is not
 	// instaked and transferred to the FeeAccountAddress)
-	LSMUnstakeFeeRate = math.LegacyNewDecWithPrec(3333, 4) // "0.333300000000000000"
+	LSMUnstakeFeeRate = math.LegacyZeroDec()
 	// LSMAutocompoundFeeRate is the fee rate for auto redelegating the stake rewards.
-	LSMAutocompoundFeeRate = math.LegacyNewDecWithPrec(3333, 4) // "0.333300000000000000"
+	LSMAutocompoundFeeRate = math.LegacyZeroDec()
 	// LSMWhitelistAdminAddress is the address of the whitelist admin, who is allowed to add/remove whitelisted validators,
 	// pause/unpause the liquid stake module, and set the weighted rewards receivers.
-	LSMWhitelistAdminAddress = "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
+	LSMWhitelistAdminAddress = "ixo15rwc9v3jfvypve8zemdr7y68dydsrh9m2urvjn"
 	// LSMWeightedRewardsReceivers is the list of weighted rewards receivers who will recieve the staking rewards based
 	// on their weights.
 	LSMWeightedRewardsReceivers = []liquidstaketypes.WeightedAddress{}
 	// LSMFeeAccountAddress is the address of the fee account, which will receive the autocompound fees.
-	LSMFeeAccountAddress = "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
+	LSMFeeAccountAddress = "ixo15rwc9v3jfvypve8zemdr7y68dydsrh9m2urvjn"
 
 	// STAKING PARAMS
 	// -------------------------------------------------
