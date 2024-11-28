@@ -14,7 +14,7 @@ FROM golang:${GO_VERSION}-alpine3.20 AS builder
 # TODO: maybe extract below args to where called in cicd?
 # git log -1 --format='%H'
 ARG GIT_VERSION="v4.0.0"
-ARG GIT_COMMIT="cbfe5c259cad5b192e6b6353879e80b1e8f2abd8"
+ARG GIT_COMMIT="0c69a80ac7daaf633381744ca5d4f02302aa16df"
 
 ENV PACKAGES="ca-certificates build-base binutils-gold curl make git libc-dev bash file gcc linux-headers eudev-dev"
 RUN apk add --no-cache $PACKAGES
@@ -22,7 +22,9 @@ RUN apk add --no-cache $PACKAGES
 # Download go dependencies
 WORKDIR /ixo
 COPY go.mod go.sum ./
-RUN go mod download
+RUN --mount=type=cache,target=/root/.cache/go-build \
+  --mount=type=cache,target=/root/go/pkg/mod \
+  go mod download
 
 # RUN ARCH=$(uname -m)
 # Cosmwasm - Download correct libwasmvm version
@@ -35,7 +37,9 @@ RUN ARCH=x86_64 && WASMVM_VERSION=$(go list -m github.com/CosmWasm/wasmvm | sed 
 COPY . .
 
 # Build ixod binary
-RUN GOWORK=off go build \
+RUN --mount=type=cache,target=/root/.cache/go-build \
+  --mount=type=cache,target=/root/go/pkg/mod \
+  GOWORK=off go build \
   -mod=readonly \
   -tags "netgo,ledger,muslc" \
   -ldflags \

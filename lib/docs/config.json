@@ -110,14 +110,6 @@
       }
     },
     {
-      "url": "./tmp-swagger-gen/cosmos/mint/v1beta1/query.swagger.json",
-      "operationIds": {
-        "rename": {
-          "Params": "MintParams"
-        }
-      }
-    },
-    {
       "url": "./tmp-swagger-gen/cosmos/params/v1beta1/query.swagger.json",
       "operationIds": {
         "rename": {
@@ -240,6 +232,33 @@
     },
     {
       "url": "./tmp-swagger-gen/ixo/iid/v1beta1/query.swagger.json"
+    },
+    {
+      "url": "./tmp-swagger-gen/ixo/epochs/v1beta1/query.swagger.json"
+    },
+    {
+      "url": "./tmp-swagger-gen/ixo/liquidstake/v1beta1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "IXOLiquidStakeParams"
+        }
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ixo/mint/v1beta1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "IXOMintParams"
+        }
+      }
+    },
+    {
+      "url": "./tmp-swagger-gen/ixo/smartaccount/v1beta1/query.swagger.json",
+      "operationIds": {
+        "rename": {
+          "Params": "IXOSmartAccountParams"
+        }
+      }
     },
     {
       "url": "./tmp-swagger-gen/ixo/token/v1beta1/query.swagger.json",

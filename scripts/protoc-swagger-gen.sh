@@ -6,7 +6,7 @@
 set -eo pipefail
 
 # The directory where the final output are to be stored
-docs_dir="./docs"
+docs_dir="./lib/docs"
 
 # The directory where temporary swagger files are to be stored before they are
 # combined. Will be deleted in the end

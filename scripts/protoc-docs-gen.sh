@@ -12,7 +12,7 @@ sleep 2
 buf protoc \
   -I "proto" \
   -I "$SWAGGER_DIR/third_party" \
-  --doc_out=./docs/core \
+  --doc_out=./lib/docs/core \
   --doc_opt=markdown,proto-docs.md \
   $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
 
@@ -20,7 +20,7 @@ buf protoc \
 buf protoc \
   -I "proto" \
   -I "$SWAGGER_DIR/third_party" \
-  --doc_out=./docs/core \
+  --doc_out=./lib/docs/core \
   --doc_opt=html,proto-docs.html \
   $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
 
@@ -28,7 +28,7 @@ buf protoc \
 buf protoc \
   -I "proto" \
   -I "$SWAGGER_DIR/third_party" \
-  --doc_out=./docs/core \
+  --doc_out=./lib/docs/core \
   --doc_opt=json,proto-docs.json \
   $(find "$(pwd)/proto" -maxdepth 5 -name '*.proto')
 
