@@ -19,6 +19,7 @@ import (
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
 	epochtypes "github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/types"
 	minttypes "github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/types"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v4/x/token/types"
@@ -126,6 +127,11 @@ func init() {
 	// mint
 	setWhitelistedQuery("/ixo.mint.v1beta1.Query/Params", &minttypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.mint.v1beta1.Query/EpochProvisions", &minttypes.QueryEpochProvisionsResponse{})
+
+	// liquidstake
+	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/Params", &liquidstaketypes.QueryParamsResponse{})
+	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/LiquidValidators", &liquidstaketypes.QueryLiquidValidatorsResponse{})
+	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/States", &liquidstaketypes.QueryStatesResponse{})
 }
 
 // IsWhitelistedQuery returns if the query is not whitelisted.

@@ -137,6 +137,19 @@ func CreateUpgradeHandler(
 				subspace.Set(ctx, stakingtypes.KeyGlobalLiquidStakingCap, ValidatorLiquidStakingCap)
 				subspace.Set(ctx, stakingtypes.KeyValidatorLiquidStakingCap, GlobalLiquidStakingCap)
 			}
+
+			// If the subspace is for icq, set the new icq params before migration
+			// otheriwse chain like ixo devnet with no AllowQueries throw error on emoty bytes decode
+			// during RunMigrations
+			if subspace.Name() == icqtypes.ModuleName {
+				ctx.Logger().Info("Set new icq params before migration")
+				icqparams := icqtypes.DefaultParams()
+				icqparams.AllowQueries = wasmbinding.GetStargateWhitelistedPaths()
+				// Adding SmartContractState query to allowlist
+				icqparams.AllowQueries = append(icqparams.AllowQueries, "/cosmwasm.wasm.v1.Query/SmartContractState")
+				subspace.Set(ctx, icqtypes.KeyAllowQueries, icqparams.AllowQueries)
+				subspace.Set(ctx, icqtypes.KeyHostEnabled, icqparams.HostEnabled)
+			}
 		}
 
 		// Migrate Tendermint consensus parameters from x/params module to a deprecated x/consensus module.
@@ -209,19 +222,6 @@ func CreateUpgradeHandler(
 		liquidStakeParams.WeightedRewardsReceivers = LSMWeightedRewardsReceivers
 		liquidStakeParams.FeeAccountAddress = LSMFeeAccountAddress
 		keepers.LiquidStakeKeeper.SetParams(ctx, liquidStakeParams)
-
-		// -------------------------------------------------
-		// Set the ICQ params in the store
-		// -------------------------------------------------
-		ctx.Logger().Info("Set ICQKeeper params")
-		icqparams := icqtypes.DefaultParams()
-		icqparams.AllowQueries = wasmbinding.GetStargateWhitelistedPaths()
-		// Adding SmartContractState query to allowlist
-		icqparams.AllowQueries = append(icqparams.AllowQueries, "/cosmwasm.wasm.v1.Query/SmartContractState")
-		err = keepers.ICQKeeper.SetParams(ctx, icqparams)
-		if err != nil {
-			return nil, err
-		}
 
 		// -------------------------------------------------
 		// Set the ICA Host params in the store
