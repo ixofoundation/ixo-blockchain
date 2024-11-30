@@ -1,8 +1,59 @@
 # Entity module specification
 
-This document specifies the entity module, a custom Ixo Cosmos SDK module.
+# IXO Entity Module: Digital Twin Domains in the Spatial Web
 
-The Entity Module introduces a holistic approach to NFT-backed identities, bridging the gap between decentralized identifiers and tangible assets. Upon entity creation, a symbiotic relationship forms between an IID Document, an NFT, and the Entity's metadata. Further enriched with the concept of Entity Accounts, this module ensures a seamless transition of ownership, while offering a robust framework for entities to operate within a decentralized landscape.
+## Overview
+
+The IXO **Entity** Module provides a cutting-edge approach to digital identity and real-world asset representation within the Spatial Web. By enabling sovereign digital twin domains, backed by NFTs and managed by actors with decentralized identifiers (DIDs), this module creates a network of interconnected nodes within the Spatial Web. These entities form a robust framework for decentralized operations, facilitating interactions that have tangible impacts in the real world.
+
+## Key Features
+
+### Sovereign Digital Twin Domains
+
+Each entity represents a distinct, sovereign domain within the Spatial Web, including:
+
+- **Controllers**: Authorities responsible for governing the domain.
+- **Verifiable Credentials**: Cryptographic proofs for verifying attributes.
+- **Linked Resources**: Digital or physical assets associated with the domain.
+- **Accorded Rights**: Permissions and capabilities available within the Spatial Web.
+- **Services**: Functionalities provided by the entity, including third-party web services that interface with the domain.
+- **Linked Claims**: Assertions about or made by the entity.
+- **Linked Entities**: Relationships with other domains in the Spatial Web.
+- **Entity Accounts**: Any number of blockchain Accounts that may be used for different purposes.
+
+### NFT-Backed Domains
+
+- **NFT Integration**: Domains are represented as NFTs, integrated seamlessly with DIDs for enhanced security.
+- **Tangible Assets**: Digital twin domains can be owned, transferred, financed, or used as collateral, similar to traditional assets.
+
+### Interchain Identifier (IID) Document
+
+- **Comprehensive Representation**: IIDs provide a complete representation of the identity domain.
+- **Interoperability**: Supports interactions across multiple blockchain networks.
+
+### Entity Metadata
+
+- **Customizable Metadata**: Rich and customizable metadata allows detailed descriptions of each digital twin domain, enabling better discovery and context.
+
+### Entity Accounts
+
+- **Financial Management**: Dedicated accounts for managing resources, payments, and interactions between entities.
+
+## Spatial Web Integration
+
+The IXO Entity Module is a foundational element of the Spatial Web, enabling:
+
+- **Interconnected Digital Twin Domains**: Digital entities that operate autonomously and are linked through the Spatial Web.
+- **Graph-Based Relationships**: Establishing connections and relationships between entities, forming a robust network.
+- **Decentralized Governance**: Sovereign entities enable new models of governance and ownership.
+
+## Technical Implementation
+
+The Entity Module is built using the IXO Cosmos SDK, leveraging blockchain technology for:
+
+- **Immutability**: Ensuring that entity records are tamper-proof and reliable.
+- **Decentralized Control**: Giving entities complete control over their domains without centralized authorities.
+- **Interoperability**: Facilitating seamless interactions with other networks within the Cosmos ecosystem.
 
 ## Contents
 
