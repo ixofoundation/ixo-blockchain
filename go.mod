@@ -17,7 +17,7 @@ require (
 	cosmossdk.io/x/feegrant v0.1.1
 	cosmossdk.io/x/tx v0.13.5
 	cosmossdk.io/x/upgrade v0.1.4
-	github.com/CosmWasm/wasmd v0.50.0
+	github.com/CosmWasm/wasmd v0.53.0
 	github.com/CosmWasm/wasmvm v1.5.4
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cometbft/cometbft v0.38.12
@@ -60,6 +60,7 @@ require (
 	filippo.io/edwards25519 v1.1.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.2 // indirect
+	github.com/CosmWasm/wasmvm/v2 v2.1.2 // indirect
 	github.com/DataDog/datadog-go v3.2.0+incompatible // indirect
 	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/aws/aws-sdk-go v1.44.224 // indirect
@@ -129,7 +130,7 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0 // indirect
 	github.com/gsterjov/go-libsecret v0.0.0-20161001094733-a6f4afe4910c // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-getter v1.7.4 // indirect
+	github.com/hashicorp/go-getter v1.7.5 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-plugin v1.5.2 // indirect
@@ -179,6 +180,7 @@ require (
 	github.com/sagikazarmark/locafero v0.4.0 // indirect
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
+	github.com/shamaton/msgpack/v2 v2.2.0 // indirect
 	github.com/sourcegraph/conc v0.3.0 // indirect
 	github.com/spf13/afero v1.11.0 // indirect
 	github.com/spf13/viper v1.19.0 // indirect
