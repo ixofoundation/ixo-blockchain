@@ -15,8 +15,6 @@ import (
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/types"
 )
 
-// TODO: need details below!!
-
 const (
 	// UpgradeName defines the on-chain upgrade name for the Ixo v4 upgrade.
 	UpgradeName = "Dominia"
@@ -41,7 +39,8 @@ const (
 	// IsSmartAccountActive is used for the smart account circuit breaker, smartaccounts are activated for v4
 	IsSmartAccountActive = true
 	// CircuitBreakerController is a DAODAO address, used only to deactivate the smart account module
-	CircuitBreakerController = "ixo15rwc9v3jfvypve8zemdr7y68dydsrh9m2urvjn"
+	// Set to the Impact Hub DAO Security Group
+	CircuitBreakerController = "ixo1rrf8ydfh23y59vdv2aslvtfsua0vp84yyrg6gwflqht5dpexhxns45j7cd"
 )
 
 var (
@@ -49,7 +48,7 @@ var (
 	// -------------------------------------------------
 	// total weights must be 10000
 	WhitelistedValidators = []liquidstaketypes.WhitelistedValidator{
-		// Launchpad Validator to start with
+		// Internet of Impacts Launchpad Validator to start with
 		{
 			ValidatorAddress: "ixovaloper1kr8v9qt46ysltgmzcrtgyw5ckke83up673u2lu",
 			TargetWeight:     math.NewIntFromUint64(10000),
@@ -62,12 +61,14 @@ var (
 	LSMAutocompoundFeeRate = math.LegacyZeroDec()
 	// LSMWhitelistAdminAddress is the address of the whitelist admin, who is allowed to add/remove whitelisted validators,
 	// pause/unpause the liquid stake module, and set the weighted rewards receivers.
-	LSMWhitelistAdminAddress = "ixo15rwc9v3jfvypve8zemdr7y68dydsrh9m2urvjn"
+	// Set to the ZERO DAO Members Group
+	LSMWhitelistAdminAddress = "ixo1dwaypqeva5j5p8a0dux9n35lp0aspepnfy9zj45fc9s3wmpvcz4sk6duea"
 	// LSMWeightedRewardsReceivers is the list of weighted rewards receivers who will recieve the staking rewards based
 	// on their weights.
 	LSMWeightedRewardsReceivers = []liquidstaketypes.WeightedAddress{}
 	// LSMFeeAccountAddress is the address of the fee account, which will receive the autocompound fees.
-	LSMFeeAccountAddress = "ixo15rwc9v3jfvypve8zemdr7y68dydsrh9m2urvjn"
+	// Set to the ZERO DAO "LS Fees" entity account
+	LSMFeeAccountAddress = "ixo1qzngrk3hnpytp9apt7442u3gyr0fyv9y4wvy6u"
 
 	// STAKING PARAMS
 	// -------------------------------------------------
