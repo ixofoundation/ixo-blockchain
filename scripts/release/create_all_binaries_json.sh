@@ -1,7 +1,7 @@
 #!/bin/bash
 
 tags=(
-  "v2.0.0"
+  "v4.0.0"
 )
 
 echo "# Cosmovisor binaries"
