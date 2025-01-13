@@ -1342,10 +1342,10 @@ signal-exit@^3.0.3:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
 
-snyk@1.1118.0:
-  version "1.1118.0"
-  resolved "https://registry.yarnpkg.com/snyk/-/snyk-1.1118.0.tgz#a85caa2ea0a808567ab7b8fa0baa68b44a4491ec"
-  integrity sha512-zddbk/h6CHrcSGFB381LsnTIHj4oD0CeCspNnHVsVmExthr1gZWbCzs3aVztN9NSmkfh7Zx8QLnGmvG6b5m7hw==
+snyk@1.1295.0:
+  version "1.1295.0"
+  resolved "https://registry.yarnpkg.com/snyk/-/snyk-1.1295.0.tgz#8fc91f9807065741484fdb890d5c462bd97d92fa"
+  integrity sha512-3r+PlwWBQhWMkFGEpS8NMQDXAcBgYoHtq8tocK/6x95PVAEQpoIcqyR1n5o4kAvvcY7v5BxnWYpG/xMSQ3aggQ==
   dependencies:
     "@sentry/node" "^7.36.0"
     global-agent "^3.0.0"
