@@ -36,7 +36,7 @@ func NewTxCmd() *cobra.Command {
 	return entityTxCmd
 }
 
-// NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
+// NewCmdUpdateEntityParamsProposal implements a command handler for submitting a software upgrade proposal transaction.
 func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-entity-params [nft-contract-code] [nft-minter-address] [flags]",

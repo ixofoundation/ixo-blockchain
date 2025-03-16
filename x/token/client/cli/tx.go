@@ -36,7 +36,7 @@ func NewTxCmd() *cobra.Command {
 	return tokenTxCmd
 }
 
-// NewCmdSubmitUpgradeProposal implements a command handler for submitting a software upgrade proposal transaction.
+// NewCmdUpdateTokenParamsProposal implements a command handler for submitting a software upgrade proposal transaction.
 func NewCmdUpdateTokenParamsProposal() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "update-token-params [ixo1155-code-id] [flags]",
