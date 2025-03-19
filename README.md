@@ -33,6 +33,6 @@ Ixo has 8 custom cosmos modules which help to reach the Ixo goals and missions:
 
 ## 🤝 How to contribute
 
-If you are interested in contributing to the ixo Blockchain, you can start by reviewing the documentation on our [website](https://docs.ixo.foundation/ixo/developers). There are many opportunities to get involved, such as contributing code or participating in community discussions.
+If you are interested in contributing to the ixo Blockchain, there are many opportunities to get involved, such as contributing code or participating in community discussions. See the [How to Contribute section](https://github.com/ixofoundation#how-to-contribute) of our documentation for more details.
 
-Our community is passionate about using blockchain technology to create positive impacts in the world. We believe in the power of collaboration and innovation to drive change, and we welcome anyone who shares our vision to join us on Discord or Telegram
+Our community is passionate about using blockchain technology to create positive impacts in the world. We believe in the power of collaboration and innovation to drive change, and we welcome anyone who shares our vision to join us on Discord or Telegram.
