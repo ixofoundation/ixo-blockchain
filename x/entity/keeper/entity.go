@@ -106,7 +106,7 @@ func (k Keeper) GetAllEntity(ctx sdk.Context) []types.Entity {
 	)
 }
 
-// Create a module account for entity id and name of account as fragemnt in form: did#name
+// Create a module account for entity id and name of account as fragment in form: did#name
 func (k Keeper) CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.AccAddress, error) {
 	address := types.GetModuleAccountAddress(entityId, name)
 

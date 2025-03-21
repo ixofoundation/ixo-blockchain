@@ -205,15 +205,16 @@ type MsgSubmitClaim struct {
 	AdminAddress string `protobuf:"bytes,5,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
 	// use_intent is the option for using intent for this claim if it exists and
 	// is active. NOTE: if use_intent is true then amount and cw20 amount are
-	// ignored and overriden with intent amounts. NOTE: if use_intent is true and
+	// ignored and overridden with intent amounts. NOTE: if use_intent is true and
 	// there is no active intent then will error
 	UseIntent bool `protobuf:"varint,6,opt,name=use_intent,json=useIntent,proto3" json:"use_intent,omitempty"`
-	// NOTE: if both amount and cw20_payment are empty then use default by
-	// Collection custom amount specified by service agent for claim approval
+	// custom amount specified by service agent for claim approval
+	// NOTE: if both amount and cw20_payment are empty then collection default is
+	// used
 	Amount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,7,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
-	// NOTE: if both amount and cw20 amount are empty then use default by
-	// Collection custom cw20 payments specified by service agent for claim
-	// approval
+	// custom cw20 payments specified by service agent for claim approval
+	// NOTE: if both amount and cw20 amount are empty then collection default is
+	// used
 	Cw20Payment []*CW20Payment `protobuf:"bytes,8,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
 }
 
@@ -360,17 +361,17 @@ type MsgEvaluateClaim struct {
 	// reason is the code expressed as an integer, for why the evaluation result
 	// was given (codes defined by evaluator)
 	Reason uint32 `protobuf:"varint,8,opt,name=reason,proto3" json:"reason,omitempty"`
-	// verificationProof is the cid of the evaluation Verfiable Credential
+	// verificationProof is the cid of the evaluation Verifiable Credential
 	VerificationProof string `protobuf:"bytes,9,opt,name=verification_proof,json=verificationProof,proto3" json:"verification_proof,omitempty"`
+	// custom amount specified by evaluator for claim approval
 	// NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-	// overriden with intent amounts NOTE: if both amount and cw20 amount are
-	// empty then use collection default custom amount specified by evaluator for
-	// claim approval
+	// overridden with intent amounts NOTE: if both amount and cw20 amount are
+	// empty then collection default is used
 	Amount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,10,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+	// custom cw20 payments specified by evaluator for claim approval
 	// NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-	// overriden with intent amounts NOTE: if both amount and cw20 amount are
-	// empty then use collection default custom cw20 payments specified by
-	// evaluator for claim approval
+	// overridden with intent amounts NOTE: if both amount and cw20 amount are
+	// empty then collection default is used
 	Cw20Payment []*CW20Payment `protobuf:"bytes,11,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
 }
 
@@ -642,9 +643,9 @@ var xxx_messageInfo_MsgDisputeClaimResponse proto.InternalMessageInfo
 type MsgWithdrawPayment struct {
 	// claim_id the withdrawal is for
 	ClaimId string `protobuf:"bytes,1,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
-	// Inputs to the multisend tx to run to withdraw payment
+	// Inputs to the multi send tx to run to withdraw payment
 	Inputs []types1.Input `protobuf:"bytes,2,rep,name=inputs,proto3" json:"inputs"`
-	// Outputs for the multisend tx to run to withdraw payment
+	// Outputs for the multi send tx to run to withdraw payment
 	Outputs []types1.Output `protobuf:"bytes,3,rep,name=outputs,proto3" json:"outputs"`
 	// payment type to keep track what payment is for and mark claim payment
 	// accordingly
@@ -1219,11 +1220,13 @@ type MsgClaimIntent struct {
 	AgentAddress string `protobuf:"bytes,2,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// The id of the collection this intent is linked to.
 	CollectionId string `protobuf:"bytes,3,opt,name=collection_id,json=collectionId,proto3" json:"collection_id,omitempty"`
+	// The desired claim amount, if any.
 	// NOTE: if both amount and cw20 amount are empty then default by Collection
-	// is used (APPROVAL payment). The desired claim amount, if any.
+	// is used (APPROVAL payment).
 	Amount github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,4,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+	// The custom CW20 payment, if any.
 	// NOTE: if both amount and cw20 amount are empty then default by Collection
-	// is used (APPROVAL payment). The custom CW20 payment, if any.
+	// is used (APPROVAL payment).
 	Cw20Payment []*CW20Payment `protobuf:"bytes,5,rep,name=cw20_payment,json=cw20Payment,proto3" json:"cw20_payment,omitempty"`
 }
 

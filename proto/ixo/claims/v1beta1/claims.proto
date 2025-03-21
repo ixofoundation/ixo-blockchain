@@ -160,8 +160,11 @@ message Payment {
   // cw20 payments, can be empty or multiple
   repeated CW20Payment cw20_payment = 5;
   // boolean to indicate if the payment is for oracle payments, aka it will go
-  // through network fees split NOTE: if true the payment can only have amount
-  // values(Native coins), no cw20 payments allowed then
+  // through network fees split, only allowed for APPROVED payment types. NOTE:
+  // if true and the payment contains cw20 payments, the claim will only be
+  // successfully if an intent exists to ensure immediate cw20 payment split,
+  // since there is no WithdrawalAuthorization to manage the cw20 payment split
+  // for delayed payments
   bool is_oracle_payment = 6;
 }
 
@@ -177,6 +180,18 @@ message CW20Payment {
   option (gogoproto.equal) = true;
 
   string address = 1;
+  // chose uint64 for now as amounts should be small enough to fit in a
+  // uint64(max 18446744073709551615)
+  uint64 amount = 3;
+}
+
+// CW20Output represents a CW20 token output for split payments
+message CW20Output {
+  // address is the address of the recipient
+  string address = 1;
+  // contract_address is the address of the contract
+  string contract_address = 2;
+  // amount is the amount of the token to transfer
   // chose uint64 for now as amounts should be small enough to fit in a
   // uint64(max 18446744073709551615)
   uint64 amount = 3;
@@ -198,15 +213,17 @@ message Claim {
   ClaimPayments payments_status = 7;
   // intent_id is the id of the intent for this claim, if any
   bool use_intent = 8;
-  // NOTE: if both amount and cw20 amount are empty then use default by
-  // Collection custom amount specified by service agent for claim approval
+  // custom amount specified by service agent for claim approval
+  // NOTE: if both amount and cw20 amount are empty then collection default is
+  // used
   repeated cosmos.base.v1beta1.Coin amount = 9 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // NOTE: if both amount and cw20 amount are empty then use default by
-  // Collection custom cw20 payments specified by service agent for claim
+  // custom cw20 payments specified by service agent for claim
   // approval
+  // NOTE: if both amount and cw20 amount are empty then collection default is
+  // used
   repeated CW20Payment cw20_payment = 10;
 }
 
@@ -240,13 +257,16 @@ message Evaluation {
   // evaluationDate is the date and time that the claim evaluation was submitted
   // on-chain
   google.protobuf.Timestamp evaluation_date = 9 [ (gogoproto.stdtime) = true ];
-  // if both amount and cw20 amount are empty then use default by Collection
   // custom amount specified by evaluator for claim approval
+  // NOTE: if both amount and cw20 amount are empty then collection default is
+  // used
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
   // custom cw20 payments specified by evaluator for claim approval
+  // NOTE: if both amount and cw20 amount are empty then collection default is
+  // used
   repeated CW20Payment cw20_payment = 11;
 }
 

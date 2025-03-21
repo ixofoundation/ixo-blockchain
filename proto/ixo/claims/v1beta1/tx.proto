@@ -73,18 +73,19 @@ message MsgSubmitClaim {
   string admin_address = 5;
   // use_intent is the option for using intent for this claim if it exists and
   // is active. NOTE: if use_intent is true then amount and cw20 amount are
-  // ignored and overriden with intent amounts. NOTE: if use_intent is true and
+  // ignored and overridden with intent amounts. NOTE: if use_intent is true and
   // there is no active intent then will error
   bool use_intent = 6;
-  // NOTE: if both amount and cw20_payment are empty then use default by
-  // Collection custom amount specified by service agent for claim approval
+  // custom amount specified by service agent for claim approval
+  // NOTE: if both amount and cw20_payment are empty then collection default is
+  // used
   repeated cosmos.base.v1beta1.Coin amount = 7 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // NOTE: if both amount and cw20 amount are empty then use default by
-  // Collection custom cw20 payments specified by service agent for claim
-  // approval
+  // custom cw20 payments specified by service agent for claim approval
+  // NOTE: if both amount and cw20 amount are empty then collection default is
+  // used
   repeated CW20Payment cw20_payment = 8;
 }
 message MsgSubmitClaimResponse {}
@@ -112,20 +113,20 @@ message MsgEvaluateClaim {
   // reason is the code expressed as an integer, for why the evaluation result
   // was given (codes defined by evaluator)
   uint32 reason = 8;
-  // verificationProof is the cid of the evaluation Verfiable Credential
+  // verificationProof is the cid of the evaluation Verifiable Credential
   string verification_proof = 9;
+  // custom amount specified by evaluator for claim approval
   // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-  // overriden with intent amounts NOTE: if both amount and cw20 amount are
-  // empty then use collection default custom amount specified by evaluator for
-  // claim approval
+  // overridden with intent amounts NOTE: if both amount and cw20 amount are
+  // empty then collection default is used
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // custom cw20 payments specified by evaluator for claim approval
   // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-  // overriden with intent amounts NOTE: if both amount and cw20 amount are
-  // empty then use collection default custom cw20 payments specified by
-  // evaluator for claim approval
+  // overridden with intent amounts NOTE: if both amount and cw20 amount are
+  // empty then collection default is used
   repeated CW20Payment cw20_payment = 11;
 }
 message MsgEvaluateClaimResponse {}
@@ -156,10 +157,10 @@ message MsgWithdrawPayment {
 
   // claim_id the withdrawal is for
   string claim_id = 1;
-  // Inputs to the multisend tx to run to withdraw payment
+  // Inputs to the multi send tx to run to withdraw payment
   repeated cosmos.bank.v1beta1.Input inputs = 2
       [ (gogoproto.nullable) = false ];
-  // Outputs for the multisend tx to run to withdraw payment
+  // Outputs for the multi send tx to run to withdraw payment
   repeated cosmos.bank.v1beta1.Output outputs = 3
       [ (gogoproto.nullable) = false ];
   // payment type to keep track what payment is for and mark claim payment
@@ -247,14 +248,16 @@ message MsgClaimIntent {
   string agent_address = 2;
   // The id of the collection this intent is linked to.
   string collection_id = 3;
+  // The desired claim amount, if any.
   // NOTE: if both amount and cw20 amount are empty then default by Collection
-  // is used (APPROVAL payment). The desired claim amount, if any.
+  // is used (APPROVAL payment).
   repeated cosmos.base.v1beta1.Coin amount = 4 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // The custom CW20 payment, if any.
   // NOTE: if both amount and cw20 amount are empty then default by Collection
-  // is used (APPROVAL payment). The custom CW20 payment, if any.
+  // is used (APPROVAL payment).
   repeated CW20Payment cw20_payment = 5;
 }
 

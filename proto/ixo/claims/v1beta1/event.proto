@@ -26,7 +26,10 @@ message ClaimEvaluatedEvent { Evaluation evaluation = 1; }
 message ClaimDisputedEvent { Dispute dispute = 1; }
 
 // ClaimDisputedEvent is an event triggered on a Claim dispute
-message PaymentWithdrawnEvent { WithdrawPaymentConstraints withdraw = 1; }
+message PaymentWithdrawnEvent {
+  WithdrawPaymentConstraints withdraw = 1;
+  repeated CW20Output cw20_outputs = 2;
+}
 
 // ClaimDisputedEvent is an event triggered on a Claim dispute
 message PaymentWithdrawCreatedEvent { WithdrawPaymentConstraints withdraw = 1; }

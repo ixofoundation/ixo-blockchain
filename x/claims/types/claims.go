@@ -131,21 +131,21 @@ func (p Payment) Validate(allowOraclePayments bool) error {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "oracle payments is only allowed for APPROVAL payments")
 	}
 
-	// if is oracle payment then only native coins allowed
-	if p.IsOraclePayment && (!IsZeroCW20Payments(p.Cw20Payment) || p.Contract_1155Payment != nil) {
-		return ErrOraclePaymentOnlyNative
+	// Temporarily disable 1155 payments
+	if p.Contract_1155Payment != nil {
+		return fmt.Errorf("1155 payments are currently disabled (not allowed)")
 	}
 
 	if err = p.Contract_1155Payment.Validate(); err != nil {
 		return err
 	}
 
-	// no 0 amounts allowed, otherwise unnnecesary 0 amount payments
+	// no 0 amounts allowed, otherwise unnecessary 0 amount payments
 	if err = ValidateCW20Payments(p.Cw20Payment, false); err != nil {
 		return err
 	}
 
-	// no 0 amounts allowed, otherwise unnnecesary 0 amount payments
+	// no 0 amounts allowed, otherwise unnecessary 0 amount payments
 	if err = p.Amount.Sort().Validate(); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "amounts not valid: (%s)", err)
 	}
@@ -311,7 +311,7 @@ func ValidateCoinsAllowZero(coins sdk.Coins) error {
 	}
 }
 
-// Create a module account for entity id and name of account as fragemnt in form: did#name
+// Create a module account for entity id and name of account as fragment in form: did#name
 func CreateNewCollectionEscrow(ctx sdk.Context, accKeeper AccountKeeper, collectionId string) (sdk.AccAddress, error) {
 	address := GetModuleAccountAddressEscrow(collectionId)
 
@@ -324,7 +324,3 @@ func CreateNewCollectionEscrow(ctx sdk.Context, accKeeper AccountKeeper, collect
 
 	return account.GetAddress(), nil
 }
-
-// func CreateNewEntityAccountAndEmitEvents(ctx sdk.Context, entityKeeper EntityKeeper, entityId string) (sdk.AccAddress, error) {
-
-// }

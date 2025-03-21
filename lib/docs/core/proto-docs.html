@@ -534,6 +534,10 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.CW20Output"><span class="badge">M</span>CW20Output</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.CW20Payment"><span class="badge">M</span>CW20Payment</a>
                 </li>
               
@@ -5284,6 +5288,46 @@ in the SETTLE stage.</p></td>
       <p></p>
 
       
+        <h3 id="ixo.claims.v1beta1.CW20Output">CW20Output</h3>
+        <p>CW20Output represents a CW20 token output for split payments</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address is the address of the recipient </p></td>
+                </tr>
+              
+                <tr>
+                  <td>contract_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>contract_address is the address of the contract </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>amount is the amount of the token to transfer
+chose uint64 for now as amounts should be small enough to fit in a
+uint64(max 18446744073709551615) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.claims.v1beta1.CW20Payment">CW20Payment</h3>
         <p></p>
 
@@ -5386,17 +5430,19 @@ uint64(max 18446744073709551615) </p></td>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20 amount are empty then use default by
-Collection custom amount specified by service agent for claim approval </p></td>
+                  <td><p>custom amount specified by service agent for claim approval
+NOTE: if both amount and cw20 amount are empty then collection default is
+used </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20 amount are empty then use default by
-Collection custom cw20 payments specified by service agent for claim
-approval </p></td>
+                  <td><p>custom cw20 payments specified by service agent for claim
+approval
+NOTE: if both amount and cw20 amount are empty then collection default is
+used </p></td>
                 </tr>
               
             </tbody>
@@ -5807,15 +5853,18 @@ on-chain </p></td>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>if both amount and cw20 amount are empty then use default by Collection
-custom amount specified by evaluator for claim approval </p></td>
+                  <td><p>custom amount specified by evaluator for claim approval
+NOTE: if both amount and cw20 amount are empty then collection default is
+used </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>custom cw20 payments specified by evaluator for claim approval </p></td>
+                  <td><p>custom cw20 payments specified by evaluator for claim approval
+NOTE: if both amount and cw20 amount are empty then collection default is
+used </p></td>
                 </tr>
               
             </tbody>
@@ -6030,8 +6079,11 @@ immediate direct payment </p></td>
                   <td><a href="#bool">bool</a></td>
                   <td></td>
                   <td><p>boolean to indicate if the payment is for oracle payments, aka it will go
-through network fees split NOTE: if true the payment can only have amount
-values(Native coins), no cw20 payments allowed then </p></td>
+through network fees split, only allowed for APPROVED payment types. NOTE:
+if true and the payment contains cw20 payments, the claim will only be
+successfully if an intent exists to ensure immediate cw20 payment split,
+since there is no WithdrawalAuthorization to manage the cw20 payment split
+for delayed payments </p></td>
                 </tr>
               
             </tbody>
@@ -6860,6 +6912,13 @@ plus the timeout on Collection payments, if null then none </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>cw20_outputs</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Output">CW20Output</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7636,16 +7695,18 @@ plus the timeout on Collection payments, if null then none </p></td>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20 amount are empty then default by Collection
-is used (APPROVAL payment). The desired claim amount, if any. </p></td>
+                  <td><p>The desired claim amount, if any.
+NOTE: if both amount and cw20 amount are empty then default by Collection
+is used (APPROVAL payment). </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20 amount are empty then default by Collection
-is used (APPROVAL payment). The custom CW20 payment, if any. </p></td>
+                  <td><p>The custom CW20 payment, if any.
+NOTE: if both amount and cw20 amount are empty then default by Collection
+is used (APPROVAL payment). </p></td>
                 </tr>
               
             </tbody>
@@ -7910,27 +7971,27 @@ was given (codes defined by evaluator) </p></td>
                   <td>verification_proof</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>verificationProof is the cid of the evaluation Verfiable Credential </p></td>
+                  <td><p>verificationProof is the cid of the evaluation Verifiable Credential </p></td>
                 </tr>
               
                 <tr>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-overriden with intent amounts NOTE: if both amount and cw20 amount are
-empty then use collection default custom amount specified by evaluator for
-claim approval </p></td>
+                  <td><p>custom amount specified by evaluator for claim approval
+NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+overridden with intent amounts NOTE: if both amount and cw20 amount are
+empty then collection default is used </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-overriden with intent amounts NOTE: if both amount and cw20 amount are
-empty then use collection default custom cw20 payments specified by
-evaluator for claim approval </p></td>
+                  <td><p>custom cw20 payments specified by evaluator for claim approval
+NOTE: if claim is using intent, then amount and cw20 amount are ignored and
+overridden with intent amounts NOTE: if both amount and cw20 amount are
+empty then collection default is used </p></td>
                 </tr>
               
             </tbody>
@@ -7998,7 +8059,7 @@ evaluator for claim approval </p></td>
                   <td></td>
                   <td><p>use_intent is the option for using intent for this claim if it exists and
 is active. NOTE: if use_intent is true then amount and cw20 amount are
-ignored and overriden with intent amounts. NOTE: if use_intent is true and
+ignored and overridden with intent amounts. NOTE: if use_intent is true and
 there is no active intent then will error </p></td>
                 </tr>
               
@@ -8006,17 +8067,18 @@ there is no active intent then will error </p></td>
                   <td>amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20_payment are empty then use default by
-Collection custom amount specified by service agent for claim approval </p></td>
+                  <td><p>custom amount specified by service agent for claim approval
+NOTE: if both amount and cw20_payment are empty then collection default is
+used </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>NOTE: if both amount and cw20 amount are empty then use default by
-Collection custom cw20 payments specified by service agent for claim
-approval </p></td>
+                  <td><p>custom cw20 payments specified by service agent for claim approval
+NOTE: if both amount and cw20 amount are empty then collection default is
+used </p></td>
                 </tr>
               
             </tbody>
@@ -8245,14 +8307,14 @@ update to </p></td>
                   <td>inputs</td>
                   <td><a href="#cosmos.bank.v1beta1.Input">cosmos.bank.v1beta1.Input</a></td>
                   <td>repeated</td>
-                  <td><p>Inputs to the multisend tx to run to withdraw payment </p></td>
+                  <td><p>Inputs to the multi send tx to run to withdraw payment </p></td>
                 </tr>
               
                 <tr>
                   <td>outputs</td>
                   <td><a href="#cosmos.bank.v1beta1.Output">cosmos.bank.v1beta1.Output</a></td>
                   <td>repeated</td>
-                  <td><p>Outputs for the multisend tx to run to withdraw payment </p></td>
+                  <td><p>Outputs for the multi send tx to run to withdraw payment </p></td>
                 </tr>
               
                 <tr>

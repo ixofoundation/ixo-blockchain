@@ -50588,11 +50588,13 @@ paths:
 
                             signatures required by gogoproto.
                         title: >-
-                          if both amount and cw20 amount are empty then use
-                          default by Collection
-
                           custom amount specified by evaluator for claim
                           approval
+
+                          NOTE: if both amount and cw20 amount are empty then
+                          collection default is
+
+                          used
                       cw20_payment:
                         type: array
                         items:
@@ -50611,6 +50613,11 @@ paths:
                         title: >-
                           custom cw20 payments specified by evaluator for claim
                           approval
+
+                          NOTE: if both amount and cw20 amount are empty then
+                          collection default is
+
+                          used
                   payments_status:
                     title: >-
                       payments_status is the status of the payments for the
@@ -50714,11 +50721,13 @@ paths:
 
                         signatures required by gogoproto.
                     title: >-
-                      NOTE: if both amount and cw20 amount are empty then use
-                      default by
+                      custom amount specified by service agent for claim
+                      approval
 
-                      Collection custom amount specified by service agent for
-                      claim approval
+                      NOTE: if both amount and cw20 amount are empty then
+                      collection default is
+
+                      used
                   cw20_payment:
                     type: array
                     items:
@@ -50735,13 +50744,14 @@ paths:
 
                             uint64(max 18446744073709551615)
                     title: >-
-                      NOTE: if both amount and cw20 amount are empty then use
-                      default by
-
-                      Collection custom cw20 payments specified by service agent
-                      for claim
+                      custom cw20 payments specified by service agent for claim
 
                       approval
+
+                      NOTE: if both amount and cw20 amount are empty then
+                      collection default is
+
+                      used
         default:
           description: An unexpected error response.
           schema:
@@ -50890,11 +50900,13 @@ paths:
 
                               signatures required by gogoproto.
                           title: >-
-                            if both amount and cw20 amount are empty then use
-                            default by Collection
-
                             custom amount specified by evaluator for claim
                             approval
+
+                            NOTE: if both amount and cw20 amount are empty then
+                            collection default is
+
+                            used
                         cw20_payment:
                           type: array
                           items:
@@ -50913,6 +50925,11 @@ paths:
                           title: >-
                             custom cw20 payments specified by evaluator for
                             claim approval
+
+                            NOTE: if both amount and cw20 amount are empty then
+                            collection default is
+
+                            used
                     payments_status:
                       title: >-
                         payments_status is the status of the payments for the
@@ -51017,11 +51034,13 @@ paths:
 
                           signatures required by gogoproto.
                       title: >-
-                        NOTE: if both amount and cw20 amount are empty then use
-                        default by
+                        custom amount specified by service agent for claim
+                        approval
 
-                        Collection custom amount specified by service agent for
-                        claim approval
+                        NOTE: if both amount and cw20 amount are empty then
+                        collection default is
+
+                        used
                     cw20_payment:
                       type: array
                       items:
@@ -51038,13 +51057,15 @@ paths:
 
                               uint64(max 18446744073709551615)
                       title: >-
-                        NOTE: if both amount and cw20 amount are empty then use
-                        default by
-
-                        Collection custom cw20 payments specified by service
-                        agent for claim
+                        custom cw20 payments specified by service agent for
+                        claim
 
                         approval
+
+                        NOTE: if both amount and cw20 amount are empty then
+                        collection default is
+
+                        used
               pagination:
                 type: object
                 properties:
@@ -51328,11 +51349,19 @@ paths:
                               boolean to indicate if the payment is for oracle
                               payments, aka it will go
 
-                              through network fees split NOTE: if true the
-                              payment can only have amount
+                              through network fees split, only allowed for
+                              APPROVED payment types. NOTE:
 
-                              values(Native coins), no cw20 payments allowed
-                              then
+                              if true and the payment contains cw20 payments,
+                              the claim will only be
+
+                              successfully if an intent exists to ensure
+                              immediate cw20 payment split,
+
+                              since there is no WithdrawalAuthorization to
+                              manage the cw20 payment split
+
+                              for delayed payments
                       evaluation:
                         type: object
                         properties:
@@ -51401,11 +51430,19 @@ paths:
                               boolean to indicate if the payment is for oracle
                               payments, aka it will go
 
-                              through network fees split NOTE: if true the
-                              payment can only have amount
+                              through network fees split, only allowed for
+                              APPROVED payment types. NOTE:
 
-                              values(Native coins), no cw20 payments allowed
-                              then
+                              if true and the payment contains cw20 payments,
+                              the claim will only be
+
+                              successfully if an intent exists to ensure
+                              immediate cw20 payment split,
+
+                              since there is no WithdrawalAuthorization to
+                              manage the cw20 payment split
+
+                              for delayed payments
                       approval:
                         type: object
                         properties:
@@ -51474,11 +51511,19 @@ paths:
                               boolean to indicate if the payment is for oracle
                               payments, aka it will go
 
-                              through network fees split NOTE: if true the
-                              payment can only have amount
+                              through network fees split, only allowed for
+                              APPROVED payment types. NOTE:
 
-                              values(Native coins), no cw20 payments allowed
-                              then
+                              if true and the payment contains cw20 payments,
+                              the claim will only be
+
+                              successfully if an intent exists to ensure
+                              immediate cw20 payment split,
+
+                              since there is no WithdrawalAuthorization to
+                              manage the cw20 payment split
+
+                              for delayed payments
                       rejection:
                         type: object
                         properties:
@@ -51547,11 +51592,19 @@ paths:
                               boolean to indicate if the payment is for oracle
                               payments, aka it will go
 
-                              through network fees split NOTE: if true the
-                              payment can only have amount
+                              through network fees split, only allowed for
+                              APPROVED payment types. NOTE:
 
-                              values(Native coins), no cw20 payments allowed
-                              then
+                              if true and the payment contains cw20 payments,
+                              the claim will only be
+
+                              successfully if an intent exists to ensure
+                              immediate cw20 payment split,
+
+                              since there is no WithdrawalAuthorization to
+                              manage the cw20 payment split
+
+                              for delayed payments
                   signer:
                     type: string
                     title: signer address
@@ -51798,11 +51851,19 @@ paths:
                                 boolean to indicate if the payment is for oracle
                                 payments, aka it will go
 
-                                through network fees split NOTE: if true the
-                                payment can only have amount
+                                through network fees split, only allowed for
+                                APPROVED payment types. NOTE:
 
-                                values(Native coins), no cw20 payments allowed
-                                then
+                                if true and the payment contains cw20 payments,
+                                the claim will only be
+
+                                successfully if an intent exists to ensure
+                                immediate cw20 payment split,
+
+                                since there is no WithdrawalAuthorization to
+                                manage the cw20 payment split
+
+                                for delayed payments
                         evaluation:
                           type: object
                           properties:
@@ -51871,11 +51932,19 @@ paths:
                                 boolean to indicate if the payment is for oracle
                                 payments, aka it will go
 
-                                through network fees split NOTE: if true the
-                                payment can only have amount
+                                through network fees split, only allowed for
+                                APPROVED payment types. NOTE:
 
-                                values(Native coins), no cw20 payments allowed
-                                then
+                                if true and the payment contains cw20 payments,
+                                the claim will only be
+
+                                successfully if an intent exists to ensure
+                                immediate cw20 payment split,
+
+                                since there is no WithdrawalAuthorization to
+                                manage the cw20 payment split
+
+                                for delayed payments
                         approval:
                           type: object
                           properties:
@@ -51944,11 +52013,19 @@ paths:
                                 boolean to indicate if the payment is for oracle
                                 payments, aka it will go
 
-                                through network fees split NOTE: if true the
-                                payment can only have amount
+                                through network fees split, only allowed for
+                                APPROVED payment types. NOTE:
 
-                                values(Native coins), no cw20 payments allowed
-                                then
+                                if true and the payment contains cw20 payments,
+                                the claim will only be
+
+                                successfully if an intent exists to ensure
+                                immediate cw20 payment split,
+
+                                since there is no WithdrawalAuthorization to
+                                manage the cw20 payment split
+
+                                for delayed payments
                         rejection:
                           type: object
                           properties:
@@ -52017,11 +52094,19 @@ paths:
                                 boolean to indicate if the payment is for oracle
                                 payments, aka it will go
 
-                                through network fees split NOTE: if true the
-                                payment can only have amount
+                                through network fees split, only allowed for
+                                APPROVED payment types. NOTE:
 
-                                values(Native coins), no cw20 payments allowed
-                                then
+                                if true and the payment contains cw20 payments,
+                                the claim will only be
+
+                                successfully if an intent exists to ensure
+                                immediate cw20 payment split,
+
+                                since there is no WithdrawalAuthorization to
+                                manage the cw20 payment split
+
+                                for delayed payments
                     signer:
                       type: string
                       title: signer address
@@ -88566,10 +88651,12 @@ definitions:
 
                 signatures required by gogoproto.
             title: >-
-              if both amount and cw20 amount are empty then use default by
-              Collection
-
               custom amount specified by evaluator for claim approval
+
+              NOTE: if both amount and cw20 amount are empty then collection
+              default is
+
+              used
           cw20_payment:
             type: array
             items:
@@ -88585,7 +88672,13 @@ definitions:
                     fit in a
 
                     uint64(max 18446744073709551615)
-            title: custom cw20 payments specified by evaluator for claim approval
+            title: >-
+              custom cw20 payments specified by evaluator for claim approval
+
+              NOTE: if both amount and cw20 amount are empty then collection
+              default is
+
+              used
       payments_status:
         title: payments_status is the status of the payments for the claim
         type: object
@@ -88679,9 +88772,13 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-        title: |-
-          NOTE: if both amount and cw20 amount are empty then use default by
-          Collection custom amount specified by service agent for claim approval
+        title: >-
+          custom amount specified by service agent for claim approval
+
+          NOTE: if both amount and cw20 amount are empty then collection default
+          is
+
+          used
       cw20_payment:
         type: array
         items:
@@ -88697,10 +88794,15 @@ definitions:
                 a
 
                 uint64(max 18446744073709551615)
-        title: |-
-          NOTE: if both amount and cw20 amount are empty then use default by
-          Collection custom cw20 payments specified by service agent for claim
+        title: >-
+          custom cw20 payments specified by service agent for claim
+
           approval
+
+          NOTE: if both amount and cw20 amount are empty then collection default
+          is
+
+          used
   ixo.claims.v1beta1.ClaimPayments:
     type: object
     properties:
@@ -88926,10 +89028,19 @@ definitions:
                   boolean to indicate if the payment is for oracle payments, aka
                   it will go
 
-                  through network fees split NOTE: if true the payment can only
-                  have amount
+                  through network fees split, only allowed for APPROVED payment
+                  types. NOTE:
 
-                  values(Native coins), no cw20 payments allowed then
+                  if true and the payment contains cw20 payments, the claim will
+                  only be
+
+                  successfully if an intent exists to ensure immediate cw20
+                  payment split,
+
+                  since there is no WithdrawalAuthorization to manage the cw20
+                  payment split
+
+                  for delayed payments
           evaluation:
             type: object
             properties:
@@ -88997,10 +89108,19 @@ definitions:
                   boolean to indicate if the payment is for oracle payments, aka
                   it will go
 
-                  through network fees split NOTE: if true the payment can only
-                  have amount
+                  through network fees split, only allowed for APPROVED payment
+                  types. NOTE:
 
-                  values(Native coins), no cw20 payments allowed then
+                  if true and the payment contains cw20 payments, the claim will
+                  only be
+
+                  successfully if an intent exists to ensure immediate cw20
+                  payment split,
+
+                  since there is no WithdrawalAuthorization to manage the cw20
+                  payment split
+
+                  for delayed payments
           approval:
             type: object
             properties:
@@ -89068,10 +89188,19 @@ definitions:
                   boolean to indicate if the payment is for oracle payments, aka
                   it will go
 
-                  through network fees split NOTE: if true the payment can only
-                  have amount
+                  through network fees split, only allowed for APPROVED payment
+                  types. NOTE:
 
-                  values(Native coins), no cw20 payments allowed then
+                  if true and the payment contains cw20 payments, the claim will
+                  only be
+
+                  successfully if an intent exists to ensure immediate cw20
+                  payment split,
+
+                  since there is no WithdrawalAuthorization to manage the cw20
+                  payment split
+
+                  for delayed payments
           rejection:
             type: object
             properties:
@@ -89139,10 +89268,19 @@ definitions:
                   boolean to indicate if the payment is for oracle payments, aka
                   it will go
 
-                  through network fees split NOTE: if true the payment can only
-                  have amount
+                  through network fees split, only allowed for APPROVED payment
+                  types. NOTE:
 
-                  values(Native coins), no cw20 payments allowed then
+                  if true and the payment contains cw20 payments, the claim will
+                  only be
+
+                  successfully if an intent exists to ensure immediate cw20
+                  payment split,
+
+                  since there is no WithdrawalAuthorization to manage the cw20
+                  payment split
+
+                  for delayed payments
       signer:
         type: string
         title: signer address
@@ -89305,10 +89443,12 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
         title: >-
-          if both amount and cw20 amount are empty then use default by
-          Collection
-
           custom amount specified by evaluator for claim approval
+
+          NOTE: if both amount and cw20 amount are empty then collection default
+          is
+
+          used
       cw20_payment:
         type: array
         items:
@@ -89324,7 +89464,13 @@ definitions:
                 a
 
                 uint64(max 18446744073709551615)
-        title: custom cw20 payments specified by evaluator for claim approval
+        title: >-
+          custom cw20 payments specified by evaluator for claim approval
+
+          NOTE: if both amount and cw20 amount are empty then collection default
+          is
+
+          used
   ixo.claims.v1beta1.EvaluationStatus:
     type: string
     enum:
@@ -89518,10 +89664,18 @@ definitions:
           boolean to indicate if the payment is for oracle payments, aka it will
           go
 
-          through network fees split NOTE: if true the payment can only have
-          amount
+          through network fees split, only allowed for APPROVED payment types.
+          NOTE:
 
-          values(Native coins), no cw20 payments allowed then
+          if true and the payment contains cw20 payments, the claim will only be
+
+          successfully if an intent exists to ensure immediate cw20 payment
+          split,
+
+          since there is no WithdrawalAuthorization to manage the cw20 payment
+          split
+
+          for delayed payments
   ixo.claims.v1beta1.PaymentStatus:
     type: string
     enum:
@@ -89610,10 +89764,19 @@ definitions:
               boolean to indicate if the payment is for oracle payments, aka it
               will go
 
-              through network fees split NOTE: if true the payment can only have
-              amount
+              through network fees split, only allowed for APPROVED payment
+              types. NOTE:
 
-              values(Native coins), no cw20 payments allowed then
+              if true and the payment contains cw20 payments, the claim will
+              only be
+
+              successfully if an intent exists to ensure immediate cw20 payment
+              split,
+
+              since there is no WithdrawalAuthorization to manage the cw20
+              payment split
+
+              for delayed payments
       evaluation:
         type: object
         properties:
@@ -89681,10 +89844,19 @@ definitions:
               boolean to indicate if the payment is for oracle payments, aka it
               will go
 
-              through network fees split NOTE: if true the payment can only have
-              amount
+              through network fees split, only allowed for APPROVED payment
+              types. NOTE:
 
-              values(Native coins), no cw20 payments allowed then
+              if true and the payment contains cw20 payments, the claim will
+              only be
+
+              successfully if an intent exists to ensure immediate cw20 payment
+              split,
+
+              since there is no WithdrawalAuthorization to manage the cw20
+              payment split
+
+              for delayed payments
       approval:
         type: object
         properties:
@@ -89752,10 +89924,19 @@ definitions:
               boolean to indicate if the payment is for oracle payments, aka it
               will go
 
-              through network fees split NOTE: if true the payment can only have
-              amount
+              through network fees split, only allowed for APPROVED payment
+              types. NOTE:
 
-              values(Native coins), no cw20 payments allowed then
+              if true and the payment contains cw20 payments, the claim will
+              only be
+
+              successfully if an intent exists to ensure immediate cw20 payment
+              split,
+
+              since there is no WithdrawalAuthorization to manage the cw20
+              payment split
+
+              for delayed payments
       rejection:
         type: object
         properties:
@@ -89823,10 +90004,19 @@ definitions:
               boolean to indicate if the payment is for oracle payments, aka it
               will go
 
-              through network fees split NOTE: if true the payment can only have
-              amount
+              through network fees split, only allowed for APPROVED payment
+              types. NOTE:
 
-              values(Native coins), no cw20 payments allowed then
+              if true and the payment contains cw20 payments, the claim will
+              only be
+
+              successfully if an intent exists to ensure immediate cw20 payment
+              split,
+
+              since there is no WithdrawalAuthorization to manage the cw20
+              payment split
+
+              for delayed payments
   ixo.claims.v1beta1.QueryClaimListResponse:
     type: object
     properties:
@@ -89931,10 +90121,12 @@ definitions:
 
                       signatures required by gogoproto.
                   title: >-
-                    if both amount and cw20 amount are empty then use default by
-                    Collection
-
                     custom amount specified by evaluator for claim approval
+
+                    NOTE: if both amount and cw20 amount are empty then
+                    collection default is
+
+                    used
                 cw20_payment:
                   type: array
                   items:
@@ -89953,6 +90145,11 @@ definitions:
                   title: >-
                     custom cw20 payments specified by evaluator for claim
                     approval
+
+                    NOTE: if both amount and cw20 amount are empty then
+                    collection default is
+
+                    used
             payments_status:
               title: payments_status is the status of the payments for the claim
               type: object
@@ -90050,11 +90247,12 @@ definitions:
 
                   signatures required by gogoproto.
               title: >-
-                NOTE: if both amount and cw20 amount are empty then use default
-                by
+                custom amount specified by service agent for claim approval
 
-                Collection custom amount specified by service agent for claim
-                approval
+                NOTE: if both amount and cw20 amount are empty then collection
+                default is
+
+                used
             cw20_payment:
               type: array
               items:
@@ -90071,13 +90269,14 @@ definitions:
 
                       uint64(max 18446744073709551615)
               title: >-
-                NOTE: if both amount and cw20 amount are empty then use default
-                by
-
-                Collection custom cw20 payments specified by service agent for
-                claim
+                custom cw20 payments specified by service agent for claim
 
                 approval
+
+                NOTE: if both amount and cw20 amount are empty then collection
+                default is
+
+                used
       pagination:
         type: object
         properties:
@@ -90206,10 +90405,12 @@ definitions:
 
                     signatures required by gogoproto.
                 title: >-
-                  if both amount and cw20 amount are empty then use default by
-                  Collection
-
                   custom amount specified by evaluator for claim approval
+
+                  NOTE: if both amount and cw20 amount are empty then collection
+                  default is
+
+                  used
               cw20_payment:
                 type: array
                 items:
@@ -90225,7 +90426,13 @@ definitions:
                         to fit in a
 
                         uint64(max 18446744073709551615)
-                title: custom cw20 payments specified by evaluator for claim approval
+                title: >-
+                  custom cw20 payments specified by evaluator for claim approval
+
+                  NOTE: if both amount and cw20 amount are empty then collection
+                  default is
+
+                  used
           payments_status:
             title: payments_status is the status of the payments for the claim
             type: object
@@ -90323,10 +90530,12 @@ definitions:
 
                 signatures required by gogoproto.
             title: >-
-              NOTE: if both amount and cw20 amount are empty then use default by
+              custom amount specified by service agent for claim approval
 
-              Collection custom amount specified by service agent for claim
-              approval
+              NOTE: if both amount and cw20 amount are empty then collection
+              default is
+
+              used
           cw20_payment:
             type: array
             items:
@@ -90343,12 +90552,14 @@ definitions:
 
                     uint64(max 18446744073709551615)
             title: >-
-              NOTE: if both amount and cw20 amount are empty then use default by
-
-              Collection custom cw20 payments specified by service agent for
-              claim
+              custom cw20 payments specified by service agent for claim
 
               approval
+
+              NOTE: if both amount and cw20 amount are empty then collection
+              default is
+
+              used
   ixo.claims.v1beta1.QueryCollectionListResponse:
     type: object
     properties:
@@ -90519,10 +90730,19 @@ definitions:
                         boolean to indicate if the payment is for oracle
                         payments, aka it will go
 
-                        through network fees split NOTE: if true the payment can
-                        only have amount
+                        through network fees split, only allowed for APPROVED
+                        payment types. NOTE:
 
-                        values(Native coins), no cw20 payments allowed then
+                        if true and the payment contains cw20 payments, the
+                        claim will only be
+
+                        successfully if an intent exists to ensure immediate
+                        cw20 payment split,
+
+                        since there is no WithdrawalAuthorization to manage the
+                        cw20 payment split
+
+                        for delayed payments
                 evaluation:
                   type: object
                   properties:
@@ -90591,10 +90811,19 @@ definitions:
                         boolean to indicate if the payment is for oracle
                         payments, aka it will go
 
-                        through network fees split NOTE: if true the payment can
-                        only have amount
+                        through network fees split, only allowed for APPROVED
+                        payment types. NOTE:
 
-                        values(Native coins), no cw20 payments allowed then
+                        if true and the payment contains cw20 payments, the
+                        claim will only be
+
+                        successfully if an intent exists to ensure immediate
+                        cw20 payment split,
+
+                        since there is no WithdrawalAuthorization to manage the
+                        cw20 payment split
+
+                        for delayed payments
                 approval:
                   type: object
                   properties:
@@ -90663,10 +90892,19 @@ definitions:
                         boolean to indicate if the payment is for oracle
                         payments, aka it will go
 
-                        through network fees split NOTE: if true the payment can
-                        only have amount
+                        through network fees split, only allowed for APPROVED
+                        payment types. NOTE:
 
-                        values(Native coins), no cw20 payments allowed then
+                        if true and the payment contains cw20 payments, the
+                        claim will only be
+
+                        successfully if an intent exists to ensure immediate
+                        cw20 payment split,
+
+                        since there is no WithdrawalAuthorization to manage the
+                        cw20 payment split
+
+                        for delayed payments
                 rejection:
                   type: object
                   properties:
@@ -90735,10 +90973,19 @@ definitions:
                         boolean to indicate if the payment is for oracle
                         payments, aka it will go
 
-                        through network fees split NOTE: if true the payment can
-                        only have amount
+                        through network fees split, only allowed for APPROVED
+                        payment types. NOTE:
 
-                        values(Native coins), no cw20 payments allowed then
+                        if true and the payment contains cw20 payments, the
+                        claim will only be
+
+                        successfully if an intent exists to ensure immediate
+                        cw20 payment split,
+
+                        since there is no WithdrawalAuthorization to manage the
+                        cw20 payment split
+
+                        for delayed payments
             signer:
               type: string
               title: signer address
@@ -90971,10 +91218,19 @@ definitions:
                       boolean to indicate if the payment is for oracle payments,
                       aka it will go
 
-                      through network fees split NOTE: if true the payment can
-                      only have amount
+                      through network fees split, only allowed for APPROVED
+                      payment types. NOTE:
 
-                      values(Native coins), no cw20 payments allowed then
+                      if true and the payment contains cw20 payments, the claim
+                      will only be
+
+                      successfully if an intent exists to ensure immediate cw20
+                      payment split,
+
+                      since there is no WithdrawalAuthorization to manage the
+                      cw20 payment split
+
+                      for delayed payments
               evaluation:
                 type: object
                 properties:
@@ -91042,10 +91298,19 @@ definitions:
                       boolean to indicate if the payment is for oracle payments,
                       aka it will go
 
-                      through network fees split NOTE: if true the payment can
-                      only have amount
+                      through network fees split, only allowed for APPROVED
+                      payment types. NOTE:
 
-                      values(Native coins), no cw20 payments allowed then
+                      if true and the payment contains cw20 payments, the claim
+                      will only be
+
+                      successfully if an intent exists to ensure immediate cw20
+                      payment split,
+
+                      since there is no WithdrawalAuthorization to manage the
+                      cw20 payment split
+
+                      for delayed payments
               approval:
                 type: object
                 properties:
@@ -91113,10 +91378,19 @@ definitions:
                       boolean to indicate if the payment is for oracle payments,
                       aka it will go
 
-                      through network fees split NOTE: if true the payment can
-                      only have amount
+                      through network fees split, only allowed for APPROVED
+                      payment types. NOTE:
 
-                      values(Native coins), no cw20 payments allowed then
+                      if true and the payment contains cw20 payments, the claim
+                      will only be
+
+                      successfully if an intent exists to ensure immediate cw20
+                      payment split,
+
+                      since there is no WithdrawalAuthorization to manage the
+                      cw20 payment split
+
+                      for delayed payments
               rejection:
                 type: object
                 properties:
@@ -91184,10 +91458,19 @@ definitions:
                       boolean to indicate if the payment is for oracle payments,
                       aka it will go
 
-                      through network fees split NOTE: if true the payment can
-                      only have amount
+                      through network fees split, only allowed for APPROVED
+                      payment types. NOTE:
 
-                      values(Native coins), no cw20 payments allowed then
+                      if true and the payment contains cw20 payments, the claim
+                      will only be
+
+                      successfully if an intent exists to ensure immediate cw20
+                      payment split,
+
+                      since there is no WithdrawalAuthorization to manage the
+                      cw20 payment split
+
+                      for delayed payments
           signer:
             type: string
             title: signer address

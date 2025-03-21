@@ -224,11 +224,11 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 		if err != nil {
 			return nil, err
 		}
-	}
-
-	// if collection approval payment is oracle payment then only native coins allowed
-	if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(claim.Cw20Payment) {
-		return nil, types.ErrOraclePaymentOnlyNative
+	} else {
+		// if no intent used, check if collection approval payment is oracle payment then only native coins allowed
+		if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(claim.Cw20Payment) {
+			return nil, types.ErrOraclePaymentOnlyNative
+		}
 	}
 
 	// update count for collection and persist
@@ -322,7 +322,7 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		evaluation.Cw20Payment = claim.Cw20Payment
 	}
 
-	// start payout process for evaluation submission, if evaluation has status invalidated, dont run evaluation payout process
+	// start payout process for evaluation submission, if evaluation has status invalidated, don't run evaluation payout process
 	if msg.Status != types.EvaluationStatus_invalidated {
 		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, &claim, collection, false); err != nil {
 			return nil, err
@@ -368,15 +368,15 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 			approvedPayment.Account = collection.EscrowAccount
 		} else {
 			// if either msg amount or cw20Payment length is not zero, it means agent set custom amount/cw20Payment that was authenticated
-			// through authZ constraints to be valid since all evaluations must be done by module account through authz
+			// through authZ constraints to be valid since all evaluations must be done by collections module account through authz
 			if len(msg.Amount) > 0 || len(msg.Cw20Payment) > 0 {
 				approvedPayment.Amount = msg.Amount
 				approvedPayment.Cw20Payment = msg.Cw20Payment
 			}
-		}
-		// if collection approval payment is oracle payment then only native coins allowed
-		if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(approvedPayment.Cw20Payment) {
-			return nil, types.ErrOraclePaymentOnlyNative
+			// if no intent used, check if collection approval payment is oracle payment then only native coins allowed
+			if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(approvedPayment.Cw20Payment) {
+				return nil, types.ErrOraclePaymentOnlyNative
+			}
 		}
 		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, &claim, collection, claim.UseIntent); err != nil {
 			return nil, err
@@ -563,7 +563,7 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 	}
 
 	// make payout
-	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, &claim, collection, msg.ReleaseDate, msg.Contract_1155Payment, msg.Cw20Payment, fromAddress, toAddress)
+	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, &claim, collection, msg.ReleaseDate, msg.Contract_1155Payment, msg.Cw20Payment, fromAddress, toAddress, []*types.CW20Output{})
 	if err != nil {
 		return nil, err
 	}
@@ -786,11 +786,6 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 	if len(msg.Amount) == 0 && len(msg.Cw20Payment) == 0 {
 		msg.Amount = collection.Payments.Approval.Amount
 		msg.Cw20Payment = collection.Payments.Approval.Cw20Payment
-	}
-
-	// if collection approval payment is oracle payment then only native coins allowed
-	if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(msg.Cw20Payment) {
-		return nil, types.ErrOraclePaymentOnlyNative
 	}
 
 	// Get account used for APPROVAL payments on collection

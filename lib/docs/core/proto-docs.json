@@ -4145,6 +4145,54 @@
       "extensions": [],
       "messages": [
         {
+          "name": "CW20Output",
+          "longName": "CW20Output",
+          "fullName": "ixo.claims.v1beta1.CW20Output",
+          "description": "CW20Output represents a CW20 token output for split payments",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "address",
+              "description": "address is the address of the recipient",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "contract_address",
+              "description": "contract_address is the address of the contract",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "amount is the amount of the token to transfer\nchose uint64 for now as amounts should be small enough to fit in a\nuint64(max 18446744073709551615)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "CW20Payment",
           "longName": "CW20Payment",
           "fullName": "ixo.claims.v1beta1.CW20Payment",
@@ -4288,7 +4336,7 @@
             },
             {
               "name": "amount",
-              "description": "NOTE: if both amount and cw20 amount are empty then use default by\nCollection custom amount specified by service agent for claim approval",
+              "description": "custom amount specified by service agent for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -4300,7 +4348,7 @@
             },
             {
               "name": "cw20_payment",
-              "description": "NOTE: if both amount and cw20 amount are empty then use default by\nCollection custom cw20 payments specified by service agent for claim\napproval",
+              "description": "custom cw20 payments specified by service agent for claim\napproval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -4876,7 +4924,7 @@
             },
             {
               "name": "amount",
-              "description": "if both amount and cw20 amount are empty then use default by Collection\ncustom amount specified by evaluator for claim approval",
+              "description": "custom amount specified by evaluator for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -4888,7 +4936,7 @@
             },
             {
               "name": "cw20_payment",
-              "description": "custom cw20 payments specified by evaluator for claim approval",
+              "description": "custom cw20 payments specified by evaluator for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -5200,7 +5248,7 @@
             },
             {
               "name": "is_oracle_payment",
-              "description": "boolean to indicate if the payment is for oracle payments, aka it will go\nthrough network fees split NOTE: if true the payment can only have amount\nvalues(Native coins), no cw20 payments allowed then",
+              "description": "boolean to indicate if the payment is for oracle payments, aka it will go\nthrough network fees split, only allowed for APPROVED payment types. NOTE:\nif true and the payment contains cw20 payments, the claim will only be\nsuccessfully if an intent exists to ensure immediate cw20 payment split,\nsince there is no WithdrawalAuthorization to manage the cw20 payment split\nfor delayed payments",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -5917,6 +5965,18 @@
               "type": "WithdrawPaymentConstraints",
               "longType": "WithdrawPaymentConstraints",
               "fullType": "ixo.claims.v1beta1.WithdrawPaymentConstraints",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw20_outputs",
+              "description": "",
+              "label": "repeated",
+              "type": "CW20Output",
+              "longType": "CW20Output",
+              "fullType": "ixo.claims.v1beta1.CW20Output",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6784,7 +6844,7 @@
             },
             {
               "name": "amount",
-              "description": "NOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment). The desired claim amount, if any.",
+              "description": "The desired claim amount, if any.\nNOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment).",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -6796,7 +6856,7 @@
             },
             {
               "name": "cw20_payment",
-              "description": "NOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment). The custom CW20 payment, if any.",
+              "description": "The custom CW20 payment, if any.\nNOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment).",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -7166,7 +7226,7 @@
             },
             {
               "name": "verification_proof",
-              "description": "verificationProof is the cid of the evaluation Verfiable Credential",
+              "description": "verificationProof is the cid of the evaluation Verifiable Credential",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -7178,7 +7238,7 @@
             },
             {
               "name": "amount",
-              "description": "NOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverriden with intent amounts NOTE: if both amount and cw20 amount are\nempty then use collection default custom amount specified by evaluator for\nclaim approval",
+              "description": "custom amount specified by evaluator for claim approval\nNOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverridden with intent amounts NOTE: if both amount and cw20 amount are\nempty then collection default is used",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -7190,7 +7250,7 @@
             },
             {
               "name": "cw20_payment",
-              "description": "NOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverriden with intent amounts NOTE: if both amount and cw20 amount are\nempty then use collection default custom cw20 payments specified by\nevaluator for claim approval",
+              "description": "custom cw20 payments specified by evaluator for claim approval\nNOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverridden with intent amounts NOTE: if both amount and cw20 amount are\nempty then collection default is used",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -7285,7 +7345,7 @@
             },
             {
               "name": "use_intent",
-              "description": "use_intent is the option for using intent for this claim if it exists and\nis active. NOTE: if use_intent is true then amount and cw20 amount are\nignored and overriden with intent amounts. NOTE: if use_intent is true and\nthere is no active intent then will error",
+              "description": "use_intent is the option for using intent for this claim if it exists and\nis active. NOTE: if use_intent is true then amount and cw20 amount are\nignored and overridden with intent amounts. NOTE: if use_intent is true and\nthere is no active intent then will error",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -7297,7 +7357,7 @@
             },
             {
               "name": "amount",
-              "description": "NOTE: if both amount and cw20_payment are empty then use default by\nCollection custom amount specified by service agent for claim approval",
+              "description": "custom amount specified by service agent for claim approval\nNOTE: if both amount and cw20_payment are empty then collection default is\nused",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -7309,7 +7369,7 @@
             },
             {
               "name": "cw20_payment",
-              "description": "NOTE: if both amount and cw20 amount are empty then use default by\nCollection custom cw20 payments specified by service agent for claim\napproval",
+              "description": "custom cw20 payments specified by service agent for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -7604,7 +7664,7 @@
             },
             {
               "name": "inputs",
-              "description": "Inputs to the multisend tx to run to withdraw payment",
+              "description": "Inputs to the multi send tx to run to withdraw payment",
               "label": "repeated",
               "type": "Input",
               "longType": "cosmos.bank.v1beta1.Input",
@@ -7616,7 +7676,7 @@
             },
             {
               "name": "outputs",
-              "description": "Outputs for the multisend tx to run to withdraw payment",
+              "description": "Outputs for the multi send tx to run to withdraw payment",
               "label": "repeated",
               "type": "Output",
               "longType": "cosmos.bank.v1beta1.Output",
