@@ -256,9 +256,6 @@ func (ad AuthenticatorDecorator) AnteHandle(
 // ValidateAuthenticatorFeePayer enforces that the tx fee payer has not been set manually
 // to an account different to the signer of the first message. This is a requirement
 // for the authenticator module.
-// The only user of a manually set fee payer is with fee grants, which are not
-// available on osmosis
-// TODO: debug and make sure can use feegrant for IXO chain
 func (ad AuthenticatorDecorator) ValidateAuthenticatorFeePayer(tx sdk.Tx) error {
 	feeTx, ok := tx.(sdk.FeeTx)
 	if !ok {

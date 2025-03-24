@@ -93,8 +93,7 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		authante.NewValidateMemoDecorator(options.AccountKeeper),
 		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
 
-		// TODO: analyse how to make smart accounts work for iid handlers
-		iidante.NewIidResolutionDecorator(options.IidKeeper),
+		iidante.NewIidResolutionDecorator(options.IidKeeper, options.appCodec),
 		entityante.NewBlockNftContractTransferForEntityDecorator(options.EntityKeeper),
 
 		smartaccountante.NewCircuitBreakerDecorator(

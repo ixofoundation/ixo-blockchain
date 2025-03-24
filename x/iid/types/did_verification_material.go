@@ -99,10 +99,6 @@ func (baID BlockchainAccountID) GetAddress() string {
 }
 
 // NewBlockchainAccountID build a new blockchain account ID struct
-//
-//	func NewBlockchainAccountID(chainID, account string) BlockchainAccountID {
-//		return BlockchainAccountID(fmt.Sprint("cosmos:", chainID, ":", account))
-//	}
 func NewBlockchainAccountID(account string) BlockchainAccountID {
 	return BlockchainAccountID(account)
 }
@@ -191,49 +187,6 @@ func NewPublicKeyHexFromString(pubKeyHex string, vmType VerificationMaterialType
 	}
 	return
 }
-
-//// PublicKeyJwk formats an account public key as hex string.
-//// https://w3c.github.io/did-spec-registries/#publickeyhex
-//// Note that this property is deprecated in favor of publicKeyMultibase or publicKeyJwk,
-//// but is maintained for compatibility with legacy implementations
-//type PublicKeyJwk struct {
-//	iid   []byte
-//	vmType VerificationMaterialType
-//}
-//
-//// EncodeToString returns the string representation of the key in hex format.
-//// https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03#appendix-B.1
-//func (pkh PublicKeyJwk) EncodeToString() string {
-//	return string(hex.EncodeToString(pkh.iid))
-//}
-//
-//// Type the verification material type
-//// https://datatracker.ietf.org/doc/html/draft-multiformats-multibase-03#appendix-B.1
-//func (pkh PublicKeyJwk) Type() VerificationMaterialType {
-//	return pkh.vmType
-//}
-//
-//// NewPublicKeyJwk build a new public key hex struct
-//func NewPublicKeyJwk(pubKey []byte, vmType VerificationMaterialType) PublicKeyJwk {
-//	return PublicKeyJwk{
-//		iid:   pubKey,
-//		vmType: vmType,
-//	}
-//}
-//
-//// NewPublicKeyJwkFromString build a new blockchain account ID struct
-//func NewPublicKeyJwkFromString(pubKeyHex string, vmType VerificationMaterialType) (pkh PublicKeyJwk, err error) {
-//	pkb, err := hex.DecodeString(pubKeyHex)
-//	if err != nil {
-//		return
-//	}
-//	// TODO: shall we check if it is conform to the verification material? probably
-//	pkh = PublicKeyJwk{
-//		iid:   pkb,
-//		vmType: vmType,
-//	}
-//	return
-//}
 
 type PublicKeyBase58 struct {
 	data   []byte

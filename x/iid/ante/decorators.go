@@ -2,6 +2,7 @@ package ante
 
 import (
 	errorsmod "cosmossdk.io/errors"
+	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
@@ -10,10 +11,11 @@ import (
 
 type IidResolutionDecorator struct {
 	iidKeeper iidkeeper.Keeper
+	cdc       codec.Codec
 }
 
-func NewIidResolutionDecorator(iidKeeper iidkeeper.Keeper) IidResolutionDecorator {
-	return IidResolutionDecorator{iidKeeper: iidKeeper}
+func NewIidResolutionDecorator(iidKeeper iidkeeper.Keeper, cdc codec.Codec) IidResolutionDecorator {
+	return IidResolutionDecorator{iidKeeper: iidKeeper, cdc: cdc}
 }
 
 func (dec IidResolutionDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
@@ -22,7 +24,7 @@ func (dec IidResolutionDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulat
 		return ctx, errorsmod.Wrap(sdkerrors.ErrTxDecode, "invalid tx type")
 	}
 
-	if err := VerifyIidControllersAgainstSignature(sigTx, ctx, dec.iidKeeper); err != nil {
+	if err := VerifyIidControllersAgainstSignature(sigTx, ctx, dec.iidKeeper, dec.cdc); err != nil {
 		return ctx, errorsmod.Wrap(sdkerrors.ErrUnauthorized, err.Error())
 	}
 

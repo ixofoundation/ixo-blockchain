@@ -30,14 +30,12 @@ The `AuthnPubKey` is a data structure that holds the necessary information for v
 - **key_id** (`string`): The credential ID generated during passkey creation.
 - **cose_algorithm** (`int32`): The COSE algorithm identifier (e.g., `-7` for ES256).
 - **key** (`bytes`): The public key in DER format.
-- **relaying_party_id** (`bytes`): The hashed `rpId`.
 
 ```protobuf
 message AuthnPubKey {
   string key_id = 1;
   int32 cose_algorithm = 2;
   bytes key = 3;
-  bytes relaying_party_id = 4;
 }
 ```
 
