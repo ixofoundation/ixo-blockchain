@@ -39,3 +39,14 @@ message IntentSubmittedEvent { Intent intent = 1; }
 
 // IntentUpdatedEvent is an event triggered on an Intent update
 message IntentUpdatedEvent { Intent intent = 1; }
+
+// ClaimAuthorizationCreatedEvent is an event triggered on a Claim authorization
+// creation
+message ClaimAuthorizationCreatedEvent {
+  string creator = 1;
+  string creator_did = 2;
+  string grantee = 3;
+  string admin = 4;
+  string collection_id = 5;
+  string auth_type = 6;
+}

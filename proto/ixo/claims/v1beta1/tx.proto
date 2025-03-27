@@ -9,6 +9,8 @@ import "ixo/claims/v1beta1/claims.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 import "cosmos/msg/v1/msg.proto";
+import "ixo/claims/v1beta1/authz.proto";
+import "google/protobuf/duration.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -27,6 +29,8 @@ service Msg {
   rpc UpdateCollectionIntents(MsgUpdateCollectionIntents)
       returns (MsgUpdateCollectionIntentsResponse);
   rpc ClaimIntent(MsgClaimIntent) returns (MsgClaimIntentResponse);
+  rpc CreateClaimAuthorization(MsgCreateClaimAuthorization)
+      returns (MsgCreateClaimAuthorizationResponse);
 }
 
 message MsgCreateCollection {
@@ -269,3 +273,52 @@ message MsgClaimIntentResponse {
   // the intent expires.
   google.protobuf.Timestamp expire_at = 2 [ (gogoproto.stdtime) = true ];
 }
+
+// MsgCreateClaimAuthorization defines a message for creating a claim
+// authorization on behalf of an entity admin account (SubmitClaimAuthorization
+// or EvaluateClaimAuthorization)
+message MsgCreateClaimAuthorization {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
+  // Address of the creator (user with meta-authorization)
+  string creator_address = 1;
+  // agent is the DID of the agent submitting the claim
+  string creator_did = 2 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
+  ];
+  // Address of the grantee (who will receive the authorization)
+  string grantee_address = 3;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 4;
+  // Collection ID the authorization applies to (for both submit and evaluate)
+  string collection_id = 5;
+  // Type of authorization to create (submit or evaluate, can't create both in a
+  // single request)
+  CreateClaimAuthorizationType auth_type = 6;
+  // Quota for the created authorization (for both submit and evaluate)
+  uint64 agent_quota = 7;
+  // Maximum amount that can be specified in the authorization (for both submit
+  // and evaluate)
+  repeated cosmos.base.v1beta1.Coin max_amount = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // Maximum CW20 payment that can be specified in the authorization (for both
+  // submit and evaluate)
+  repeated CW20Payment max_cw20_payment = 9;
+  // Expiration time for the authorization, be careful with this as it is the
+  // expiration of the authorization itself, not the constraints, meaning if the
+  // authorization expires all constraints will be removed with the
+  // authorization (standard authz behavior)
+  google.protobuf.Timestamp expiration = 10 [ (gogoproto.stdtime) = true ];
+  // Maximum intent duration for the authorization allowed (for submit)
+  google.protobuf.Duration intent_duration_ns = 11
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // if null then no before_date validation done (for evaluate)
+  google.protobuf.Timestamp before_date = 12 [ (gogoproto.stdtime) = true ];
+}
+
+// MsgCreateClaimAuthorizationResponse defines the response for creating a claim
+// authorization
+message MsgCreateClaimAuthorizationResponse {}

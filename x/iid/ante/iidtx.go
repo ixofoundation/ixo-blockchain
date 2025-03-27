@@ -14,13 +14,13 @@ import (
 // in the SigVerifiableTx are authorized to control the IID. This works for both traditional
 // signature-based authentication and smart account authentication methods.
 func VerifyIidControllersAgainstSignature(tx signing.SigVerifiableTx, ctx sdk.Context, iidKeeper iidkeeper.Keeper, cdc codec.Codec) error {
-	// The constraints for the verification relationships that can be used to update the IID document
+	// The constraints for the verification relationships that can be used to act on behalf of the IID
 	constraints := []string{
 		iidtypes.Authentication,
 		iidtypes.AssertionMethod,
-		iidtypes.KeyAgreement,
-		iidtypes.CapabilityInvocation,
-		iidtypes.CapabilityDelegation,
+		// iidtypes.KeyAgreement,
+		// iidtypes.CapabilityInvocation,
+		// iidtypes.CapabilityDelegation,
 	}
 
 	// For each message in the transaction check if this is an IidTxMsg, and if so validate
@@ -53,16 +53,9 @@ func VerifyIidControllersAgainstSignature(tx signing.SigVerifiableTx, ctx sdk.Co
 		// Check if the signer has any of the verification relationships in the IID document
 		// We check all possible relationships - the specific ones to check can be configured as needed
 		if !iidDoc.HasRelationship(iidtypes.NewBlockchainAccountID(signerAddr.String()), constraints...) {
-			// If the signer is not authorized through verification relationships,
-			// check if they are a controller
-			// TODO: Don't do this as controllers will always be a did, so pointless checking against address?
-			// And controllers specify which other dids have control over this did, so cant use it as verification
-			// check for this scenario where we try and see if the account (keys) can act on behalf of did
-			// if !iidDoc.HasController(iidtypes.DID(signerAddr.String())) {
 			return errorsmod.Wrapf(iidtypes.ErrUnauthorized,
 				"signer account %s not authorized to act on behalf of the did %s",
 				signerAddr.String(), iid)
-			// }
 		}
 	}
 

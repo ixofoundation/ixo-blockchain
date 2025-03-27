@@ -5,8 +5,10 @@ import (
 	"fmt"
 
 	errorsmod "cosmossdk.io/errors"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/ixofoundation/ixo-blockchain/v4/lib/ixo"
 	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
@@ -841,4 +843,197 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 		IntentId: intent.Id,
 		ExpireAt: intent.ExpireAt,
 	}, nil
+}
+
+// --------------------------
+// CREATE CLAIM AUTHORIZATION
+// --------------------------
+func (s msgServer) CreateClaimAuthorization(goCtx context.Context, msg *types.MsgCreateClaimAuthorization) (*types.MsgCreateClaimAuthorizationResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get the collection to verify it exists and get admin details
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verify that the admin address in the message matches the collection's admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(
+			types.ErrClaimUnauthorized,
+			"collection admin %s, msg admin address %s",
+			collection.Admin,
+			msg.AdminAddress,
+		)
+	}
+
+	// get current owner of entity to pass to MsgGrantEntityAccountAuthz
+	currentOwner, err := s.Keeper.EntityKeeper.GetCurrentOwner(ctx, collection.Entity)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get grantee address for checking existing authorizations
+	grantee, err := sdk.AccAddressFromBech32(msg.GranteeAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// Get granter address (admin account)
+	granter, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	// create the authorization
+	// fist check the type of authorization (submit, evaluate)
+	// then check if an authorization for that type already exists
+	// if it does, append the new constraint to the existing authorization
+	// if it doesn't, create a new authorization with the new constraint
+	var authorization authz.Authorization
+	switch msg.AuthType {
+	case types.CreateClaimAuthorizationType_SUBMIT:
+		// Create the new constraint
+		newConstraint := &types.SubmitClaimConstraints{
+			CollectionId:     msg.CollectionId,
+			AgentQuota:       msg.AgentQuota,
+			MaxAmount:        msg.MaxAmount,
+			MaxCw20Payment:   msg.MaxCw20Payment,
+			IntentDurationNs: msg.IntentDurationNs,
+		}
+
+		// Check for existing SubmitClaimAuthorization
+		authzMsgType := sdk.MsgTypeURL(&types.MsgSubmitClaim{})
+		existingAuth, _ := s.Keeper.AuthzKeeper.GetAuthorization(ctx, grantee, granter, authzMsgType)
+
+		if existingAuth != nil {
+			// check if existing auth is generic authorization
+			// if so throw error as grantee already has a generic authorization with no constraints
+			_, ok := existingAuth.(*authz.GenericAuthorization)
+			if ok {
+				return nil, errorsmod.Wrapf(
+					sdkerrors.ErrInvalidRequest,
+					"grantee %s already has a generic authorization from granter %s for authzMsgType %s, please remove the generic authorization before creating a new authorization with specific constraints",
+					grantee.String(),
+					granter.String(),
+					authzMsgType,
+				)
+			}
+			submitAuth, ok := existingAuth.(*types.SubmitClaimAuthorization)
+			if ok {
+				// Append the new constraint to existing constraints and create new authorization
+				constraints := submitAuth.Constraints
+				constraints = append(constraints, newConstraint)
+				authorization = types.NewSubmitClaimAuthorization(msg.AdminAddress, constraints)
+			} else {
+				return nil, errorsmod.Wrapf(
+					sdkerrors.ErrInvalidRequest,
+					"existing authorization is not of type SubmitClaimAuthorization",
+				)
+			}
+		} else {
+			// Create new authorization with single constraint
+			authorization = types.NewSubmitClaimAuthorization(msg.AdminAddress, []*types.SubmitClaimConstraints{newConstraint})
+		}
+
+	case types.CreateClaimAuthorizationType_EVALUATE:
+		// Create the new constraint
+		newConstraint := &types.EvaluateClaimConstraints{
+			CollectionId:         msg.CollectionId,
+			AgentQuota:           msg.AgentQuota,
+			MaxCustomAmount:      msg.MaxAmount,
+			MaxCustomCw20Payment: msg.MaxCw20Payment,
+			BeforeDate:           msg.BeforeDate,
+		}
+
+		// Check for existing EvaluateClaimAuthorization
+		authzMsgType := sdk.MsgTypeURL(&types.MsgEvaluateClaim{})
+		existingAuth, _ := s.Keeper.AuthzKeeper.GetAuthorization(ctx, grantee, granter, authzMsgType)
+
+		if existingAuth != nil {
+			// check if existing auth is generic authorization
+			// if so throw error as grantee already has a generic authorization with no constraints
+			_, ok := existingAuth.(*authz.GenericAuthorization)
+			if ok {
+				return nil, errorsmod.Wrapf(
+					sdkerrors.ErrInvalidRequest,
+					"grantee %s already has a generic authorization from granter %s for authzMsgType %s, please remove the generic authorization before creating a new authorization with specific constraints",
+					grantee.String(),
+					granter.String(),
+					authzMsgType,
+				)
+			}
+			evalAuth, ok := existingAuth.(*types.EvaluateClaimAuthorization)
+			if ok {
+				// Append the new constraint to existing constraints and create new authorization
+				constraints := evalAuth.Constraints
+				constraints = append(constraints, newConstraint)
+				authorization = types.NewEvaluateClaimAuthorization(msg.AdminAddress, constraints)
+			} else {
+				return nil, errorsmod.Wrapf(
+					sdkerrors.ErrInvalidRequest,
+					"existing authorization is not of type EvaluateClaimAuthorization",
+				)
+			}
+		} else {
+			// Create new authorization with single constraint
+			authorization = types.NewEvaluateClaimAuthorization(msg.AdminAddress, []*types.EvaluateClaimConstraints{newConstraint})
+		}
+
+	case types.CreateClaimAuthorizationType_ALL:
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"cannot create both submission and evaluation authorization in a single request, use separate requests",
+		)
+	default:
+		return nil, errorsmod.Wrapf(
+			sdkerrors.ErrInvalidRequest,
+			"unknown authorization type: %s",
+			msg.AuthType,
+		)
+	}
+
+	// Create the Any type for the authorization
+	authAny, err := cdctypes.NewAnyWithValue(authorization)
+	if err != nil {
+		return nil, errorsmod.Wrapf(err, "failed to pack authorization into Any type")
+	}
+
+	// Create the MsgGrantEntityAccountAuthz to route to entity keeper
+	grantMsg := entitytypes.MsgGrantEntityAccountAuthz{
+		Id:             collection.Entity,
+		Name:           entitytypes.EntityAdminAccountName,
+		GranteeAddress: msg.GranteeAddress,
+		Grant: authz.Grant{
+			Authorization: authAny,
+			Expiration:    msg.Expiration,
+		},
+		OwnerAddress: currentOwner,
+	}
+
+	// Route the authorization grant through the keeper
+	err = s.Keeper.RouteGrantEntityAccountAuthz(ctx, &grantMsg)
+	if err != nil {
+		return nil, errorsmod.Wrapf(
+			err,
+			"failed to route authorization grant for grantee %s",
+			msg.GranteeAddress,
+		)
+	}
+
+	// Emit the event
+	if err := ctx.EventManager().EmitTypedEvents(
+		&types.ClaimAuthorizationCreatedEvent{
+			Creator:      msg.CreatorAddress,
+			CreatorDid:   msg.CreatorDid.Did(),
+			Grantee:      msg.GranteeAddress,
+			Admin:        msg.AdminAddress,
+			CollectionId: msg.CollectionId,
+			AuthType:     msg.AuthType.String(),
+		},
+	); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgCreateClaimAuthorizationResponse{}, nil
 }

@@ -531,6 +531,7 @@ func NewAppKeepers(
 		appKeepers.EntityKeeper,
 		appKeepers.ContractKeeper,
 		appKeepers.AccountKeeper,
+		bApp.MsgServiceRouter(),
 	)
 
 	// Initialize authenticators

@@ -621,6 +621,14 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.CreateClaimAuthorizationAuthorization"><span class="badge">M</span>CreateClaimAuthorizationAuthorization</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.CreateClaimAuthorizationConstraints"><span class="badge">M</span>CreateClaimAuthorizationConstraints</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.EvaluateClaimAuthorization"><span class="badge">M</span>EvaluateClaimAuthorization</a>
                 </li>
               
@@ -645,6 +653,10 @@
                 </li>
               
               
+                <li>
+                  <a href="#ixo.claims.v1beta1.CreateClaimAuthorizationType"><span class="badge">E</span>CreateClaimAuthorizationType</a>
+                </li>
+              
               
               
             </ul>
@@ -654,6 +666,10 @@
           <li>
             <a href="#ixo%2fclaims%2fv1beta1%2fevent.proto">ixo/claims/v1beta1/event.proto</a>
             <ul>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent"><span class="badge">M</span>ClaimAuthorizationCreatedEvent</a>
+                </li>
               
                 <li>
                   <a href="#ixo.claims.v1beta1.ClaimDisputedEvent"><span class="badge">M</span>ClaimDisputedEvent</a>
@@ -814,6 +830,14 @@
               
                 <li>
                   <a href="#ixo.claims.v1beta1.MsgClaimIntentResponse"><span class="badge">M</span>MsgClaimIntentResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgCreateClaimAuthorization"><span class="badge">M</span>MsgCreateClaimAuthorization</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse"><span class="badge">M</span>MsgCreateClaimAuthorizationResponse</a>
                 </li>
               
                 <li>
@@ -6374,6 +6398,121 @@ escrow</p></td>
       <p></p>
 
       
+        <h3 id="ixo.claims.v1beta1.CreateClaimAuthorizationAuthorization">CreateClaimAuthorizationAuthorization</h3>
+        <p>CreateClaimAuthorizationAuthorization allows a grantee to create</p><p>SubmitClaimAuthorization and EvaluateClaimAuthorization for specific</p><p>collections(constraints)</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>admin</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>address of admin (entity admin module account) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>constraints</td>
+                  <td><a href="#ixo.claims.v1beta1.CreateClaimAuthorizationConstraints">CreateClaimAuthorizationConstraints</a></td>
+                  <td>repeated</td>
+                  <td><p>Constraints on the authorizations that can be created </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.CreateClaimAuthorizationConstraints">CreateClaimAuthorizationConstraints</h3>
+        <p>CreateClaimAuthorizationConstraints defines the constraints for creating</p><p>claim authorizations</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>max_authorizations</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Maximum number of authorizations that can be created through this
+meta-authorization, 0 means no quota </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_agent_quota</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Maximum quota that can be set in created authorizations
+0 means no quota maximum quota per authorization </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>Maximum amount that can be set in created authorizations,
+if empty then any custom amount is allowed in the created authorizations
+explicitly set to 0 to disallow any custom amount in the created
+authorizations </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>Maximum cw20 payment that can be set in created authorizations,
+if empty then any cw20 payment is allowed in the created authorizations
+explicitly set to 0 to disallow any cw20 payment in the created
+authorizations </p></td>
+                </tr>
+              
+                <tr>
+                  <td>expiration</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Expiration of this meta-authorization(specific constraint), if not set then
+no expiration </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection_ids</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>Collection IDs the grantee can create authorizations for, if empty then all
+collections for the admin are allowed </p></td>
+                </tr>
+              
+                <tr>
+                  <td>allowed_auth_types</td>
+                  <td><a href="#ixo.claims.v1beta1.CreateClaimAuthorizationType">CreateClaimAuthorizationType</a></td>
+                  <td></td>
+                  <td><p>Types of authorizations the grantee can create (submit, evaluate, or
+all(both)) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_intent_duration_ns</td>
+                  <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
+                  <td></td>
+                  <td><p>Maximum intent duration for the authorization allowed (for submit) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.claims.v1beta1.EvaluateClaimAuthorization">EvaluateClaimAuthorization</h3>
         <p></p>
 
@@ -6388,7 +6527,7 @@ escrow</p></td>
                   <td>admin</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>address of admin </p></td>
+                  <td><p>address of admin (entity admin module account) </p></td>
                 </tr>
               
                 <tr>
@@ -6447,16 +6586,16 @@ escrow</p></td>
                   <td>max_custom_amount</td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
-                  <td><p>max custom amount evaluator can change, if empty list must use amount
-defined in Token payments </p></td>
+                  <td><p>max custom amount evaluator can change, if empty then no custom amount is
+allowed, and default payments from Collection payments are used </p></td>
                 </tr>
               
                 <tr>
                   <td>max_custom_cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>max custom cw20 payment evaluator can change, if empty list must use amount
-defined in Token payments </p></td>
+                  <td><p>max custom cw20 payment evaluator can change, if empty then no custom
+amount is allowed, and default payments from Collection payments are used </p></td>
                 </tr>
               
             </tbody>
@@ -6480,7 +6619,7 @@ defined in Token payments </p></td>
                   <td>admin</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>address of admin </p></td>
+                  <td><p>address of admin (entity admin module account) </p></td>
                 </tr>
               
                 <tr>
@@ -6526,7 +6665,8 @@ defined in Token payments </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>custom max_amount allowed to be specified by service agent for claim
-approval, if empty then no custom amount is allowed </p></td>
+approval, if empty then no custom amount is allowed, and default payments
+from Collection payments are used </p></td>
                 </tr>
               
                 <tr>
@@ -6534,7 +6674,8 @@ approval, if empty then no custom amount is allowed </p></td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
                   <td><p>custom max_cw20_payment allowed to be specified by service agent for claim
-approval, if empty then no custom amount is allowed </p></td>
+approval, if empty then no custom amount is allowed, and default payments
+from Collection payments are used </p></td>
                 </tr>
               
                 <tr>
@@ -6667,6 +6808,35 @@ plus the timeout on Collection payments, if null then none </p></td>
       
 
       
+        <h3 id="ixo.claims.v1beta1.CreateClaimAuthorizationType">CreateClaimAuthorizationType</h3>
+        <p>AuthorizationType defines the types of claim authorizations that can be</p><p>created</p>
+        <table class="enum-table">
+          <thead>
+            <tr><td>Name</td><td>Number</td><td>Description</td></tr>
+          </thead>
+          <tbody>
+            
+              <tr>
+                <td>ALL</td>
+                <td>0</td>
+                <td><p>both submit and evaluate</p></td>
+              </tr>
+            
+              <tr>
+                <td>SUBMIT</td>
+                <td>1</td>
+                <td><p>submit only</p></td>
+              </tr>
+            
+              <tr>
+                <td>EVALUATE</td>
+                <td>2</td>
+                <td><p>evaluate only</p></td>
+              </tr>
+            
+          </tbody>
+        </table>
+      
 
       
 
@@ -6678,6 +6848,65 @@ plus the timeout on Collection payments, if null then none </p></td>
       </div>
       <p></p>
 
+      
+        <h3 id="ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent">ClaimAuthorizationCreatedEvent</h3>
+        <p>ClaimAuthorizationCreatedEvent is an event triggered on a Claim authorization</p><p>creation</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>creator</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>creator_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grantee</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>auth_type</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
       
         <h3 id="ixo.claims.v1beta1.ClaimDisputedEvent">ClaimDisputedEvent</h3>
         <p>ClaimDisputedEvent is an event triggered on a Claim dispute</p>
@@ -7748,6 +7977,120 @@ the intent expires. </p></td>
 
         
       
+        <h3 id="ixo.claims.v1beta1.MsgCreateClaimAuthorization">MsgCreateClaimAuthorization</h3>
+        <p>MsgCreateClaimAuthorization defines a message for creating a claim</p><p>authorization on behalf of an entity admin account (SubmitClaimAuthorization</p><p>or EvaluateClaimAuthorization)</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>creator_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Address of the creator (user with meta-authorization) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>creator_did</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>agent is the DID of the agent submitting the claim </p></td>
+                </tr>
+              
+                <tr>
+                  <td>grantee_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Address of the grantee (who will receive the authorization) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>Collection ID the authorization applies to (for both submit and evaluate) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>auth_type</td>
+                  <td><a href="#ixo.claims.v1beta1.CreateClaimAuthorizationType">CreateClaimAuthorizationType</a></td>
+                  <td></td>
+                  <td><p>Type of authorization to create (submit or evaluate, can&#39;t create both in a
+single request) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>agent_quota</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>Quota for the created authorization (for both submit and evaluate) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>Maximum amount that can be specified in the authorization (for both submit
+and evaluate) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_cw20_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>Maximum CW20 payment that can be specified in the authorization (for both
+submit and evaluate) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>expiration</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>Expiration time for the authorization, be careful with this as it is the
+expiration of the authorization itself, not the constraints, meaning if the
+authorization expires all constraints will be removed with the
+authorization (standard authz behavior) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>intent_duration_ns</td>
+                  <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
+                  <td></td>
+                  <td><p>Maximum intent duration for the authorization allowed (for submit) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>before_date</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>if null then no before_date validation done (for evaluate) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse">MsgCreateClaimAuthorizationResponse</h3>
+        <p>MsgCreateClaimAuthorizationResponse defines the response for creating a claim</p><p>authorization</p>
+
+        
+
+        
+      
         <h3 id="ixo.claims.v1beta1.MsgCreateCollection">MsgCreateCollection</h3>
         <p></p>
 
@@ -8463,6 +8806,13 @@ plus the timeout on Collection payments </p></td>
                 <td>ClaimIntent</td>
                 <td><a href="#ixo.claims.v1beta1.MsgClaimIntent">MsgClaimIntent</a></td>
                 <td><a href="#ixo.claims.v1beta1.MsgClaimIntentResponse">MsgClaimIntentResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CreateClaimAuthorization</td>
+                <td><a href="#ixo.claims.v1beta1.MsgCreateClaimAuthorization">MsgCreateClaimAuthorization</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse">MsgCreateClaimAuthorizationResponse</a></td>
                 <td><p></p></td>
               </tr>
             

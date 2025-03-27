@@ -15,7 +15,7 @@ message SubmitClaimAuthorization {
   option (cosmos_proto.implements_interface) =
       "cosmos.authz.v1beta1.Authorization";
 
-  // address of admin
+  // address of admin (entity admin module account)
   string admin = 1;
   repeated SubmitClaimConstraints constraints = 2;
 }
@@ -25,13 +25,15 @@ message SubmitClaimConstraints {
   string collection_id = 1;
   uint64 agent_quota = 2;
   // custom max_amount allowed to be specified by service agent for claim
-  // approval, if empty then no custom amount is allowed
+  // approval, if empty then no custom amount is allowed, and default payments
+  // from Collection payments are used
   repeated cosmos.base.v1beta1.Coin max_amount = 3 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
   // custom max_cw20_payment allowed to be specified by service agent for claim
-  // approval, if empty then no custom amount is allowed
+  // approval, if empty then no custom amount is allowed, and default payments
+  // from Collection payments are used
   repeated CW20Payment max_cw20_payment = 4;
   // intent_duration_ns is the duration for which the intent is active, after
   // which it will expire (in nanoseconds)
@@ -43,7 +45,7 @@ message EvaluateClaimAuthorization {
   option (cosmos_proto.implements_interface) =
       "cosmos.authz.v1beta1.Authorization";
 
-  // address of admin
+  // address of admin (entity admin module account)
   string admin = 1;
   repeated EvaluateClaimConstraints constraints = 2;
 }
@@ -56,14 +58,14 @@ message EvaluateClaimConstraints {
   uint64 agent_quota = 3;
   // if null then no before_date validation done
   google.protobuf.Timestamp before_date = 4 [ (gogoproto.stdtime) = true ];
-  // max custom amount evaluator can change, if empty list must use amount
-  // defined in Token payments
+  // max custom amount evaluator can change, if empty then no custom amount is
+  // allowed, and default payments from Collection payments are used
   repeated cosmos.base.v1beta1.Coin max_custom_amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // max custom cw20 payment evaluator can change, if empty list must use amount
-  // defined in Token payments
+  // max custom cw20 payment evaluator can change, if empty then no custom
+  // amount is allowed, and default payments from Collection payments are used
   repeated CW20Payment max_custom_cw20_payment = 11;
 }
 
@@ -99,4 +101,61 @@ message WithdrawPaymentConstraints {
   google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
   // cw20 payments, can be empty or multiple
   repeated CW20Payment cw20_payment = 9;
+}
+
+// CreateClaimAuthorizationAuthorization allows a grantee to create
+// SubmitClaimAuthorization and EvaluateClaimAuthorization for specific
+// collections(constraints)
+message CreateClaimAuthorizationAuthorization {
+  option (cosmos_proto.implements_interface) =
+      "cosmos.authz.v1beta1.Authorization";
+
+  // address of admin (entity admin module account)
+  string admin = 1;
+  // Constraints on the authorizations that can be created
+  repeated CreateClaimAuthorizationConstraints constraints = 2;
+}
+
+// AuthorizationType defines the types of claim authorizations that can be
+// created
+enum CreateClaimAuthorizationType {
+  ALL = 0;      // both submit and evaluate
+  SUBMIT = 1;   // submit only
+  EVALUATE = 2; // evaluate only
+}
+
+// CreateClaimAuthorizationConstraints defines the constraints for creating
+// claim authorizations
+message CreateClaimAuthorizationConstraints {
+  // Maximum number of authorizations that can be created through this
+  // meta-authorization, 0 means no quota
+  uint64 max_authorizations = 1;
+  // Maximum quota that can be set in created authorizations
+  // 0 means no quota maximum quota per authorization
+  uint64 max_agent_quota = 2;
+  // Maximum amount that can be set in created authorizations,
+  // if empty then any custom amount is allowed in the created authorizations
+  // explicitly set to 0 to disallow any custom amount in the created
+  // authorizations
+  repeated cosmos.base.v1beta1.Coin max_amount = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // Maximum cw20 payment that can be set in created authorizations,
+  // if empty then any cw20 payment is allowed in the created authorizations
+  // explicitly set to 0 to disallow any cw20 payment in the created
+  // authorizations
+  repeated CW20Payment max_cw20_payment = 4;
+  // Expiration of this meta-authorization(specific constraint), if not set then
+  // no expiration
+  google.protobuf.Timestamp expiration = 5 [ (gogoproto.stdtime) = true ];
+  // Collection IDs the grantee can create authorizations for, if empty then all
+  // collections for the admin are allowed
+  repeated string collection_ids = 6;
+  // Types of authorizations the grantee can create (submit, evaluate, or
+  // all(both))
+  CreateClaimAuthorizationType allowed_auth_types = 7;
+  // Maximum intent duration for the authorization allowed (for submit)
+  google.protobuf.Duration max_intent_duration_ns = 8
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
 }

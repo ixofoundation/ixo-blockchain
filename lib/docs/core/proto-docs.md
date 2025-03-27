@@ -113,6 +113,8 @@
     - [PaymentType](#ixo.claims.v1beta1.PaymentType)
   
 - [ixo/claims/v1beta1/authz.proto](#ixo/claims/v1beta1/authz.proto)
+    - [CreateClaimAuthorizationAuthorization](#ixo.claims.v1beta1.CreateClaimAuthorizationAuthorization)
+    - [CreateClaimAuthorizationConstraints](#ixo.claims.v1beta1.CreateClaimAuthorizationConstraints)
     - [EvaluateClaimAuthorization](#ixo.claims.v1beta1.EvaluateClaimAuthorization)
     - [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints)
     - [SubmitClaimAuthorization](#ixo.claims.v1beta1.SubmitClaimAuthorization)
@@ -120,7 +122,10 @@
     - [WithdrawPaymentAuthorization](#ixo.claims.v1beta1.WithdrawPaymentAuthorization)
     - [WithdrawPaymentConstraints](#ixo.claims.v1beta1.WithdrawPaymentConstraints)
   
+    - [CreateClaimAuthorizationType](#ixo.claims.v1beta1.CreateClaimAuthorizationType)
+  
 - [ixo/claims/v1beta1/event.proto](#ixo/claims/v1beta1/event.proto)
+    - [ClaimAuthorizationCreatedEvent](#ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent)
     - [ClaimDisputedEvent](#ixo.claims.v1beta1.ClaimDisputedEvent)
     - [ClaimEvaluatedEvent](#ixo.claims.v1beta1.ClaimEvaluatedEvent)
     - [ClaimSubmittedEvent](#ixo.claims.v1beta1.ClaimSubmittedEvent)
@@ -160,6 +165,8 @@
 - [ixo/claims/v1beta1/tx.proto](#ixo/claims/v1beta1/tx.proto)
     - [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent)
     - [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse)
+    - [MsgCreateClaimAuthorization](#ixo.claims.v1beta1.MsgCreateClaimAuthorization)
+    - [MsgCreateClaimAuthorizationResponse](#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse)
     - [MsgCreateCollection](#ixo.claims.v1beta1.MsgCreateCollection)
     - [MsgCreateCollectionResponse](#ixo.claims.v1beta1.MsgCreateCollectionResponse)
     - [MsgDisputeClaim](#ixo.claims.v1beta1.MsgDisputeClaim)
@@ -2219,6 +2226,47 @@ Intent defines the structure for a service agent&#39;s claim intent.
 
 
 
+<a name="ixo.claims.v1beta1.CreateClaimAuthorizationAuthorization"></a>
+
+### CreateClaimAuthorizationAuthorization
+CreateClaimAuthorizationAuthorization allows a grantee to create
+SubmitClaimAuthorization and EvaluateClaimAuthorization for specific
+collections(constraints)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| admin | [string](#string) |  | address of admin (entity admin module account) |
+| constraints | [CreateClaimAuthorizationConstraints](#ixo.claims.v1beta1.CreateClaimAuthorizationConstraints) | repeated | Constraints on the authorizations that can be created |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.CreateClaimAuthorizationConstraints"></a>
+
+### CreateClaimAuthorizationConstraints
+CreateClaimAuthorizationConstraints defines the constraints for creating
+claim authorizations
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| max_authorizations | [uint64](#uint64) |  | Maximum number of authorizations that can be created through this meta-authorization, 0 means no quota |
+| max_agent_quota | [uint64](#uint64) |  | Maximum quota that can be set in created authorizations 0 means no quota maximum quota per authorization |
+| max_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Maximum amount that can be set in created authorizations, if empty then any custom amount is allowed in the created authorizations explicitly set to 0 to disallow any custom amount in the created authorizations |
+| max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | Maximum cw20 payment that can be set in created authorizations, if empty then any cw20 payment is allowed in the created authorizations explicitly set to 0 to disallow any cw20 payment in the created authorizations |
+| expiration | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Expiration of this meta-authorization(specific constraint), if not set then no expiration |
+| collection_ids | [string](#string) | repeated | Collection IDs the grantee can create authorizations for, if empty then all collections for the admin are allowed |
+| allowed_auth_types | [CreateClaimAuthorizationType](#ixo.claims.v1beta1.CreateClaimAuthorizationType) |  | Types of authorizations the grantee can create (submit, evaluate, or all(both)) |
+| max_intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum intent duration for the authorization allowed (for submit) |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.EvaluateClaimAuthorization"></a>
 
 ### EvaluateClaimAuthorization
@@ -2227,7 +2275,7 @@ Intent defines the structure for a service agent&#39;s claim intent.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| admin | [string](#string) |  | address of admin |
+| admin | [string](#string) |  | address of admin (entity admin module account) |
 | constraints | [EvaluateClaimConstraints](#ixo.claims.v1beta1.EvaluateClaimConstraints) | repeated |  |
 
 
@@ -2247,8 +2295,8 @@ Intent defines the structure for a service agent&#39;s claim intent.
 | claim_ids | [string](#string) | repeated | either collection_id or claim_ids is needed |
 | agent_quota | [uint64](#uint64) |  |  |
 | before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done |
-| max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, if empty list must use amount defined in Token payments |
-| max_custom_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | max custom cw20 payment evaluator can change, if empty list must use amount defined in Token payments |
+| max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, if empty then no custom amount is allowed, and default payments from Collection payments are used |
+| max_custom_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | max custom cw20 payment evaluator can change, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 
 
 
@@ -2263,7 +2311,7 @@ Intent defines the structure for a service agent&#39;s claim intent.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| admin | [string](#string) |  | address of admin |
+| admin | [string](#string) |  | address of admin (entity admin module account) |
 | constraints | [SubmitClaimConstraints](#ixo.claims.v1beta1.SubmitClaimConstraints) | repeated |  |
 
 
@@ -2281,8 +2329,8 @@ Intent defines the structure for a service agent&#39;s claim intent.
 | ----- | ---- | ----- | ----------- |
 | collection_id | [string](#string) |  | collection_id indicates to which Collection this claim belongs |
 | agent_quota | [uint64](#uint64) |  |  |
-| max_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom max_amount allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed |
-| max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom max_cw20_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed |
+| max_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom max_amount allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed, and default payments from Collection payments are used |
+| max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom max_cw20_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 | intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | intent_duration_ns is the duration for which the intent is active, after which it will expire (in nanoseconds) |
 
 
@@ -2330,6 +2378,20 @@ Intent defines the structure for a service agent&#39;s claim intent.
 
  
 
+
+<a name="ixo.claims.v1beta1.CreateClaimAuthorizationType"></a>
+
+### CreateClaimAuthorizationType
+AuthorizationType defines the types of claim authorizations that can be
+created
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ALL | 0 | both submit and evaluate |
+| SUBMIT | 1 | submit only |
+| EVALUATE | 2 | evaluate only |
+
+
  
 
  
@@ -2342,6 +2404,27 @@ Intent defines the structure for a service agent&#39;s claim intent.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/claims/v1beta1/event.proto
+
+
+
+<a name="ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent"></a>
+
+### ClaimAuthorizationCreatedEvent
+ClaimAuthorizationCreatedEvent is an event triggered on a Claim authorization
+creation
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| creator | [string](#string) |  |  |
+| creator_did | [string](#string) |  |  |
+| grantee | [string](#string) |  |  |
+| admin | [string](#string) |  |  |
+| collection_id | [string](#string) |  |  |
+| auth_type | [string](#string) |  |  |
+
+
+
 
 
 
@@ -2887,6 +2970,45 @@ MsgClaimIntentResponse defines the response after submitting an intent.
 
 
 
+<a name="ixo.claims.v1beta1.MsgCreateClaimAuthorization"></a>
+
+### MsgCreateClaimAuthorization
+MsgCreateClaimAuthorization defines a message for creating a claim
+authorization on behalf of an entity admin account (SubmitClaimAuthorization
+or EvaluateClaimAuthorization)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| creator_address | [string](#string) |  | Address of the creator (user with meta-authorization) |
+| creator_did | [string](#string) |  | agent is the DID of the agent submitting the claim |
+| grantee_address | [string](#string) |  | Address of the grantee (who will receive the authorization) |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+| collection_id | [string](#string) |  | Collection ID the authorization applies to (for both submit and evaluate) |
+| auth_type | [CreateClaimAuthorizationType](#ixo.claims.v1beta1.CreateClaimAuthorizationType) |  | Type of authorization to create (submit or evaluate, can&#39;t create both in a single request) |
+| agent_quota | [uint64](#uint64) |  | Quota for the created authorization (for both submit and evaluate) |
+| max_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Maximum amount that can be specified in the authorization (for both submit and evaluate) |
+| max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | Maximum CW20 payment that can be specified in the authorization (for both submit and evaluate) |
+| expiration | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Expiration time for the authorization, be careful with this as it is the expiration of the authorization itself, not the constraints, meaning if the authorization expires all constraints will be removed with the authorization (standard authz behavior) |
+| intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum intent duration for the authorization allowed (for submit) |
+| before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done (for evaluate) |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse"></a>
+
+### MsgCreateClaimAuthorizationResponse
+MsgCreateClaimAuthorizationResponse defines the response for creating a claim
+authorization
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.MsgCreateCollection"></a>
 
 ### MsgCreateCollection
@@ -3183,6 +3305,7 @@ Msg defines the Msg service.
 | UpdateCollectionPayments | [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments) | [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse) |  |
 | UpdateCollectionIntents | [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents) | [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse) |  |
 | ClaimIntent | [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent) | [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse) |  |
+| CreateClaimAuthorization | [MsgCreateClaimAuthorization](#ixo.claims.v1beta1.MsgCreateClaimAuthorization) | [MsgCreateClaimAuthorizationResponse](#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse) |  |
 
  
 

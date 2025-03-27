@@ -21,6 +21,7 @@ type EntityKeeper interface {
 	CheckIfOwner(ctx sdk.Context, entityId, ownerAddress string) error
 	CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.AccAddress, error)
 	SetEntity(ctx sdk.Context, key []byte, entity entitytypes.Entity)
+	GetCurrentOwner(ctx sdk.Context, entityId string) (string, error)
 }
 
 type AuthzKeeper interface {

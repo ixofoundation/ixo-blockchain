@@ -5327,13 +5327,181 @@
       "name": "ixo/claims/v1beta1/authz.proto",
       "description": "",
       "package": "ixo.claims.v1beta1",
-      "hasEnums": false,
+      "hasEnums": true,
       "hasExtensions": false,
       "hasMessages": true,
       "hasServices": false,
-      "enums": [],
+      "enums": [
+        {
+          "name": "CreateClaimAuthorizationType",
+          "longName": "CreateClaimAuthorizationType",
+          "fullName": "ixo.claims.v1beta1.CreateClaimAuthorizationType",
+          "description": "AuthorizationType defines the types of claim authorizations that can be\ncreated",
+          "values": [
+            {
+              "name": "ALL",
+              "number": "0",
+              "description": "both submit and evaluate"
+            },
+            {
+              "name": "SUBMIT",
+              "number": "1",
+              "description": "submit only"
+            },
+            {
+              "name": "EVALUATE",
+              "number": "2",
+              "description": "evaluate only"
+            }
+          ]
+        }
+      ],
       "extensions": [],
       "messages": [
+        {
+          "name": "CreateClaimAuthorizationAuthorization",
+          "longName": "CreateClaimAuthorizationAuthorization",
+          "fullName": "ixo.claims.v1beta1.CreateClaimAuthorizationAuthorization",
+          "description": "CreateClaimAuthorizationAuthorization allows a grantee to create\nSubmitClaimAuthorization and EvaluateClaimAuthorization for specific\ncollections(constraints)",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "admin",
+              "description": "address of admin (entity admin module account)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "constraints",
+              "description": "Constraints on the authorizations that can be created",
+              "label": "repeated",
+              "type": "CreateClaimAuthorizationConstraints",
+              "longType": "CreateClaimAuthorizationConstraints",
+              "fullType": "ixo.claims.v1beta1.CreateClaimAuthorizationConstraints",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CreateClaimAuthorizationConstraints",
+          "longName": "CreateClaimAuthorizationConstraints",
+          "fullName": "ixo.claims.v1beta1.CreateClaimAuthorizationConstraints",
+          "description": "CreateClaimAuthorizationConstraints defines the constraints for creating\nclaim authorizations",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "max_authorizations",
+              "description": "Maximum number of authorizations that can be created through this\nmeta-authorization, 0 means no quota",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_agent_quota",
+              "description": "Maximum quota that can be set in created authorizations\n0 means no quota maximum quota per authorization",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_amount",
+              "description": "Maximum amount that can be set in created authorizations,\nif empty then any custom amount is allowed in the created authorizations\nexplicitly set to 0 to disallow any custom amount in the created\nauthorizations",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_cw20_payment",
+              "description": "Maximum cw20 payment that can be set in created authorizations,\nif empty then any cw20 payment is allowed in the created authorizations\nexplicitly set to 0 to disallow any cw20 payment in the created\nauthorizations",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "expiration",
+              "description": "Expiration of this meta-authorization(specific constraint), if not set then\nno expiration",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection_ids",
+              "description": "Collection IDs the grantee can create authorizations for, if empty then all\ncollections for the admin are allowed",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "allowed_auth_types",
+              "description": "Types of authorizations the grantee can create (submit, evaluate, or\nall(both))",
+              "label": "",
+              "type": "CreateClaimAuthorizationType",
+              "longType": "CreateClaimAuthorizationType",
+              "fullType": "ixo.claims.v1beta1.CreateClaimAuthorizationType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_intent_duration_ns",
+              "description": "Maximum intent duration for the authorization allowed (for submit)",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "EvaluateClaimAuthorization",
           "longName": "EvaluateClaimAuthorization",
@@ -5346,7 +5514,7 @@
           "fields": [
             {
               "name": "admin",
-              "description": "address of admin",
+              "description": "address of admin (entity admin module account)",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -5430,7 +5598,7 @@
             },
             {
               "name": "max_custom_amount",
-              "description": "max custom amount evaluator can change, if empty list must use amount\ndefined in Token payments",
+              "description": "max custom amount evaluator can change, if empty then no custom amount is\nallowed, and default payments from Collection payments are used",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -5442,7 +5610,7 @@
             },
             {
               "name": "max_custom_cw20_payment",
-              "description": "max custom cw20 payment evaluator can change, if empty list must use amount\ndefined in Token payments",
+              "description": "max custom cw20 payment evaluator can change, if empty then no custom\namount is allowed, and default payments from Collection payments are used",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -5466,7 +5634,7 @@
           "fields": [
             {
               "name": "admin",
-              "description": "address of admin",
+              "description": "address of admin (entity admin module account)",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -5526,7 +5694,7 @@
             },
             {
               "name": "max_amount",
-              "description": "custom max_amount allowed to be specified by service agent for claim\napproval, if empty then no custom amount is allowed",
+              "description": "custom max_amount allowed to be specified by service agent for claim\napproval, if empty then no custom amount is allowed, and default payments\nfrom Collection payments are used",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -5538,7 +5706,7 @@
             },
             {
               "name": "max_cw20_payment",
-              "description": "custom max_cw20_payment allowed to be specified by service agent for claim\napproval, if empty then no custom amount is allowed",
+              "description": "custom max_cw20_payment allowed to be specified by service agent for claim\napproval, if empty then no custom amount is allowed, and default payments\nfrom Collection payments are used",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
@@ -5732,6 +5900,90 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "ClaimAuthorizationCreatedEvent",
+          "longName": "ClaimAuthorizationCreatedEvent",
+          "fullName": "ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent",
+          "description": "ClaimAuthorizationCreatedEvent is an event triggered on a Claim authorization\ncreation",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "creator",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "creator_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "grantee",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "auth_type",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "ClaimDisputedEvent",
           "longName": "ClaimDisputedEvent",
@@ -6905,6 +7157,173 @@
           ]
         },
         {
+          "name": "MsgCreateClaimAuthorization",
+          "longName": "MsgCreateClaimAuthorization",
+          "fullName": "ixo.claims.v1beta1.MsgCreateClaimAuthorization",
+          "description": "MsgCreateClaimAuthorization defines a message for creating a claim\nauthorization on behalf of an entity admin account (SubmitClaimAuthorization\nor EvaluateClaimAuthorization)",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "creator_address",
+              "description": "Address of the creator (user with meta-authorization)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "creator_did",
+              "description": "agent is the DID of the agent submitting the claim",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "grantee_address",
+              "description": "Address of the grantee (who will receive the authorization)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "collection_id",
+              "description": "Collection ID the authorization applies to (for both submit and evaluate)",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "auth_type",
+              "description": "Type of authorization to create (submit or evaluate, can't create both in a\nsingle request)",
+              "label": "",
+              "type": "CreateClaimAuthorizationType",
+              "longType": "CreateClaimAuthorizationType",
+              "fullType": "ixo.claims.v1beta1.CreateClaimAuthorizationType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_quota",
+              "description": "Quota for the created authorization (for both submit and evaluate)",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_amount",
+              "description": "Maximum amount that can be specified in the authorization (for both submit\nand evaluate)",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_cw20_payment",
+              "description": "Maximum CW20 payment that can be specified in the authorization (for both\nsubmit and evaluate)",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "expiration",
+              "description": "Expiration time for the authorization, be careful with this as it is the\nexpiration of the authorization itself, not the constraints, meaning if the\nauthorization expires all constraints will be removed with the\nauthorization (standard authz behavior)",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intent_duration_ns",
+              "description": "Maximum intent duration for the authorization allowed (for submit)",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "before_date",
+              "description": "if null then no before_date validation done (for evaluate)",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCreateClaimAuthorizationResponse",
+          "longName": "MsgCreateClaimAuthorizationResponse",
+          "fullName": "ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse",
+          "description": "MsgCreateClaimAuthorizationResponse defines the response for creating a claim\nauthorization",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
           "name": "MsgCreateCollection",
           "longName": "MsgCreateCollection",
           "fullName": "ixo.claims.v1beta1.MsgCreateCollection",
@@ -7909,6 +8328,18 @@
               "responseType": "MsgClaimIntentResponse",
               "responseLongType": "MsgClaimIntentResponse",
               "responseFullType": "ixo.claims.v1beta1.MsgClaimIntentResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "CreateClaimAuthorization",
+              "description": "",
+              "requestType": "MsgCreateClaimAuthorization",
+              "requestLongType": "MsgCreateClaimAuthorization",
+              "requestFullType": "ixo.claims.v1beta1.MsgCreateClaimAuthorization",
+              "requestStreaming": false,
+              "responseType": "MsgCreateClaimAuthorizationResponse",
+              "responseLongType": "MsgCreateClaimAuthorizationResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse",
               "responseStreaming": false
             }
           ]

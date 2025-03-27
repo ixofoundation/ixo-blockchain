@@ -12,6 +12,8 @@ type msgServer struct {
 	Keeper
 }
 
+// TODO: add ControllerDid check for iid update types
+
 // NewMsgServerImpl returns an implementation of the identity MsgServer interface
 // for the provided Keeper.
 func NewMsgServerImpl(keeper Keeper) types.MsgServer {

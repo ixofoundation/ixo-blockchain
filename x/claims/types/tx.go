@@ -129,3 +129,16 @@ func (msg MsgClaimIntent) Type() string { return TypeMsgClaimIntent }
 func (msg MsgClaimIntent) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
 
 func (msg MsgClaimIntent) Route() string { return RouterKey }
+
+// --------------------------
+// CREATE CLAIM AUTHORIZATION
+// --------------------------
+const TypeMsgCreateClaimAuthorization = "create_claim_authorization"
+
+var _ sdk.Msg = &MsgCreateClaimAuthorization{}
+
+func (msg MsgCreateClaimAuthorization) Type() string { return TypeMsgCreateClaimAuthorization }
+
+func (msg MsgCreateClaimAuthorization) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
+
+func (msg MsgCreateClaimAuthorization) Route() string { return RouterKey }

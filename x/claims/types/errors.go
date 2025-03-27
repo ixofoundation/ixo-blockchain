@@ -34,4 +34,6 @@ var (
 	ErrIntentNotFound     = errorsmod.Register(ModuleName, 1500, "intent not found")
 	ErrIntentExists       = errorsmod.Register(ModuleName, 1501, "active intent found")
 	ErrIntentUnauthorized = errorsmod.Register(ModuleName, 1502, "unauthorized")
+
+	ErrInvalidResponse = errorsmod.Register(ModuleName, 1601, "invalid response")
 )
