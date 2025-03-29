@@ -44,14 +44,15 @@ import (
 	txmodule "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	"github.com/gorilla/mux"
-	"github.com/ixofoundation/ixo-blockchain/v4/app/keepers"
-	"github.com/ixofoundation/ixo-blockchain/v4/app/params"
-	"github.com/ixofoundation/ixo-blockchain/v4/app/upgrades"
-	v2 "github.com/ixofoundation/ixo-blockchain/v4/app/upgrades/v2"
-	v3 "github.com/ixofoundation/ixo-blockchain/v4/app/upgrades/v3"
-	v4 "github.com/ixofoundation/ixo-blockchain/v4/app/upgrades/v4"
-	"github.com/ixofoundation/ixo-blockchain/v4/lib/docs"
-	"github.com/ixofoundation/ixo-blockchain/v4/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v5/app/keepers"
+	"github.com/ixofoundation/ixo-blockchain/v5/app/params"
+	"github.com/ixofoundation/ixo-blockchain/v5/app/upgrades"
+	v2 "github.com/ixofoundation/ixo-blockchain/v5/app/upgrades/v2"
+	v3 "github.com/ixofoundation/ixo-blockchain/v5/app/upgrades/v3"
+	v4 "github.com/ixofoundation/ixo-blockchain/v5/app/upgrades/v4"
+	v5 "github.com/ixofoundation/ixo-blockchain/v5/app/upgrades/v5"
+	"github.com/ixofoundation/ixo-blockchain/v5/lib/docs"
+	"github.com/ixofoundation/ixo-blockchain/v5/lib/ixo"
 	"github.com/spf13/cast"
 )
 
@@ -67,7 +68,7 @@ var (
 	maccPerms = moduleAccountPermissions
 
 	// scheduled upgrades and forks
-	Upgrades = []upgrades.Upgrade{v2.Upgrade, v3.Upgrade, v4.Upgrade}
+	Upgrades = []upgrades.Upgrade{v2.Upgrade, v3.Upgrade, v4.Upgrade, v5.Upgrade}
 	Forks    = []upgrades.Fork{}
 
 	// EmptyWasmOpts defines a type alias for a list of wasm options.

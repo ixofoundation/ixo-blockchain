@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/epochs/types"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"

@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ixo.claims.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v5/x/claims/types";
 
 import "gogoproto/gogo.proto";
 import "google/protobuf/timestamp.proto";
@@ -9,6 +9,8 @@ import "ixo/claims/v1beta1/claims.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 import "cosmos/msg/v1/msg.proto";
+import "ixo/claims/v1beta1/authz.proto";
+import "google/protobuf/duration.proto";
 
 // Msg defines the Msg service.
 service Msg {
@@ -27,6 +29,8 @@ service Msg {
   rpc UpdateCollectionIntents(MsgUpdateCollectionIntents)
       returns (MsgUpdateCollectionIntentsResponse);
   rpc ClaimIntent(MsgClaimIntent) returns (MsgClaimIntentResponse);
+  rpc CreateClaimAuthorization(MsgCreateClaimAuthorization)
+      returns (MsgCreateClaimAuthorizationResponse);
 }
 
 message MsgCreateCollection {
@@ -66,25 +70,26 @@ message MsgSubmitClaim {
   // agent is the DID of the agent submitting the claim
   string agent_did = 3 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment"
   ];
   string agent_address = 4;
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 5;
   // use_intent is the option for using intent for this claim if it exists and
   // is active. NOTE: if use_intent is true then amount and cw20 amount are
-  // ignored and overriden with intent amounts. NOTE: if use_intent is true and
+  // ignored and overridden with intent amounts. NOTE: if use_intent is true and
   // there is no active intent then will error
   bool use_intent = 6;
-  // NOTE: if both amount and cw20_payment are empty then use default by
-  // Collection custom amount specified by service agent for claim approval
+  // custom amount specified by service agent for claim approval
+  // NOTE: if both amount and cw20_payment are empty then collection default is
+  // used
   repeated cosmos.base.v1beta1.Coin amount = 7 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // NOTE: if both amount and cw20 amount are empty then use default by
-  // Collection custom cw20 payments specified by service agent for claim
-  // approval
+  // custom cw20 payments specified by service agent for claim approval
+  // NOTE: if both amount and cw20 amount are empty then collection default is
+  // used
   repeated CW20Payment cw20_payment = 8;
 }
 message MsgSubmitClaimResponse {}
@@ -101,7 +106,7 @@ message MsgEvaluateClaim {
   // agent is the DID of the agent that submits the evaluation
   string agent_did = 4 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment"
   ];
   string agent_address = 5;
   // admin address used to sign this message, validated against Collection Admin
@@ -112,20 +117,20 @@ message MsgEvaluateClaim {
   // reason is the code expressed as an integer, for why the evaluation result
   // was given (codes defined by evaluator)
   uint32 reason = 8;
-  // verificationProof is the cid of the evaluation Verfiable Credential
+  // verificationProof is the cid of the evaluation Verifiable Credential
   string verification_proof = 9;
+  // custom amount specified by evaluator for claim approval
   // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-  // overriden with intent amounts NOTE: if both amount and cw20 amount are
-  // empty then use collection default custom amount specified by evaluator for
-  // claim approval
+  // overridden with intent amounts NOTE: if both amount and cw20 amount are
+  // empty then collection default is used
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // custom cw20 payments specified by evaluator for claim approval
   // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-  // overriden with intent amounts NOTE: if both amount and cw20 amount are
-  // empty then use collection default custom cw20 payments specified by
-  // evaluator for claim approval
+  // overridden with intent amounts NOTE: if both amount and cw20 amount are
+  // empty then collection default is used
   repeated CW20Payment cw20_payment = 11;
 }
 message MsgEvaluateClaimResponse {}
@@ -142,7 +147,7 @@ message MsgDisputeClaim {
   // saved in kvStore
   string agent_did = 2 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment"
   ];
   string agent_address = 3;
   // type is expressed as an integer, interpreted by the client
@@ -156,10 +161,10 @@ message MsgWithdrawPayment {
 
   // claim_id the withdrawal is for
   string claim_id = 1;
-  // Inputs to the multisend tx to run to withdraw payment
+  // Inputs to the multi send tx to run to withdraw payment
   repeated cosmos.bank.v1beta1.Input inputs = 2
       [ (gogoproto.nullable) = false ];
-  // Outputs for the multisend tx to run to withdraw payment
+  // Outputs for the multi send tx to run to withdraw payment
   repeated cosmos.bank.v1beta1.Output outputs = 3
       [ (gogoproto.nullable) = false ];
   // payment type to keep track what payment is for and mark claim payment
@@ -241,20 +246,22 @@ message MsgClaimIntent {
   // The service agent's DID (Decentralized Identifier).
   string agent_did = 1 [
     (gogoproto.casttype) =
-        "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment"
+        "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment"
   ];
   // The service agent's address (who submits this message).
   string agent_address = 2;
   // The id of the collection this intent is linked to.
   string collection_id = 3;
+  // The desired claim amount, if any.
   // NOTE: if both amount and cw20 amount are empty then default by Collection
-  // is used (APPROVAL payment). The desired claim amount, if any.
+  // is used (APPROVAL payment).
   repeated cosmos.base.v1beta1.Coin amount = 4 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
+  // The custom CW20 payment, if any.
   // NOTE: if both amount and cw20 amount are empty then default by Collection
-  // is used (APPROVAL payment). The custom CW20 payment, if any.
+  // is used (APPROVAL payment).
   repeated CW20Payment cw20_payment = 5;
 }
 
@@ -266,3 +273,52 @@ message MsgClaimIntentResponse {
   // the intent expires.
   google.protobuf.Timestamp expire_at = 2 [ (gogoproto.stdtime) = true ];
 }
+
+// MsgCreateClaimAuthorization defines a message for creating a claim
+// authorization on behalf of an entity admin account (SubmitClaimAuthorization
+// or EvaluateClaimAuthorization)
+message MsgCreateClaimAuthorization {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
+  // Address of the creator (user with meta-authorization)
+  string creator_address = 1;
+  // agent is the DID of the agent submitting the claim
+  string creator_did = 2 [
+    (gogoproto.casttype) =
+        "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment"
+  ];
+  // Address of the grantee (who will receive the authorization)
+  string grantee_address = 3;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 4;
+  // Collection ID the authorization applies to (for both submit and evaluate)
+  string collection_id = 5;
+  // Type of authorization to create (submit or evaluate, can't create both in a
+  // single request)
+  CreateClaimAuthorizationType auth_type = 6;
+  // Quota for the created authorization (for both submit and evaluate)
+  uint64 agent_quota = 7;
+  // Maximum amount that can be specified in the authorization (for both submit
+  // and evaluate)
+  repeated cosmos.base.v1beta1.Coin max_amount = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // Maximum CW20 payment that can be specified in the authorization (for both
+  // submit and evaluate)
+  repeated CW20Payment max_cw20_payment = 9;
+  // Expiration time for the authorization, be careful with this as it is the
+  // expiration of the authorization itself, not the constraints, meaning if the
+  // authorization expires all constraints will be removed with the
+  // authorization (standard authz behavior)
+  google.protobuf.Timestamp expiration = 10 [ (gogoproto.stdtime) = true ];
+  // Maximum intent duration for the authorization allowed (for submit)
+  google.protobuf.Duration intent_duration_ns = 11
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // if null then no before_date validation done (for evaluate)
+  google.protobuf.Timestamp before_date = 12 [ (gogoproto.stdtime) = true ];
+}
+
+// MsgCreateClaimAuthorizationResponse defines the response for creating a claim
+// authorization
+message MsgCreateClaimAuthorizationResponse {}

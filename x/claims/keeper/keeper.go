@@ -5,10 +5,11 @@ import (
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
 )
 
 // UnmarshalFn is a generic function to unmarshal bytes
@@ -19,15 +20,18 @@ type MarshalFn func(value interface{}) []byte
 
 type (
 	Keeper struct {
-		cdc           codec.BinaryCodec
-		storeKey      storetypes.StoreKey
-		paramstore    paramtypes.Subspace
+		cdc        codec.BinaryCodec
+		storeKey   storetypes.StoreKey
+		paramstore paramtypes.Subspace
+
 		AuthzKeeper   types.AuthzKeeper
 		IidKeeper     types.IidKeeper
 		BankKeeper    types.BankKeeper
 		EntityKeeper  types.EntityKeeper
 		WasmKeeper    types.WasmKeeper
 		AccountKeeper types.AccountKeeper
+
+		router *baseapp.MsgServiceRouter
 	}
 )
 
@@ -41,6 +45,7 @@ func NewKeeper(
 	entityKeeper types.EntityKeeper,
 	wasmKeeper types.WasmKeeper,
 	accountKeeper types.AccountKeeper,
+	router *baseapp.MsgServiceRouter,
 ) Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -57,6 +62,7 @@ func NewKeeper(
 		EntityKeeper:  entityKeeper,
 		WasmKeeper:    wasmKeeper,
 		AccountKeeper: accountKeeper,
+		router:        router,
 	}
 }
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/bonds/types"
 )
 
 // RegisterInvariants registers all supply invariants

@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 type IidKeeper interface {
@@ -21,6 +21,7 @@ type EntityKeeper interface {
 	CheckIfOwner(ctx sdk.Context, entityId, ownerAddress string) error
 	CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.AccAddress, error)
 	SetEntity(ctx sdk.Context, key []byte, entity entitytypes.Entity)
+	GetCurrentOwner(ctx sdk.Context, entityId string) (string, error)
 }
 
 type AuthzKeeper interface {

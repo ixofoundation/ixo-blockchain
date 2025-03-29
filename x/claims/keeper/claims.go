@@ -8,8 +8,10 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/token/types/contracts/cw20"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types/contracts/cw20"
 )
 
 func (k Keeper) SetCollection(ctx sdk.Context, data types.Collection) {
@@ -319,6 +321,42 @@ func (k Keeper) CollectionPersistAndEmitEvents(ctx sdk.Context, collection types
 		},
 	); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// RouteGrantEntityAccountAuthz routes the grant entity account authz message to the correct handler.
+// It returns an error if the handler is not found or if the message is invalid.
+// It emits the events from the message response.
+func (k Keeper) RouteGrantEntityAccountAuthz(ctx sdk.Context, msg *entitytypes.MsgGrantEntityAccountAuthz) error {
+	// get handler
+	handler := k.router.Handler(msg)
+	if handler == nil {
+		k.Logger(ctx).Error("failed to find grant entity account authz handler")
+		return sdkerrors.ErrUnknownRequest.Wrapf("unrecognized message route: %s", sdk.MsgTypeURL(msg))
+	}
+
+	// execute handler
+	msgResp, err := handler(ctx, msg)
+	if err != nil {
+		k.Logger(ctx).Error(
+			"failed to execute grant entity account authz message",
+			"error", err,
+			"msg", msg.String(),
+		)
+
+		return err
+	}
+
+	ctx.EventManager().EmitEvents(msgResp.GetEvents())
+
+	if len(msgResp.MsgResponses) != 1 {
+		return errorsmod.Wrapf(
+			types.ErrInvalidResponse,
+			"expected msg response should be exactly 1, got: %v, responses: %v",
+			len(msgResp.MsgResponses), msgResp.MsgResponses,
+		)
 	}
 
 	return nil

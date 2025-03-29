@@ -8,7 +8,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 type (

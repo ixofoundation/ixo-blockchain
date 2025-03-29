@@ -6,10 +6,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	simapp "github.com/ixofoundation/ixo-blockchain/v4/app"
-	"github.com/ixofoundation/ixo-blockchain/v4/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/mint/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
+	simapp "github.com/ixofoundation/ixo-blockchain/v5/app"
+	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/types"
 
 	"github.com/cosmos/cosmos-sdk/types/kv"
 )

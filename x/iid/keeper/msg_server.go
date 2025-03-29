@@ -5,12 +5,14 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 type msgServer struct {
 	Keeper
 }
+
+// TODO: add ControllerDid check for iid update types
 
 // NewMsgServerImpl returns an implementation of the identity MsgServer interface
 // for the provided Keeper.
@@ -82,7 +84,6 @@ func (k msgServer) UpdateIidDocument(goCtx context.Context, msg *types.MsgUpdate
 				return err
 			}
 			// Keep old iid doc metadata
-			// nolint
 			did.Metadata = didDoc.Metadata
 			return nil
 		}); err != nil {
@@ -400,6 +401,7 @@ func ExecuteOnDidWithRelationships(ctx sdk.Context, k types.IidKeeper, constrain
 	// Any verification method in the authentication relationship can update the DID document
 	if !didDoc.HasRelationship(types.NewBlockchainAccountID(signer), constraints...) {
 		// check also the controllers
+		// TODO: for usage of this in iid msg_server.go, the signer is always address, so this will never pass?
 		if !didDoc.HasController(types.DID(signer)) {
 			// if also the controller was not set the error
 			err = errorsmod.Wrapf(

@@ -29,9 +29,11 @@ var (
 	ErrPaymentPresetPercentagesOverflow = errorsmod.Register(ModuleName, 1400, "preset fee percentages for node and network overflows 100%")
 	ErrPaymentWithdrawFailed            = errorsmod.Register(ModuleName, 1401, "payment withdrawal failed")
 	ErrDistributionFailed               = errorsmod.Register(ModuleName, 1402, "distribution calculations failed")
-	ErrOraclePaymentOnlyNative          = errorsmod.Register(ModuleName, 1403, "oracle payments can only have Native Coin payments, CW20 payments are not allowed")
+	ErrOraclePaymentOnlyNative          = errorsmod.Register(ModuleName, 1403, "oracle payments can only have Native Coin payments if no intent is used, CW20 payments are not allowed")
 
 	ErrIntentNotFound     = errorsmod.Register(ModuleName, 1500, "intent not found")
 	ErrIntentExists       = errorsmod.Register(ModuleName, 1501, "active intent found")
 	ErrIntentUnauthorized = errorsmod.Register(ModuleName, 1502, "unauthorized")
+
+	ErrInvalidResponse = errorsmod.Register(ModuleName, 1601, "invalid response")
 )

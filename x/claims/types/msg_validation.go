@@ -4,8 +4,8 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ixo "github.com/ixofoundation/ixo-blockchain/v4/lib/ixo"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	ixo "github.com/ixofoundation/ixo-blockchain/v5/lib/ixo"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 // --------------------------
@@ -274,6 +274,50 @@ func (msg *MsgClaimIntent) ValidateBasic() error {
 		return err
 	}
 	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// --------------------------
+// CREATE CLAIM AUTHORIZATION
+// --------------------------
+func (msg MsgCreateClaimAuthorization) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.CreatorAddress)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+	_, err = sdk.AccAddressFromBech32(msg.GranteeAddress)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid grantee address (%s)", err)
+	}
+	_, err = sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+
+	if !iidtypes.IsValidDID(msg.CreatorDid.Did()) {
+		return errorsmod.Wrap(iidtypes.ErrInvalidDIDFormat, msg.CreatorDid.String())
+	}
+
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+
+	if !ixo.IsEnumValueValid(CreateClaimAuthorizationType_name, int32(msg.AuthType)) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for auth_type")
+	}
+
+	if msg.AgentQuota == 0 {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "agent_quota cannot be 0")
+	}
+
+	if err = ValidateCoinsAllowZero(msg.MaxAmount.Sort()); err != nil {
+		return err
+	}
+
+	if err = ValidateCW20Payments(msg.MaxCw20Payment, true); err != nil {
 		return err
 	}
 

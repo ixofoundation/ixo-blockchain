@@ -7,9 +7,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
-	nft "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types/contracts"
-	iidTypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
+	nft "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types/contracts"
+	iidTypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 func (k Keeper) SetEntity(ctx sdk.Context, key []byte, meta types.Entity) {
@@ -106,7 +106,7 @@ func (k Keeper) GetAllEntity(ctx sdk.Context) []types.Entity {
 	)
 }
 
-// Create a module account for entity id and name of account as fragemnt in form: did#name
+// Create a module account for entity id and name of account as fragment in form: did#name
 func (k Keeper) CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.AccAddress, error) {
 	address := types.GetModuleAccountAddress(entityId, name)
 
@@ -122,11 +122,26 @@ func (k Keeper) CreateNewAccount(ctx sdk.Context, entityId, name string) (sdk.Ac
 
 // checks if the provided address is the owner on the smart contract
 func (k Keeper) CheckIfOwner(ctx sdk.Context, entityId, ownerAddress string) error {
+	currentOwner, err := k.GetCurrentOwner(ctx, entityId)
+	if err != nil {
+		return err
+	}
+
+	// check if token owner is owner provided
+	if currentOwner == ownerAddress {
+		return nil
+	}
+
+	return types.ErrEntityUnauthorized
+}
+
+// function to get current owner of entity
+func (k Keeper) GetCurrentOwner(ctx sdk.Context, entityId string) (string, error) {
 	// get cw721 contract address
 	params := k.GetParams(ctx)
 	nftContractAddress, err := sdk.AccAddressFromBech32(params.NftContractAddress)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// create the nft cw721 query
@@ -136,23 +151,19 @@ func (k Keeper) CheckIfOwner(ctx sdk.Context, entityId, ownerAddress string) err
 		},
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// query smart contract
 	ownerOfBytes, err := k.WasmViewKeeper.QuerySmart(ctx, nftContractAddress, queryMessage)
 	if err != nil {
-		return err
+		return "", err
 	}
+
 	var ownerOf nft.OwnerOfResponse
 	if err := json.Unmarshal(ownerOfBytes, &ownerOf); err != nil {
-		return err
+		return "", err
 	}
 
-	// check if token owner is owner provided
-	if ownerOf.Owner == ownerAddress {
-		return nil
-	}
-
-	return types.ErrEntityUnauthorized
+	return ownerOf.Owner, nil
 }

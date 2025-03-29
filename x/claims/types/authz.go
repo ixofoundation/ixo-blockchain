@@ -7,14 +7,15 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	ixo "github.com/ixofoundation/ixo-blockchain/v4/lib/ixo"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	ixo "github.com/ixofoundation/ixo-blockchain/v5/lib/ixo"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 var (
 	_ authz.Authorization = &SubmitClaimAuthorization{}
 	_ authz.Authorization = &EvaluateClaimAuthorization{}
 	_ authz.Authorization = &WithdrawPaymentAuthorization{}
+	_ authz.Authorization = &CreateClaimAuthorizationAuthorization{}
 )
 
 // ---------------------------------------
@@ -80,7 +81,7 @@ func (a SubmitClaimAuthorization) Accept(_ context.Context, msg sdk.Msg) (authz.
 
 	// check all constraints if the msg fields correlates to a granted constraint
 	for _, constraint := range a.Constraints {
-		// If the msg fields dont correlate to granted constraint, add constraint back into list
+		// If the msg fields don't correlate to granted constraint, add constraint back into list
 		if constraint.CollectionId != mSubmit.CollectionId {
 			unhandledConstraints = append(unhandledConstraints, constraint)
 			continue
@@ -104,19 +105,17 @@ func (a SubmitClaimAuthorization) Accept(_ context.Context, msg sdk.Msg) (authz.
 		}
 	}
 
-	if !matched {
-		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
-	}
-
-	// set Auth constraints to the currently unhandled ones after the current msg constraint removed
+	// set new constraints as unhandled constraints
 	a.Constraints = unhandledConstraints
 
 	// If no more constraints means no more grants for grantee to submit claims, so delete authorization
-	if len(a.Constraints) == 0 {
-		return authz.AcceptResponse{Accept: true, Delete: true}, nil
+	mustDeleteAuth := len(a.Constraints) == 0
+
+	if !matched {
+		return authz.AcceptResponse{Accept: false, Updated: &a, Delete: mustDeleteAuth}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
 	}
 
-	return authz.AcceptResponse{Accept: true, Updated: &a}, nil
+	return authz.AcceptResponse{Accept: true, Updated: &a, Delete: mustDeleteAuth}, nil
 }
 
 // ---------------------------------------
@@ -191,6 +190,13 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 		if (constraint.BeforeDate != nil && constraint.BeforeDate.Before(sdkCtx.BlockTime())) || constraint.AgentQuota == 0 {
 			continue
 		}
+
+		// if we already found a match, don't check further, only above check to maybe remove constraint
+		if matched {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
 		// If the msg fields dont correlate to granted constraint, add constraint back into list
 		if constraint.CollectionId != mEval.CollectionId && !ixo.Contains(constraint.ClaimIds, mEval.ClaimId) {
 			unhandledConstraints = append(unhandledConstraints, constraint)
@@ -198,40 +204,31 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 		}
 
 		// check when evaluator defined own custom amounts if is is allowed in constraints
-		if len(mEval.Amount) != 0 {
-			invalid := !IsCoinsInMaxConstraints(mEval.Amount, constraint.MaxCustomAmount)
-
-			// if invalid then add constraint back into list
-			if invalid {
-				unhandledConstraints = append(unhandledConstraints, constraint)
-				continue
-			}
+		if len(mEval.Amount) != 0 && !IsCoinsInMaxConstraints(mEval.Amount, constraint.MaxCustomAmount) {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
 		}
 
 		// check when evaluator defined own custom cw20 payments if is is allowed in constraints
-		if len(mEval.Cw20Payment) != 0 {
-			invalid := !IsCW20PaymentsInMaxConstraints(mEval.Cw20Payment, constraint.MaxCustomCw20Payment)
-
-			// if invalid then add constraint back into list
-			if invalid {
-				unhandledConstraints = append(unhandledConstraints, constraint)
-				continue
-			}
+		if len(mEval.Cw20Payment) != 0 && !IsCW20PaymentsInMaxConstraints(mEval.Cw20Payment, constraint.MaxCustomCw20Payment) {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
 		}
 
 		// if reaches here it means there is a matching constraint for the specific batch,
 		// meaning if custom amounts defined it was within constraints, otherwise just the collection id or claim id was in constraints
 		matched = true
+
 		// subtract quota by one (if eval status is not invalidated) and if not 0 re-add to constraints
 		if constraint.AgentQuota > 1 || mEval.Status == EvaluationStatus_invalidated {
-			// if evaluation status is invalidated then dont subtract quota
+			// if evaluation status is invalidated then don't subtract quota
 			if mEval.Status != EvaluationStatus_invalidated {
 				constraint.AgentQuota--
 			}
 
 			// if constraint based of ClaimId then remove claimId once done
 			if iidtypes.IsEmpty(constraint.CollectionId) {
-				// if current constraint only has one ClaimId, which used now, dont re-add constraint once done
+				// if current constraint only has one ClaimId, which used now, don't re-add constraint once done
 				if len(constraint.ClaimIds) == 1 {
 					continue
 				}
@@ -243,24 +240,26 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 				}
 				constraint.ClaimIds = claimIds
 			}
-			unhandledConstraints = append(unhandledConstraints, constraint)
+
+			// add constraint back into list only if quota is not 0
+			if constraint.AgentQuota > 0 {
+				unhandledConstraints = append(unhandledConstraints, constraint)
+			}
 		}
 	}
 
-	// set Auth constraints to the currently unhandled ones after the current msg constraint removed or at least outdated ones removed
+	// set new constraints as unhandled constraints
 	a.Constraints = unhandledConstraints
+
+	// If no more constraints means no more grants for grantee to evaluate claims, so delete authorization
+	mustDeleteAuth := len(a.Constraints) == 0
 
 	if !matched {
 		// still update constraints as above logic removes auths with passed end_date
-		return authz.AcceptResponse{Accept: false, Updated: &a}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
+		return authz.AcceptResponse{Accept: false, Updated: &a, Delete: mustDeleteAuth}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
 	}
 
-	// If no more constraints means no more grants for grantee to submit claims, so delete authorization
-	if len(a.Constraints) == 0 {
-		return authz.AcceptResponse{Accept: true, Delete: true}, nil
-	}
-
-	return authz.AcceptResponse{Accept: true, Updated: &a}, nil
+	return authz.AcceptResponse{Accept: true, Updated: &a, Delete: mustDeleteAuth}, nil
 }
 
 // ---------------------------------------
@@ -434,13 +433,161 @@ func (a WithdrawPaymentAuthorization) Accept(ctx context.Context, msg sdk.Msg) (
 		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
 	}
 
-	// set Auth constraints to the currently unhandled ones after the current msg constraint removed
+	// set new constraints as unhandled constraints
 	a.Constraints = unhandledConstraints
 
 	// If no more constraints means no more grants for grantee to submit claims, so delete authorization
-	if len(a.Constraints) == 0 {
-		return authz.AcceptResponse{Accept: true, Delete: true}, nil
+	mustDeleteAuth := len(a.Constraints) == 0
+
+	return authz.AcceptResponse{Accept: true, Updated: &a, Delete: mustDeleteAuth}, nil
+}
+
+// ---------------------------------------
+// CREATE CLAIM AUTHORIZATION
+// ---------------------------------------
+
+// NewCreateClaimAuthorizationAuthorization creates a new CreateClaimAuthorizationAuthorization object.
+func NewCreateClaimAuthorizationAuthorization(admin string, constraints []*CreateClaimAuthorizationConstraints) *CreateClaimAuthorizationAuthorization {
+	return &CreateClaimAuthorizationAuthorization{
+		Admin:       admin,
+		Constraints: constraints,
+	}
+}
+
+// MsgTypeURL implements Authorization.MsgTypeURL.
+func (a CreateClaimAuthorizationAuthorization) MsgTypeURL() string {
+	return sdk.MsgTypeURL(&MsgCreateClaimAuthorization{})
+}
+
+// ValidateBasic implements Authorization.ValidateBasic.
+func (a CreateClaimAuthorizationAuthorization) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(a.Admin)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
 	}
 
-	return authz.AcceptResponse{Accept: true, Updated: &a}, nil
+	// check that there is at least one constraint
+	if len(a.Constraints) == 0 {
+		return sdkerrors.ErrInvalidRequest.Wrap("create claim authorization must contain at least 1 constraint")
+	}
+
+	// check that all constraints are valid
+	for _, constraint := range a.Constraints {
+		if err = ValidateCoinsAllowZero(constraint.MaxAmount.Sort()); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max amounts not valid: (%s)", err)
+		}
+
+		if err = ValidateCW20Payments(constraint.MaxCw20Payment, true); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max cw20 payments not valid: (%s)", err)
+		}
+
+		if !ixo.IsEnumValueValid(CreateClaimAuthorizationType_name, int32(constraint.AllowedAuthTypes)) {
+			return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid enum for allowed_auth_types")
+		}
+	}
+
+	return nil
+}
+
+// Accept implements Authorization.Accept.
+func (a CreateClaimAuthorizationAuthorization) Accept(ctx context.Context, msg sdk.Msg) (authz.AcceptResponse, error) {
+	mCreate, ok := msg.(*MsgCreateClaimAuthorization)
+	if !ok {
+		return authz.AcceptResponse{}, sdkerrors.ErrInvalidType.Wrap("type mismatch")
+	}
+
+	if a.Admin != mCreate.AdminAddress {
+		return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("authorized admin (%s) did not match the admin in the msg %s", a.Admin, mCreate.AdminAddress)
+	}
+
+	// state indicating if there was a auth constraint that matched msg fields
+	var matched bool
+	var unhandledConstraints []*CreateClaimAuthorizationConstraints
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	// check all constraints if the msg fields correlates to a granted constraint
+	for _, constraint := range a.Constraints {
+		// If the constraint has an expiration, check that it before now block time
+		// if before (already expired) then don't add to unhandledConstraints
+		if constraint.Expiration != nil && constraint.Expiration.Before(sdkCtx.BlockTime()) {
+			continue
+		}
+
+		// if we already found a match, don't check further, only above check to maybe remove constraint
+		if matched {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// If collection_ids is not empty, check if this collection is allowed
+		if len(constraint.CollectionIds) > 0 && !ixo.Contains(constraint.CollectionIds, mCreate.CollectionId) {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// Check if the authorization type is allowed
+		if constraint.AllowedAuthTypes != CreateClaimAuthorizationType_ALL &&
+			constraint.AllowedAuthTypes != mCreate.AuthType {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// Check if the agent quota is within the allowed maximum
+		if constraint.MaxAgentQuota > 0 && mCreate.AgentQuota > constraint.MaxAgentQuota {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// Check if custom amount is within the max amount constraint
+		if len(constraint.MaxAmount) > 0 && len(mCreate.MaxAmount) > 0 && !IsCoinsInMaxConstraints(mCreate.MaxAmount, constraint.MaxAmount) {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// Check if CW20 payment is within the max constraints
+		if len(constraint.MaxCw20Payment) > 0 && len(mCreate.MaxCw20Payment) > 0 && !IsCW20PaymentsInMaxConstraints(mCreate.MaxCw20Payment, constraint.MaxCw20Payment) {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// check that msg AuthType is allowed in constraint by constraint.AllowedAuthTypes
+		if constraint.AllowedAuthTypes != CreateClaimAuthorizationType_ALL &&
+			constraint.AllowedAuthTypes != mCreate.AuthType {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// Check intent duration if this is for a submit authorization
+		if mCreate.AuthType == CreateClaimAuthorizationType_SUBMIT {
+			if mCreate.IntentDurationNs.Nanoseconds() > constraint.MaxIntentDurationNs.Nanoseconds() {
+				unhandledConstraints = append(unhandledConstraints, constraint)
+				continue
+			}
+		}
+
+		// Mark as matched since we've found a valid constraint
+		matched = true
+
+		// If max authorizations is 0 then don't decrement and re-add constraint (unlimited authorizations)
+		// Otherwise decrement the max authorizations count and re-add constraint if more than 1
+		if constraint.MaxAuthorizations == 0 {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+		} else if constraint.MaxAuthorizations > 1 {
+			constraint.MaxAuthorizations--
+			unhandledConstraints = append(unhandledConstraints, constraint)
+		}
+	}
+
+	// set new constraints as unhandled constraints
+	a.Constraints = unhandledConstraints
+
+	// If no more constraints means no more grants for grantee to submit claims, so delete authorization
+	mustDeleteAuth := len(a.Constraints) == 0
+
+	// if no constraints matched, return error
+	if !matched {
+		return authz.AcceptResponse{Accept: false, Updated: &a, Delete: mustDeleteAuth}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message, please check that all constraints are valid")
+	}
+
+	return authz.AcceptResponse{Accept: true, Updated: &a, Delete: mustDeleteAuth}, nil
 }
