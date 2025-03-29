@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v4/app/keepers"
-	"github.com/ixofoundation/ixo-blockchain/v4/app/params"
+	"github.com/ixofoundation/ixo-blockchain/v5/app/keepers"
+	"github.com/ixofoundation/ixo-blockchain/v5/app/params"
 
 	"github.com/cosmos/cosmos-sdk/std"
 )

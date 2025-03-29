@@ -8,7 +8,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
 )
 
 type msgServer struct {

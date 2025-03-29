@@ -2,7 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/types"
 )
 
 // InitGenesis new mint genesis.

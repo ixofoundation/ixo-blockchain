@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	types "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	types "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 const (

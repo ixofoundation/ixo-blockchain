@@ -16,9 +16,9 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 
-	"github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/authenticator"
-	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/authenticator"
+	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
 )
 
 // AuthenticatorDecorator is responsible for processing authentication logic

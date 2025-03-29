@@ -1,6 +1,6 @@
 package types
 
-import "github.com/ixofoundation/ixo-blockchain/v4/ixoutils/observability"
+import "github.com/ixofoundation/ixo-blockchain/v5/ixoutils/observability"
 
 var (
 	// epoch_hook_failed

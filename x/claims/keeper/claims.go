@@ -9,9 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/token/types/contracts/cw20"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types/contracts/cw20"
 )
 
 func (k Keeper) SetCollection(ctx sdk.Context, data types.Collection) {

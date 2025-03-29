@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/epochs/types"
 )
 
 // InitGenesis sets epoch info from genesis

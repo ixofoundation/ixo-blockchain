@@ -20,7 +20,7 @@ cd ..
 # move proto files to the right places
 #
 # Note: Proto files are suffixed with the current binary version.
-cp -r github.com/ixofoundation/ixo-blockchain/v4/* ./
+cp -r github.com/ixofoundation/ixo-blockchain/v5/* ./
 rm -rf github.com
 
 # go mod tidy

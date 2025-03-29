@@ -3,7 +3,7 @@ package ixo.entity.v1beta1;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v4/x/entity/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types";
 
 message InitializeNftContract {
   uint64 NftContractCodeId = 1;

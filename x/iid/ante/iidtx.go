@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v4/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v5/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 )
 
 // VerifyIidControllersAgainstSignature verifies that the controllers of the IID for all IidTxMsgs

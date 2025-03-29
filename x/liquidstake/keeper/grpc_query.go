@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/liquidstake/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

@@ -13,8 +13,8 @@ import (
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
 	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
-	github_com_ixofoundation_ixo_blockchain_v4_x_iid_types "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
-	types "github.com/ixofoundation/ixo-blockchain/v4/x/iid/types"
+	github_com_ixofoundation_ixo_blockchain_v5_x_iid_types "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
+	types "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -62,7 +62,7 @@ type MsgCreateEntity struct {
 	// Content ID or Hash of public Verifiable Credentials associated with the
 	// subject
 	Credentials  []string                                                           `protobuf:"bytes,13,rep,name=credentials,proto3" json:"credentials,omitempty"`
-	OwnerDid     github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,14,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
+	OwnerDid     github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment `protobuf:"bytes,14,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
 	OwnerAddress string                                                             `protobuf:"bytes,15,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 	Data         encoding_json.RawMessage                                           `protobuf:"bytes,16,opt,name=data,proto3,casttype=encoding/json.RawMessage" json:"data,omitempty"`
 	AlsoKnownAs  string                                                             `protobuf:"bytes,17,opt,name=alsoKnownAs,proto3" json:"alsoKnownAs,omitempty"`
@@ -193,7 +193,7 @@ func (m *MsgCreateEntity) GetCredentials() []string {
 	return nil
 }
 
-func (m *MsgCreateEntity) GetOwnerDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
+func (m *MsgCreateEntity) GetOwnerDid() github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.OwnerDid
 	}
@@ -305,7 +305,7 @@ type MsgUpdateEntity struct {
 	// Content ID or Hash of public Verifiable Credentials associated with the
 	// subject
 	Credentials       []string                                                           `protobuf:"bytes,5,rep,name=credentials,proto3" json:"credentials,omitempty"`
-	ControllerDid     github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,6,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
+	ControllerDid     github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment `protobuf:"bytes,6,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
 	ControllerAddress string                                                             `protobuf:"bytes,7,opt,name=controller_address,json=controllerAddress,proto3" json:"controller_address,omitempty"`
 }
 
@@ -377,7 +377,7 @@ func (m *MsgUpdateEntity) GetCredentials() []string {
 	return nil
 }
 
-func (m *MsgUpdateEntity) GetControllerDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
+func (m *MsgUpdateEntity) GetControllerDid() github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.ControllerDid
 	}
@@ -433,7 +433,7 @@ type MsgUpdateEntityVerified struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether entity is verified or not based on credentials
 	EntityVerified     bool                                                               `protobuf:"varint,2,opt,name=entity_verified,json=entityVerified,proto3" json:"entity_verified,omitempty"`
-	RelayerNodeDid     github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=relayer_node_did,json=relayerNodeDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"relayer_node_did,omitempty"`
+	RelayerNodeDid     github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=relayer_node_did,json=relayerNodeDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment" json:"relayer_node_did,omitempty"`
 	RelayerNodeAddress string                                                             `protobuf:"bytes,4,opt,name=relayer_node_address,json=relayerNodeAddress,proto3" json:"relayer_node_address,omitempty"`
 }
 
@@ -484,7 +484,7 @@ func (m *MsgUpdateEntityVerified) GetEntityVerified() bool {
 	return false
 }
 
-func (m *MsgUpdateEntityVerified) GetRelayerNodeDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
+func (m *MsgUpdateEntityVerified) GetRelayerNodeDid() github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.RelayerNodeDid
 	}
@@ -537,10 +537,10 @@ var xxx_messageInfo_MsgUpdateEntityVerifiedResponse proto.InternalMessageInfo
 type MsgTransferEntity struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The owner_did used to sign this transaction.
-	OwnerDid github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
+	OwnerDid github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
 	// The owner_address used to sign this transaction.
 	OwnerAddress string                                                             `protobuf:"bytes,3,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
-	RecipientDid github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v4/x/iid/types.DIDFragment" json:"recipient_did,omitempty"`
+	RecipientDid github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v5/x/iid/types.DIDFragment" json:"recipient_did,omitempty"`
 }
 
 func (m *MsgTransferEntity) Reset()         { *m = MsgTransferEntity{} }
@@ -583,7 +583,7 @@ func (m *MsgTransferEntity) GetId() string {
 	return ""
 }
 
-func (m *MsgTransferEntity) GetOwnerDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
+func (m *MsgTransferEntity) GetOwnerDid() github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.OwnerDid
 	}
@@ -597,7 +597,7 @@ func (m *MsgTransferEntity) GetOwnerAddress() string {
 	return ""
 }
 
-func (m *MsgTransferEntity) GetRecipientDid() github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment {
+func (m *MsgTransferEntity) GetRecipientDid() github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment {
 	if m != nil {
 		return m.RecipientDid
 	}
@@ -1009,7 +1009,7 @@ var fileDescriptor_60859df4ac9fa053 = []byte{
 	// 1271 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x57, 0x4d, 0x6f, 0x1b, 0x45,
 	0x18, 0xce, 0xda, 0xce, 0xd7, 0x6b, 0xc7, 0x69, 0x97, 0x8a, 0x6c, 0x9c, 0x62, 0xbb, 0x2e, 0x55,
-	0xa3, 0xa2, 0xee, 0xb6, 0x29, 0xa2, 0xa2, 0x1c, 0xaa, 0xb8, 0x69, 0xa1, 0x82, 0x70, 0xd8, 0xb6,
+	0xa3, 0xa2, 0xee, 0xb6, 0xa9, 0xa0, 0xa2, 0x1c, 0xaa, 0xb8, 0x69, 0xa1, 0x82, 0x70, 0xd8, 0xb6,
 	0x1c, 0xb8, 0xb8, 0x93, 0xdd, 0xc9, 0x66, 0xc8, 0x7a, 0xc7, 0xda, 0x19, 0xbb, 0x0e, 0xe2, 0x02,
 	0xe2, 0x07, 0x94, 0x1f, 0xc0, 0x4f, 0x00, 0xf1, 0x27, 0x90, 0x7a, 0xec, 0x11, 0x09, 0xa9, 0xa0,
 	0xf6, 0xc0, 0x89, 0x3f, 0xd0, 0x13, 0x9a, 0x8f, 0xdd, 0xd8, 0x5e, 0x2f, 0x75, 0xa0, 0x70, 0x4a,
@@ -1085,8 +1085,8 @@ var fileDescriptor_60859df4ac9fa053 = []byte{
 	0x72, 0x2f, 0xa5, 0x93, 0x13, 0x34, 0xcf, 0xa1, 0x76, 0xfd, 0x84, 0x0e, 0x49, 0x19, 0xed, 0x7b,
 	0x4f, 0x9e, 0xd7, 0x8d, 0xa7, 0xcf, 0xeb, 0xc6, 0xef, 0xcf, 0xeb, 0xc6, 0xe3, 0x17, 0xf5, 0xb9,
 	0xa7, 0x2f, 0xea, 0x73, 0xbf, 0xbc, 0xa8, 0xcf, 0x7d, 0xfe, 0xfe, 0x89, 0x9e, 0x1c, 0xfd, 0x1b,
-	0x5a, 0xbe, 0x3a, 0x7b, 0x0b, 0xf2, 0x33, 0xee, 0xda, 0x5f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x6e,
-	0x69, 0xf6, 0x47, 0xf7, 0x0f, 0x00, 0x00,
+	0x5a, 0xbe, 0x3a, 0x7b, 0x0b, 0xf2, 0x33, 0xee, 0xda, 0x5f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x3a,
+	0xad, 0xd0, 0x6e, 0xf7, 0x0f, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -2983,7 +2983,7 @@ func (m *MsgCreateEntity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.OwnerDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.OwnerDid = github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 15:
 			if wireType != 2 {
@@ -3485,7 +3485,7 @@ func (m *MsgUpdateEntity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.ControllerDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.ControllerDid = github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 7:
 			if wireType != 2 {
@@ -3701,7 +3701,7 @@ func (m *MsgUpdateEntityVerified) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RelayerNodeDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.RelayerNodeDid = github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
@@ -3897,7 +3897,7 @@ func (m *MsgTransferEntity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.OwnerDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.OwnerDid = github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
@@ -3961,7 +3961,7 @@ func (m *MsgTransferEntity) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RecipientDid = github_com_ixofoundation_ixo_blockchain_v4_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
+			m.RecipientDid = github_com_ixofoundation_ixo_blockchain_v5_x_iid_types.DIDFragment(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

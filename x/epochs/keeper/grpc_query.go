@@ -5,7 +5,7 @@ import (
 	"errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v4/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v5/x/epochs/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
