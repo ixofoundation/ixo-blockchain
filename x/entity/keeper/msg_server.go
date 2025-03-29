@@ -239,15 +239,17 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 				msg.RecipientDid.Did(),
 			}
 
-			// remove old verification methods
+			// Only remove verification method with recipient did as Id if it exists
 			for _, vm := range document.VerificationMethod {
-				err := document.RevokeVerification(vm.Id)
-				if err != nil {
-					return err
+				if vm.Id == msg.RecipientDid.Did() {
+					err := document.RevokeVerification(vm.Id)
+					if err != nil {
+						return err
+					}
 				}
 			}
 
-			// Add recipient did as verification method
+			// Add recipient did as verification method, with address as verification material
 			vm := iidtypes.NewBlockchainAccountID(recipientAddress.String())
 			err := document.AddVerifications(iidtypes.NewVerification(
 				iidtypes.NewVerificationMethod(msg.RecipientDid.Did(), iidtypes.DID(msg.RecipientDid), vm),
