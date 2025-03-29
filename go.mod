@@ -1,6 +1,7 @@
 module github.com/ixofoundation/ixo-blockchain/v5
 
 go 1.22.4
+toolchain go1.24.1
 
 require (
 	cosmossdk.io/api v0.7.6
@@ -111,7 +112,7 @@ require (
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/godbus/dbus v0.0.0-20190726142602-4481cbc300e2 // indirect
 	github.com/gogo/googleapis v1.4.1 // indirect
-	github.com/golang/glog v1.2.2 // indirect
+	github.com/golang/glog v1.2.4 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
