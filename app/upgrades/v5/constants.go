@@ -7,7 +7,7 @@ import (
 
 const (
 	// UpgradeName defines the on-chain upgrade name for the Ixo v5 upgrade.
-	UpgradeName = "Dominia Plus"
+	UpgradeName = "Dominia-Plus"
 )
 
 var Upgrade = upgrades.Upgrade{
