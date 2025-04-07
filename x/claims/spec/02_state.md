@@ -39,6 +39,8 @@ type Collection struct {
 	Invalidated  uint64
 	State        CollectionState
 	Payments     *Payments
+	EscrowAccount string
+	Intents      CollectionIntentOptions
 }
 ```
 
@@ -59,6 +61,8 @@ The field's descriptions is as follows:
 - `invalidated` - a integer containing the number of claims that have invalidated status (internally calculated)
 - `state` - a [CollectionState](#collectionstate)
 - `payments` - a [Payments](#payments)
+- `escrowAccount` - a string containing the escrow account address for this collection created at collection creation, used to transfer payments to escrow account for GUARANTEED payments through intents
+- `intents` - a [CollectionIntentOptions](#collectionintentoptions) option for intents for this collection (allow, deny, required)
 
 ### Payments
 
@@ -90,6 +94,8 @@ type Payment struct {
 	Amount                github_com_cosmos_cosmos_sdk_types.Coins
 	Contract_1155Payment  *Contract1155Payment
 	TimeoutNs             time.Duration
+	CW20Payment           []CW20Payment
+	IsOraclePayment       bool
 }
 ```
 
@@ -99,6 +105,8 @@ The field's descriptions is as follows:
 - `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount to be paid on payment
 - `contract_1155Payment` - a [Contract1155Payment](#contract1155payment), not allowed for `Evaluation` Payment
 - `timeoutNs` - a duration containing the timeout after claim/evaluation to create authZ for payment, if 0 then immediate direct payment is made
+- `cw20Payment` - an array of [CW20Payment](#cw20payment) containing the CW20 tokens to be paid
+- `isOraclePayment` - a boolean indicating if the payment is for oracle payments, meaning it will go through network fees split. Only allowed for APPROVAL payment types. If true and the payment contains CW20 payments, the claim will only be successful if an intent exists to ensure immediate CW20 payment split, since there is no WithdrawalAuthorization to manage the CW20 payment split for delayed payments.
 
 ### Contract1155Payment
 
@@ -118,6 +126,40 @@ The field's descriptions is as follows:
 - `amount` - a integer indicating how many tokens must transferred for the payment
 - `tokenId` - a string containing the `id` of the token on the cw1155 smart contract to transfer
 
+### CW20Payment
+
+A CW20Payment stores information about the payment to make if it is a CW20 token payment.
+
+```go
+type CW20Payment struct {
+	Address string
+	Amount  uint64
+}
+```
+
+The field's descriptions is as follows:
+
+- `address` - a string containing the contract address of the CW20 token
+- `amount` - a uint64 containing the amount of CW20 tokens to transfer
+
+### CW20Output
+
+A CW20Output represents a CW20 token output for split payments.
+
+```go
+type CW20Output struct {
+	Address         string
+	ContractAddress string
+	Amount          uint64
+}
+```
+
+The field's descriptions is as follows:
+
+- `address` - a string containing the address of the recipient
+- `contractAddress` - a string containing the address of the CW20 contract
+- `amount` - a uint64 containing the amount of the token to transfer
+
 ### Claim
 
 A Claim stores information about a claim that was made towards a [Collection](#collection)
@@ -131,6 +173,9 @@ type Claim struct {
 	ClaimId        string
 	Evaluation     *Evaluation
 	PaymentsStatus *ClaimPayments
+	UseIntent      bool
+	Amount         github_com_cosmos_cosmos_sdk_types.Coins
+	CW20Payment    []CW20Payment
 }
 ```
 
@@ -143,6 +188,9 @@ The field's descriptions is as follows:
 - `claimId` - a string containing the unique identifier of the claim (eg. cid hash of file is good identifier)
 - `evaluation` - a [Evaluation](#evaluation)
 - `paymentsStatus` - a [ClaimPayments](#claimpayments)
+- `useIntent` - a boolean indicating if this claim is using an intent. If true, then the amount and CW20 payment are ignored and overridden with intent amounts
+- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the custom amount specified by service agent for claim approval. If both amount and CW20 payment are empty, then collection default is used (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate amount wanted if no intent used)
+- `cw20Payment` - an array of [CW20Payment](#cw20payment) containing the custom CW20 payments specified by service agent for claim approval. If both amount and CW20 payment are empty, then collection default is used (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw20Payment wanted if no intent used)
 
 ### ClaimPayments
 
@@ -180,6 +228,7 @@ type Evaluation struct {
 	VerificationProof  string
 	EvaluationDate     *time.Time
 	Amount             github_com_cosmos_cosmos_sdk_types.Coins
+	CW20Payment        []CW20Payment
 }
 ```
 
@@ -194,7 +243,8 @@ The field's descriptions is as follows:
 - `reason` - a integer for why the evaluation result was given (codes defined by evaluator)
 - `verificationProof` - a string containing the proof to verify the linked resource (eg. the cid of the evaluation Verfiable Credential)
 - `evaluationDate` - the timestamp of the date and time that the claim evaluation was submitted on-chain
-- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount to be paid on `Approval` payment if it is a custom amount and not the preset `Approval` from the [Collection](#collection)
+- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount to be paid on `Approval` payment if it is a custom amount and not the preset `Approval` from the [Collection](#collection) (Note if intent was used, then the amount and CW20 payment are ignored and overridden with intent amounts)
+- `cw20Payment` - an array of [CW20Payment](#cw20payment) containing the custom CW20 payments specified by evaluator for claim approval (Note if intent was used, then the amount and CW20 payment are ignored and overridden with intent amounts)
 
 ### Dispute
 
@@ -234,6 +284,36 @@ The field's descriptions is as follows:
 - `proof ` - a string representing the proof to verify the data linked resource
 - `encrypted ` - a boolean value for whether this data linked resource is encrypted or not
 
+### Intent
+
+An Intent stores information about an intent to submit a claim to a collection.
+
+```go
+type Intent struct {
+	Id            string
+	CollectionId  string
+	AgentDid      string
+	AgentAddress  string
+	Amount        github_com_cosmos_cosmos_sdk_types.Coins
+	CW20Payment   []CW20Payment
+	CreateDate    *time.Time
+	ExpireDate    *time.Time
+	Status        IntentStatus
+}
+```
+
+The field's descriptions is as follows:
+
+- `id` - a string containing the intent's identifier, it is incremented on chain for each intent created
+- `collectionId` - a string containing the Collection `id` this intent belongs to
+- `agentDid` - a string containing the DID of the agent creating the intent
+- `agentAddress` - a string containing the account address of the agent creating the intent
+- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the custom amount specified for claim approval. If both amount and CW20 payment are empty, then collection default is used for intent amount
+- `cw20Payment` - an array of [CW20Payment](#cw20payment) containing the custom CW20 payments specified for claim approval. If both amount and CW20 payment are empty, then collection default is used for intent amount
+- `createDate` - a timestamp of the date and time that the intent was created on-chain
+- `expireDate` - a timestamp of the date and time that the intent will expire
+- `status` - a [IntentStatus](#intentstatus) indicating the current status of the intent
+
 ## Enums
 
 ### CollectionState
@@ -248,6 +328,18 @@ var CollectionState_name = map[int32]string{
 }
 ```
 
+### CollectionIntentOptions
+
+Defines the options for intents for a [Collection](#collection), determining how intents are handled for claims in the collection.
+
+```go
+var CollectionIntentOptions_name = map[int32]string{
+	0: "ALLOW",    // Allow: Intents can be made for claims, but claims can also be made without intents
+	1: "DENY",     // Deny: Intents cannot be made for claims for the collection
+	2: "REQUIRED", // Required: Claims cannot be made without an associated intent. An intent is mandatory before a claim can be submitted
+}
+```
+
 ### EvaluationStatus
 
 Defines the `status` of a [Evaluation](#evaluation) indicating the status and result of the evaluation.
@@ -259,6 +351,18 @@ var EvaluationStatus_name = map[int32]string{
 	2: "REJECTED",
 	3: "DISPUTED",
   4: "INVALIDATED"
+}
+```
+
+### IntentStatus
+
+Defines the status of an [Intent](#intent) indicating its current state.
+
+```go
+var IntentStatus_name = map[int32]string{
+	0: "ACTIVE",    // Active: Intent is created and active, payments have been transferred to escrow if there is any
+	1: "FULFILLED", // Fulfilled: Intent is fulfilled, was used to create a claim and funds will be released on claim APPROVAL, or funds will be reverted on claim REJECTION or DISPUTE
+	2: "EXPIRED",   // Expired: Intent has expired, payments have been transferred back out of escrow
 }
 ```
 
@@ -323,6 +427,7 @@ type WithdrawPaymentConstraints struct {
 	ToAddress             string
 	FromAddress           string
 	ReleaseDate           *time.Time
+	CW20Payment           []CW20Payment
 }
 ```
 
@@ -336,7 +441,7 @@ The field's descriptions is as follows:
 - `toAddress` - a string containing the account address to make the payment to
 - `fromAddress` - a string containing the account address to make the payment from
 - `releaseDate` - a timestamp of the date that grantee can execute authorization to make the withdrawal payment, calculated from created date plus the timeout on [Collection](02_state.md#collection) `Payments`
-- `adminAddress` - a string containing the account address defined in the [Collection](02_state.md#collection) `admin` field
+- `cw20Payment` - an array of [CW20Payment](#cw20payment) containing the CW20 tokens to be paid
 
 ### SubmitClaimAuthorization
 
@@ -360,8 +465,11 @@ A SubmitClaimConstraints stores information about authorization given to submit 
 
 ```go
 type SubmitClaimConstraints struct {
-	CollectionId   string
-	AgentQuota     uint64
+	CollectionId      string
+	AgentQuota        uint64
+	MaxAmount         github_com_cosmos_cosmos_sdk_types.Coins
+	MaxCW20Payment    []CW20Payment
+	IntentDurationNs  time.Duration
 }
 ```
 
@@ -369,6 +477,9 @@ The field's descriptions is as follows:
 
 - `collectionId` - a string containing the Collection `id` the constraints is for
 - `agentQuota` - a integer containing the quota for amount of time the grantee can execute the given authorization(authz)
+- `maxAmount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the maximum amount allowed to be specified by service agent for claim approval. If empty then no custom amount is allowed, and default payments from Collection payments are used.
+- `maxCW20Payment` - an array of [CW20Payment](#cw20payment) containing the maximum CW20 payments allowed to be specified by service agent for claim approval. If empty then no custom amount is allowed, and default payments from Collection payments are used.
+- `intentDurationNs` - a duration for which the intent is active, after which it will expire (in nanoseconds)
 
 ### EvaluateClaimAuthorization
 
@@ -392,11 +503,12 @@ A EvaluateClaimConstraints stores information about authorization given to evalu
 
 ```go
 type EvaluateClaimConstraints struct {
-	CollectionId     string
-	ClaimIds         []string
-	AgentQuota       uint64
-	BeforeDate       *time.Time
-	MaxCustomAmount  github_com_cosmos_cosmos_sdk_types.Coins
+	CollectionId          string
+	ClaimIds              []string
+	AgentQuota            uint64
+	BeforeDate            *time.Time
+	MaxCustomAmount       github_com_cosmos_cosmos_sdk_types.Coins
+	MaxCustomCW20Payment  []CW20Payment
 }
 ```
 
@@ -407,3 +519,60 @@ The field's descriptions is as follows:
 - `agentQuota` - a integer containing the quota for amount of time the grantee can execute the given authorization(authz), note: it won't subtract one on evaluation if agent evaluates claim with status `invalidated`
 - `beforeDate` - a timestamp of the date after which the grantee can't execute this authz anymore, a cut off date
 - `MaxCustomAmount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount that indicates the maximum the evaluator is allowed to change the `APPROVED` payout to, since claims can be made for specific amount an evaluator is allowed to change the `APPROVED` payout amount.
+- `MaxCustomCW20Payment` - an array of [CW20Payment](#cw20payment) containing the maximum CW20 payments allowed to be specified by evaluator for claim approval. If empty then no custom amount is allowed, and default payments from Collection payments are used.
+
+### CreateClaimAuthorizationAuthorization
+
+A CreateClaimAuthorizationAuthorization allows a grantee to create SubmitClaimAuthorization and EvaluateClaimAuthorization for specific collections(constraints).
+
+```go
+type CreateClaimAuthorizationAuthorization struct {
+	Admin         string
+	Constraints   []CreateClaimAuthorizationConstraints
+}
+```
+
+The field's descriptions is as follows:
+
+- `admin` - a string containing the account address defined in the [Collection](02_state.md#collection) `admin` field
+- `constraints` - a list of [CreateClaimAuthorizationConstraints](#createclaimauthorizationconstraints)
+
+### CreateClaimAuthorizationType
+
+Defines the types of claim authorizations that can be created.
+
+```go
+var CreateClaimAuthorizationType_name = map[int32]string{
+	0: "ALL",      // both submit and evaluate
+	1: "SUBMIT",   // submit only
+	2: "EVALUATE", // evaluate only
+}
+```
+
+### CreateClaimAuthorizationConstraints
+
+Constraints for creating claim authorizations through a [CreateClaimAuthorizationAuthorization](#createclaimauthorizationauthorization).
+
+```go
+type CreateClaimAuthorizationConstraints struct {
+	MaxAuthorizations    uint64
+	MaxAgentQuota        uint64
+	MaxAmount            github_com_cosmos_cosmos_sdk_types.Coins
+	MaxCW20Payment       []CW20Payment
+	Expiration           *time.Time
+	CollectionIds        []string
+	AllowedAuthTypes     CreateClaimAuthorizationType
+	MaxIntentDurationNs  time.Duration
+}
+```
+
+The field's descriptions is as follows:
+
+- `maxAuthorizations` - a integer containing the maximum number of authorizations that can be created through this meta-authorization. 0 means no quota.
+- `maxAgentQuota` - a integer containing the maximum quota that can be set in created authorizations. 0 means no maximum quota per authorization.
+- `maxAmount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the maximum amount that can be set in created authorizations. If empty then any custom amount is allowed in the created authorizations. Explicitly set to 0 to disallow any custom amount in the created authorizations.
+- `maxCW20Payment` - an array of [CW20Payment](#cw20payment) containing the maximum CW20 payment that can be set in created authorizations. If empty then any CW20 payment is allowed in the created authorizations. Explicitly set to 0 to disallow any CW20 payment in the created authorizations.
+- `expiration` - a timestamp of the expiration of this meta-authorization(specific constraint). If not set then no expiration.
+- `collectionIds` - a list of strings containing the Collection IDs the grantee can create authorizations for. If empty then all collections for the admin are allowed.
+- `allowedAuthTypes` - a [CreateClaimAuthorizationType](#createclaimauthorizationtype) indicating the types of authorizations the grantee can create (submit, evaluate, or all/both).
+- `maxIntentDurationNs` - a duration containing the maximum intent duration for the authorization allowed (for submit).

@@ -66,7 +66,7 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
      - The Group by governance (referring to the group account).
 2. **Authorize Agents for Claim Evaluation:**
 
-   - The “evaluation” agent acting on behalf of an entity can be a Group:
+   - The "evaluation" agent acting on behalf of an entity can be a Group:
      - Either any Member of a Group.
      - Or the Group by governance.
    - There's flexibility in evaluation:
@@ -90,10 +90,34 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
 
    - Payments can be authorized to agents or evaluators' `account` upon various claim activities like submission, evaluation, approval, or when disputes arise.
    - For claim evaluations with status `invalidated` no evaluation payment will be made.
+   - Payments can be made in multiple forms:
+     - Native tokens (Cosmos SDK coins)
+     - CW1155 tokens (Temporarily blocked, coming soon)
+     - CW20 tokens
+   - Oracle payments is configured to automatically distribute fees to the network and relayers, same as EVALUATION type payments.
 
-5. **Recording Counter-Claims Evidence:**
+5. **Claim Intents and Escrow Payments:**
+
+   - Intents allow agents to declare their intention to submit a claim, with payment guarantees before performing work.
+   - Collections can be configured with different intent options:
+     - `ALLOW`: Claims can be made with or without intents
+     - `DENY`: Intents cannot be used for the collection
+     - `REQUIRED`: Claims can only be submitted with a pre-existing intent
+   - Funds for approved claims can be held in escrow until the claim is evaluated.
+   - Intents have a defined expiration period, after which they become invalid.
+
+6. **Oracle Payments:**
+
+   - Oracle payments enable results-based payments for Oracle Services including fee-for-service autonomous AI agents.
+   - When configured, Oracle payments automatically split fees:
+     - 10% to the Market Relayer connecting Oracle services to users
+     - 10% to the network DAO operated by the Impacts Venture Cooperative
+     - 80% to the Oracle service provider
+   - CW20 payments are supported for Oracle payments when using intents or when configured without timeouts.
+
+7. **Recording Counter-Claims Evidence:**
    - In case of disputes, evidence for counter-claims can be recorded, facilitating transparency and conflict resolution.
 
 ## Conclusion
 
-The Claims module is instrumental in the ixo system, providing a robust infrastructure for the creation, management, evaluation, and verification of claims. With the integration of the W3C standard for VCs, it ensures that all claims are both trustworthy and verifiable.
+The Claims module is instrumental in the ixo system, providing a robust infrastructure for the creation, management, evaluation, and verification of claims. With the integration of the W3C standard for VCs, it ensures that all claims are both trustworthy and verifiable. Recent upgrades have expanded payment options and introduced intent-based guarantees, enhancing the flexibility and utility of the claims system for real-world applications.
