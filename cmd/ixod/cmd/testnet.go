@@ -30,7 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	ixo "github.com/ixofoundation/ixo-blockchain/v5/app"
+	ixo "github.com/ixofoundation/ixo-blockchain/v6/app"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )

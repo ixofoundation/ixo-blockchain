@@ -8,9 +8,9 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types/contracts/ixo1155"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types/contracts/ixo1155"
 )
 
 // msgServer provides a way to reference keeper pointer in the message server interface.

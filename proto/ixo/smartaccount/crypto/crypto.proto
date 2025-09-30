@@ -4,7 +4,7 @@ package ixo.smartaccount.crypto;
 import "amino/amino.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/crypto";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/crypto";
 option (gogoproto.goproto_stringer_all) = false;
 
 // PubKey defines an authn public key

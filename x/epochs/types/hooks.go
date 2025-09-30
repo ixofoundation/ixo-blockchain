@@ -7,7 +7,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/hashicorp/go-metrics"
-	"github.com/ixofoundation/ixo-blockchain/v5/ixoutils"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixoutils"
 )
 
 type EpochHooks interface {

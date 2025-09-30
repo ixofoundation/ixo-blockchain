@@ -9,8 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
 )
 
 // --------------------------

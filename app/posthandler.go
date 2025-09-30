@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/keeper"
-	smartaccountpost "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/post"
+	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/keeper"
+	smartaccountpost "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/post"
 )
 
 func NewPostHandler(

@@ -8,8 +8,8 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 )
 
 // GetProxyAccBalance returns the available spendable balance of the proxy account for the native token.

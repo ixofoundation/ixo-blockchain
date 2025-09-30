@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/keeper"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
+	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/keeper"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
 )
 
 // CircuitBreakerDecorator routes transactions through appropriate ante handlers based on

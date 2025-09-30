@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v5/x/liquidstake/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 )
 
 func BeginBlock(ctx sdk.Context, k keeper.Keeper) {

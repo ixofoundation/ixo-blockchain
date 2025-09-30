@@ -12,8 +12,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
 	"github.com/spf13/cobra"
 )
 

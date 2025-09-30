@@ -4,7 +4,7 @@ import (
 	"context"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
 )
 
 var _ types.QueryServer = Keeper{}

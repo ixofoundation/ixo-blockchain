@@ -9,9 +9,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v5/lib/ixo"
-	epochtypes "github.com/ixofoundation/ixo-blockchain/v5/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
+	epochtypes "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
 )
 
 var _ paramtypes.ParamSet = &Params{}

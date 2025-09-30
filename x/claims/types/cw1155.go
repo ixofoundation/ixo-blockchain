@@ -7,8 +7,8 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types/contracts/ixo1155"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types/contracts/ixo1155"
 )
 
 func (p *CW1155Payment) Validate(allowZero bool) error {

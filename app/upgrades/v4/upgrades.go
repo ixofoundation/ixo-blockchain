@@ -21,14 +21,14 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 
 	// Local
-	"github.com/ixofoundation/ixo-blockchain/v5/app/keepers"
-	"github.com/ixofoundation/ixo-blockchain/v5/lib/ixo"
-	"github.com/ixofoundation/ixo-blockchain/v5/wasmbinding"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v5/x/bonds/types"
-	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/v5/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/app/keepers"
+	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v6/wasmbinding"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
+	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
 
 	// SDK v47 modules
 	"cosmossdk.io/math"

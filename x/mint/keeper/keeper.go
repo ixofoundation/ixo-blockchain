@@ -7,9 +7,9 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v5/ixoutils"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixoutils"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
 )
 
 // Keeper of the mint store.

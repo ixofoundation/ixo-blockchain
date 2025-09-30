@@ -2,7 +2,7 @@ package keeper
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
 )
 
 // InitGenesis initializes the x/token module's state from a provided genesis state.

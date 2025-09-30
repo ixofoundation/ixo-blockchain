@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
 )
 
 // NOTE: if performance becomes an issue, we can consider using a similar approach to cosmos sdk grants queue

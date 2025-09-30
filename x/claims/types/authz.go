@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	ixo "github.com/ixofoundation/ixo-blockchain/v5/lib/ixo"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
+	ixo "github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
 )
 
 var (

@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
 )
 
 // GetParams get all parameters as types.Params

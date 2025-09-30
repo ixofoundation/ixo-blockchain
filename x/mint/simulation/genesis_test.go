@@ -8,9 +8,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/mint/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"

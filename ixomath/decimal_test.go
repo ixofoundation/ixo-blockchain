@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v2"
 
-	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
 )
 
 type decimalTestSuite struct {

@@ -5,7 +5,7 @@ import "google/api/annotations.proto";
 import "ixo/liquidstake/v1beta1/liquidstake.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v5/x/liquidstake/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types";
 
 // Query defines the gRPC query service for the liquidstake module.
 service Query {

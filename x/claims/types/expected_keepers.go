@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
 )
 
 type IidKeeper interface {
