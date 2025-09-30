@@ -233,3 +233,39 @@ func (m *MsgSetModulePaused) ValidateBasic() error {
 
 	return nil
 }
+
+// --------------------------
+// BURN
+// --------------------------
+const MsgTypeBurn = "burn"
+
+var _ sdk.Msg = &MsgBurn{}
+
+// NewMsgBurn creates a new MsgBurn.
+func NewMsgBurn(burner sdk.AccAddress, amount sdk.Coin) *MsgBurn {
+	return &MsgBurn{
+		Burner: burner.String(),
+		Amount: amount,
+	}
+}
+
+func (m *MsgBurn) Route() string { return RouterKey }
+
+func (m *MsgBurn) Type() string { return MsgTypeBurn }
+
+func (m *MsgBurn) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(m.Burner); err != nil {
+		return errors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid burner address %q: %v", m.Burner, err)
+	}
+	if ok := m.Amount.IsZero(); ok {
+		return errors.Wrap(sdkerrors.ErrInvalidRequest, "burning amount must not be zero")
+	}
+	if err := m.Amount.Validate(); err != nil {
+		return err
+	}
+	// do static validation for the Coin denom, only uixo is allowed
+	if m.Amount.Denom != "uixo" {
+		return errors.Wrap(sdkerrors.ErrInvalidRequest, "burning amount must be in uixo")
+	}
+	return nil
+}

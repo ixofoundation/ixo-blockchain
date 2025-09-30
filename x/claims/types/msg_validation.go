@@ -69,6 +69,9 @@ func (msg MsgSubmitClaim) ValidateBasic() error {
 	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
 		return err
 	}
+	if err = ValidateCW1155Payments(msg.Cw1155Payment, true); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -115,6 +118,9 @@ func (msg MsgEvaluateClaim) ValidateBasic() error {
 		return err
 	}
 	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
+		return err
+	}
+	if err = ValidateCW1155Payments(msg.Cw1155Payment, true); err != nil {
 		return err
 	}
 
@@ -166,7 +172,7 @@ func (msg MsgWithdrawPayment) ValidateBasic() error {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid to address (%s)", err)
 	}
 
-	if err = msg.Contract_1155Payment.Validate(); err != nil {
+	if err = ValidateCW1155Payments(msg.Cw1155Payment, true); err != nil {
 		return err
 	}
 
@@ -276,6 +282,9 @@ func (msg *MsgClaimIntent) ValidateBasic() error {
 	if err = ValidateCW20Payments(msg.Cw20Payment, true); err != nil {
 		return err
 	}
+	if err = ValidateCW1155Payments(msg.Cw1155Payment, true); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -316,8 +325,10 @@ func (msg MsgCreateClaimAuthorization) ValidateBasic() error {
 	if err = ValidateCoinsAllowZero(msg.MaxAmount.Sort()); err != nil {
 		return err
 	}
-
 	if err = ValidateCW20Payments(msg.MaxCw20Payment, true); err != nil {
+		return err
+	}
+	if err = ValidateCW1155Payments(msg.MaxCw1155Payment, true); err != nil {
 		return err
 	}
 

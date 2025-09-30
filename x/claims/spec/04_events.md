@@ -94,6 +94,7 @@ This event is emitted when a payment is withdrawn using the [MsgWithdrawPayment]
 type PaymentWithdrawnEvent struct {
 	Withdraw *WithdrawPaymentConstraints
   CW20Output []CW20Output
+  CW1155Payment []CW1155Payment
 }
 ```
 
@@ -101,6 +102,7 @@ The field's descriptions is as follows:
 
 - `withdraw` - the full [WithdrawPaymentConstraints](02_state.md#withdrawpaymentconstraints)
 - `cw20Output` - an array of [CW20Output](02_state.md#CW20Output) that defines the CW20Payment payment split outputs if any.
+- `cw1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) that defines the CW1155Payment payments to know amount per token id.
 
 ### PaymentWithdrawCreatedEvent
 

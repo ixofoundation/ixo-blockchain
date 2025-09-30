@@ -27,8 +27,7 @@ func NewMsgServerImpl(keeper *Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
 
-// TODO: ADD 1155 and 721 capabilities to claims and payments also.
-// TODO: add possibility to allow multiple intents per agent based of collection flag
+// TODO: ADD 721 capabilities to claims and payments also.
 
 // --------------------------
 // CREATE COLLECTION
@@ -52,13 +51,13 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 		return nil, errorsmod.Wrapf(err, "unauthorized")
 	}
 
-	// check that Evaluation Payment does not have 1155 payment
-	if msg.Payments.Evaluation.Contract_1155Payment != nil {
-		return nil, types.ErrCollectionEvalError
-	}
 	// check that Evaluation Payment does not have CW20 payments
 	if len(msg.Payments.Evaluation.Cw20Payment) > 1 {
 		return nil, types.ErrCollectionEvalCW20Error
+	}
+	// check that Evaluation Payment does not have CW1155 payments
+	if len(msg.Payments.Evaluation.Cw1155Payment) > 0 {
+		return nil, types.ErrCollectionEvalCW1155Error
 	}
 
 	// check that all payments accounts is part of entity module accounts
@@ -203,19 +202,22 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 			Evaluation: types.PaymentStatus_no_payment,
 			Rejection:  types.PaymentStatus_no_payment,
 		},
-		Amount:      msg.Amount,
-		Cw20Payment: msg.Cw20Payment,
-		UseIntent:   msg.UseIntent,
+		Amount:        msg.Amount,
+		Cw20Payment:   msg.Cw20Payment,
+		Cw1155Payment: msg.Cw1155Payment,
+		UseIntent:     msg.UseIntent,
 	}
 
 	// if intent then override payments, add intent id and update APPROVAL payment to GUARANTEED
 	if msg.UseIntent {
 		claim.Amount = intent.Amount
 		claim.Cw20Payment = intent.Cw20Payment
+		claim.Cw1155Payment = intent.Cw1155Payment
+		claim.Cw1155IntentPayment = intent.Cw1155IntentPayment
 
-		// if either payment is not empty then APPROVAL payment become GUARANTEED as funds is in escrow account
-		// if both payments is empty or all amounts is 0 then APPROVAL payment stays NO_PAYMENT since no funds are in escrow account
-		if !intent.Amount.IsZero() || !types.IsZeroCW20Payments(intent.Cw20Payment) {
+		// if any payment is not empty then APPROVAL payment become GUARANTEED as funds is in escrow account
+		// if all payments is empty or all amounts is 0 then APPROVAL payment stays NO_PAYMENT since no funds are in escrow account
+		if !intent.Amount.IsZero() || !types.IsZeroCW20Payments(intent.Cw20Payment) || !types.IsZeroCW1155Payments(intent.Cw1155Payment) {
 			claim.PaymentsStatus.Approval = types.PaymentStatus_guaranteed
 		}
 
@@ -228,7 +230,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 		}
 	} else {
 		// if no intent used, check if collection approval payment is oracle payment then only native coins allowed
-		if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(claim.Cw20Payment) {
+		if collection.Payments.Approval.IsOraclePayment && (!types.IsZeroCW20Payments(claim.Cw20Payment) || !types.IsZeroCW1155Payments(claim.Cw1155Payment)) {
 			return nil, types.ErrOraclePaymentOnlyNative
 		}
 	}
@@ -240,7 +242,7 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 	}
 
 	// start payout process for claim submission
-	if err = processPayment(ctx, *s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, &claim, collection, false); err != nil {
+	if err = processPayment(ctx, *s.Keeper, agent, collection.Payments.Submission, types.PaymentType_submission, &claim, collection, false, []*types.CW1155IntentPayment{}); err != nil {
 		return nil, err
 	}
 
@@ -316,17 +318,20 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		EvaluationDate:    &evaluationDate,
 		Amount:            msg.Amount,
 		Cw20Payment:       msg.Cw20Payment,
+		Cw1155Payment:     msg.Cw1155Payment,
 	}
 
 	// if intent on claim then override payments with claim payments as it used the intent
 	if claim.UseIntent {
 		evaluation.Amount = claim.Amount
 		evaluation.Cw20Payment = claim.Cw20Payment
+		evaluation.Cw1155Payment = claim.Cw1155Payment
+		evaluation.Cw1155IntentPayment = claim.Cw1155IntentPayment
 	}
 
 	// start payout process for evaluation submission, if evaluation has status invalidated, don't run evaluation payout process
 	if msg.Status != types.EvaluationStatus_invalidated {
-		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, &claim, collection, false); err != nil {
+		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, &claim, collection, false, []*types.CW1155IntentPayment{}); err != nil {
 			return nil, err
 		}
 
@@ -346,7 +351,8 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		if err != nil {
 			return nil, err
 		}
-		if err := s.Keeper.TransferIntentPayments(ctx, escrow, approvalAddress, claim.Amount, claim.Cw20Payment); err != nil {
+		_, err = s.Keeper.TransferIntentPayments(ctx, escrow, approvalAddress, claim.Amount, claim.Cw20Payment, claim.Cw1155Payment, claim.Cw1155IntentPayment)
+		if err != nil {
 			return nil, err
 		}
 		// Update payment status to no payment again as was guaranteed with intent
@@ -365,28 +371,30 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		// if intent on claim then override payments with claim payments as it used the intent and payment must be intent amount
 		// also override payment account to escrow account, so funds can be transferred from escrow to agent
 		if claim.UseIntent {
+			approvedPayment.Account = collection.EscrowAccount
 			approvedPayment.Amount = claim.Amount
 			approvedPayment.Cw20Payment = claim.Cw20Payment
-			approvedPayment.Account = collection.EscrowAccount
+			approvedPayment.Cw1155Payment = claim.Cw1155Payment
 		} else {
-			// if either msg amount or cw20Payment length is not zero, it means agent set custom amount/cw20Payment that was authenticated
+			// if any amount length is not zero, it means agent set custom amount that was authenticated
 			// through authZ constraints to be valid since all evaluations must be done by collections module account through authz
-			if len(msg.Amount) > 0 || len(msg.Cw20Payment) > 0 {
+			if len(msg.Amount) > 0 || len(msg.Cw20Payment) > 0 || len(msg.Cw1155Payment) > 0 {
 				approvedPayment.Amount = msg.Amount
 				approvedPayment.Cw20Payment = msg.Cw20Payment
+				approvedPayment.Cw1155Payment = msg.Cw1155Payment
 			}
 			// if no intent used, check if collection approval payment is oracle payment then only native coins allowed
-			if collection.Payments.Approval.IsOraclePayment && !types.IsZeroCW20Payments(approvedPayment.Cw20Payment) {
+			if collection.Payments.Approval.IsOraclePayment && (!types.IsZeroCW20Payments(approvedPayment.Cw20Payment) || !types.IsZeroCW1155Payments(approvedPayment.Cw1155Payment)) {
 				return nil, types.ErrOraclePaymentOnlyNative
 			}
 		}
-		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, &claim, collection, claim.UseIntent); err != nil {
+		if err = processPayment(ctx, *s.Keeper, claimAgent, approvedPayment, types.PaymentType_approval, &claim, collection, claim.UseIntent, claim.Cw1155IntentPayment); err != nil {
 			return nil, err
 		}
 	} else if msg.Status == types.EvaluationStatus_rejected {
 		// payout process for evaluation rejected to claim agent
 		collection.Rejected++
-		if err = processPayment(ctx, *s.Keeper, claimAgent, collection.Payments.Rejection, types.PaymentType_rejection, &claim, collection, false); err != nil {
+		if err = processPayment(ctx, *s.Keeper, claimAgent, collection.Payments.Rejection, types.PaymentType_rejection, &claim, collection, false, []*types.CW1155IntentPayment{}); err != nil {
 			return nil, err
 		}
 	} else if msg.Status == types.EvaluationStatus_disputed {
@@ -565,7 +573,7 @@ func (s msgServer) WithdrawPayment(goCtx context.Context, msg *types.MsgWithdraw
 	}
 
 	// make payout
-	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, &claim, collection, msg.ReleaseDate, msg.Contract_1155Payment, msg.Cw20Payment, fromAddress, toAddress, []*types.CW20Output{})
+	err = payout(ctx, *s.Keeper, msg.Inputs, msg.Outputs, msg.PaymentType, &claim, collection, msg.ReleaseDate, msg.Cw20Payment, fromAddress, toAddress, []*types.CW20Output{}, msg.Cw1155Payment, []*types.CW1155IntentPayment{})
 	if err != nil {
 		return nil, err
 	}
@@ -663,13 +671,13 @@ func (s msgServer) UpdateCollectionPayments(goCtx context.Context, msg *types.Ms
 		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
 	}
 
-	// check that Evaluation Payment does not have 1155 payment
-	if msg.Payments.Evaluation.Contract_1155Payment != nil {
-		return nil, types.ErrCollectionEvalError
-	}
 	// check that Evaluation Payment does not have CW20 payments
 	if len(msg.Payments.Evaluation.Cw20Payment) > 1 {
 		return nil, types.ErrCollectionEvalCW20Error
+	}
+	// check that Evaluation Payment does not have CW1155 payments
+	if len(msg.Payments.Evaluation.Cw1155Payment) > 1 {
+		return nil, types.ErrCollectionEvalCW1155Error
 	}
 
 	// check that all payments accounts is part of entity module accounts
@@ -689,7 +697,7 @@ func (s msgServer) UpdateCollectionPayments(goCtx context.Context, msg *types.Ms
 }
 
 // --------------------------
-// UPDATE COLLECTION STATE
+// UPDATE COLLECTION INTENTS
 // --------------------------
 func (s msgServer) UpdateCollectionIntents(goCtx context.Context, msg *types.MsgUpdateCollectionIntents) (*types.MsgUpdateCollectionIntentsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
@@ -776,18 +784,22 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "agent %s does not have authz from this collection %s", msg.AgentAddress, msg.CollectionId)
 	}
 
-	// check that intent amount and cw20 payments are within max constraints
+	// check that intent amounts are within max constraints
 	if !types.IsCoinsInMaxConstraints(msg.Amount, constraint.MaxAmount) {
 		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intent amount is not within authz max constraints")
 	}
 	if !types.IsCW20PaymentsInMaxConstraints(msg.Cw20Payment, constraint.MaxCw20Payment) {
 		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intent cw20 payments is not within authz max constraints")
 	}
+	if !types.IsCW1155PaymentsInMaxConstraints(msg.Cw1155Payment, constraint.MaxCw1155Payment) {
+		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intent cw1155 payments is not within authz max constraints")
+	}
 
-	// if both amount and cw20 payments are empty then use default payments for APPROVAL
-	if len(msg.Amount) == 0 && len(msg.Cw20Payment) == 0 {
+	// if all payments are empty then use default payments for APPROVAL
+	if len(msg.Amount) == 0 && len(msg.Cw20Payment) == 0 && len(msg.Cw1155Payment) == 0 {
 		msg.Amount = collection.Payments.Approval.Amount
 		msg.Cw20Payment = collection.Payments.Approval.Cw20Payment
+		msg.Cw1155Payment = collection.Payments.Approval.Cw1155Payment
 	}
 
 	// Get account used for APPROVAL payments on collection
@@ -807,26 +819,29 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 	params.IntentSequence++
 	s.Keeper.SetParams(ctx, &params)
 
+	// transfer the payments to escrow
+	cw1155IntentPayments, err := s.Keeper.TransferIntentPayments(ctx, approvalAddress, escrow, msg.Amount, msg.Cw20Payment, msg.Cw1155Payment, []*types.CW1155IntentPayment{})
+	if err != nil {
+		return nil, errorsmod.Wrap(err, "failed to transfer payments to escrow")
+	}
+
 	// create Intent
 	createdDate := ctx.BlockTime()
 	expireAt := createdDate.Add(constraint.IntentDurationNs)
 	intent := types.Intent{
-		Id:            fmt.Sprint(intentID),
-		AgentDid:      msg.AgentDid.Did(),
-		AgentAddress:  msg.AgentAddress,
-		CollectionId:  msg.CollectionId,
-		CreatedAt:     &createdDate,
-		ExpireAt:      &expireAt,
-		Status:        types.IntentStatus_active,
-		Amount:        msg.Amount,
-		Cw20Payment:   msg.Cw20Payment,
-		FromAddress:   approvalAddress.String(),
-		EscrowAddress: escrow.String(),
-	}
-	// transfer the payments to escrow
-	err = s.Keeper.TransferIntentPayments(ctx, approvalAddress, escrow, intent.Amount, intent.Cw20Payment)
-	if err != nil {
-		return nil, errorsmod.Wrap(err, "failed to transfer payments to escrow")
+		Id:                  fmt.Sprint(intentID),
+		AgentDid:            msg.AgentDid.Did(),
+		AgentAddress:        msg.AgentAddress,
+		CollectionId:        msg.CollectionId,
+		CreatedAt:           &createdDate,
+		ExpireAt:            &expireAt,
+		Status:              types.IntentStatus_active,
+		Amount:              msg.Amount,
+		Cw20Payment:         msg.Cw20Payment,
+		FromAddress:         approvalAddress.String(),
+		EscrowAddress:       escrow.String(),
+		Cw1155Payment:       msg.Cw1155Payment,
+		Cw1155IntentPayment: cw1155IntentPayments,
 	}
 
 	// Save the intent and emit the events
@@ -899,6 +914,7 @@ func (s msgServer) CreateClaimAuthorization(goCtx context.Context, msg *types.Ms
 			AgentQuota:       msg.AgentQuota,
 			MaxAmount:        msg.MaxAmount,
 			MaxCw20Payment:   msg.MaxCw20Payment,
+			MaxCw1155Payment: msg.MaxCw1155Payment,
 			IntentDurationNs: msg.IntentDurationNs,
 		}
 
@@ -939,11 +955,12 @@ func (s msgServer) CreateClaimAuthorization(goCtx context.Context, msg *types.Ms
 	case types.CreateClaimAuthorizationType_EVALUATE:
 		// Create the new constraint
 		newConstraint := &types.EvaluateClaimConstraints{
-			CollectionId:         msg.CollectionId,
-			AgentQuota:           msg.AgentQuota,
-			MaxCustomAmount:      msg.MaxAmount,
-			MaxCustomCw20Payment: msg.MaxCw20Payment,
-			BeforeDate:           msg.BeforeDate,
+			CollectionId:           msg.CollectionId,
+			AgentQuota:             msg.AgentQuota,
+			MaxCustomAmount:        msg.MaxAmount,
+			MaxCustomCw20Payment:   msg.MaxCw20Payment,
+			MaxCustomCw1155Payment: msg.MaxCw1155Payment,
+			BeforeDate:             msg.BeforeDate,
 		}
 
 		// Check for existing EvaluateClaimAuthorization

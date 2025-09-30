@@ -33,7 +33,7 @@ func NewKeeper(
 	key storetypes.StoreKey,
 	iidKeeper types.IidKeeper,
 	wasmKeeper types.WasmKeeper,
-	wasViewKeeper types.WasmViewKeeper,
+	wasmViewKeeper types.WasmViewKeeper,
 	paramSpace paramstypes.Subspace,
 	accountKeeper types.AccountKeeper,
 	authzKeeper types.AuthzKeeper,
@@ -50,7 +50,7 @@ func NewKeeper(
 		ParamSpace:     paramSpace,
 		AccountKeeper:  accountKeeper,
 		AuthzKeeper:    authzKeeper,
-		WasmViewKeeper: wasViewKeeper,
+		WasmViewKeeper: wasmViewKeeper,
 	}
 }
 

@@ -151,8 +151,8 @@ message Payment {
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // if empty(nil) then no contract payment, not allowed for Evaluation Payment
-  Contract1155Payment contract_1155_payment = 3;
+  // Deprecated: Use cw1155_payment instead
+  Contract1155Payment contract_1155_payment = 3 [ deprecated = true ];
   // timeout after claim/evaluation to create authZ for payment, if 0 then
   // immediate direct payment
   google.protobuf.Duration timeout_ns = 4
@@ -166,7 +166,17 @@ message Payment {
   // since there is no WithdrawalAuthorization to manage the cw20 payment split
   // for delayed payments
   bool is_oracle_payment = 6;
+  // cw1155 payments, can be empty or multiple
+  repeated CW1155Payment cw1155_payment = 7;
 }
+
+// message Cw721Payment {
+//   option (gogoproto.equal) = true;
+
+//   string address = 1;
+//   repeated string token_id = 2;
+//   uint64 amount = 3;
+// }
 
 message Contract1155Payment {
   option (gogoproto.equal) = true;
@@ -174,6 +184,28 @@ message Contract1155Payment {
   string address = 1;
   string token_id = 2;
   uint32 amount = 3;
+}
+
+message CW1155Payment {
+  option (gogoproto.equal) = true;
+
+  string address = 1;
+  repeated string token_id = 2;
+  uint64 amount = 3;
+}
+
+message CW1155IntentPayment {
+  option (gogoproto.equal) = true;
+
+  string address = 1;
+  repeated CW1155IntentPaymentToken tokens = 2;
+}
+
+message CW1155IntentPaymentToken {
+  option (gogoproto.equal) = true;
+
+  string token_id = 1;
+  uint64 amount = 2;
 }
 
 message CW20Payment {
@@ -207,24 +239,27 @@ message Claim {
   google.protobuf.Timestamp submission_date = 4 [ (gogoproto.stdtime) = true ];
   // claimID is the unique identifier of the claim in the cid hash format
   string claim_id = 5;
-  // evaluation is the result of one or more claim evaluations
+  // evaluation is the result of the claim evaluation
   Evaluation evaluation = 6;
   // payments_status is the status of the payments for the claim
   ClaimPayments payments_status = 7;
   // intent_id is the id of the intent for this claim, if any
   bool use_intent = 8;
   // custom amount specified by service agent for claim approval
-  // NOTE: if both amount and cw20 amount are empty then collection default is
-  // used
+  // NOTE: if all amounts are empty then collection default is used
   repeated cosmos.base.v1beta1.Coin amount = 9 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
-  // custom cw20 payments specified by service agent for claim
-  // approval
-  // NOTE: if both amount and cw20 amount are empty then collection default is
-  // used
+  // custom cw20 payments specified by service agent for claim approval
+  // NOTE: if all amounts are empty then collection default is used
   repeated CW20Payment cw20_payment = 10;
+  // custom cw1155 payments specified by service agent for claim approval
+  // NOTE: if all amounts are empty then collection default is used
+  repeated CW1155Payment cw1155_payment = 11;
+  // If intent was used, this is the cw20_payment equivalent but with amounts
+  // per token_id to transfer the same tokens to and from the escrow account
+  repeated CW1155IntentPayment cw1155_intent_payment = 12;
 }
 
 message ClaimPayments {
@@ -252,22 +287,32 @@ message Evaluation {
   // reason is the code expressed as an integer, for why the evaluation result
   // was given (codes defined by evaluator)
   uint32 reason = 7;
-  // verificationProof is the cid of the evaluation Verfiable Credential
+  // verificationProof is the cid of the evaluation Verifiable Credential
   string verification_proof = 8;
   // evaluationDate is the date and time that the claim evaluation was submitted
   // on-chain
   google.protobuf.Timestamp evaluation_date = 9 [ (gogoproto.stdtime) = true ];
   // custom amount specified by evaluator for claim approval
-  // NOTE: if both amount and cw20 amount are empty then collection default is
-  // used
+  // NOTE: if all amounts are empty then collection default is used
+  // NOTE: if claim has intent, then custom amounts are ignored and intent
+  // amounts are used
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
   // custom cw20 payments specified by evaluator for claim approval
-  // NOTE: if both amount and cw20 amount are empty then collection default is
-  // used
+  // NOTE: if all amounts are empty then collection default is used
+  // NOTE: if claim has intent, then custom amounts are ignored and intent
+  // amounts are used
   repeated CW20Payment cw20_payment = 11;
+  // custom cw1155 payments specified by evaluator for claim approval
+  // NOTE: if all amounts are empty then collection default is used
+  // NOTE: if claim has intent, then custom amounts are ignored and intent
+  // amounts are used
+  repeated CW1155Payment cw1155_payment = 12;
+  // If intent was used, this is the cw20_payment equivalent but with amounts
+  // per token_id to transfer the same tokens to and from the escrow account
+  repeated CW1155IntentPayment cw1155_intent_payment = 13;
 }
 
 message Dispute {
@@ -314,4 +359,9 @@ message Intent {
   string from_address = 11;
   // the escrow account address
   string escrow_address = 12;
+  // The custom cw1155 payments the agent intends to claim, if any.
+  repeated CW1155Payment cw1155_payment = 13;
+  // Same as cw1155_payment but with amounts per token_id to transfer
+  // the same tokens to and from the escrow account
+  repeated CW1155IntentPayment cw1155_intent_payment = 14;
 }

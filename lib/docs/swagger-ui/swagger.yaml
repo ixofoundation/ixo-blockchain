@@ -50509,7 +50509,7 @@ paths:
                       claimID is the unique identifier of the claim in the cid
                       hash format
                   evaluation:
-                    title: evaluation is the result of one or more claim evaluations
+                    title: evaluation is the result of the claim evaluation
                     type: object
                     properties:
                       claim_id:
@@ -50560,7 +50560,7 @@ paths:
                         type: string
                         title: >-
                           verificationProof is the cid of the evaluation
-                          Verfiable Credential
+                          Verifiable Credential
                       evaluation_date:
                         type: string
                         format: date-time
@@ -50591,10 +50591,13 @@ paths:
                           custom amount specified by evaluator for claim
                           approval
 
-                          NOTE: if both amount and cw20 amount are empty then
-                          collection default is
+                          NOTE: if all amounts are empty then collection default
+                          is used
 
-                          used
+                          NOTE: if claim has intent, then custom amounts are
+                          ignored and intent
+
+                          amounts are used
                       cw20_payment:
                         type: array
                         items:
@@ -50614,10 +50617,61 @@ paths:
                           custom cw20 payments specified by evaluator for claim
                           approval
 
-                          NOTE: if both amount and cw20 amount are empty then
-                          collection default is
+                          NOTE: if all amounts are empty then collection default
+                          is used
 
-                          used
+                          NOTE: if claim has intent, then custom amounts are
+                          ignored and intent
+
+                          amounts are used
+                      cw1155_payment:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            token_id:
+                              type: array
+                              items:
+                                type: string
+                            amount:
+                              type: string
+                              format: uint64
+                        title: >-
+                          custom cw1155 payments specified by evaluator for
+                          claim approval
+
+                          NOTE: if all amounts are empty then collection default
+                          is used
+
+                          NOTE: if claim has intent, then custom amounts are
+                          ignored and intent
+
+                          amounts are used
+                      cw1155_intent_payment:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            address:
+                              type: string
+                            tokens:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  token_id:
+                                    type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                        title: >-
+                          If intent was used, this is the cw20_payment
+                          equivalent but with amounts
+
+                          per token_id to transfer the same tokens to and from
+                          the escrow account
                   payments_status:
                     title: >-
                       payments_status is the status of the payments for the
@@ -50724,9 +50778,7 @@ paths:
                       custom amount specified by service agent for claim
                       approval
 
-                      NOTE: if both amount and cw20 amount are empty then
-                      collection default is
-
+                      NOTE: if all amounts are empty then collection default is
                       used
                   cw20_payment:
                     type: array
@@ -50745,13 +50797,53 @@ paths:
                             uint64(max 18446744073709551615)
                     title: >-
                       custom cw20 payments specified by service agent for claim
-
                       approval
 
-                      NOTE: if both amount and cw20 amount are empty then
-                      collection default is
-
+                      NOTE: if all amounts are empty then collection default is
                       used
+                  cw1155_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        token_id:
+                          type: array
+                          items:
+                            type: string
+                        amount:
+                          type: string
+                          format: uint64
+                    title: >-
+                      custom cw1155 payments specified by service agent for
+                      claim approval
+
+                      NOTE: if all amounts are empty then collection default is
+                      used
+                  cw1155_intent_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        tokens:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              token_id:
+                                type: string
+                              amount:
+                                type: string
+                                format: uint64
+                    title: >-
+                      If intent was used, this is the cw20_payment equivalent
+                      but with amounts
+
+                      per token_id to transfer the same tokens to and from the
+                      escrow account
         default:
           description: An unexpected error response.
           schema:
@@ -50817,9 +50909,7 @@ paths:
                         claimID is the unique identifier of the claim in the cid
                         hash format
                     evaluation:
-                      title: >-
-                        evaluation is the result of one or more claim
-                        evaluations
+                      title: evaluation is the result of the claim evaluation
                       type: object
                       properties:
                         claim_id:
@@ -50872,7 +50962,7 @@ paths:
                           type: string
                           title: >-
                             verificationProof is the cid of the evaluation
-                            Verfiable Credential
+                            Verifiable Credential
                         evaluation_date:
                           type: string
                           format: date-time
@@ -50903,10 +50993,13 @@ paths:
                             custom amount specified by evaluator for claim
                             approval
 
-                            NOTE: if both amount and cw20 amount are empty then
-                            collection default is
+                            NOTE: if all amounts are empty then collection
+                            default is used
 
-                            used
+                            NOTE: if claim has intent, then custom amounts are
+                            ignored and intent
+
+                            amounts are used
                         cw20_payment:
                           type: array
                           items:
@@ -50926,10 +51019,61 @@ paths:
                             custom cw20 payments specified by evaluator for
                             claim approval
 
-                            NOTE: if both amount and cw20 amount are empty then
-                            collection default is
+                            NOTE: if all amounts are empty then collection
+                            default is used
 
-                            used
+                            NOTE: if claim has intent, then custom amounts are
+                            ignored and intent
+
+                            amounts are used
+                        cw1155_payment:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              address:
+                                type: string
+                              token_id:
+                                type: array
+                                items:
+                                  type: string
+                              amount:
+                                type: string
+                                format: uint64
+                          title: >-
+                            custom cw1155 payments specified by evaluator for
+                            claim approval
+
+                            NOTE: if all amounts are empty then collection
+                            default is used
+
+                            NOTE: if claim has intent, then custom amounts are
+                            ignored and intent
+
+                            amounts are used
+                        cw1155_intent_payment:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              address:
+                                type: string
+                              tokens:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    token_id:
+                                      type: string
+                                    amount:
+                                      type: string
+                                      format: uint64
+                          title: >-
+                            If intent was used, this is the cw20_payment
+                            equivalent but with amounts
+
+                            per token_id to transfer the same tokens to and from
+                            the escrow account
                     payments_status:
                       title: >-
                         payments_status is the status of the payments for the
@@ -51037,10 +51181,8 @@ paths:
                         custom amount specified by service agent for claim
                         approval
 
-                        NOTE: if both amount and cw20 amount are empty then
-                        collection default is
-
-                        used
+                        NOTE: if all amounts are empty then collection default
+                        is used
                     cw20_payment:
                       type: array
                       items:
@@ -51058,14 +51200,53 @@ paths:
                               uint64(max 18446744073709551615)
                       title: >-
                         custom cw20 payments specified by service agent for
-                        claim
+                        claim approval
 
-                        approval
+                        NOTE: if all amounts are empty then collection default
+                        is used
+                    cw1155_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          token_id:
+                            type: array
+                            items:
+                              type: string
+                          amount:
+                            type: string
+                            format: uint64
+                      title: >-
+                        custom cw1155 payments specified by service agent for
+                        claim approval
 
-                        NOTE: if both amount and cw20 amount are empty then
-                        collection default is
+                        NOTE: if all amounts are empty then collection default
+                        is used
+                    cw1155_intent_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          tokens:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                token_id:
+                                  type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                      title: >-
+                        If intent was used, this is the cw20_payment equivalent
+                        but with amounts
 
-                        used
+                        per token_id to transfer the same tokens to and from the
+                        escrow account
               pagination:
                 type: object
                 properties:
@@ -51308,9 +51489,7 @@ paths:
 
                                 signatures required by gogoproto.
                           contract_1155_payment:
-                            title: >-
-                              if empty(nil) then no contract payment, not
-                              allowed for Evaluation Payment
+                            title: 'Deprecated: Use cw1155_payment instead'
                             type: object
                             properties:
                               address:
@@ -51362,6 +51541,21 @@ paths:
                               manage the cw20 payment split
 
                               for delayed payments
+                          cw1155_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                token_id:
+                                  type: array
+                                  items:
+                                    type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                            title: cw1155 payments, can be empty or multiple
                       evaluation:
                         type: object
                         properties:
@@ -51389,9 +51583,7 @@ paths:
 
                                 signatures required by gogoproto.
                           contract_1155_payment:
-                            title: >-
-                              if empty(nil) then no contract payment, not
-                              allowed for Evaluation Payment
+                            title: 'Deprecated: Use cw1155_payment instead'
                             type: object
                             properties:
                               address:
@@ -51443,6 +51635,21 @@ paths:
                               manage the cw20 payment split
 
                               for delayed payments
+                          cw1155_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                token_id:
+                                  type: array
+                                  items:
+                                    type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                            title: cw1155 payments, can be empty or multiple
                       approval:
                         type: object
                         properties:
@@ -51470,9 +51677,7 @@ paths:
 
                                 signatures required by gogoproto.
                           contract_1155_payment:
-                            title: >-
-                              if empty(nil) then no contract payment, not
-                              allowed for Evaluation Payment
+                            title: 'Deprecated: Use cw1155_payment instead'
                             type: object
                             properties:
                               address:
@@ -51524,6 +51729,21 @@ paths:
                               manage the cw20 payment split
 
                               for delayed payments
+                          cw1155_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                token_id:
+                                  type: array
+                                  items:
+                                    type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                            title: cw1155 payments, can be empty or multiple
                       rejection:
                         type: object
                         properties:
@@ -51551,9 +51771,7 @@ paths:
 
                                 signatures required by gogoproto.
                           contract_1155_payment:
-                            title: >-
-                              if empty(nil) then no contract payment, not
-                              allowed for Evaluation Payment
+                            title: 'Deprecated: Use cw1155_payment instead'
                             type: object
                             properties:
                               address:
@@ -51605,6 +51823,21 @@ paths:
                               manage the cw20 payment split
 
                               for delayed payments
+                          cw1155_payment:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                token_id:
+                                  type: array
+                                  items:
+                                    type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                            title: cw1155 payments, can be empty or multiple
                   signer:
                     type: string
                     title: signer address
@@ -51810,9 +52043,7 @@ paths:
 
                                   signatures required by gogoproto.
                             contract_1155_payment:
-                              title: >-
-                                if empty(nil) then no contract payment, not
-                                allowed for Evaluation Payment
+                              title: 'Deprecated: Use cw1155_payment instead'
                               type: object
                               properties:
                                 address:
@@ -51864,6 +52095,21 @@ paths:
                                 manage the cw20 payment split
 
                                 for delayed payments
+                            cw1155_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  token_id:
+                                    type: array
+                                    items:
+                                      type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                              title: cw1155 payments, can be empty or multiple
                         evaluation:
                           type: object
                           properties:
@@ -51891,9 +52137,7 @@ paths:
 
                                   signatures required by gogoproto.
                             contract_1155_payment:
-                              title: >-
-                                if empty(nil) then no contract payment, not
-                                allowed for Evaluation Payment
+                              title: 'Deprecated: Use cw1155_payment instead'
                               type: object
                               properties:
                                 address:
@@ -51945,6 +52189,21 @@ paths:
                                 manage the cw20 payment split
 
                                 for delayed payments
+                            cw1155_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  token_id:
+                                    type: array
+                                    items:
+                                      type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                              title: cw1155 payments, can be empty or multiple
                         approval:
                           type: object
                           properties:
@@ -51972,9 +52231,7 @@ paths:
 
                                   signatures required by gogoproto.
                             contract_1155_payment:
-                              title: >-
-                                if empty(nil) then no contract payment, not
-                                allowed for Evaluation Payment
+                              title: 'Deprecated: Use cw1155_payment instead'
                               type: object
                               properties:
                                 address:
@@ -52026,6 +52283,21 @@ paths:
                                 manage the cw20 payment split
 
                                 for delayed payments
+                            cw1155_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  token_id:
+                                    type: array
+                                    items:
+                                      type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                              title: cw1155 payments, can be empty or multiple
                         rejection:
                           type: object
                           properties:
@@ -52053,9 +52325,7 @@ paths:
 
                                   signatures required by gogoproto.
                             contract_1155_payment:
-                              title: >-
-                                if empty(nil) then no contract payment, not
-                                allowed for Evaluation Payment
+                              title: 'Deprecated: Use cw1155_payment instead'
                               type: object
                               properties:
                                 address:
@@ -52107,6 +52377,21 @@ paths:
                                 manage the cw20 payment split
 
                                 for delayed payments
+                            cw1155_payment:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  address:
+                                    type: string
+                                  token_id:
+                                    type: array
+                                    items:
+                                      type: string
+                                  amount:
+                                    type: string
+                                    format: uint64
+                              title: cw1155 payments, can be empty or multiple
                     signer:
                       type: string
                       title: signer address
@@ -52554,6 +52839,45 @@ paths:
                   escrow_address:
                     type: string
                     title: the escrow account address
+                  cw1155_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        token_id:
+                          type: array
+                          items:
+                            type: string
+                        amount:
+                          type: string
+                          format: uint64
+                    description: >-
+                      The custom cw1155 payments the agent intends to claim, if
+                      any.
+                  cw1155_intent_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        tokens:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              token_id:
+                                type: string
+                              amount:
+                                type: string
+                                format: uint64
+                    title: >-
+                      Same as cw1155_payment but with amounts per token_id to
+                      transfer
+
+                      the same tokens to and from the escrow account
                 description: >-
                   Intent defines the structure for a service agent's claim
                   intent.
@@ -52698,6 +53022,45 @@ paths:
                     escrow_address:
                       type: string
                       title: the escrow account address
+                    cw1155_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          token_id:
+                            type: array
+                            items:
+                              type: string
+                          amount:
+                            type: string
+                            format: uint64
+                      description: >-
+                        The custom cw1155 payments the agent intends to claim,
+                        if any.
+                    cw1155_intent_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          tokens:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                token_id:
+                                  type: string
+                                amount:
+                                  type: string
+                                  format: uint64
+                      title: >-
+                        Same as cw1155_payment but with amounts per token_id to
+                        transfer
+
+                        the same tokens to and from the escrow account
                   description: >-
                     Intent defines the structure for a service agent's claim
                     intent.
@@ -88545,6 +88908,41 @@ definitions:
       a
 
       bond.
+  ixo.claims.v1beta1.CW1155IntentPayment:
+    type: object
+    properties:
+      address:
+        type: string
+      tokens:
+        type: array
+        items:
+          type: object
+          properties:
+            token_id:
+              type: string
+            amount:
+              type: string
+              format: uint64
+  ixo.claims.v1beta1.CW1155IntentPaymentToken:
+    type: object
+    properties:
+      token_id:
+        type: string
+      amount:
+        type: string
+        format: uint64
+  ixo.claims.v1beta1.CW1155Payment:
+    type: object
+    properties:
+      address:
+        type: string
+      token_id:
+        type: array
+        items:
+          type: string
+      amount:
+        type: string
+        format: uint64
   ixo.claims.v1beta1.CW20Payment:
     type: object
     properties:
@@ -88577,7 +88975,7 @@ definitions:
         type: string
         title: claimID is the unique identifier of the claim in the cid hash format
       evaluation:
-        title: evaluation is the result of one or more claim evaluations
+        title: evaluation is the result of the claim evaluation
         type: object
         properties:
           claim_id:
@@ -88623,7 +89021,7 @@ definitions:
           verification_proof:
             type: string
             title: >-
-              verificationProof is the cid of the evaluation Verfiable
+              verificationProof is the cid of the evaluation Verifiable
               Credential
           evaluation_date:
             type: string
@@ -88653,10 +89051,12 @@ definitions:
             title: >-
               custom amount specified by evaluator for claim approval
 
-              NOTE: if both amount and cw20 amount are empty then collection
-              default is
+              NOTE: if all amounts are empty then collection default is used
 
-              used
+              NOTE: if claim has intent, then custom amounts are ignored and
+              intent
+
+              amounts are used
           cw20_payment:
             type: array
             items:
@@ -88675,10 +89075,58 @@ definitions:
             title: >-
               custom cw20 payments specified by evaluator for claim approval
 
-              NOTE: if both amount and cw20 amount are empty then collection
-              default is
+              NOTE: if all amounts are empty then collection default is used
 
-              used
+              NOTE: if claim has intent, then custom amounts are ignored and
+              intent
+
+              amounts are used
+          cw1155_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                token_id:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: string
+                  format: uint64
+            title: >-
+              custom cw1155 payments specified by evaluator for claim approval
+
+              NOTE: if all amounts are empty then collection default is used
+
+              NOTE: if claim has intent, then custom amounts are ignored and
+              intent
+
+              amounts are used
+          cw1155_intent_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                tokens:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      token_id:
+                        type: string
+                      amount:
+                        type: string
+                        format: uint64
+            title: >-
+              If intent was used, this is the cw20_payment equivalent but with
+              amounts
+
+              per token_id to transfer the same tokens to and from the escrow
+              account
       payments_status:
         title: payments_status is the status of the payments for the claim
         type: object
@@ -88772,13 +89220,9 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-        title: >-
+        title: |-
           custom amount specified by service agent for claim approval
-
-          NOTE: if both amount and cw20 amount are empty then collection default
-          is
-
-          used
+          NOTE: if all amounts are empty then collection default is used
       cw20_payment:
         type: array
         items:
@@ -88794,15 +89238,49 @@ definitions:
                 a
 
                 uint64(max 18446744073709551615)
+        title: |-
+          custom cw20 payments specified by service agent for claim approval
+          NOTE: if all amounts are empty then collection default is used
+      cw1155_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            token_id:
+              type: array
+              items:
+                type: string
+            amount:
+              type: string
+              format: uint64
+        title: |-
+          custom cw1155 payments specified by service agent for claim approval
+          NOTE: if all amounts are empty then collection default is used
+      cw1155_intent_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            tokens:
+              type: array
+              items:
+                type: object
+                properties:
+                  token_id:
+                    type: string
+                  amount:
+                    type: string
+                    format: uint64
         title: >-
-          custom cw20 payments specified by service agent for claim
+          If intent was used, this is the cw20_payment equivalent but with
+          amounts
 
-          approval
-
-          NOTE: if both amount and cw20 amount are empty then collection default
-          is
-
-          used
+          per token_id to transfer the same tokens to and from the escrow
+          account
   ixo.claims.v1beta1.ClaimPayments:
     type: object
     properties:
@@ -88987,9 +89465,7 @@ definitions:
 
                     signatures required by gogoproto.
               contract_1155_payment:
-                title: >-
-                  if empty(nil) then no contract payment, not allowed for
-                  Evaluation Payment
+                title: 'Deprecated: Use cw1155_payment instead'
                 type: object
                 properties:
                   address:
@@ -89041,6 +89517,21 @@ definitions:
                   payment split
 
                   for delayed payments
+              cw1155_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    token_id:
+                      type: array
+                      items:
+                        type: string
+                    amount:
+                      type: string
+                      format: uint64
+                title: cw1155 payments, can be empty or multiple
           evaluation:
             type: object
             properties:
@@ -89067,9 +89558,7 @@ definitions:
 
                     signatures required by gogoproto.
               contract_1155_payment:
-                title: >-
-                  if empty(nil) then no contract payment, not allowed for
-                  Evaluation Payment
+                title: 'Deprecated: Use cw1155_payment instead'
                 type: object
                 properties:
                   address:
@@ -89121,6 +89610,21 @@ definitions:
                   payment split
 
                   for delayed payments
+              cw1155_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    token_id:
+                      type: array
+                      items:
+                        type: string
+                    amount:
+                      type: string
+                      format: uint64
+                title: cw1155 payments, can be empty or multiple
           approval:
             type: object
             properties:
@@ -89147,9 +89651,7 @@ definitions:
 
                     signatures required by gogoproto.
               contract_1155_payment:
-                title: >-
-                  if empty(nil) then no contract payment, not allowed for
-                  Evaluation Payment
+                title: 'Deprecated: Use cw1155_payment instead'
                 type: object
                 properties:
                   address:
@@ -89201,6 +89703,21 @@ definitions:
                   payment split
 
                   for delayed payments
+              cw1155_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    token_id:
+                      type: array
+                      items:
+                        type: string
+                    amount:
+                      type: string
+                      format: uint64
+                title: cw1155 payments, can be empty or multiple
           rejection:
             type: object
             properties:
@@ -89227,9 +89744,7 @@ definitions:
 
                     signatures required by gogoproto.
               contract_1155_payment:
-                title: >-
-                  if empty(nil) then no contract payment, not allowed for
-                  Evaluation Payment
+                title: 'Deprecated: Use cw1155_payment instead'
                 type: object
                 properties:
                   address:
@@ -89281,6 +89796,21 @@ definitions:
                   payment split
 
                   for delayed payments
+              cw1155_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    token_id:
+                      type: array
+                      items:
+                        type: string
+                    amount:
+                      type: string
+                      format: uint64
+                title: cw1155 payments, can be empty or multiple
       signer:
         type: string
         title: signer address
@@ -89419,7 +89949,7 @@ definitions:
           was given (codes defined by evaluator)
       verification_proof:
         type: string
-        title: verificationProof is the cid of the evaluation Verfiable Credential
+        title: verificationProof is the cid of the evaluation Verifiable Credential
       evaluation_date:
         type: string
         format: date-time
@@ -89442,13 +89972,11 @@ definitions:
 
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
-        title: >-
+        title: |-
           custom amount specified by evaluator for claim approval
-
-          NOTE: if both amount and cw20 amount are empty then collection default
-          is
-
-          used
+          NOTE: if all amounts are empty then collection default is used
+          NOTE: if claim has intent, then custom amounts are ignored and intent
+          amounts are used
       cw20_payment:
         type: array
         items:
@@ -89464,13 +89992,53 @@ definitions:
                 a
 
                 uint64(max 18446744073709551615)
-        title: >-
+        title: |-
           custom cw20 payments specified by evaluator for claim approval
+          NOTE: if all amounts are empty then collection default is used
+          NOTE: if claim has intent, then custom amounts are ignored and intent
+          amounts are used
+      cw1155_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            token_id:
+              type: array
+              items:
+                type: string
+            amount:
+              type: string
+              format: uint64
+        title: |-
+          custom cw1155 payments specified by evaluator for claim approval
+          NOTE: if all amounts are empty then collection default is used
+          NOTE: if claim has intent, then custom amounts are ignored and intent
+          amounts are used
+      cw1155_intent_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            tokens:
+              type: array
+              items:
+                type: object
+                properties:
+                  token_id:
+                    type: string
+                  amount:
+                    type: string
+                    format: uint64
+        title: >-
+          If intent was used, this is the cw20_payment equivalent but with
+          amounts
 
-          NOTE: if both amount and cw20 amount are empty then collection default
-          is
-
-          used
+          per token_id to transfer the same tokens to and from the escrow
+          account
   ixo.claims.v1beta1.EvaluationStatus:
     type: string
     enum:
@@ -89567,6 +90135,41 @@ definitions:
       escrow_address:
         type: string
         title: the escrow account address
+      cw1155_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            token_id:
+              type: array
+              items:
+                type: string
+            amount:
+              type: string
+              format: uint64
+        description: The custom cw1155 payments the agent intends to claim, if any.
+      cw1155_intent_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            tokens:
+              type: array
+              items:
+                type: object
+                properties:
+                  token_id:
+                    type: string
+                  amount:
+                    type: string
+                    format: uint64
+        title: |-
+          Same as cw1155_payment but with amounts per token_id to transfer
+          the same tokens to and from the escrow account
     description: Intent defines the structure for a service agent's claim intent.
   ixo.claims.v1beta1.IntentStatus:
     type: string
@@ -89625,9 +90228,7 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
       contract_1155_payment:
-        title: >-
-          if empty(nil) then no contract payment, not allowed for Evaluation
-          Payment
+        title: 'Deprecated: Use cw1155_payment instead'
         type: object
         properties:
           address:
@@ -89676,6 +90277,21 @@ definitions:
           split
 
           for delayed payments
+      cw1155_payment:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            token_id:
+              type: array
+              items:
+                type: string
+            amount:
+              type: string
+              format: uint64
+        title: cw1155 payments, can be empty or multiple
   ixo.claims.v1beta1.PaymentStatus:
     type: string
     enum:
@@ -89723,9 +90339,7 @@ definitions:
 
                 signatures required by gogoproto.
           contract_1155_payment:
-            title: >-
-              if empty(nil) then no contract payment, not allowed for Evaluation
-              Payment
+            title: 'Deprecated: Use cw1155_payment instead'
             type: object
             properties:
               address:
@@ -89777,6 +90391,21 @@ definitions:
               payment split
 
               for delayed payments
+          cw1155_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                token_id:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: string
+                  format: uint64
+            title: cw1155 payments, can be empty or multiple
       evaluation:
         type: object
         properties:
@@ -89803,9 +90432,7 @@ definitions:
 
                 signatures required by gogoproto.
           contract_1155_payment:
-            title: >-
-              if empty(nil) then no contract payment, not allowed for Evaluation
-              Payment
+            title: 'Deprecated: Use cw1155_payment instead'
             type: object
             properties:
               address:
@@ -89857,6 +90484,21 @@ definitions:
               payment split
 
               for delayed payments
+          cw1155_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                token_id:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: string
+                  format: uint64
+            title: cw1155 payments, can be empty or multiple
       approval:
         type: object
         properties:
@@ -89883,9 +90525,7 @@ definitions:
 
                 signatures required by gogoproto.
           contract_1155_payment:
-            title: >-
-              if empty(nil) then no contract payment, not allowed for Evaluation
-              Payment
+            title: 'Deprecated: Use cw1155_payment instead'
             type: object
             properties:
               address:
@@ -89937,6 +90577,21 @@ definitions:
               payment split
 
               for delayed payments
+          cw1155_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                token_id:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: string
+                  format: uint64
+            title: cw1155 payments, can be empty or multiple
       rejection:
         type: object
         properties:
@@ -89963,9 +90618,7 @@ definitions:
 
                 signatures required by gogoproto.
           contract_1155_payment:
-            title: >-
-              if empty(nil) then no contract payment, not allowed for Evaluation
-              Payment
+            title: 'Deprecated: Use cw1155_payment instead'
             type: object
             properties:
               address:
@@ -90017,6 +90670,21 @@ definitions:
               payment split
 
               for delayed payments
+          cw1155_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                token_id:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: string
+                  format: uint64
+            title: cw1155 payments, can be empty or multiple
   ixo.claims.v1beta1.QueryClaimListResponse:
     type: object
     properties:
@@ -90045,7 +90713,7 @@ definitions:
                 claimID is the unique identifier of the claim in the cid hash
                 format
             evaluation:
-              title: evaluation is the result of one or more claim evaluations
+              title: evaluation is the result of the claim evaluation
               type: object
               properties:
                 claim_id:
@@ -90093,7 +90761,7 @@ definitions:
                 verification_proof:
                   type: string
                   title: >-
-                    verificationProof is the cid of the evaluation Verfiable
+                    verificationProof is the cid of the evaluation Verifiable
                     Credential
                 evaluation_date:
                   type: string
@@ -90123,10 +90791,13 @@ definitions:
                   title: >-
                     custom amount specified by evaluator for claim approval
 
-                    NOTE: if both amount and cw20 amount are empty then
-                    collection default is
-
+                    NOTE: if all amounts are empty then collection default is
                     used
+
+                    NOTE: if claim has intent, then custom amounts are ignored
+                    and intent
+
+                    amounts are used
                 cw20_payment:
                   type: array
                   items:
@@ -90146,10 +90817,61 @@ definitions:
                     custom cw20 payments specified by evaluator for claim
                     approval
 
-                    NOTE: if both amount and cw20 amount are empty then
-                    collection default is
-
+                    NOTE: if all amounts are empty then collection default is
                     used
+
+                    NOTE: if claim has intent, then custom amounts are ignored
+                    and intent
+
+                    amounts are used
+                cw1155_payment:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                      token_id:
+                        type: array
+                        items:
+                          type: string
+                      amount:
+                        type: string
+                        format: uint64
+                  title: >-
+                    custom cw1155 payments specified by evaluator for claim
+                    approval
+
+                    NOTE: if all amounts are empty then collection default is
+                    used
+
+                    NOTE: if claim has intent, then custom amounts are ignored
+                    and intent
+
+                    amounts are used
+                cw1155_intent_payment:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      address:
+                        type: string
+                      tokens:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            token_id:
+                              type: string
+                            amount:
+                              type: string
+                              format: uint64
+                  title: >-
+                    If intent was used, this is the cw20_payment equivalent but
+                    with amounts
+
+                    per token_id to transfer the same tokens to and from the
+                    escrow account
             payments_status:
               title: payments_status is the status of the payments for the claim
               type: object
@@ -90246,13 +90968,9 @@ definitions:
                   method
 
                   signatures required by gogoproto.
-              title: >-
+              title: |-
                 custom amount specified by service agent for claim approval
-
-                NOTE: if both amount and cw20 amount are empty then collection
-                default is
-
-                used
+                NOTE: if all amounts are empty then collection default is used
             cw20_payment:
               type: array
               items:
@@ -90270,13 +90988,51 @@ definitions:
                       uint64(max 18446744073709551615)
               title: >-
                 custom cw20 payments specified by service agent for claim
-
                 approval
 
-                NOTE: if both amount and cw20 amount are empty then collection
-                default is
+                NOTE: if all amounts are empty then collection default is used
+            cw1155_payment:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  token_id:
+                    type: array
+                    items:
+                      type: string
+                  amount:
+                    type: string
+                    format: uint64
+              title: >-
+                custom cw1155 payments specified by service agent for claim
+                approval
 
-                used
+                NOTE: if all amounts are empty then collection default is used
+            cw1155_intent_payment:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  tokens:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        token_id:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+              title: >-
+                If intent was used, this is the cw20_payment equivalent but with
+                amounts
+
+                per token_id to transfer the same tokens to and from the escrow
+                account
       pagination:
         type: object
         properties:
@@ -90329,7 +91085,7 @@ definitions:
               claimID is the unique identifier of the claim in the cid hash
               format
           evaluation:
-            title: evaluation is the result of one or more claim evaluations
+            title: evaluation is the result of the claim evaluation
             type: object
             properties:
               claim_id:
@@ -90377,7 +91133,7 @@ definitions:
               verification_proof:
                 type: string
                 title: >-
-                  verificationProof is the cid of the evaluation Verfiable
+                  verificationProof is the cid of the evaluation Verifiable
                   Credential
               evaluation_date:
                 type: string
@@ -90407,10 +91163,12 @@ definitions:
                 title: >-
                   custom amount specified by evaluator for claim approval
 
-                  NOTE: if both amount and cw20 amount are empty then collection
-                  default is
+                  NOTE: if all amounts are empty then collection default is used
 
-                  used
+                  NOTE: if claim has intent, then custom amounts are ignored and
+                  intent
+
+                  amounts are used
               cw20_payment:
                 type: array
                 items:
@@ -90429,10 +91187,59 @@ definitions:
                 title: >-
                   custom cw20 payments specified by evaluator for claim approval
 
-                  NOTE: if both amount and cw20 amount are empty then collection
-                  default is
+                  NOTE: if all amounts are empty then collection default is used
 
-                  used
+                  NOTE: if claim has intent, then custom amounts are ignored and
+                  intent
+
+                  amounts are used
+              cw1155_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    token_id:
+                      type: array
+                      items:
+                        type: string
+                    amount:
+                      type: string
+                      format: uint64
+                title: >-
+                  custom cw1155 payments specified by evaluator for claim
+                  approval
+
+                  NOTE: if all amounts are empty then collection default is used
+
+                  NOTE: if claim has intent, then custom amounts are ignored and
+                  intent
+
+                  amounts are used
+              cw1155_intent_payment:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    address:
+                      type: string
+                    tokens:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          token_id:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                title: >-
+                  If intent was used, this is the cw20_payment equivalent but
+                  with amounts
+
+                  per token_id to transfer the same tokens to and from the
+                  escrow account
           payments_status:
             title: payments_status is the status of the payments for the claim
             type: object
@@ -90529,13 +91336,9 @@ definitions:
                 method
 
                 signatures required by gogoproto.
-            title: >-
+            title: |-
               custom amount specified by service agent for claim approval
-
-              NOTE: if both amount and cw20 amount are empty then collection
-              default is
-
-              used
+              NOTE: if all amounts are empty then collection default is used
           cw20_payment:
             type: array
             items:
@@ -90551,15 +91354,51 @@ definitions:
                     fit in a
 
                     uint64(max 18446744073709551615)
+            title: |-
+              custom cw20 payments specified by service agent for claim approval
+              NOTE: if all amounts are empty then collection default is used
+          cw1155_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                token_id:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: string
+                  format: uint64
             title: >-
-              custom cw20 payments specified by service agent for claim
-
+              custom cw1155 payments specified by service agent for claim
               approval
 
-              NOTE: if both amount and cw20 amount are empty then collection
-              default is
+              NOTE: if all amounts are empty then collection default is used
+          cw1155_intent_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                tokens:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      token_id:
+                        type: string
+                      amount:
+                        type: string
+                        format: uint64
+            title: >-
+              If intent was used, this is the cw20_payment equivalent but with
+              amounts
 
-              used
+              per token_id to transfer the same tokens to and from the escrow
+              account
   ixo.claims.v1beta1.QueryCollectionListResponse:
     type: object
     properties:
@@ -90689,9 +91528,7 @@ definitions:
 
                           signatures required by gogoproto.
                     contract_1155_payment:
-                      title: >-
-                        if empty(nil) then no contract payment, not allowed for
-                        Evaluation Payment
+                      title: 'Deprecated: Use cw1155_payment instead'
                       type: object
                       properties:
                         address:
@@ -90743,6 +91580,21 @@ definitions:
                         cw20 payment split
 
                         for delayed payments
+                    cw1155_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          token_id:
+                            type: array
+                            items:
+                              type: string
+                          amount:
+                            type: string
+                            format: uint64
+                      title: cw1155 payments, can be empty or multiple
                 evaluation:
                   type: object
                   properties:
@@ -90770,9 +91622,7 @@ definitions:
 
                           signatures required by gogoproto.
                     contract_1155_payment:
-                      title: >-
-                        if empty(nil) then no contract payment, not allowed for
-                        Evaluation Payment
+                      title: 'Deprecated: Use cw1155_payment instead'
                       type: object
                       properties:
                         address:
@@ -90824,6 +91674,21 @@ definitions:
                         cw20 payment split
 
                         for delayed payments
+                    cw1155_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          token_id:
+                            type: array
+                            items:
+                              type: string
+                          amount:
+                            type: string
+                            format: uint64
+                      title: cw1155 payments, can be empty or multiple
                 approval:
                   type: object
                   properties:
@@ -90851,9 +91716,7 @@ definitions:
 
                           signatures required by gogoproto.
                     contract_1155_payment:
-                      title: >-
-                        if empty(nil) then no contract payment, not allowed for
-                        Evaluation Payment
+                      title: 'Deprecated: Use cw1155_payment instead'
                       type: object
                       properties:
                         address:
@@ -90905,6 +91768,21 @@ definitions:
                         cw20 payment split
 
                         for delayed payments
+                    cw1155_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          token_id:
+                            type: array
+                            items:
+                              type: string
+                          amount:
+                            type: string
+                            format: uint64
+                      title: cw1155 payments, can be empty or multiple
                 rejection:
                   type: object
                   properties:
@@ -90932,9 +91810,7 @@ definitions:
 
                           signatures required by gogoproto.
                     contract_1155_payment:
-                      title: >-
-                        if empty(nil) then no contract payment, not allowed for
-                        Evaluation Payment
+                      title: 'Deprecated: Use cw1155_payment instead'
                       type: object
                       properties:
                         address:
@@ -90986,6 +91862,21 @@ definitions:
                         cw20 payment split
 
                         for delayed payments
+                    cw1155_payment:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          token_id:
+                            type: array
+                            items:
+                              type: string
+                          amount:
+                            type: string
+                            format: uint64
+                      title: cw1155 payments, can be empty or multiple
             signer:
               type: string
               title: signer address
@@ -91177,9 +92068,7 @@ definitions:
 
                         signatures required by gogoproto.
                   contract_1155_payment:
-                    title: >-
-                      if empty(nil) then no contract payment, not allowed for
-                      Evaluation Payment
+                    title: 'Deprecated: Use cw1155_payment instead'
                     type: object
                     properties:
                       address:
@@ -91231,6 +92120,21 @@ definitions:
                       cw20 payment split
 
                       for delayed payments
+                  cw1155_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        token_id:
+                          type: array
+                          items:
+                            type: string
+                        amount:
+                          type: string
+                          format: uint64
+                    title: cw1155 payments, can be empty or multiple
               evaluation:
                 type: object
                 properties:
@@ -91257,9 +92161,7 @@ definitions:
 
                         signatures required by gogoproto.
                   contract_1155_payment:
-                    title: >-
-                      if empty(nil) then no contract payment, not allowed for
-                      Evaluation Payment
+                    title: 'Deprecated: Use cw1155_payment instead'
                     type: object
                     properties:
                       address:
@@ -91311,6 +92213,21 @@ definitions:
                       cw20 payment split
 
                       for delayed payments
+                  cw1155_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        token_id:
+                          type: array
+                          items:
+                            type: string
+                        amount:
+                          type: string
+                          format: uint64
+                    title: cw1155 payments, can be empty or multiple
               approval:
                 type: object
                 properties:
@@ -91337,9 +92254,7 @@ definitions:
 
                         signatures required by gogoproto.
                   contract_1155_payment:
-                    title: >-
-                      if empty(nil) then no contract payment, not allowed for
-                      Evaluation Payment
+                    title: 'Deprecated: Use cw1155_payment instead'
                     type: object
                     properties:
                       address:
@@ -91391,6 +92306,21 @@ definitions:
                       cw20 payment split
 
                       for delayed payments
+                  cw1155_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        token_id:
+                          type: array
+                          items:
+                            type: string
+                        amount:
+                          type: string
+                          format: uint64
+                    title: cw1155 payments, can be empty or multiple
               rejection:
                 type: object
                 properties:
@@ -91417,9 +92347,7 @@ definitions:
 
                         signatures required by gogoproto.
                   contract_1155_payment:
-                    title: >-
-                      if empty(nil) then no contract payment, not allowed for
-                      Evaluation Payment
+                    title: 'Deprecated: Use cw1155_payment instead'
                     type: object
                     properties:
                       address:
@@ -91471,6 +92399,21 @@ definitions:
                       cw20 payment split
 
                       for delayed payments
+                  cw1155_payment:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        token_id:
+                          type: array
+                          items:
+                            type: string
+                        amount:
+                          type: string
+                          format: uint64
+                    title: cw1155 payments, can be empty or multiple
           signer:
             type: string
             title: signer address
@@ -91679,6 +92622,41 @@ definitions:
             escrow_address:
               type: string
               title: the escrow account address
+            cw1155_payment:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  token_id:
+                    type: array
+                    items:
+                      type: string
+                  amount:
+                    type: string
+                    format: uint64
+              description: The custom cw1155 payments the agent intends to claim, if any.
+            cw1155_intent_payment:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  tokens:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        token_id:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+              title: |-
+                Same as cw1155_payment but with amounts per token_id to transfer
+                the same tokens to and from the escrow account
           description: Intent defines the structure for a service agent's claim intent.
       pagination:
         type: object
@@ -91799,6 +92777,41 @@ definitions:
           escrow_address:
             type: string
             title: the escrow account address
+          cw1155_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                token_id:
+                  type: array
+                  items:
+                    type: string
+                amount:
+                  type: string
+                  format: uint64
+            description: The custom cw1155 payments the agent intends to claim, if any.
+          cw1155_intent_payment:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                tokens:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      token_id:
+                        type: string
+                      amount:
+                        type: string
+                        format: uint64
+            title: |-
+              Same as cw1155_payment but with amounts per token_id to transfer
+              the same tokens to and from the escrow account
         description: Intent defines the structure for a service agent's claim intent.
   ixo.claims.v1beta1.QueryParamsResponse:
     type: object

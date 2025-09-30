@@ -38,7 +38,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 			}
 
 			// Transfer funds back to the original account
-			err = k.TransferIntentPayments(ctx, escrow, fromAddress, intent.Amount, intent.Cw20Payment)
+			_, err = k.TransferIntentPayments(ctx, escrow, fromAddress, intent.Amount, intent.Cw20Payment, intent.Cw1155Payment, intent.Cw1155IntentPayment)
 			if err != nil {
 				// if this happens then it means there is funds missing in escrow account, should never happen
 				panic(err)

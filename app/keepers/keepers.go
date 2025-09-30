@@ -530,6 +530,7 @@ func NewAppKeepers(
 		appKeepers.BankKeeper,
 		appKeepers.EntityKeeper,
 		appKeepers.ContractKeeper,
+		appKeepers.WasmKeeper,
 		appKeepers.AccountKeeper,
 		bApp.MsgServiceRouter(),
 	)

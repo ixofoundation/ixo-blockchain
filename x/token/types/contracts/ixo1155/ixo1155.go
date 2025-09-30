@@ -138,6 +138,10 @@ type Balance struct {
 	Token_id string `json:"token_id"`
 }
 
+type BalanceResponse struct {
+	Balance string `json:"balance"`
+}
+
 type WasmMsgBatchBalance struct {
 	BatchBalance BatchBalance `json:"batch_balance"`
 }
@@ -149,6 +153,10 @@ type BatchBalance struct {
 	Token_ids []string `json:"token_ids"`
 }
 
+type BatchBalanceResponse struct {
+	Balances []string `json:"balances"`
+}
+
 type WasmMsgApprovedForAll struct {
 	ApprovedForAll ApprovedForAll `json:"approved_for_all"`
 }
@@ -158,9 +166,9 @@ type WasmMsgApprovedForAll struct {
 type ApprovedForAll struct {
 	Owner string `json:"owner"`
 	/// unset or false will filter out expired approvals you must set to true to see them
-	Include_expired bool   `json:"include_expired"`
-	Start_after     string `json:"start_after"`
-	Limit           string `json:"limit"`
+	Include_expired *bool   `json:"include_expired,omitempty"`
+	Start_after     *string `json:"start_after,omitempty"`
+	Limit           *uint32 `json:"limit,omitempty"`
 }
 
 type WasmMsgIsApprovedForAll struct {
@@ -193,9 +201,16 @@ type WasmMsgTokens struct {
 // / Returns all tokens owned by the given address [] if unset.
 // #[returns(TokensResponse)]
 type Tokens struct {
-	Owner       string `json:"owner"`
-	Start_after string `json:"start_after"`
-	Limit       string `json:"limit"`
+	Owner       string  `json:"owner"`
+	Start_after *string `json:"start_after,omitempty"`
+	Limit       *uint32 `json:"limit,omitempty"`
+}
+
+type TokensResponse struct {
+	/// Contains all token_ids in lexicographical ordering
+	/// If there are more than `limit`, use `start_from` in future queries
+	/// to achieve pagination.
+	Tokens []string `json:"tokens"`
 }
 
 type WasmMsgAllTokens struct {
@@ -206,8 +221,8 @@ type WasmMsgAllTokens struct {
 // / Requires pagination. Lists all token_ids controlled by the contract.
 // #[returns(TokensResponse)]
 type AllTokens struct {
-	Start_after string `json:"start_after"`
-	Limit       string `json:"limit"`
+	Start_after *string `json:"start_after,omitempty"`
+	Limit       *uint32 `json:"limit,omitempty"`
 }
 
 func Marshal(value interface{}) ([]byte, error) {

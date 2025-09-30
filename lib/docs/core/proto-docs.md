@@ -91,6 +91,9 @@
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
 - [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
+    - [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment)
+    - [CW1155IntentPaymentToken](#ixo.claims.v1beta1.CW1155IntentPaymentToken)
+    - [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment)
     - [CW20Output](#ixo.claims.v1beta1.CW20Output)
     - [CW20Payment](#ixo.claims.v1beta1.CW20Payment)
     - [Claim](#ixo.claims.v1beta1.Claim)
@@ -366,6 +369,8 @@
     - [Query](#ixo.liquidstake.v1beta1.Query)
   
 - [ixo/liquidstake/v1beta1/tx.proto](#ixo/liquidstake/v1beta1/tx.proto)
+    - [MsgBurn](#ixo.liquidstake.v1beta1.MsgBurn)
+    - [MsgBurnResponse](#ixo.liquidstake.v1beta1.MsgBurnResponse)
     - [MsgLiquidStake](#ixo.liquidstake.v1beta1.MsgLiquidStake)
     - [MsgLiquidStakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidStakeResponse)
     - [MsgLiquidUnstake](#ixo.liquidstake.v1beta1.MsgLiquidUnstake)
@@ -1858,6 +1863,55 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.CW1155IntentPayment"></a>
+
+### CW1155IntentPayment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| tokens | [CW1155IntentPaymentToken](#ixo.claims.v1beta1.CW1155IntentPaymentToken) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.CW1155IntentPaymentToken"></a>
+
+### CW1155IntentPaymentToken
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| token_id | [string](#string) |  |  |
+| amount | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.CW1155Payment"></a>
+
+### CW1155Payment
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address | [string](#string) |  |  |
+| token_id | [string](#string) | repeated |  |
+| amount | [uint64](#uint64) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.CW20Output"></a>
 
 ### CW20Output
@@ -1904,11 +1958,13 @@ CW20Output represents a CW20 token output for split payments
 | agent_address | [string](#string) |  |  |
 | submission_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | submissionDate is the date and time that the claim was submitted on-chain |
 | claim_id | [string](#string) |  | claimID is the unique identifier of the claim in the cid hash format |
-| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of one or more claim evaluations |
+| evaluation | [Evaluation](#ixo.claims.v1beta1.Evaluation) |  | evaluation is the result of the claim evaluation |
 | payments_status | [ClaimPayments](#ixo.claims.v1beta1.ClaimPayments) |  | payments_status is the status of the payments for the claim |
 | use_intent | [bool](#bool) |  | intent_id is the id of the intent for this claim, if any |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by service agent for claim approval NOTE: if both amount and cw20 amount are empty then collection default is used |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by service agent for claim approval NOTE: if both amount and cw20 amount are empty then collection default is used |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
+| cw1155_intent_payment | [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment) | repeated | If intent was used, this is the cw20_payment equivalent but with amounts per token_id to transfer the same tokens to and from the escrow account |
 
 
 
@@ -2032,10 +2088,12 @@ CW20Output represents a CW20 token output for split payments
 | agent_address | [string](#string) |  |  |
 | status | [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus) |  | status is the evaluation status expressed as an integer (2=approved, 3=rejected, ...) |
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
-| verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verfiable Credential |
+| verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verifiable Credential |
 | evaluation_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | evaluationDate is the date and time that the claim evaluation was submitted on-chain |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval NOTE: if both amount and cw20 amount are empty then collection default is used |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval NOTE: if both amount and cw20 amount are empty then collection default is used |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval NOTE: if all amounts are empty then collection default is used NOTE: if claim has intent, then custom amounts are ignored and intent amounts are used |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval NOTE: if all amounts are empty then collection default is used NOTE: if claim has intent, then custom amounts are ignored and intent amounts are used |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments specified by evaluator for claim approval NOTE: if all amounts are empty then collection default is used NOTE: if claim has intent, then custom amounts are ignored and intent amounts are used |
+| cw1155_intent_payment | [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment) | repeated | If intent was used, this is the cw20_payment equivalent but with amounts per token_id to transfer the same tokens to and from the escrow account |
 
 
 
@@ -2062,6 +2120,8 @@ Intent defines the structure for a service agent&#39;s claim intent.
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | The CW20Payment amount the agent intends to claim, if any. |
 | from_address | [string](#string) |  | the address the escrow payment came from |
 | escrow_address | [string](#string) |  | the escrow account address |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | The custom cw1155 payments the agent intends to claim, if any. |
+| cw1155_intent_payment | [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment) | repeated | Same as cw1155_payment but with amounts per token_id to transfer the same tokens to and from the escrow account |
 
 
 
@@ -2097,10 +2157,11 @@ Intent defines the structure for a service agent&#39;s claim intent.
 | ----- | ---- | ----- | ----------- |
 | account | [string](#string) |  | account is the entity account address from which the payment will be made |
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment, not allowed for Evaluation Payment |
+| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | **Deprecated.** Deprecated: Use cw1155_payment instead |
 | timeout_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | timeout after claim/evaluation to create authZ for payment, if 0 then immediate direct payment |
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
 | is_oracle_payment | [bool](#bool) |  | boolean to indicate if the payment is for oracle payments, aka it will go through network fees split, only allowed for APPROVED payment types. NOTE: if true and the payment contains cw20 payments, the claim will only be successfully if an intent exists to ensure immediate cw20 payment split, since there is no WithdrawalAuthorization to manage the cw20 payment split for delayed payments |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | cw1155 payments, can be empty or multiple |
 
 
 
@@ -2261,6 +2322,7 @@ claim authorizations
 | collection_ids | [string](#string) | repeated | Collection IDs the grantee can create authorizations for, if empty then all collections for the admin are allowed |
 | allowed_auth_types | [CreateClaimAuthorizationType](#ixo.claims.v1beta1.CreateClaimAuthorizationType) |  | Types of authorizations the grantee can create (submit, evaluate, or all(both)) |
 | max_intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum intent duration for the authorization allowed (for submit) |
+| max_cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | Maximum cw1155 payment that can be set in created authorizations, if empty then any cw1155 payment is allowed in the created authorizations explicitly set to amount to 0 to disallow any cw1155 payment in the created authorizations |
 
 
 
@@ -2297,6 +2359,7 @@ claim authorizations
 | before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done |
 | max_custom_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | max custom amount evaluator can change, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 | max_custom_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | max custom cw20 payment evaluator can change, if empty then no custom amount is allowed, and default payments from Collection payments are used |
+| max_custom_cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom max_cw1155_payment evaluator can change, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 
 
 
@@ -2332,6 +2395,7 @@ claim authorizations
 | max_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom max_amount allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 | max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom max_cw20_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 | intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | intent_duration_ns is the duration for which the intent is active, after which it will expire (in nanoseconds) |
+| max_cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom max_cw1155_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 
 
 
@@ -2366,11 +2430,12 @@ claim authorizations
 | inputs | [cosmos.bank.v1beta1.Input](#cosmos.bank.v1beta1.Input) | repeated | Inputs to the multisend tx to run to withdraw payment |
 | outputs | [cosmos.bank.v1beta1.Output](#cosmos.bank.v1beta1.Output) | repeated | Outputs for the multisend tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
-| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
+| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | **Deprecated.** if empty(nil) then no contract payment |
 | toAddress | [string](#string) |  | for contract payment |
 | fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments, if null then none |
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments, can be empty or multiple |
 
 
 
@@ -2572,7 +2637,8 @@ ClaimDisputedEvent is an event triggered on a Claim dispute
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | withdraw | [WithdrawPaymentConstraints](#ixo.claims.v1beta1.WithdrawPaymentConstraints) |  |  |
-| cw20_outputs | [CW20Output](#ixo.claims.v1beta1.CW20Output) | repeated |  |
+| cw20_outputs | [CW20Output](#ixo.claims.v1beta1.CW20Output) | repeated | the cw20 with the split amounts if any |
+| cw1155_payments | [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment) | repeated | the cw1155 with the transferred token ids and amounts since in the msg you can define an amount but we don&#39;t necessarily know the token ids |
 
 
 
@@ -2946,8 +3012,9 @@ Query defines the gRPC querier service.
 | agent_did | [string](#string) |  | The service agent&#39;s DID (Decentralized Identifier). |
 | agent_address | [string](#string) |  | The service agent&#39;s address (who submits this message). |
 | collection_id | [string](#string) |  | The id of the collection this intent is linked to. |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | The desired claim amount, if any. NOTE: if both amount and cw20 amount are empty then default by Collection is used (APPROVAL payment). |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | The custom CW20 payment, if any. NOTE: if both amount and cw20 amount are empty then default by Collection is used (APPROVAL payment). |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | The desired claim amount, if any. NOTE: if all amounts are empty then collection default is used (APPROVAL payment) |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | The custom CW20 payment, if any. NOTE: if all amounts are empty then collection default is used (APPROVAL payment) |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | The custom CW1155 payment, if any. NOTE: if all amounts are empty then collection default is used (APPROVAL payment) |
 
 
 
@@ -2992,6 +3059,7 @@ or EvaluateClaimAuthorization)
 | expiration | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Expiration time for the authorization, be careful with this as it is the expiration of the authorization itself, not the constraints, meaning if the authorization expires all constraints will be removed with the authorization (standard authz behavior) |
 | intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum intent duration for the authorization allowed (for submit) |
 | before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done (for evaluate) |
+| max_cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | Maximum cw1155 payment that can be specified in the authorization (for both submit and evaluate) |
 
 
 
@@ -3089,8 +3157,9 @@ Collection entity, or have authz cap, aka is agent
 | status | [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus) |  | status is the evaluation status expressed as an integer (2=approved, 3=rejected, ...) |
 | reason | [uint32](#uint32) |  | reason is the code expressed as an integer, for why the evaluation result was given (codes defined by evaluator) |
 | verification_proof | [string](#string) |  | verificationProof is the cid of the evaluation Verifiable Credential |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval NOTE: if claim is using intent, then amount and cw20 amount are ignored and overridden with intent amounts NOTE: if both amount and cw20 amount are empty then collection default is used |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval NOTE: if claim is using intent, then amount and cw20 amount are ignored and overridden with intent amounts NOTE: if both amount and cw20 amount are empty then collection default is used |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by evaluator for claim approval NOTE: if claim is using intent, then custom amounts are ignored and overridden with intent amounts NOTE: if all amounts are empty then collection default is used |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by evaluator for claim approval NOTE: if claim is using intent, then custom amounts are ignored and overridden with intent amounts NOTE: if all amounts are empty then collection default is used |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments specified by evaluator for claim approval NOTE: if claim is using intent, then custom amounts are ignored and overridden with intent amounts NOTE: if all amounts are empty then collection default is used |
 
 
 
@@ -3120,9 +3189,10 @@ Collection entity, or have authz cap, aka is agent
 | agent_did | [string](#string) |  | agent is the DID of the agent submitting the claim |
 | agent_address | [string](#string) |  |  |
 | admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
-| use_intent | [bool](#bool) |  | use_intent is the option for using intent for this claim if it exists and is active. NOTE: if use_intent is true then amount and cw20 amount are ignored and overridden with intent amounts. NOTE: if use_intent is true and there is no active intent then will error |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by service agent for claim approval NOTE: if both amount and cw20_payment are empty then collection default is used |
-| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by service agent for claim approval NOTE: if both amount and cw20 amount are empty then collection default is used |
+| use_intent | [bool](#bool) |  | use_intent is the option for using intent for this claim if it exists and is active. NOTE: if use_intent is true then custom amounts in the msg are ignored and overridden with intent amounts. NOTE: if use_intent is true and there is no active intent then will error |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
+| cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
 
 
 
@@ -3260,12 +3330,13 @@ Collection entity, or have authz cap, aka is agent
 | inputs | [cosmos.bank.v1beta1.Input](#cosmos.bank.v1beta1.Input) | repeated | Inputs to the multi send tx to run to withdraw payment |
 | outputs | [cosmos.bank.v1beta1.Output](#cosmos.bank.v1beta1.Output) | repeated | Outputs for the multi send tx to run to withdraw payment |
 | payment_type | [PaymentType](#ixo.claims.v1beta1.PaymentType) |  | payment type to keep track what payment is for and mark claim payment accordingly |
-| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | if empty(nil) then no contract payment |
+| contract_1155_payment | [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment) |  | **Deprecated.** Deprecated: Use cw1155_payment instead |
 | toAddress | [string](#string) |  | for contract payment |
 | fromAddress | [string](#string) |  | for contract payment |
 | release_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | date that grantee can execute authorization, calculated from created date plus the timeout on Collection payments |
 | admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | cw20 payments, can be empty or multiple |
+| cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155, can be empty or multiple |
 
 
 
@@ -5692,6 +5763,33 @@ Query defines the gRPC query service for the liquidstake module.
 
 
 
+<a name="ixo.liquidstake.v1beta1.MsgBurn"></a>
+
+### MsgBurn
+MsgBurn defines a SDK message for performing a burn of coins.
+NOTE: only ixo native token can be burned
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| burner | [string](#string) |  |  |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | amount is the amount of coins to burn NOTE: only ixo native token can be burned |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgBurnResponse"></a>
+
+### MsgBurnResponse
+
+
+
+
+
+
+
 <a name="ixo.liquidstake.v1beta1.MsgLiquidStake"></a>
 
 ### MsgLiquidStake
@@ -5877,6 +5975,7 @@ Msg defines the liquid staking Msg service.
 | UpdateWhitelistedValidators | [MsgUpdateWhitelistedValidators](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators) | [MsgUpdateWhitelistedValidatorsResponse](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse) | UpdateWhitelistedValidators defines a method to update the whitelisted validators list. |
 | UpdateWeightedRewardsReceivers | [MsgUpdateWeightedRewardsReceivers](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers) | [MsgUpdateWeightedRewardsReceiversResponse](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse) | UpdateWhitelistedValidators defines a method to update the whitelisted validators list. Only the whitelist admin address can update this list. |
 | SetModulePaused | [MsgSetModulePaused](#ixo.liquidstake.v1beta1.MsgSetModulePaused) | [MsgSetModulePausedResponse](#ixo.liquidstake.v1beta1.MsgSetModulePausedResponse) | SetModulePaused defines a method to update the module&#39;s pause status, setting value of the safety flag in params. |
+| Burn | [MsgBurn](#ixo.liquidstake.v1beta1.MsgBurn) | [MsgBurnResponse](#ixo.liquidstake.v1beta1.MsgBurnResponse) | Burn defines a method for burning coins. |
 
  
 

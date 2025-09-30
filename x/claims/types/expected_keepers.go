@@ -40,6 +40,10 @@ type WasmKeeper interface {
 	Execute(ctx sdk.Context, contractAddress sdk.AccAddress, caller sdk.AccAddress, msg []byte, coins sdk.Coins) ([]byte, error)
 }
 
+type WasmViewKeeper interface {
+	QuerySmart(ctx context.Context, contractAddress sdk.AccAddress, queryMsg []byte) ([]byte, error)
+}
+
 type AccountKeeper interface {
 	NewAccountWithAddress(context.Context, sdk.AccAddress) sdk.AccountI
 	GetAccount(context.Context, sdk.AccAddress) sdk.AccountI

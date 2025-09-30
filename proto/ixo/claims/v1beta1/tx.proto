@@ -76,21 +76,22 @@ message MsgSubmitClaim {
   // admin address used to sign this message, validated against Collection Admin
   string admin_address = 5;
   // use_intent is the option for using intent for this claim if it exists and
-  // is active. NOTE: if use_intent is true then amount and cw20 amount are
+  // is active. NOTE: if use_intent is true then custom amounts in the msg are
   // ignored and overridden with intent amounts. NOTE: if use_intent is true and
   // there is no active intent then will error
   bool use_intent = 6;
   // custom amount specified by service agent for claim approval
-  // NOTE: if both amount and cw20_payment are empty then collection default is
-  // used
+  // NOTE: if all amounts are empty then collection default is used
   repeated cosmos.base.v1beta1.Coin amount = 7 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
   // custom cw20 payments specified by service agent for claim approval
-  // NOTE: if both amount and cw20 amount are empty then collection default is
-  // used
+  // NOTE: if all amounts are empty then collection default is used
   repeated CW20Payment cw20_payment = 8;
+  // custom cw1155 payments specified by service agent for claim approval
+  // NOTE: if all amounts are empty then collection default is used
+  repeated CW1155Payment cw1155_payment = 9;
 }
 message MsgSubmitClaimResponse {}
 
@@ -120,18 +121,23 @@ message MsgEvaluateClaim {
   // verificationProof is the cid of the evaluation Verifiable Credential
   string verification_proof = 9;
   // custom amount specified by evaluator for claim approval
-  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-  // overridden with intent amounts NOTE: if both amount and cw20 amount are
-  // empty then collection default is used
+  // NOTE: if claim is using intent, then custom amounts are ignored and
+  // overridden with intent amounts NOTE: if all amounts are empty then
+  // collection default is used
   repeated cosmos.base.v1beta1.Coin amount = 10 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
   // custom cw20 payments specified by evaluator for claim approval
-  // NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-  // overridden with intent amounts NOTE: if both amount and cw20 amount are
-  // empty then collection default is used
+  // NOTE: if claim is using intent, then custom amounts are ignored and
+  // overridden with intent amounts NOTE: if all amounts are empty then
+  // collection default is used
   repeated CW20Payment cw20_payment = 11;
+  // custom cw1155 payments specified by evaluator for claim approval
+  // NOTE: if claim is using intent, then custom amounts are ignored and
+  // overridden with intent amounts NOTE: if all amounts are empty then
+  // collection default is used
+  repeated CW1155Payment cw1155_payment = 12;
 }
 message MsgEvaluateClaimResponse {}
 
@@ -170,8 +176,8 @@ message MsgWithdrawPayment {
   // payment type to keep track what payment is for and mark claim payment
   // accordingly
   PaymentType payment_type = 4;
-  // if empty(nil) then no contract payment
-  Contract1155Payment contract_1155_payment = 5;
+  // Deprecated: Use cw1155_payment instead
+  Contract1155Payment contract_1155_payment = 5 [ deprecated = true ];
   // for contract payment
   string toAddress = 6;
   // for contract payment
@@ -183,6 +189,8 @@ message MsgWithdrawPayment {
   string admin_address = 9;
   // cw20 payments, can be empty or multiple
   repeated CW20Payment cw20_payment = 10;
+  // custom cw1155, can be empty or multiple
+  repeated CW1155Payment cw1155_payment = 11;
 }
 message MsgWithdrawPaymentResponse {}
 
@@ -253,16 +261,20 @@ message MsgClaimIntent {
   // The id of the collection this intent is linked to.
   string collection_id = 3;
   // The desired claim amount, if any.
-  // NOTE: if both amount and cw20 amount are empty then default by Collection
-  // is used (APPROVAL payment).
+  // NOTE: if all amounts are empty then collection default is used (APPROVAL
+  // payment)
   repeated cosmos.base.v1beta1.Coin amount = 4 [
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
   // The custom CW20 payment, if any.
-  // NOTE: if both amount and cw20 amount are empty then default by Collection
-  // is used (APPROVAL payment).
+  // NOTE: if all amounts are empty then collection default is used (APPROVAL
+  // payment)
   repeated CW20Payment cw20_payment = 5;
+  // The custom CW1155 payment, if any.
+  // NOTE: if all amounts are empty then collection default is used (APPROVAL
+  // payment)
+  repeated CW1155Payment cw1155_payment = 6;
 }
 
 // MsgClaimIntentResponse defines the response after submitting an intent.
@@ -317,6 +329,9 @@ message MsgCreateClaimAuthorization {
       [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
   // if null then no before_date validation done (for evaluate)
   google.protobuf.Timestamp before_date = 12 [ (gogoproto.stdtime) = true ];
+  // Maximum cw1155 payment that can be specified in the authorization (for both
+  // submit and evaluate)
+  repeated CW1155Payment max_cw1155_payment = 13;
 }
 
 // MsgCreateClaimAuthorizationResponse defines the response for creating a claim

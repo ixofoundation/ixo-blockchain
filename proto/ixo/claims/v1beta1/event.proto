@@ -28,7 +28,12 @@ message ClaimDisputedEvent { Dispute dispute = 1; }
 // ClaimDisputedEvent is an event triggered on a Claim dispute
 message PaymentWithdrawnEvent {
   WithdrawPaymentConstraints withdraw = 1;
+  // the cw20 with the split amounts if any
   repeated CW20Output cw20_outputs = 2;
+  // the cw1155 with the transferred token ids and amounts
+  // since in the msg you can define an amount but we don't necessarily know the
+  // token ids
+  repeated CW1155IntentPayment cw1155_payments = 3;
 }
 
 // ClaimDisputedEvent is an event triggered on a Claim dispute

@@ -59,6 +59,9 @@ func (a SubmitClaimAuthorization) ValidateBasic() error {
 		if err = ValidateCW20Payments(constraint.MaxCw20Payment, true); err != nil {
 			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max cw20 payments not valid: (%s)", err)
 		}
+		if err = ValidateCW1155Payments(constraint.MaxCw1155Payment, true); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max cw1155 payments not valid: (%s)", err)
+		}
 	}
 
 	return nil
@@ -81,22 +84,33 @@ func (a SubmitClaimAuthorization) Accept(_ context.Context, msg sdk.Msg) (authz.
 
 	// check all constraints if the msg fields correlates to a granted constraint
 	for _, constraint := range a.Constraints {
-		// If the msg fields don't correlate to granted constraint, add constraint back into list
-		if constraint.CollectionId != mSubmit.CollectionId {
+		// if quota is 0, which should not get in constraints but adding extra check, don't add to unhandled constraints
+		if constraint.AgentQuota == 0 {
+			continue
+		}
+
+		// if we already found a match, don't check further, only above check to maybe remove constraint
+		// or if the collection id doesn't match, don't check further
+		if matched || constraint.CollectionId != mSubmit.CollectionId {
 			unhandledConstraints = append(unhandledConstraints, constraint)
 			continue
 		}
 
-		// if reaches here it means there is a matching constraint for the specific collection
-		// if amount or cw20 payment is defined, check that it is within max constraints
+		// if reaches here it means it is a possible matching constraint, check amounts needed are within max constraints
 		if len(mSubmit.Amount) != 0 && !IsCoinsInMaxConstraints(mSubmit.Amount, constraint.MaxAmount) {
-			return authz.AcceptResponse{}, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "amount is not within max constraints")
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
 		}
 		if len(mSubmit.Cw20Payment) != 0 && !IsCW20PaymentsInMaxConstraints(mSubmit.Cw20Payment, constraint.MaxCw20Payment) {
-			return authz.AcceptResponse{}, errorsmod.Wrapf(sdkerrors.ErrUnauthorized, "cw20 payments is not within max constraints")
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+		if len(mSubmit.Cw1155Payment) != 0 && !IsCW1155PaymentsInMaxConstraints(mSubmit.Cw1155Payment, constraint.MaxCw1155Payment) {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
 		}
 
-		// now the collection matches and amount and cw20 payments are within max constraints
+		// now the collection matches and amounts are within max constraints
 		matched = true
 		// subtract quota by one and if not 0 re-add to constraints, otherwise new quota is 0 so remove from constraints
 		if constraint.AgentQuota > 1 {
@@ -160,7 +174,10 @@ func (a EvaluateClaimAuthorization) ValidateBasic() error {
 			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max custom amounts not valid: (%s)", err)
 		}
 		if err = ValidateCW20Payments(constraint.MaxCustomCw20Payment, true); err != nil {
-			return err
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max custom cw20 payments not valid: (%s)", err)
+		}
+		if err = ValidateCW1155Payments(constraint.MaxCustomCw1155Payment, true); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max custom cw1155 payments not valid: (%s)", err)
 		}
 	}
 
@@ -203,14 +220,16 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 			continue
 		}
 
-		// check when evaluator defined own custom amounts if is is allowed in constraints
+		// if reaches here it means it is a possible matching constraint, check amounts needed are within max constraints
 		if len(mEval.Amount) != 0 && !IsCoinsInMaxConstraints(mEval.Amount, constraint.MaxCustomAmount) {
 			unhandledConstraints = append(unhandledConstraints, constraint)
 			continue
 		}
-
-		// check when evaluator defined own custom cw20 payments if is is allowed in constraints
 		if len(mEval.Cw20Payment) != 0 && !IsCW20PaymentsInMaxConstraints(mEval.Cw20Payment, constraint.MaxCustomCw20Payment) {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+		if len(mEval.Cw1155Payment) != 0 && !IsCW1155PaymentsInMaxConstraints(mEval.Cw1155Payment, constraint.MaxCustomCw1155Payment) {
 			unhandledConstraints = append(unhandledConstraints, constraint)
 			continue
 		}
@@ -255,7 +274,7 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 	mustDeleteAuth := len(a.Constraints) == 0
 
 	if !matched {
-		// still update constraints as above logic removes auths with passed end_date
+		// update constraints as above logic removes auths with passed end_date
 		return authz.AcceptResponse{Accept: false, Updated: &a, Delete: mustDeleteAuth}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message")
 	}
 
@@ -305,11 +324,11 @@ func (a WithdrawPaymentAuthorization) ValidateBasic() error {
 		if iidtypes.IsEmpty(constraint.ClaimId) {
 			return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "claim id cannot be empty")
 		}
-		if err = constraint.Contract_1155Payment.Validate(); err != nil {
-			return err
-		}
 		if err = ValidateCW20Payments(constraint.Cw20Payment, true); err != nil {
-			return err
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "cw20 payments not valid: (%s)", err)
+		}
+		if err = ValidateCW1155Payments(constraint.Cw1155Payment, true); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "cw1155 payments not valid: (%s)", err)
 		}
 	}
 
@@ -353,11 +372,6 @@ func (a WithdrawPaymentAuthorization) Accept(ctx context.Context, msg sdk.Msg) (
 		// check that to address is same
 		if mWith.ToAddress != constraint.ToAddress {
 			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("to address in msg does not match constraint")
-		}
-
-		// check that withdraw contract payment is same
-		if !mWith.Contract_1155Payment.Equal(constraint.Contract_1155Payment) {
-			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("contract payments does not match")
 		}
 
 		// check that withdraw input and output lengths are the same
@@ -409,18 +423,47 @@ func (a WithdrawPaymentAuthorization) Accept(ctx context.Context, msg sdk.Msg) (
 
 		// if has cw20 payments then check that valid
 		if len(mWith.Cw20Payment) != 0 {
+			constraintCw20Payments := constraint.Cw20Payment
 			// then check that for each cw20 payment there is a corresponding constraint cw20 payment
 			for _, mCw20Payment := range mWith.Cw20Payment {
 				// state if this specific cw20Payment is valid
 				valid := false
-				for _, cCw20Payment := range constraint.Cw20Payment {
-					if mCw20Payment.Address == cCw20Payment.Address && mCw20Payment.Amount == cCw20Payment.Amount {
+				for i, cCw20Payment := range constraintCw20Payments {
+					if cCw20Payment.Equal(mCw20Payment) {
+						// if found match then remove from constraint cw20 payments and mark as valid
+						constraintCw20Payments = ixo.RemoveUnordered(constraintCw20Payments, i)
 						valid = true
 						break
 					}
 				}
 				if !valid {
 					return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("msg cw20 payments does not match constraint cw20 payments")
+				}
+			}
+		}
+
+		// check that cw1155 payments lengths match
+		if len(mWith.Cw1155Payment) != len(constraint.Cw1155Payment) {
+			return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("cw1155 payments length does not match constraint")
+		}
+
+		// if has cw1155 payments then check that valid
+		if len(mWith.Cw1155Payment) != 0 {
+			constraintCw1155Payments := constraint.Cw1155Payment
+			// then check that for each cw1155 payment there is a corresponding constraint cw1155 payment
+			for _, mCw1155Payment := range mWith.Cw1155Payment {
+				// state if this specific cw1155 payment is valid
+				valid := false
+				for i, cCw1155Payment := range constraintCw1155Payments {
+					if cCw1155Payment.Equal(mCw1155Payment) {
+						// if found match then remove from constraint cw1155 payments and mark as valid
+						constraintCw1155Payments = ixo.RemoveUnordered(constraintCw1155Payments, i)
+						valid = true
+						break
+					}
+				}
+				if !valid {
+					return authz.AcceptResponse{}, sdkerrors.ErrInvalidRequest.Wrapf("msg cw1155 payments does not match constraint cw1155 payments")
 				}
 			}
 		}
@@ -476,9 +519,11 @@ func (a CreateClaimAuthorizationAuthorization) ValidateBasic() error {
 		if err = ValidateCoinsAllowZero(constraint.MaxAmount.Sort()); err != nil {
 			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max amounts not valid: (%s)", err)
 		}
-
 		if err = ValidateCW20Payments(constraint.MaxCw20Payment, true); err != nil {
 			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max cw20 payments not valid: (%s)", err)
+		}
+		if err = ValidateCW1155Payments(constraint.MaxCw1155Payment, true); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "max cw1155 payments not valid: (%s)", err)
 		}
 
 		if !ixo.IsEnumValueValid(CreateClaimAuthorizationType_name, int32(constraint.AllowedAuthTypes)) {
@@ -550,9 +595,8 @@ func (a CreateClaimAuthorizationAuthorization) Accept(ctx context.Context, msg s
 			continue
 		}
 
-		// check that msg AuthType is allowed in constraint by constraint.AllowedAuthTypes
-		if constraint.AllowedAuthTypes != CreateClaimAuthorizationType_ALL &&
-			constraint.AllowedAuthTypes != mCreate.AuthType {
+		// Check if CW1155 payment is within the max constraints
+		if len(constraint.MaxCw1155Payment) > 0 && len(mCreate.MaxCw1155Payment) > 0 && !IsCW1155PaymentsInMaxConstraints(mCreate.MaxCw1155Payment, constraint.MaxCw1155Payment) {
 			unhandledConstraints = append(unhandledConstraints, constraint)
 			continue
 		}
@@ -584,7 +628,7 @@ func (a CreateClaimAuthorizationAuthorization) Accept(ctx context.Context, msg s
 	// If no more constraints means no more grants for grantee to submit claims, so delete authorization
 	mustDeleteAuth := len(a.Constraints) == 0
 
-	// if no constraints matched, return error
+	// if no constraints matched, return error, but still update constraints to remove outdated constraints
 	if !matched {
 		return authz.AcceptResponse{Accept: false, Updated: &a, Delete: mustDeleteAuth}, sdkerrors.ErrInvalidRequest.Wrap("no granted constraints correlates to the message, please check that all constraints are valid")
 	}

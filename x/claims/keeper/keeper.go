@@ -24,12 +24,13 @@ type (
 		storeKey   storetypes.StoreKey
 		paramstore paramtypes.Subspace
 
-		AuthzKeeper   types.AuthzKeeper
-		IidKeeper     types.IidKeeper
-		BankKeeper    types.BankKeeper
-		EntityKeeper  types.EntityKeeper
-		WasmKeeper    types.WasmKeeper
-		AccountKeeper types.AccountKeeper
+		AuthzKeeper    types.AuthzKeeper
+		IidKeeper      types.IidKeeper
+		BankKeeper     types.BankKeeper
+		EntityKeeper   types.EntityKeeper
+		WasmKeeper     types.WasmKeeper
+		WasmViewKeeper types.WasmViewKeeper
+		AccountKeeper  types.AccountKeeper
 
 		router *baseapp.MsgServiceRouter
 	}
@@ -44,6 +45,7 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	entityKeeper types.EntityKeeper,
 	wasmKeeper types.WasmKeeper,
+	wasmViewKeeper types.WasmViewKeeper,
 	accountKeeper types.AccountKeeper,
 	router *baseapp.MsgServiceRouter,
 ) Keeper {
@@ -53,16 +55,17 @@ func NewKeeper(
 	}
 
 	return Keeper{
-		cdc:           cdc,
-		storeKey:      storeKey,
-		paramstore:    ps,
-		IidKeeper:     iidKeeper,
-		AuthzKeeper:   authzKeeper,
-		BankKeeper:    bankKeeper,
-		EntityKeeper:  entityKeeper,
-		WasmKeeper:    wasmKeeper,
-		AccountKeeper: accountKeeper,
-		router:        router,
+		cdc:            cdc,
+		storeKey:       storeKey,
+		paramstore:     ps,
+		IidKeeper:      iidKeeper,
+		AuthzKeeper:    authzKeeper,
+		BankKeeper:     bankKeeper,
+		EntityKeeper:   entityKeeper,
+		WasmKeeper:     wasmKeeper,
+		WasmViewKeeper: wasmViewKeeper,
+		AccountKeeper:  accountKeeper,
+		router:         router,
 	}
 }
 

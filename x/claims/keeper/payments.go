@@ -11,7 +11,6 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
 	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types/contracts/ixo1155"
 )
 
 // --------------------------
@@ -27,23 +26,21 @@ import (
 // after the payments is calculated, it does the following:
 //  1. if timeout for the payment is nil(or it is intent payment) it makes the payment by calling payout() function
 //  2. if timeout for the payment is not nil, it creates an authz grant to make the payment by calling createAuthz() function
-//     this is why we don't allow APPROVAL payments with cw20 payments where no intent is used, since we can't create an authz grant for that,
-//     the WithdrawalAuthorization only handles native coin payments splits, not cw20 payments splits
-func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment *types.Payment, paymentType types.PaymentType, claim *types.Claim, collection types.Collection, useIntent bool) error {
+//     this is why we don't allow APPROVAL payments for cw1155 or cw20(where no intent) is used, since we can't create an authz grant for that,
+//     the WithdrawalAuthorization only handles native coin payments splits, not cw20 or cw1155 payments splits
+func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment *types.Payment, paymentType types.PaymentType, claim *types.Claim, collection types.Collection, useIntent bool, cw1155IntentPayments []*types.CW1155IntentPayment) error {
 	// check that there is outcome payment to make, otherwise skip this with no error as no payment for action
 	paymentExists := false
-	if !payment.Amount.IsZero() || !types.IsZeroCW20Payments(payment.Cw20Payment) {
-		paymentExists = true
-	}
-	if payment.Contract_1155Payment != nil && payment.Contract_1155Payment.Amount != 0 {
+	if !payment.Amount.IsZero() || !types.IsZeroCW20Payments(payment.Cw20Payment) || !types.IsZeroCW1155Payments(payment.Cw1155Payment) {
 		paymentExists = true
 	}
 	if !paymentExists {
 		return nil
 	}
 
-	// if payment is oracle payment then no 1155 payments or if no intent then also no cw20 payments allowed
-	if payment.IsOraclePayment && (payment.Contract_1155Payment != nil || (!useIntent && !types.IsZeroCW20Payments(payment.Cw20Payment))) {
+	// if payment is oracle payment then no cw1155 payments or if no intent then also no cw20 payments allowed,
+	// because we don't have cw1155 split logic, nor cw20 split logic for delayed payments (WithdrawPaymentAuthorization)
+	if payment.IsOraclePayment && (!types.IsZeroCW1155Payments(payment.Cw1155Payment) || (!useIntent && !types.IsZeroCW20Payments(payment.Cw20Payment))) {
 		return types.ErrOraclePaymentOnlyNative
 	}
 
@@ -226,7 +223,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 	// if no timeout in payment or use intent is true make payout immediately
 	// if use intent then funds is already in escrow account, so no need to wait even if timeout is set
 	if payment.TimeoutNs == 0 || useIntent {
-		if err := payout(ctx, k, inputs, outputs, paymentType, claim, collection, &time.Time{}, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver, cw20Outputs); err != nil {
+		if err := payout(ctx, k, inputs, outputs, paymentType, claim, collection, &time.Time{}, payment.Cw20Payment, payerAddress, receiver, cw20Outputs, payment.Cw1155Payment, cw1155IntentPayments); err != nil {
 			return err
 		}
 	} else {
@@ -242,7 +239,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 		}
 
 		// else create authz WithdrawPaymentAuthorization for receiver to execute to receive payout once timeout has passed
-		if err := createAuthz(ctx, k, receiver, adminAddress, inputs, outputs, paymentType, claim, payment.TimeoutNs, payment.Contract_1155Payment, payment.Cw20Payment, payerAddress, receiver); err != nil {
+		if err := createAuthz(ctx, k, receiver, adminAddress, inputs, outputs, paymentType, claim, payment.TimeoutNs, payment.Cw20Payment, payerAddress, receiver, payment.Cw1155Payment); err != nil {
 			return err
 		}
 	}
@@ -259,7 +256,7 @@ func processPayment(ctx sdk.Context, k Keeper, receiver sdk.AccAddress, payment 
 // 5. if cw20Outputs is not empty, it makes the split payments for each CW20 output
 // 6. update the claim payment status to success
 // 7. emit PaymentWithdrawnEvent event
-func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claim *types.Claim, collection types.Collection, releaseDate *time.Time, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress, cw20Outputs []*types.CW20Output) error {
+func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claim *types.Claim, collection types.Collection, releaseDate *time.Time, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress, cw20Outputs []*types.CW20Output, cw1155Payments []*types.CW1155Payment, cw1155IntentPayments []*types.CW1155IntentPayment) error {
 	// get entity payout is for to validate if from address is valid entity module account
 	_, entity, err := k.EntityKeeper.ResolveEntity(ctx, collection.Entity)
 	if err != nil {
@@ -297,35 +294,10 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 		}
 	}
 
-	// pay 1155 contract payment if has one
-	if payment1155 != nil && payment1155.Amount != 0 {
-		encodedTransferMessage, err := ixo1155.Marshal(ixo1155.WasmSendFrom{
-			SendFrom: ixo1155.SendFrom{
-				From:     fromAddress.String(),
-				To:       toAddress.String(),
-				Token_id: payment1155.TokenId,
-				Value:    fmt.Sprint(payment1155.Amount),
-			},
-		})
-		if err != nil {
-			return err
-		}
-
-		contractAddress, err := sdk.AccAddressFromBech32(payment1155.Address)
-		if err != nil {
-			return err
-		}
-
-		_, err = k.WasmKeeper.Execute(
-			ctx,
-			contractAddress,
-			fromAddress,
-			encodedTransferMessage,
-			sdk.NewCoins(sdk.NewCoin("uixo", math.ZeroInt())),
-		)
-		if err != nil {
-			return err
-		}
+	// transfer CW1155 payments
+	paidCw1155Payments, err := k.TransferCW1155Payments(ctx, fromAddress, toAddress, cw1155Payments, cw1155IntentPayments)
+	if err != nil {
+		return err
 	}
 
 	// pay cw20 payments if has any and no cw20Outputs
@@ -371,17 +343,18 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.PaymentWithdrawnEvent{
 			Withdraw: &types.WithdrawPaymentConstraints{
-				ClaimId:              claim.ClaimId,
-				Inputs:               inputs,
-				Outputs:              outputs,
-				PaymentType:          paymentType,
-				ReleaseDate:          releaseDate,
-				Contract_1155Payment: payment1155,
-				Cw20Payment:          paymentCw20s,
-				FromAddress:          fromAddress.String(),
-				ToAddress:            toAddress.String(),
+				ClaimId:       claim.ClaimId,
+				Inputs:        inputs,
+				Outputs:       outputs,
+				PaymentType:   paymentType,
+				ReleaseDate:   releaseDate,
+				Cw20Payment:   paymentCw20s,
+				FromAddress:   fromAddress.String(),
+				ToAddress:     toAddress.String(),
+				Cw1155Payment: cw1155Payments,
 			},
-			Cw20Outputs: cw20Outputs,
+			Cw20Outputs:    cw20Outputs,
+			Cw1155Payments: paidCw1155Payments,
 		},
 	); err != nil {
 		return err
@@ -395,7 +368,7 @@ func payout(ctx sdk.Context, k Keeper, inputs []banktypes.Input, outputs []bankt
 // 2. create and add the new WithdrawPaymentConstraints to the current existing constraints, and persist
 // 3. update the payment status to authorized
 // 4. emit PaymentWithdrawCreatedEvent event
-func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claim *types.Claim, timeoutNs time.Duration, payment1155 *types.Contract1155Payment, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress) error {
+func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inputs []banktypes.Input, outputs []banktypes.Output, paymentType types.PaymentType, claim *types.Claim, timeoutNs time.Duration, paymentCw20s []*types.CW20Payment, fromAddress, toAddress sdk.AccAddress, cw1155Payments []*types.CW1155Payment) error {
 	// get user's current WithdrawPaymentAuthorization authorization
 	authzMsgType := sdk.MsgTypeURL(&types.MsgWithdrawPayment{})
 	auth, _ := k.AuthzKeeper.GetAuthorization(ctx, receiver, admin, authzMsgType)
@@ -403,15 +376,15 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	releaseDate := ctx.BlockTime().Add(timeoutNs)
 	var constraints []*types.WithdrawPaymentConstraints
 	constraint := types.WithdrawPaymentConstraints{
-		ClaimId:              claim.ClaimId,
-		Inputs:               inputs,
-		Outputs:              outputs,
-		PaymentType:          paymentType,
-		ReleaseDate:          &releaseDate,
-		Contract_1155Payment: payment1155,
-		Cw20Payment:          paymentCw20s,
-		FromAddress:          fromAddress.String(),
-		ToAddress:            toAddress.String(),
+		ClaimId:       claim.ClaimId,
+		Inputs:        inputs,
+		Outputs:       outputs,
+		PaymentType:   paymentType,
+		ReleaseDate:   &releaseDate,
+		Cw20Payment:   paymentCw20s,
+		FromAddress:   fromAddress.String(),
+		ToAddress:     toAddress.String(),
+		Cw1155Payment: cw1155Payments,
 	}
 
 	// if have a WithdrawPaymentAuthorization authz use current constraints to append new one to
@@ -438,17 +411,7 @@ func createAuthz(ctx sdk.Context, k Keeper, receiver, admin sdk.AccAddress, inpu
 	// emit the events
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.PaymentWithdrawCreatedEvent{
-			Withdraw: &types.WithdrawPaymentConstraints{
-				ClaimId:              claim.ClaimId,
-				Inputs:               inputs,
-				Outputs:              outputs,
-				PaymentType:          paymentType,
-				ReleaseDate:          &releaseDate,
-				Contract_1155Payment: payment1155,
-				Cw20Payment:          paymentCw20s,
-				FromAddress:          fromAddress.String(),
-				ToAddress:            toAddress.String(),
-			},
+			Withdraw: &constraint,
 		},
 	); err != nil {
 		return err

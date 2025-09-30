@@ -534,6 +534,18 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.CW1155IntentPayment"><span class="badge">M</span>CW1155IntentPayment</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.CW1155IntentPaymentToken"><span class="badge">M</span>CW1155IntentPaymentToken</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.CW1155Payment"><span class="badge">M</span>CW1155Payment</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.CW20Output"><span class="badge">M</span>CW20Output</a>
                 </li>
               
@@ -1666,6 +1678,14 @@
           <li>
             <a href="#ixo%2fliquidstake%2fv1beta1%2ftx.proto">ixo/liquidstake/v1beta1/tx.proto</a>
             <ul>
+              
+                <li>
+                  <a href="#ixo.liquidstake.v1beta1.MsgBurn"><span class="badge">M</span>MsgBurn</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.liquidstake.v1beta1.MsgBurnResponse"><span class="badge">M</span>MsgBurnResponse</a>
+                </li>
               
                 <li>
                   <a href="#ixo.liquidstake.v1beta1.MsgLiquidStake"><span class="badge">M</span>MsgLiquidStake</a>
@@ -5312,6 +5332,106 @@ in the SETTLE stage.</p></td>
       <p></p>
 
       
+        <h3 id="ixo.claims.v1beta1.CW1155IntentPayment">CW1155IntentPayment</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>tokens</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155IntentPaymentToken">CW1155IntentPaymentToken</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.CW1155IntentPaymentToken">CW1155IntentPaymentToken</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>token_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.CW1155Payment">CW1155Payment</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>token_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
         <h3 id="ixo.claims.v1beta1.CW20Output">CW20Output</h3>
         <p>CW20Output represents a CW20 token output for split payments</p>
 
@@ -5433,7 +5553,7 @@ uint64(max 18446744073709551615) </p></td>
                   <td>evaluation</td>
                   <td><a href="#ixo.claims.v1beta1.Evaluation">Evaluation</a></td>
                   <td></td>
-                  <td><p>evaluation is the result of one or more claim evaluations </p></td>
+                  <td><p>evaluation is the result of the claim evaluation </p></td>
                 </tr>
               
                 <tr>
@@ -5455,18 +5575,31 @@ uint64(max 18446744073709551615) </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>custom amount specified by service agent for claim approval
-NOTE: if both amount and cw20 amount are empty then collection default is
-used </p></td>
+NOTE: if all amounts are empty then collection default is used </p></td>
                 </tr>
               
                 <tr>
                   <td>cw20_payment</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
-                  <td><p>custom cw20 payments specified by service agent for claim
-approval
-NOTE: if both amount and cw20 amount are empty then collection default is
-used </p></td>
+                  <td><p>custom cw20 payments specified by service agent for claim approval
+NOTE: if all amounts are empty then collection default is used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw1155 payments specified by service agent for claim approval
+NOTE: if all amounts are empty then collection default is used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_intent_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155IntentPayment">CW1155IntentPayment</a></td>
+                  <td>repeated</td>
+                  <td><p>If intent was used, this is the cw20_payment equivalent but with amounts
+per token_id to transfer the same tokens to and from the escrow account </p></td>
                 </tr>
               
             </tbody>
@@ -5862,7 +5995,7 @@ was given (codes defined by evaluator) </p></td>
                   <td>verification_proof</td>
                   <td><a href="#string">string</a></td>
                   <td></td>
-                  <td><p>verificationProof is the cid of the evaluation Verfiable Credential </p></td>
+                  <td><p>verificationProof is the cid of the evaluation Verifiable Credential </p></td>
                 </tr>
               
                 <tr>
@@ -5878,8 +6011,9 @@ on-chain </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>custom amount specified by evaluator for claim approval
-NOTE: if both amount and cw20 amount are empty then collection default is
-used </p></td>
+NOTE: if all amounts are empty then collection default is used
+NOTE: if claim has intent, then custom amounts are ignored and intent
+amounts are used </p></td>
                 </tr>
               
                 <tr>
@@ -5887,8 +6021,27 @@ used </p></td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
                   <td><p>custom cw20 payments specified by evaluator for claim approval
-NOTE: if both amount and cw20 amount are empty then collection default is
-used </p></td>
+NOTE: if all amounts are empty then collection default is used
+NOTE: if claim has intent, then custom amounts are ignored and intent
+amounts are used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw1155 payments specified by evaluator for claim approval
+NOTE: if all amounts are empty then collection default is used
+NOTE: if claim has intent, then custom amounts are ignored and intent
+amounts are used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_intent_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155IntentPayment">CW1155IntentPayment</a></td>
+                  <td>repeated</td>
+                  <td><p>If intent was used, this is the cw20_payment equivalent but with amounts
+per token_id to transfer the same tokens to and from the escrow account </p></td>
                 </tr>
               
             </tbody>
@@ -5993,6 +6146,21 @@ the intent expires. </p></td>
                   <td><p>the escrow account address </p></td>
                 </tr>
               
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>The custom cw1155 payments the agent intends to claim, if any. </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_intent_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155IntentPayment">CW1155IntentPayment</a></td>
+                  <td>repeated</td>
+                  <td><p>Same as cw1155_payment but with amounts per token_id to transfer
+the same tokens to and from the escrow account </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6080,7 +6248,7 @@ the intent expires. </p></td>
                   <td>contract_1155_payment</td>
                   <td><a href="#ixo.claims.v1beta1.Contract1155Payment">Contract1155Payment</a></td>
                   <td></td>
-                  <td><p>if empty(nil) then no contract payment, not allowed for Evaluation Payment </p></td>
+                  <td><p><strong>Deprecated.</strong> Deprecated: Use cw1155_payment instead </p></td>
                 </tr>
               
                 <tr>
@@ -6110,9 +6278,37 @@ since there is no WithdrawalAuthorization to manage the cw20 payment split
 for delayed payments </p></td>
                 </tr>
               
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>cw1155 payments, can be empty or multiple </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
+          
+            
+            
+            <h4>Fields with deprecated option</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Name</td>
+                  <td>Option</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>contract_1155_payment</td>
+                  <td><p>true</p></td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
           
 
         
@@ -6506,6 +6702,16 @@ all(both)) </p></td>
                   <td><p>Maximum intent duration for the authorization allowed (for submit) </p></td>
                 </tr>
               
+                <tr>
+                  <td>max_cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>Maximum cw1155 payment that can be set in created authorizations,
+if empty then any cw1155 payment is allowed in the created authorizations
+explicitly set to amount to 0 to disallow any cw1155 payment in the created
+authorizations </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6598,6 +6804,14 @@ allowed, and default payments from Collection payments are used </p></td>
 amount is allowed, and default payments from Collection payments are used </p></td>
                 </tr>
               
+                <tr>
+                  <td>max_custom_cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom max_cw1155_payment evaluator can change, if empty then no custom
+amount is allowed, and default payments from Collection payments are used </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6686,6 +6900,15 @@ from Collection payments are used </p></td>
 which it will expire (in nanoseconds) </p></td>
                 </tr>
               
+                <tr>
+                  <td>max_cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom max_cw1155_payment allowed to be specified by service agent for
+claim approval, if empty then no custom amount is allowed, and default
+payments from Collection payments are used </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6767,7 +6990,7 @@ accordingly </p></td>
                   <td>contract_1155_payment</td>
                   <td><a href="#ixo.claims.v1beta1.Contract1155Payment">Contract1155Payment</a></td>
                   <td></td>
-                  <td><p>if empty(nil) then no contract payment </p></td>
+                  <td><p><strong>Deprecated.</strong> if empty(nil) then no contract payment </p></td>
                 </tr>
               
                 <tr>
@@ -6799,9 +7022,37 @@ plus the timeout on Collection payments, if null then none </p></td>
                   <td><p>cw20 payments, can be empty or multiple </p></td>
                 </tr>
               
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw1155 payments, can be empty or multiple </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
+          
+            
+            
+            <h4>Fields with deprecated option</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Name</td>
+                  <td>Option</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>contract_1155_payment</td>
+                  <td><p>true</p></td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
           
 
         
@@ -7145,7 +7396,16 @@ plus the timeout on Collection payments, if null then none </p></td>
                   <td>cw20_outputs</td>
                   <td><a href="#ixo.claims.v1beta1.CW20Output">CW20Output</a></td>
                   <td>repeated</td>
-                  <td><p> </p></td>
+                  <td><p>the cw20 with the split amounts if any </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_payments</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155IntentPayment">CW1155IntentPayment</a></td>
+                  <td>repeated</td>
+                  <td><p>the cw1155 with the transferred token ids and amounts
+since in the msg you can define an amount but we don&#39;t necessarily know the
+token ids </p></td>
                 </tr>
               
             </tbody>
@@ -7925,8 +8185,8 @@ plus the timeout on Collection payments, if null then none </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>The desired claim amount, if any.
-NOTE: if both amount and cw20 amount are empty then default by Collection
-is used (APPROVAL payment). </p></td>
+NOTE: if all amounts are empty then collection default is used (APPROVAL
+payment) </p></td>
                 </tr>
               
                 <tr>
@@ -7934,8 +8194,17 @@ is used (APPROVAL payment). </p></td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
                   <td><p>The custom CW20 payment, if any.
-NOTE: if both amount and cw20 amount are empty then default by Collection
-is used (APPROVAL payment). </p></td>
+NOTE: if all amounts are empty then collection default is used (APPROVAL
+payment) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>The custom CW1155 payment, if any.
+NOTE: if all amounts are empty then collection default is used (APPROVAL
+payment) </p></td>
                 </tr>
               
             </tbody>
@@ -8075,6 +8344,14 @@ authorization (standard authz behavior) </p></td>
                   <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
                   <td></td>
                   <td><p>if null then no before_date validation done (for evaluate) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>max_cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>Maximum cw1155 payment that can be specified in the authorization (for both
+submit and evaluate) </p></td>
                 </tr>
               
             </tbody>
@@ -8322,9 +8599,9 @@ was given (codes defined by evaluator) </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>custom amount specified by evaluator for claim approval
-NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-overridden with intent amounts NOTE: if both amount and cw20 amount are
-empty then collection default is used </p></td>
+NOTE: if claim is using intent, then custom amounts are ignored and
+overridden with intent amounts NOTE: if all amounts are empty then
+collection default is used </p></td>
                 </tr>
               
                 <tr>
@@ -8332,9 +8609,19 @@ empty then collection default is used </p></td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
                   <td><p>custom cw20 payments specified by evaluator for claim approval
-NOTE: if claim is using intent, then amount and cw20 amount are ignored and
-overridden with intent amounts NOTE: if both amount and cw20 amount are
-empty then collection default is used </p></td>
+NOTE: if claim is using intent, then custom amounts are ignored and
+overridden with intent amounts NOTE: if all amounts are empty then
+collection default is used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw1155 payments specified by evaluator for claim approval
+NOTE: if claim is using intent, then custom amounts are ignored and
+overridden with intent amounts NOTE: if all amounts are empty then
+collection default is used </p></td>
                 </tr>
               
             </tbody>
@@ -8401,7 +8688,7 @@ empty then collection default is used </p></td>
                   <td><a href="#bool">bool</a></td>
                   <td></td>
                   <td><p>use_intent is the option for using intent for this claim if it exists and
-is active. NOTE: if use_intent is true then amount and cw20 amount are
+is active. NOTE: if use_intent is true then custom amounts in the msg are
 ignored and overridden with intent amounts. NOTE: if use_intent is true and
 there is no active intent then will error </p></td>
                 </tr>
@@ -8411,8 +8698,7 @@ there is no active intent then will error </p></td>
                   <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
                   <td>repeated</td>
                   <td><p>custom amount specified by service agent for claim approval
-NOTE: if both amount and cw20_payment are empty then collection default is
-used </p></td>
+NOTE: if all amounts are empty then collection default is used </p></td>
                 </tr>
               
                 <tr>
@@ -8420,8 +8706,15 @@ used </p></td>
                   <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
                   <td>repeated</td>
                   <td><p>custom cw20 payments specified by service agent for claim approval
-NOTE: if both amount and cw20 amount are empty then collection default is
-used </p></td>
+NOTE: if all amounts are empty then collection default is used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw1155 payments specified by service agent for claim approval
+NOTE: if all amounts are empty then collection default is used </p></td>
                 </tr>
               
             </tbody>
@@ -8672,7 +8965,7 @@ accordingly </p></td>
                   <td>contract_1155_payment</td>
                   <td><a href="#ixo.claims.v1beta1.Contract1155Payment">Contract1155Payment</a></td>
                   <td></td>
-                  <td><p>if empty(nil) then no contract payment </p></td>
+                  <td><p><strong>Deprecated.</strong> Deprecated: Use cw1155_payment instead </p></td>
                 </tr>
               
                 <tr>
@@ -8711,9 +9004,37 @@ plus the timeout on Collection payments </p></td>
                   <td><p>cw20 payments, can be empty or multiple </p></td>
                 </tr>
               
+                <tr>
+                  <td>cw1155_payment</td>
+                  <td><a href="#ixo.claims.v1beta1.CW1155Payment">CW1155Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>custom cw1155, can be empty or multiple </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
+          
+            
+            
+            <h4>Fields with deprecated option</h4>
+            <table>
+              <thead>
+                <tr>
+                  <td>Name</td>
+                  <td>Option</td>
+                </tr>
+              </thead>
+              <tbody>
+              
+                <tr>
+                  <td>contract_1155_payment</td>
+                  <td><p>true</p></td>
+                </tr>
+              
+              </tbody>
+            </table>
+            
           
 
         
@@ -13821,6 +14142,45 @@ module.</p></td>
       <p></p>
 
       
+        <h3 id="ixo.liquidstake.v1beta1.MsgBurn">MsgBurn</h3>
+        <p>MsgBurn defines a SDK message for performing a burn of coins.</p><p>NOTE: only ixo native token can be burned</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>burner</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>amount</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td></td>
+                  <td><p>amount is the amount of coins to burn
+NOTE: only ixo native token can be burned </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.liquidstake.v1beta1.MsgBurnResponse">MsgBurnResponse</h3>
+        <p></p>
+
+        
+
+        
+      
         <h3 id="ixo.liquidstake.v1beta1.MsgLiquidStake">MsgLiquidStake</h3>
         <p>MsgLiquidStake defines a SDK message for performing a liquid stake of coins</p><p>from a delegator to whitelisted validators.</p>
 
@@ -14133,6 +14493,13 @@ validators list. Only the whitelist admin address can update this list.</p></td>
                 <td><a href="#ixo.liquidstake.v1beta1.MsgSetModulePausedResponse">MsgSetModulePausedResponse</a></td>
                 <td><p>SetModulePaused  defines a method to update the module&#39;s pause status,
 setting value of the safety flag in params.</p></td>
+              </tr>
+            
+              <tr>
+                <td>Burn</td>
+                <td><a href="#ixo.liquidstake.v1beta1.MsgBurn">MsgBurn</a></td>
+                <td><a href="#ixo.liquidstake.v1beta1.MsgBurnResponse">MsgBurnResponse</a></td>
+                <td><p>Burn defines a method for burning coins.</p></td>
               </tr>
             
           </tbody>

@@ -54,6 +54,13 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					Example:        fmt.Sprintf(`$ %s tx liquidstake pause-module true --from mykey`, version.AppName),
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "is_paused"}},
 				},
+				{
+					RpcMethod:      "Burn",
+					Use:            "burn [amount]",
+					Short:          "Burn IXO tokens",
+					Example:        fmt.Sprintf(`$ %s tx liquidstake burn 1000000uixo --from mykey`, version.AppName),
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "amount"}},
+				},
 			},
 		},
 	}

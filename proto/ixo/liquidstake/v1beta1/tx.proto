@@ -37,6 +37,9 @@ service Msg {
   // SetModulePaused  defines a method to update the module's pause status,
   // setting value of the safety flag in params.
   rpc SetModulePaused(MsgSetModulePaused) returns (MsgSetModulePausedResponse);
+
+  // Burn defines a method for burning coins.
+  rpc Burn(MsgBurn) returns (MsgBurnResponse);
 }
 
 // MsgLiquidStake defines a SDK message for performing a liquid stake of coins
@@ -146,3 +149,16 @@ message MsgSetModulePaused {
 // MsgSetModulePausedResponse defines the response structure for
 // executing a
 message MsgSetModulePausedResponse {}
+
+// MsgBurn defines a SDK message for performing a burn of coins.
+// NOTE: only ixo native token can be burned
+message MsgBurn {
+  option (cosmos.msg.v1.signer) = "burner";
+
+  string burner = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  // amount is the amount of coins to burn
+  // NOTE: only ixo native token can be burned
+  cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
+}
+
+message MsgBurnResponse {}

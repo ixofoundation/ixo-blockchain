@@ -92,7 +92,7 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
    - For claim evaluations with status `invalidated` no evaluation payment will be made.
    - Payments can be made in multiple forms:
      - Native tokens (Cosmos SDK coins)
-     - CW1155 tokens (Temporarily blocked, coming soon)
+     - CW1155 tokens
      - CW20 tokens
    - Oracle payments is configured to automatically distribute fees to the network and relayers, same as EVALUATION type payments.
 

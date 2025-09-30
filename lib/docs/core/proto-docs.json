@@ -4145,6 +4145,126 @@
       "extensions": [],
       "messages": [
         {
+          "name": "CW1155IntentPayment",
+          "longName": "CW1155IntentPayment",
+          "fullName": "ixo.claims.v1beta1.CW1155IntentPayment",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tokens",
+              "description": "",
+              "label": "repeated",
+              "type": "CW1155IntentPaymentToken",
+              "longType": "CW1155IntentPaymentToken",
+              "fullType": "ixo.claims.v1beta1.CW1155IntentPaymentToken",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CW1155IntentPaymentToken",
+          "longName": "CW1155IntentPaymentToken",
+          "fullName": "ixo.claims.v1beta1.CW1155IntentPaymentToken",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "token_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CW1155Payment",
+          "longName": "CW1155Payment",
+          "fullName": "ixo.claims.v1beta1.CW1155Payment",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "token_id",
+              "description": "",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "CW20Output",
           "longName": "CW20Output",
           "fullName": "ixo.claims.v1beta1.CW20Output",
@@ -4300,7 +4420,7 @@
             },
             {
               "name": "evaluation",
-              "description": "evaluation is the result of one or more claim evaluations",
+              "description": "evaluation is the result of the claim evaluation",
               "label": "",
               "type": "Evaluation",
               "longType": "Evaluation",
@@ -4336,7 +4456,7 @@
             },
             {
               "name": "amount",
-              "description": "custom amount specified by service agent for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
+              "description": "custom amount specified by service agent for claim approval\nNOTE: if all amounts are empty then collection default is used",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -4348,11 +4468,35 @@
             },
             {
               "name": "cw20_payment",
-              "description": "custom cw20 payments specified by service agent for claim\napproval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
+              "description": "custom cw20 payments specified by service agent for claim approval\nNOTE: if all amounts are empty then collection default is used",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "custom cw1155 payments specified by service agent for claim approval\nNOTE: if all amounts are empty then collection default is used",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_intent_payment",
+              "description": "If intent was used, this is the cw20_payment equivalent but with amounts\nper token_id to transfer the same tokens to and from the escrow account",
+              "label": "repeated",
+              "type": "CW1155IntentPayment",
+              "longType": "CW1155IntentPayment",
+              "fullType": "ixo.claims.v1beta1.CW1155IntentPayment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -4900,7 +5044,7 @@
             },
             {
               "name": "verification_proof",
-              "description": "verificationProof is the cid of the evaluation Verfiable Credential",
+              "description": "verificationProof is the cid of the evaluation Verifiable Credential",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -4924,7 +5068,7 @@
             },
             {
               "name": "amount",
-              "description": "custom amount specified by evaluator for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
+              "description": "custom amount specified by evaluator for claim approval\nNOTE: if all amounts are empty then collection default is used\nNOTE: if claim has intent, then custom amounts are ignored and intent\namounts are used",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -4936,11 +5080,35 @@
             },
             {
               "name": "cw20_payment",
-              "description": "custom cw20 payments specified by evaluator for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
+              "description": "custom cw20 payments specified by evaluator for claim approval\nNOTE: if all amounts are empty then collection default is used\nNOTE: if claim has intent, then custom amounts are ignored and intent\namounts are used",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "custom cw1155 payments specified by evaluator for claim approval\nNOTE: if all amounts are empty then collection default is used\nNOTE: if claim has intent, then custom amounts are ignored and intent\namounts are used",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_intent_payment",
+              "description": "If intent was used, this is the cw20_payment equivalent but with amounts\nper token_id to transfer the same tokens to and from the escrow account",
+              "label": "repeated",
+              "type": "CW1155IntentPayment",
+              "longType": "CW1155IntentPayment",
+              "fullType": "ixo.claims.v1beta1.CW1155IntentPayment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5101,6 +5269,30 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "The custom cw1155 payments the agent intends to claim, if any.",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_intent_payment",
+              "description": "Same as cw1155_payment but with amounts per token_id to transfer\nthe same tokens to and from the escrow account",
+              "label": "repeated",
+              "type": "CW1155IntentPayment",
+              "longType": "CW1155IntentPayment",
+              "fullType": "ixo.claims.v1beta1.CW1155IntentPayment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5212,7 +5404,7 @@
             },
             {
               "name": "contract_1155_payment",
-              "description": "if empty(nil) then no contract payment, not allowed for Evaluation Payment",
+              "description": "Deprecated: Use cw1155_payment instead",
               "label": "",
               "type": "Contract1155Payment",
               "longType": "Contract1155Payment",
@@ -5220,7 +5412,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "timeout_ns",
@@ -5253,6 +5448,18 @@
               "type": "bool",
               "longType": "bool",
               "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "cw1155 payments, can be empty or multiple",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5499,6 +5706,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "max_cw1155_payment",
+              "description": "Maximum cw1155 payment that can be set in created authorizations,\nif empty then any cw1155 payment is allowed in the created authorizations\nexplicitly set to amount to 0 to disallow any cw1155 payment in the created\nauthorizations",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5619,6 +5838,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "max_custom_cw1155_payment",
+              "description": "custom max_cw1155_payment evaluator can change, if empty then no custom\namount is allowed, and default payments from Collection payments are used",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5723,6 +5954,18 @@
               "type": "Duration",
               "longType": "google.protobuf.Duration",
               "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_cw1155_payment",
+              "description": "custom max_cw1155_payment allowed to be specified by service agent for\nclaim approval, if empty then no custom amount is allowed, and default\npayments from Collection payments are used",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -5834,7 +6077,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "toAddress",
@@ -5879,6 +6125,18 @@
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "custom cw1155 payments, can be empty or multiple",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6224,11 +6482,23 @@
             },
             {
               "name": "cw20_outputs",
-              "description": "",
+              "description": "the cw20 with the split amounts if any",
               "label": "repeated",
               "type": "CW20Output",
               "longType": "CW20Output",
               "fullType": "ixo.claims.v1beta1.CW20Output",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payments",
+              "description": "the cw1155 with the transferred token ids and amounts\nsince in the msg you can define an amount but we don't necessarily know the\ntoken ids",
+              "label": "repeated",
+              "type": "CW1155IntentPayment",
+              "longType": "CW1155IntentPayment",
+              "fullType": "ixo.claims.v1beta1.CW1155IntentPayment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7096,7 +7366,7 @@
             },
             {
               "name": "amount",
-              "description": "The desired claim amount, if any.\nNOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment).",
+              "description": "The desired claim amount, if any.\nNOTE: if all amounts are empty then collection default is used (APPROVAL\npayment)",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -7108,11 +7378,23 @@
             },
             {
               "name": "cw20_payment",
-              "description": "The custom CW20 payment, if any.\nNOTE: if both amount and cw20 amount are empty then default by Collection\nis used (APPROVAL payment).",
+              "description": "The custom CW20 payment, if any.\nNOTE: if all amounts are empty then collection default is used (APPROVAL\npayment)",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "The custom CW1155 payment, if any.\nNOTE: if all amounts are empty then collection default is used (APPROVAL\npayment)",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7305,6 +7587,18 @@
               "type": "Timestamp",
               "longType": "google.protobuf.Timestamp",
               "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_cw1155_payment",
+              "description": "Maximum cw1155 payment that can be specified in the authorization (for both\nsubmit and evaluate)",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7657,7 +7951,7 @@
             },
             {
               "name": "amount",
-              "description": "custom amount specified by evaluator for claim approval\nNOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverridden with intent amounts NOTE: if both amount and cw20 amount are\nempty then collection default is used",
+              "description": "custom amount specified by evaluator for claim approval\nNOTE: if claim is using intent, then custom amounts are ignored and\noverridden with intent amounts NOTE: if all amounts are empty then\ncollection default is used",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -7669,11 +7963,23 @@
             },
             {
               "name": "cw20_payment",
-              "description": "custom cw20 payments specified by evaluator for claim approval\nNOTE: if claim is using intent, then amount and cw20 amount are ignored and\noverridden with intent amounts NOTE: if both amount and cw20 amount are\nempty then collection default is used",
+              "description": "custom cw20 payments specified by evaluator for claim approval\nNOTE: if claim is using intent, then custom amounts are ignored and\noverridden with intent amounts NOTE: if all amounts are empty then\ncollection default is used",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "custom cw1155 payments specified by evaluator for claim approval\nNOTE: if claim is using intent, then custom amounts are ignored and\noverridden with intent amounts NOTE: if all amounts are empty then\ncollection default is used",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7764,7 +8070,7 @@
             },
             {
               "name": "use_intent",
-              "description": "use_intent is the option for using intent for this claim if it exists and\nis active. NOTE: if use_intent is true then amount and cw20 amount are\nignored and overridden with intent amounts. NOTE: if use_intent is true and\nthere is no active intent then will error",
+              "description": "use_intent is the option for using intent for this claim if it exists and\nis active. NOTE: if use_intent is true then custom amounts in the msg are\nignored and overridden with intent amounts. NOTE: if use_intent is true and\nthere is no active intent then will error",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -7776,7 +8082,7 @@
             },
             {
               "name": "amount",
-              "description": "custom amount specified by service agent for claim approval\nNOTE: if both amount and cw20_payment are empty then collection default is\nused",
+              "description": "custom amount specified by service agent for claim approval\nNOTE: if all amounts are empty then collection default is used",
               "label": "repeated",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -7788,11 +8094,23 @@
             },
             {
               "name": "cw20_payment",
-              "description": "custom cw20 payments specified by service agent for claim approval\nNOTE: if both amount and cw20 amount are empty then collection default is\nused",
+              "description": "custom cw20 payments specified by service agent for claim approval\nNOTE: if all amounts are empty then collection default is used",
               "label": "repeated",
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "custom cw1155 payments specified by service agent for claim approval\nNOTE: if all amounts are empty then collection default is used",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -8119,7 +8437,7 @@
             },
             {
               "name": "contract_1155_payment",
-              "description": "if empty(nil) then no contract payment",
+              "description": "Deprecated: Use cw1155_payment instead",
               "label": "",
               "type": "Contract1155Payment",
               "longType": "Contract1155Payment",
@@ -8127,7 +8445,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "toAddress",
@@ -8184,6 +8505,18 @@
               "type": "CW20Payment",
               "longType": "CW20Payment",
               "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "cw1155_payment",
+              "description": "custom cw1155, can be empty or multiple",
+              "label": "repeated",
+              "type": "CW1155Payment",
+              "longType": "CW1155Payment",
+              "fullType": "ixo.claims.v1beta1.CW1155Payment",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -14624,6 +14957,53 @@
       "extensions": [],
       "messages": [
         {
+          "name": "MsgBurn",
+          "longName": "MsgBurn",
+          "fullName": "ixo.liquidstake.v1beta1.MsgBurn",
+          "description": "MsgBurn defines a SDK message for performing a burn of coins.\nNOTE: only ixo native token can be burned",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "burner",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "amount is the amount of coins to burn\nNOTE: only ixo native token can be burned",
+              "label": "",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgBurnResponse",
+          "longName": "MsgBurnResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgBurnResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
           "name": "MsgLiquidStake",
           "longName": "MsgLiquidStake",
           "fullName": "ixo.liquidstake.v1beta1.MsgLiquidStake",
@@ -14996,6 +15376,18 @@
               "responseType": "MsgSetModulePausedResponse",
               "responseLongType": "MsgSetModulePausedResponse",
               "responseFullType": "ixo.liquidstake.v1beta1.MsgSetModulePausedResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "Burn",
+              "description": "Burn defines a method for burning coins.",
+              "requestType": "MsgBurn",
+              "requestLongType": "MsgBurn",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgBurn",
+              "requestStreaming": false,
+              "responseType": "MsgBurnResponse",
+              "responseLongType": "MsgBurnResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgBurnResponse",
               "responseStreaming": false
             }
           ]
