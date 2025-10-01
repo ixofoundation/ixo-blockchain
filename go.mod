@@ -1,6 +1,7 @@
 module github.com/ixofoundation/ixo-blockchain/v6
 
 go 1.22.4
+toolchain go1.24.1
 
 require (
 	cosmossdk.io/api v0.7.6
@@ -18,7 +19,7 @@ require (
 	cosmossdk.io/x/tx v0.13.7
 	cosmossdk.io/x/upgrade v0.1.4
 	github.com/CosmWasm/wasmd v0.50.0
-	github.com/CosmWasm/wasmvm v1.5.4
+	github.com/CosmWasm/wasmvm v1.5.8
 	github.com/btcsuite/btcutil v1.0.3-0.20201208143702-a53e38424cce
 	github.com/cometbft/cometbft v0.38.12
 	github.com/cosmos/cosmos-db v1.1.0
