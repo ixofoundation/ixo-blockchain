@@ -6,7 +6,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	"github.com/cosmos/cosmos-sdk/types/tx"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/crypto"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/crypto"
 )
 
 // AuthenticatorTxOptions

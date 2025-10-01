@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
 )
 
 // UnmarshalFn is a generic function to unmarshal bytes

@@ -8,8 +8,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v5/x/iid/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
 )
 
 // IsValidCollection tells if a Claim Collection is valid,
@@ -101,26 +101,6 @@ func HasBalances(ctx sdk.Context, bankKeeper bankkeeper.Keeper, payerAddr sdk.Ac
 	return true
 }
 
-func (p *Contract1155Payment) Validate() error {
-	if p != nil {
-		// temporarily disable using 1155 tokens for payments
-		return fmt.Errorf("contract_1155_payment is currently disabled (not allowed)")
-
-		// _, err := sdk.AccAddressFromBech32(p.Address)
-		// if err != nil {
-		// 	return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "err %s", err)
-		// }
-		// if iidtypes.IsEmpty(p.TokenId) {
-		// 	return fmt.Errorf("token id cannot be empty")
-		// }
-		// // if p.Contract_1155Payment.Amount == 0 {
-		// // 	return fmt.Errorf("token amount cannot be 0")
-		// // }
-	}
-
-	return nil
-}
-
 func (p Payment) Validate(allowOraclePayments bool) error {
 	_, err := sdk.AccAddressFromBech32(p.Account)
 	if err != nil {
@@ -131,13 +111,8 @@ func (p Payment) Validate(allowOraclePayments bool) error {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "oracle payments is only allowed for APPROVAL payments")
 	}
 
-	// Temporarily disable 1155 payments
 	if p.Contract_1155Payment != nil {
-		return fmt.Errorf("1155 payments are currently disabled (not allowed)")
-	}
-
-	if err = p.Contract_1155Payment.Validate(); err != nil {
-		return err
+		return fmt.Errorf("contract_1155_payment is deprecated, use cw1155_payment instead")
 	}
 
 	// no 0 amounts allowed, otherwise unnecessary 0 amount payments
@@ -148,6 +123,11 @@ func (p Payment) Validate(allowOraclePayments bool) error {
 	// no 0 amounts allowed, otherwise unnecessary 0 amount payments
 	if err = p.Amount.Sort().Validate(); err != nil {
 		return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "amounts not valid: (%s)", err)
+	}
+
+	// no 0 amounts allowed, otherwise unnecessary 0 amount payments
+	if err = ValidateCW1155Payments(p.Cw1155Payment, false); err != nil {
+		return err
 	}
 
 	return nil
@@ -161,13 +141,17 @@ func (p Payments) AccountsIsEntityAccounts(entity entitytypes.Entity) bool {
 }
 
 func (p Payments) Validate() error {
-	// if evaluation payment has contract_1155payment, it is not allowed
-	if p.Evaluation.Contract_1155Payment != nil {
-		return ErrCollectionEvalError
-	}
 	// if evaluation payment has cw20 payments, it is not allowed
 	if len(p.Evaluation.Cw20Payment) > 1 {
 		return ErrCollectionEvalCW20Error
+	}
+	// if evaluation payment has cw1155 payments, it is not allowed
+	if len(p.Evaluation.Cw1155Payment) > 1 {
+		return ErrCollectionEvalCW1155Error
+	}
+	// if approval is oracle payment then no cw1155 payments allowed
+	if p.Approval.IsOraclePayment && len(p.Approval.Cw1155Payment) > 0 {
+		return ErrCollectionApprovalCW1155Error
 	}
 
 	if err := p.Submission.Validate(false); err != nil {
@@ -220,6 +204,19 @@ func (p *Payment) Clone() *Payment {
 	} else {
 		cloned.Cw20Payment = nil
 	}
+	if p.Cw1155Payment != nil {
+		cloned.Cw1155Payment = make([]*CW1155Payment, len(p.Cw1155Payment))
+		for i, cw1155 := range p.Cw1155Payment {
+			if cw1155 != nil {
+				derefedCW1155Payment := *cw1155
+				cloned.Cw1155Payment[i] = &derefedCW1155Payment
+			} else {
+				cloned.Cw1155Payment[i] = nil
+			}
+		}
+	} else {
+		cloned.Cw1155Payment = nil
+	}
 
 	return cloned
 }
@@ -244,21 +241,6 @@ func IsCoinsInMaxConstraints(coins sdk.Coins, maxCoins sdk.Coins) bool {
 	for _, coin := range coins {
 		maxCoin, ok := maxCoinsMap[coin.Denom]
 		if !ok || !coin.IsLTE(maxCoin) {
-			return false
-		}
-	}
-	return true
-}
-
-func IsCW20PaymentsInMaxConstraints(cw20Payments []*CW20Payment, maxCw20Payments []*CW20Payment) bool {
-	maxPaymentsMap := make(map[string]*CW20Payment)
-	for _, maxPayment := range maxCw20Payments {
-		maxPaymentsMap[maxPayment.Address] = maxPayment
-	}
-
-	for _, payment := range cw20Payments {
-		maxPayment, ok := maxPaymentsMap[payment.Address]
-		if !ok || payment.Amount > maxPayment.Amount {
 			return false
 		}
 	}

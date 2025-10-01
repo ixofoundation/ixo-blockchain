@@ -6,11 +6,13 @@ import (
 
 // x/claims module sentinel errors
 var (
-	ErrCollectionNotFound      = errorsmod.Register(ModuleName, 1001, "collection not found")
-	ErrCollectionNotOpen       = errorsmod.Register(ModuleName, 1002, "collection is not in open state")
-	ErrCollectionEvalError     = errorsmod.Register(ModuleName, 1003, "evaluation payment is not allowed to have a Contract1155Payment")
-	ErrCollNotEntityAcc        = errorsmod.Register(ModuleName, 1004, "collection payments accounts can only be entity accounts")
-	ErrCollectionEvalCW20Error = errorsmod.Register(ModuleName, 1005, "evaluation payment is not allowed to have CW20 payments")
+	ErrCollectionNotFound            = errorsmod.Register(ModuleName, 1001, "collection not found")
+	ErrCollectionNotOpen             = errorsmod.Register(ModuleName, 1002, "collection is not in open state")
+	ErrCollectionEvalError           = errorsmod.Register(ModuleName, 1003, "evaluation payment is not allowed to have a Contract1155Payment")
+	ErrCollNotEntityAcc              = errorsmod.Register(ModuleName, 1004, "collection payments accounts can only be entity accounts")
+	ErrCollectionEvalCW20Error       = errorsmod.Register(ModuleName, 1005, "evaluation payment is not allowed to have CW20 payments")
+	ErrCollectionEvalCW1155Error     = errorsmod.Register(ModuleName, 1006, "evaluation payment is not allowed to have CW1155 payments")
+	ErrCollectionApprovalCW1155Error = errorsmod.Register(ModuleName, 1007, "approval payment that is an oracle payment is not allowed to have CW1155 payments")
 
 	ErrClaimNotFound               = errorsmod.Register(ModuleName, 1100, "claim not found")
 	ErrClaimUnauthorized           = errorsmod.Register(ModuleName, 1101, "unauthorized, incorrect admin")
@@ -36,4 +38,6 @@ var (
 	ErrIntentUnauthorized = errorsmod.Register(ModuleName, 1502, "unauthorized")
 
 	ErrInvalidResponse = errorsmod.Register(ModuleName, 1601, "invalid response")
+
+	ErrInternalError = errorsmod.Register(ModuleName, 1700, "internal error")
 )

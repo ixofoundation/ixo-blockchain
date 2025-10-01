@@ -8,7 +8,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
-	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
 )
 
 // Parameter store keys

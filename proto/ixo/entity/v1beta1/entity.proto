@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "ixo/iid/v1beta1/iid.proto";
 import "google/protobuf/timestamp.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v5/x/entity/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types";
 
 message Params {
   string nftContractAddress = 1;

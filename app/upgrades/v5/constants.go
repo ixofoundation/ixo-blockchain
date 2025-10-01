@@ -2,7 +2,7 @@ package v5
 
 import (
 	store "cosmossdk.io/store/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/app/upgrades"
+	"github.com/ixofoundation/ixo-blockchain/v6/app/upgrades"
 )
 
 const (

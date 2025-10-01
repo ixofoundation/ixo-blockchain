@@ -13,9 +13,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
 	"github.com/spf13/cobra"
 )
 

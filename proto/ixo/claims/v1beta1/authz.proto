@@ -9,7 +9,7 @@ import "ixo/claims/v1beta1/claims.proto";
 import "google/protobuf/duration.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v5/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types";
 
 message SubmitClaimAuthorization {
   option (cosmos_proto.implements_interface) =
@@ -39,6 +39,10 @@ message SubmitClaimConstraints {
   // which it will expire (in nanoseconds)
   google.protobuf.Duration intent_duration_ns = 5
       [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // custom max_cw1155_payment allowed to be specified by service agent for
+  // claim approval, if empty then no custom amount is allowed, and default
+  // payments from Collection payments are used
+  repeated CW1155Payment max_cw1155_payment = 6;
 }
 
 message EvaluateClaimAuthorization {
@@ -67,6 +71,9 @@ message EvaluateClaimConstraints {
   // max custom cw20 payment evaluator can change, if empty then no custom
   // amount is allowed, and default payments from Collection payments are used
   repeated CW20Payment max_custom_cw20_payment = 11;
+  // custom max_cw1155_payment evaluator can change, if empty then no custom
+  // amount is allowed, and default payments from Collection payments are used
+  repeated CW1155Payment max_custom_cw1155_payment = 12;
 }
 
 message WithdrawPaymentAuthorization {
@@ -91,7 +98,7 @@ message WithdrawPaymentConstraints {
   // accordingly
   PaymentType payment_type = 4;
   // if empty(nil) then no contract payment
-  Contract1155Payment contract_1155_payment = 5;
+  Contract1155Payment contract_1155_payment = 5 [ deprecated = true ];
   // for contract payment
   string toAddress = 6;
   // for contract payment
@@ -101,6 +108,8 @@ message WithdrawPaymentConstraints {
   google.protobuf.Timestamp release_date = 8 [ (gogoproto.stdtime) = true ];
   // cw20 payments, can be empty or multiple
   repeated CW20Payment cw20_payment = 9;
+  // custom cw1155 payments, can be empty or multiple
+  repeated CW1155Payment cw1155_payment = 10;
 }
 
 // CreateClaimAuthorizationAuthorization allows a grantee to create
@@ -158,4 +167,9 @@ message CreateClaimAuthorizationConstraints {
   // Maximum intent duration for the authorization allowed (for submit)
   google.protobuf.Duration max_intent_duration_ns = 8
       [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // Maximum cw1155 payment that can be set in created authorizations,
+  // if empty then any cw1155 payment is allowed in the created authorizations
+  // explicitly set to amount to 0 to disallow any cw1155 payment in the created
+  // authorizations
+  repeated CW1155Payment max_cw1155_payment = 9;
 }

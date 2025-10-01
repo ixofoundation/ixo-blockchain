@@ -11,7 +11,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	distributiontypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 )
 
 func (k Keeper) LiquidBondDenom(ctx sdk.Context) string {

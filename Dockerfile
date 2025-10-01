@@ -13,7 +13,7 @@ FROM golang:${GO_VERSION}-alpine3.20 AS builder
 
 # TODO: maybe extract below args to where called in cicd?
 # git log -1 --format='%H'
-ARG GIT_VERSION="v5.0.0"
+ARG GIT_VERSION="v6.0.0"
 ARG GIT_COMMIT="e2f15a98d6e33f705461b38403931f129efd8056"
 
 ENV PACKAGES="ca-certificates build-base binutils-gold curl make git libc-dev bash file gcc linux-headers eudev-dev"

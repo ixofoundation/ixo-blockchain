@@ -16,9 +16,9 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
-	"github.com/ixofoundation/ixo-blockchain/v5/ixoutils"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/authenticator"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixoutils"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/authenticator"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
 )
 
 func (k Keeper) Logger(ctx sdk.Context) log.Logger {

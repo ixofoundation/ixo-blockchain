@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/ixofoundation/ixo-blockchain/v5/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
 )
 
 // Simulation parameter constants.

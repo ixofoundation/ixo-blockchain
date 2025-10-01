@@ -16,6 +16,7 @@ type MsgCreateCollection struct {
 	Quota uint64
 	State CollectionState
 	Payments *Payments
+	Intents CollectionIntentOptions
 }
 ```
 
@@ -29,6 +30,7 @@ The field's descriptions is as follows:
 - `quota` - a integer containing the maximum number of claims that may be submitted, 0 is unlimited
 - `state` - a [CollectionState](02_state.md#collectionstate)
 - `payments` - a [Payments](02_state.md#payments)
+- `intents` - a [CollectionIntentOptions](02_state.md#collectionintentoptions) option for intents for this collection (allow, deny, required)
 
 ## MsgUpdateCollectionState
 
@@ -86,6 +88,24 @@ The field's descriptions is as follows:
 - `payments` - a [Payments](02_state.md#payments)
 - `adminAddress` - a string containing the account address of the private key signing the transaction, must be same as [Collection](02_state.md#collection) admin field
 
+## MsgUpdateCollectionIntents
+
+A `MsgUpdateCollectionIntents` updates a Collection's `intents` field.
+
+```go
+type MsgUpdateCollectionIntents struct {
+	CollectionId string
+	Intents CollectionIntentOptions
+	AdminAddress string
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` to make the update to
+- `intents` - a [CollectionIntentOptions](02_state.md#collectionintentoptions) option for intents for this collection (allow, deny, required)
+- `adminAddress` - a string containing the account address of the private key signing the transaction, must be same as [Collection](02_state.md#collection) admin field
+
 ## MsgSubmitClaim
 
 A `MsgSubmitClaim` creates and stores a new Claim made towards a `Collection`. On Submission of claim `SUBMISSION` payments will be made if there is any defined in the [Collection](02_state.md#collection) `Payments`.
@@ -97,15 +117,24 @@ type MsgSubmitClaim struct {
 	AgentDid  DIDFragment
 	AgentAddress string
 	AdminAddress string
+	UseIntent bool
+	Amount github_com_cosmos_cosmos_sdk_types.Coins
+	CW20Payment []CW20Payment
+	CW1155Payment []CW1155Payment
 }
 ```
 
 The field's descriptions is as follows:
 
 - `collectionId` - a string containing the Collection `id` this claim belongs
+- `claimId` - a string containing the unique identifier of the claim in the cid hash format
 - `agentAddress` - a string containing the account address that is submitting the claim
 - `agentDid` - a string containing the Did of the agent that is submitting the claim
 - `adminAddress` - a string containing the account address defined in the [Collection](02_state.md#collection) `admin` field
+- `useIntent` - a boolean indicating if this claim is using an intent. If true, then the amount and CW20 payment are ignored and overridden with intent amounts. If true and there is no active intent then will error.
+- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the custom amount specified by service agent for claim approval. If both amount and CW20 payment are empty, then collection default is used. (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate amount wanted if no intent used)
+- `cw20Payment` - an array of [CW20Payment](02_state.md#cw20payment) containing the custom CW20 payments specified by service agent for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used. (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw20Payment wanted if no intent used)
+- `cw1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) containing the custom CW1155 payments specified by service agent for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used. (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw1155Payment wanted if no intent used)
 
 ## MsgEvaluateClaim
 
@@ -123,6 +152,8 @@ type MsgEvaluateClaim struct {
 	Reason uint32
 	VerificationProof string
 	Amount github_com_cosmos_cosmos_sdk_types.Coins
+	CW20Payment []CW20Payment
+	CW1155Payment []CW1155Payment
 }
 ```
 
@@ -137,7 +168,9 @@ The field's descriptions is as follows:
 - `status` - a [EvaluationStatus](#evaluationstatus)
 - `reason` - a integer for why the evaluation result was given (codes defined by evaluator)
 - `verificationProof` - a string containing the proof to verify the linked resource (eg. the cid of the evaluation Verfiable Credential)
-- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount to be paid on `Approval` payment if it is a custom amount and not the preset `Approval` from the [Collection](#collection)
+- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount to be paid on `Approval` payment if it is a custom amount and not the preset `Approval` from the [Collection](#collection). NOTE: if claim is using intent, then amount and CW20 and CW1155 payments are ignored and overridden with intent amounts. NOTE: if amount and CW20 and CW1155 payments are empty then collection default is used.
+- `cw20Payment` - an array of [CW20Payment](02_state.md#cw20payment) containing the custom CW20 payments specified by evaluator for claim approval. NOTE: if claim is using intent, then amount and CW20 and CW1155 payments are ignored and overridden with intent amounts. NOTE: if amount and CW20 and CW1155 payments are empty then collection default is used.
+- `cw1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) containing the custom CW1155 payments specified by evaluator for claim approval. NOTE: if claim is using intent, then amount and CW20 and CW1155 payments are ignored and overridden with intent amounts. NOTE: if amount and CW20 and CW1155 payments are empty then collection default is used.
 
 ## MsgDisputeClaim
 
@@ -176,6 +209,8 @@ type MsgWithdrawPayment struct {
 	FromAddress string
 	ReleaseDate *time.Time
 	AdminAddress string
+	CW20Payment []CW20Payment
+	CW1155Payment []CW1155Payment
 }
 ```
 
@@ -185,8 +220,75 @@ The field's descriptions is as follows:
 - `inputs` - a list of cosmos defined `Input` to pass to the the multisend tx to run to withdraw payment
 - `outputs` - a list of cosmos defined `Output` to pass to the the multisend tx to run to withdraw payment
 - `paymentType` - a [PaymentType](02_state.md#paymenttype)
-- `contract_1155Payment` - a [Contract1155Payment](02_state.md#contract1155payment)
+- `contract_1155Payment` - a [Contract1155Payment](02_state.md#contract1155payment) DEPRECATED, use [CW1155Payment](02_state.md#cw1155payment) instead
 - `toAddress` - a string containing the account address to make the payment to
 - `fromAddress` - a string containing the account address to make the payment from
 - `releaseDate` - a timestamp of the date that grantee can execute authorization to make the withdrawal payment, calculated from created date plus the timeout on [Collection](02_state.md#collection) `Payments`
 - `adminAddress` - a string containing the account address defined in the [Collection](02_state.md#collection) `admin` field
+- `cw20Payment` - an array of [CW20Payment](02_state.md#cw20payment) containing the CW20 tokens to be paid
+- `cw1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) containing the CW1155 tokens to be paid
+
+## MsgClaimIntent
+
+A `MsgClaimIntent` creates a new intent to claim on a collection, with an optional custom payment amount. An agent must have a valid [SubmitClaimAuthorization](02_state.md#SubmitClaimAuthorization) to create and intent.
+On successful intent creation the claim amount is transferred from the deed admin account to the Collections Escrow account.
+Once a claim is created using the intent then the claim payment has a status of GUARANTEED.
+Once the intent expires without any claim made then the funds is transferred back out of the Escrow account.
+
+```go
+type MsgClaimIntent struct {
+	AgentDid     DIDFragment
+	AgentAddress string
+	CollectionId string
+	Amount       github_com_cosmos_cosmos_sdk_types.Coins
+	CW20Payment  []CW20Payment
+	CW1155Payment []CW1155Payment
+}
+```
+
+The field's descriptions is as follows:
+
+- `agentDid` - a string containing the DID of the agent creating the intent
+- `agentAddress` - a string containing the account address of the agent creating the intent
+- `collectionId` - a string containing the Collection `id` this intent belongs to
+- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the custom amount specified for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used.
+- `cw20Payment` - an array of [CW20Payment](02_state.md#cw20payment) containing the custom CW20 payments specified for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used.
+- `cw1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) containing the custom CW1155 payments specified for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used.
+
+## MsgCreateClaimAuthorization
+
+A `MsgCreateClaimAuthorization` creates a new claim authorization on behalf of an entity admin account (SubmitClaimAuthorization or EvaluateClaimAuthorization). The creator (one executing this message), must have a valid [CreateClaimAuthorizationAuthorization](02_state.md#CreateClaimAuthorizationAuthorization) with at least one of the [constraints](02_state.md#CreateClaimAuthorizationConstraints) permitting the Authorization the creator is attempting to create.
+
+```go
+type MsgCreateClaimAuthorization struct {
+	CreatorAddress string
+	CreatorDid     DIDFragment
+	GranteeAddress string
+	AdminAddress   string
+	CollectionId   string
+	AuthType       CreateClaimAuthorizationType
+	AgentQuota     uint64
+	MaxAmount      github_com_cosmos_cosmos_sdk_types.Coins
+	MaxCW20Payment []CW20Payment
+	MaxCW1155Payment []CW1155Payment
+	Expiration     *time.Time
+	IntentDurationNs time.Duration
+	BeforeDate     *time.Time
+}
+```
+
+The field's descriptions is as follows:
+
+- `creatorAddress` - a string containing the address of the creator (user with meta-authorization)
+- `creatorDid` - a string containing the DID of the agent creating the authorization
+- `granteeAddress` - a string containing the address of the grantee (who will receive the authorization)
+- `adminAddress` - a string containing the account address defined in the [Collection](02_state.md#collection) `admin` field
+- `collectionId` - a string containing the Collection ID the authorization applies to (for both submit and evaluate)
+- `authType` - a [CreateClaimAuthorizationType](02_state.md#createclaimauthorizationtype) indicating the type of authorization to create (submit or evaluate, can't create both in a single request)
+- `agentQuota` - a integer containing the quota for the created authorization (for both submit and evaluate)
+- `maxAmount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the maximum amount that can be specified in the authorization (for both submit and evaluate)
+- `maxCW20Payment` - an array of [CW20Payment](02_state.md#cw20payment) containing the maximum CW20 payment that can be specified in the authorization (for both submit and evaluate)
+- `maxCW1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) containing the maximum CW1155 payment that can be specified in the authorization (for both submit and evaluate)
+- `expiration` - a timestamp of the expiration time for the authorization. Be careful with this as it is the expiration of the authorization itself, not the constraints, meaning if the authorization expires all constraints will be removed with the authorization (standard authz behavior).
+- `intentDurationNs` - a duration containing the maximum intent duration for the authorization allowed (for submit)
+- `beforeDate` - a timestamp after which the grantee can't execute this authz anymore, a cut off date (for evaluate). If null then no before_date validation done.

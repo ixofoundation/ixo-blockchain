@@ -53,6 +53,10 @@ type ApproveNftTransfer struct {
 	Expires string `json:"expires,omitempty"`
 }
 
+// -----------------------------------------------------------------------------
+// QUERIES
+// -----------------------------------------------------------------------------
+
 // / Return the owner of the given token, error if token does not exist
 // #[returns(cw721::OwnerOfResponse)]
 type WasmQueryOwnerOf struct {
@@ -65,6 +69,25 @@ type OwnerOf struct {
 type OwnerOfResponse struct {
 	Owner     string   `json:"owner"`
 	Approvals []string `json:"approvals"`
+}
+
+// / With Enumerable extension.
+// / Returns all tokens owned by the given address, [] if unset.
+// / Return type: TokensResponse.
+type WasmQueryTokens struct {
+	Tokens Tokens `json:"tokens"`
+}
+type Tokens struct {
+	Owner       string `json:"owner"`
+	Limit       string `json:"limit"`
+	Start_after string `json:"start_after"`
+}
+
+// / Contains all token_ids in lexicographical ordering
+// / If there are more than `limit`, use `start_from` in future queries
+// / to achieve pagination.
+type TokensResponse struct {
+	Tokens []string `json:"tokens"`
 }
 
 func Marshal(value interface{}) ([]byte, error) {

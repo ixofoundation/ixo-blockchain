@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
 
 	errorsmod "cosmossdk.io/errors"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"

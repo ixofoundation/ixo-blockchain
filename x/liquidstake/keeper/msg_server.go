@@ -10,7 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 )
 
 type msgServer struct {
@@ -249,4 +249,36 @@ func (s msgServer) SetModulePaused(goCtx context.Context, msg *types.MsgSetModul
 	}
 
 	return &types.MsgSetModulePausedResponse{}, nil
+}
+
+// --------------------------
+// BURN
+// --------------------------
+func (s msgServer) Burn(goCtx context.Context, msg *types.MsgBurn) (*types.MsgBurnResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// enforce only ixo native token can be burned
+	if msg.Amount.Denom != "uixo" {
+		return nil, errors.Wrap(sdkerrors.ErrInvalidRequest, "burning amount must be in uixo")
+	}
+	coins := sdk.NewCoins(msg.Amount)
+
+	burnerAddr, err := sdk.AccAddressFromBech32(msg.GetBurner())
+	if err != nil {
+		return nil, err
+	}
+
+	// Send coins to be burned from burner (enforces burnAmount <= balance)
+	err = s.bankKeeper.SendCoinsFromAccountToModule(ctx, burnerAddr, types.ModuleName, coins)
+	if err != nil {
+		return nil, err
+	}
+
+	// Burn the coins
+	err = s.bankKeeper.BurnCoins(ctx, types.ModuleName, coins)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgBurnResponse{}, nil
 }

@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v5/x/epochs/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/mint/types"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
 )
 
 // BeforeEpochStart is a hook which is executed before the start of an epoch. It is a no-op for mint module.

@@ -22,7 +22,9 @@ The Claims Module provides an advanced structure for handling Verifiable Claims 
      - [Collection](02_state.md#collection)
      - [Payments](02_state.md#payments)
      - [Payment](02_state.md#payment)
-     - [Contract1155Payment](02_state.md#contract1155payment)
+     - [Contract1155Payment](02_state.md#contract1155payment) DEPRECATED, use [CW1155Payment](02_state.md#cw1155payment) instead
+     - [CW1155Payment](02_state.md#cw1155payment)
+     - [CW1155IntentPayment](02_state.md#cw1155intentpayment)
      - [Claim](02_state.md#claim)
      - [ClaimPayments](02_state.md#claimpayments)
      - [Evaluation](02_state.md#evaluation)

@@ -10,7 +10,7 @@ import (
 
 // "fmt"
 
-// "github.com/ixofoundation/ixo-blockchain/v5/x/bonds/types"
+// "github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
 func toPercentage(f float64) float64 { return f / 100 }
 
 func ConvertFloat64ToDec(f float64) (sdk_math.LegacyDec, error) {

@@ -56,3 +56,19 @@ func IsZeroCW20Payments(cw20Payments []*CW20Payment) bool {
 	}
 	return true
 }
+
+// Checks if the CW20 payments are within the max constraints provided
+func IsCW20PaymentsInMaxConstraints(cw20Payments []*CW20Payment, maxCw20Payments []*CW20Payment) bool {
+	maxPaymentsMap := make(map[string]*CW20Payment)
+	for _, maxPayment := range maxCw20Payments {
+		maxPaymentsMap[maxPayment.Address] = maxPayment
+	}
+
+	for _, payment := range cw20Payments {
+		maxPayment, ok := maxPaymentsMap[payment.Address]
+		if !ok || payment.Amount > maxPayment.Amount {
+			return false
+		}
+	}
+	return true
+}

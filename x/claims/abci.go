@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v5/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
 )
 
 // NOTE: if performance becomes an issue, we can consider using a similar approach to cosmos sdk grants queue
@@ -38,7 +38,7 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 			}
 
 			// Transfer funds back to the original account
-			err = k.TransferIntentPayments(ctx, escrow, fromAddress, intent.Amount, intent.Cw20Payment)
+			_, err = k.TransferIntentPayments(ctx, escrow, fromAddress, intent.Amount, intent.Cw20Payment, intent.Cw1155Payment, intent.Cw1155IntentPayment)
 			if err != nil {
 				// if this happens then it means there is funds missing in escrow account, should never happen
 				panic(err)

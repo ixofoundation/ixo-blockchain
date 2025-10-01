@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ixo.smartaccount.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v5/x/smart-account/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types";
 
 // AccountAuthenticator represents a foundational model for all authenticators.
 // It provides extensibility by allowing concrete types to interpret and

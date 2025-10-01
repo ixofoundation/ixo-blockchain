@@ -6,7 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
 
-	"github.com/ixofoundation/ixo-blockchain/v5/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
 )
 
 // NewTokenProposalHandler creates a new governance Handler for a ParamChangeProposal
