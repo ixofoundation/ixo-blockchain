@@ -897,10 +897,10 @@ shell-quote@^1.8.1:
   resolved "https://registry.yarnpkg.com/shell-quote/-/shell-quote-1.8.2.tgz#d2d83e057959d53ec261311e9e9b8f51dcb2934a"
   integrity sha512-AzqKpGKjrj7EM6rKVQEPpB288oCfnrEIuyoT9cyF4nmGa7V8Zk6f7RRqYisX8X9m+Q7bd632aZW4ky7EhbQztA==
 
-snyk@1.1296.1:
-  version "1.1296.1"
-  resolved "https://registry.yarnpkg.com/snyk/-/snyk-1.1296.1.tgz#108cd439c4d6f62d51f0273c165e9f26a0001a70"
-  integrity sha512-swfGdH+Od5NHxH2xYherwDRYaWZWMBug5d5+ybuNUg+0JZzCO3edW+2Tu3/5JB7oQSw6yd97Zk21IVE3vdRVWQ==
+snyk@1.1300.2:
+  version "1.1300.2"
+  resolved "https://registry.yarnpkg.com/snyk/-/snyk-1.1300.2.tgz#8372786ee5bf2afeadf5ae741ac6da09566b4596"
+  integrity sha512-wkJ1hTooKFaNZl8cl+G1EE15qhOLB54YCIcT0GsX/sTPUAgK7pTm7902QrBtODdL68+wzqazazyDRlElXC1U2w==
   dependencies:
     "@sentry/node" "^7.36.0"
     global-agent "^3.0.0"
