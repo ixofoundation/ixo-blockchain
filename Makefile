@@ -146,7 +146,8 @@ run_with_genesis:
 ###                                Release                                  ###
 ###############################################################################
 
-GORELEASER_IMAGE := ghcr.io/goreleaser/goreleaser-cross:v$(GO_VERSION)
+# GORELEASER_IMAGE := ghcr.io/goreleaser/goreleaser-cross:v$(GO_VERSION)
+GORELEASER_IMAGE := ghcr.io/goreleaser/goreleaser-cross:v1.23.3 # v1.22.11 has no goreleaser-cross image
 COSMWASM_VERSION := $(shell go list -m github.com/CosmWasm/wasmvm | sed 's/.* //')
 
 ifdef GITHUB_TOKEN
