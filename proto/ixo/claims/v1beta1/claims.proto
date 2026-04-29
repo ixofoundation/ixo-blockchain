@@ -260,6 +260,10 @@ message Claim {
   // If intent was used, this is the cw20_payment equivalent but with amounts
   // per token_id to transfer the same tokens to and from the escrow account
   repeated CW1155IntentPayment cw1155_intent_payment = 12;
+  // member_address is the team member this claim is on behalf of, if any.
+  // Copied from intent when use_intent is true. Used for budget restoration
+  // on claim rejection/dispute/invalidation.
+  string member_address = 13;
 }
 
 message ClaimPayments {
@@ -364,4 +368,40 @@ message Intent {
   // Same as cw1155_payment but with amounts per token_id to transfer
   // the same tokens to and from the escrow account
   repeated CW1155IntentPayment cw1155_intent_payment = 14;
+  // member_address is the team member this intent is on behalf of, if any.
+  // Required if the collection has member budgets. Validated against the
+  // oracle's SubmitClaimConstraints.member_address.
+  string member_address = 15;
+}
+
+// MemberBudget defines a team member's periodic spending budget for a
+// collection. Stored as separate state keyed by collectionId/memberAddress
+// for gas-efficient O(1) reads and writes independent of team size.
+message MemberBudget {
+  // collection_id this budget belongs to
+  string collection_id = 1;
+  // member's blockchain address
+  string member_address = 2;
+  // period duration for budget reset (e.g., 30 days). Must be at least 24 hours
+  // (MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to
+  // prevent griefing via the lazy-reset loop in the intent handler.
+  google.protobuf.Duration period = 3
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // maximum native coin spend allowed per period
+  repeated cosmos.base.v1beta1.Coin period_spend_limit = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // native coins already spent (intented) in the current period
+  repeated cosmos.base.v1beta1.Coin period_spent = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // maximum CW20 spend allowed per period
+  repeated CW20Payment period_cw20_spend_limit = 6;
+  // CW20 amount already spent in the current period
+  repeated CW20Payment period_cw20_spent = 7;
+  // timestamp when current period resets (lazy reset in intent handler,
+  // following the feegrant PeriodicAllowance pattern)
+  google.protobuf.Timestamp period_reset_at = 8 [ (gogoproto.stdtime) = true ];
 }

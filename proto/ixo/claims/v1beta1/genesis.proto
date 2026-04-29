@@ -13,4 +13,5 @@ message GenesisState {
   repeated Claim claims = 3 [ (gogoproto.nullable) = false ];
   repeated Dispute disputes = 4 [ (gogoproto.nullable) = false ];
   repeated Intent intents = 5 [ (gogoproto.nullable) = false ];
+  repeated MemberBudget member_budgets = 6 [ (gogoproto.nullable) = false ];
 }

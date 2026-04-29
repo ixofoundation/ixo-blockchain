@@ -18,6 +18,18 @@ A Dispute is stored in the state and is accessed by the SubjectId of the dispute
 
 - Disputes: `0x03 | disputeSubjectId(DID) -> ProtocolBuffer(Dispute)`
 
+## Intents
+
+An Intent is stored in the state under a composite key of agent address, collection id, and intent id.
+
+- Intents: `0x04 | agentAddress + "/" + collectionId + "/" + intentId -> ProtocolBuffer(Intent)`
+
+## Member Budgets
+
+A MemberBudget is stored in the state under a composite key of collection id and member address. Storing each member budget under its own KV entry keeps reads and writes O(1) per member regardless of total team size — operations on one member do not require loading or rewriting other members' budgets, so per-operation gas is constant in team size.
+
+- Member Budgets: `0x05 | collectionId + "/" + memberAddress -> ProtocolBuffer(MemberBudget)`
+
 # Types
 
 ### Collection
@@ -226,6 +238,7 @@ type Claim struct {
 	CW20Payment    []CW20Payment
 	CW1155Payment  []CW1155Payment
 	CW1155IntentPayment []CW1155IntentPayment
+	MemberAddress  string
 }
 ```
 
@@ -243,6 +256,7 @@ The field's descriptions is as follows:
 - `cw20Payment` - an array of [CW20Payment](#cw20payment) containing the custom CW20 payments specified by service agent for claim approval. If both amount and CW20 and CW1155 payments are empty, then collection default is used (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw20Payment wanted if no intent used)
 - `cw1155Payment` - an array of [CW1155Payment](#cw1155payment) containing the custom CW1155 payments specified by service agent for claim approval. If amount, CW20 and CW1155 payments are empty, then collection default is used (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw1155Payment wanted if no intent used)
 - `cw1155IntentPayment` - an array of [CW1155IntentPayment](#cw1155intentpayment) containing the custom CW1155 payments if an intent was used to submit the claim.
+- `memberAddress` - a string containing the team member address this claim is on behalf of, if any. Copied from the intent (`Intent.MemberAddress`) when `useIntent` is true. Empty for individual subscriptions. Used to know which [MemberBudget](#memberbudget) to credit on rejection / dispute / invalidation.
 
 ### ClaimPayments
 
@@ -356,6 +370,7 @@ type Intent struct {
 	CreateDate    *time.Time
 	ExpireDate    *time.Time
 	Status        IntentStatus
+	MemberAddress string
 }
 ```
 
@@ -371,6 +386,43 @@ The field's descriptions is as follows:
 - `createDate` - a timestamp of the date and time that the intent was created on-chain
 - `expireDate` - a timestamp of the date and time that the intent will expire
 - `status` - a [IntentStatus](#intentstatus) indicating the current status of the intent
+- `memberAddress` - a string containing the team member this intent is on behalf of, if any. Required if the collection has [MemberBudgets](#memberbudget); empty for individual subscriptions. Validated against the oracle's [SubmitClaimConstraints](#submitclaimconstraints) `memberAddress` (the constraint must have been created by this same member) and used to deduct from the corresponding [MemberBudget](#memberbudget). Carried into the resulting [Claim](#claim) and used to restore the budget on rejection / dispute / invalidation / expiration.
+
+### MemberBudget
+
+A MemberBudget stores a team member's periodic spending budget on a [Collection](#collection). Member budgets are an opt-in mechanism that turns a collection into a "team / enterprise" collection — when one or more `MemberBudget` entries exist for a collection, all intents and claims on that collection must be attributed to a specific member, and per-member spending is enforced at intent creation time.
+
+```go
+type MemberBudget struct {
+	CollectionId         string
+	MemberAddress        string
+	Period               time.Duration
+	PeriodSpendLimit     github_com_cosmos_cosmos_sdk_types.Coins
+	PeriodSpent          github_com_cosmos_cosmos_sdk_types.Coins
+	PeriodCw20SpendLimit []CW20Payment
+	PeriodCw20Spent      []CW20Payment
+	PeriodResetAt        *time.Time
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` this budget belongs to
+- `memberAddress` - a string containing the team member's blockchain address
+- `period` - a duration for the budget reset cycle (e.g., 30 days). Must be at least 24 hours; shorter periods are rejected to prevent griefing through the lazy-reset loop
+- `periodSpendLimit` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object specifying the maximum native coin spend per period
+- `periodSpent` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object tracking native coin amounts already consumed (intented) in the current period
+- `periodCw20SpendLimit` - an array of [CW20Payment](#cw20payment) specifying the maximum CW20 spend per period
+- `periodCw20Spent` - an array of [CW20Payment](#cw20payment) tracking CW20 amounts already consumed in the current period
+- `periodResetAt` - a timestamp of the next period reset boundary. Period reset is **lazy**: when an intent or restore operation runs and `now >= periodResetAt`, `periodSpent` and `periodCw20Spent` are zeroed and `periodResetAt` is rolled forward by `period` until it lands in the future. No background scheduler is involved.
+
+Lifecycle:
+
+- **Created** — when a member is added to a collection via `MsgSetCollectionMembers`. `periodSpent` starts empty and `periodResetAt = now + period`.
+- **Updated (admin)** — when an existing member's budget is changed via `MsgSetCollectionMembers`. `periodSpent` and `periodResetAt` are preserved unless `resetPeriodSpent` is true.
+- **Updated (intent)** — when a [MsgClaimIntent](03_messages.md#msgclaimintent) is created with a matching `memberAddress`, the intent amount is added to `periodSpent` (and CW20 equivalents).
+- **Updated (restore)** — when a claim is rejected / disputed / invalidated, or an intent expires before being used, the corresponding amounts are subtracted back from `periodSpent`. If the period has reset between the original deduction and the restore, the restore is skipped (the old period's spend doesn't carry over into the new period).
+- **Removed** — when removed via `MsgRemoveCollectionMembers`. Pending intents from a removed member still expire and refund escrow normally; budget restore is silently skipped.
 
 ## Enums
 
@@ -529,6 +581,7 @@ type SubmitClaimConstraints struct {
 	MaxCW20Payment    []CW20Payment
 	MaxCW1155Payment  []CW1155Payment
 	IntentDurationNs  time.Duration
+	MemberAddress     string
 }
 ```
 
@@ -540,6 +593,7 @@ The field's descriptions is as follows:
 - `maxCW20Payment` - an array of [CW20Payment](#cw20payment) containing the maximum CW20 payments allowed to be specified by service agent for claim approval. If empty then no custom amount is allowed, and default payments from Collection payments are used.
 - `maxCW1155Payment` - an array of [CW1155Payment](#cw1155payment) containing the maximum CW1155 payments allowed to be specified by service agent for claim approval. If empty then no custom amount is allowed, and default payments from Collection payments are used.
 - `intentDurationNs` - a duration for which the intent is active, after which it will expire (in nanoseconds)
+- `memberAddress` - a string containing the team member who created this constraint via [MsgCreateClaimAuthorization](03_messages.md#msgcreateclaimauthorization). Empty for individual (non-team) subscriptions. The intent handler matches constraints by `(collectionId, memberAddress)` using strict equality (both empty for individual; both equal for team), so when multiple team members authorize the same oracle on the same collection, each member's intents consume their own constraint and `agentQuota` independently.
 
 ### EvaluateClaimAuthorization
 
@@ -626,6 +680,7 @@ type CreateClaimAuthorizationConstraints struct {
 	CollectionIds        []string
 	AllowedAuthTypes     CreateClaimAuthorizationType
 	MaxIntentDurationNs  time.Duration
+	MemberAddress        string
 }
 ```
 
@@ -640,3 +695,4 @@ The field's descriptions is as follows:
 - `collectionIds` - a list of strings containing the Collection IDs the grantee can create authorizations for. If empty then all collections for the admin are allowed.
 - `allowedAuthTypes` - a [CreateClaimAuthorizationType](#createclaimauthorizationtype) indicating the types of authorizations the grantee can create (submit, evaluate, or all/both).
 - `maxIntentDurationNs` - a duration containing the maximum intent duration for the authorization allowed (for submit).
+- `memberAddress` - a string containing the team member identity locked into this constraint by the admin at grant creation time. The Accept method enforces strict equality between this and the `MsgCreateClaimAuthorization.memberAddress` field — both empty for individual subscriptions, both equal to the same member address for team members. This is the **anti-spoofing primitive**: a grantee cannot create an authorization tagged with a member address other than the one the admin authorized.

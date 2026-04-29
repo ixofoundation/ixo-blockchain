@@ -181,3 +181,42 @@ func (k Keeper) IntentList(c context.Context, req *types.QueryIntentListRequest)
 
 	return &types.QueryIntentListResponse{Intents: intents, Pagination: pageRes}, nil
 }
+
+func (k Keeper) CollectionMember(c context.Context, req *types.QueryCollectionMemberRequest) (*types.QueryCollectionMemberResponse, error) {
+	if req == nil || req.CollectionId == "" || req.MemberAddress == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+	budget, err := k.GetMemberBudget(ctx, req.CollectionId, req.MemberAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryCollectionMemberResponse{MemberBudget: budget}, nil
+}
+
+func (k Keeper) CollectionMemberList(c context.Context, req *types.QueryCollectionMemberListRequest) (*types.QueryCollectionMemberListResponse, error) {
+	if req == nil || req.CollectionId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	var budgets []types.MemberBudget
+	ctx := sdk.UnwrapSDKContext(c)
+	memberBudgetStore := prefix.NewStore(ctx.KVStore(k.storeKey), append(types.MemberBudgetKey, []byte(req.CollectionId+"/")...))
+
+	pageRes, err := query.Paginate(memberBudgetStore, req.Pagination, func(key []byte, value []byte) error {
+		var budget types.MemberBudget
+		if err := k.cdc.Unmarshal(value, &budget); err != nil {
+			return err
+		}
+		budgets = append(budgets, budget)
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryCollectionMemberListResponse{MemberBudgets: budgets, Pagination: pageRes}, nil
+}

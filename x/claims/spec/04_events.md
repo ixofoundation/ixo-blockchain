@@ -170,3 +170,53 @@ The field's descriptions is as follows:
 - `admin` - a string containing the address of the admin account on the collection from which the authz is given through the meta-authorization
 - `collectionId` - a string containing the id of the collection the authorization applies to
 - `authorizationType` - a [CreateClaimAuthorizationType](./02_state.md#createclaimauthorizationtype) indicating the type of authorization created
+
+## MemberBudgetCreatedEvent
+
+This event is emitted when a [MemberBudget](./02_state.md#memberbudget) is added to a collection for the first time via [MsgSetCollectionMembers](./03_messages.md#msgsetcollectionmembers). Carries the full initial budget state so an indexer can insert a fresh row without re-querying the chain.
+
+```go
+type MemberBudgetCreatedEvent struct {
+	Budget *MemberBudget
+}
+```
+
+The field's descriptions is as follows:
+
+- `budget` - the full [MemberBudget](./02_state.md#memberbudget)
+
+## MemberBudgetUpdatedEvent
+
+This event is emitted on **every state change** to an existing [MemberBudget](./02_state.md#memberbudget). Carries the post-update full budget state so an indexer can `UPDATE` the corresponding row directly.
+
+Triggered by:
+
+- An admin update to an existing member's limits via [MsgSetCollectionMembers](./03_messages.md#msgsetcollectionmembers) (preserving or resetting `periodSpent` per `resetPeriodSpent`).
+- A `periodSpent` deduction during [MsgClaimIntent](./03_messages.md#msgclaimintent) (covers both the lazy period reset and the deduction in one event).
+- A `periodSpent` restoration on claim rejection / dispute / invalidation via [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim).
+- A `periodSpent` restoration on intent expiration in the EndBlocker.
+- A lazy period reset triggered during a restore operation when the period had elapsed (the restore early-returns after persisting the reset state).
+
+```go
+type MemberBudgetUpdatedEvent struct {
+	Budget *MemberBudget
+}
+```
+
+The field's descriptions is as follows:
+
+- `budget` - the full updated [MemberBudget](./02_state.md#memberbudget)
+
+## MemberBudgetRemovedEvent
+
+This event is emitted when a [MemberBudget](./02_state.md#memberbudget) is removed via [MsgRemoveCollectionMembers](./03_messages.md#msgremovecollectionmembers). Carries the final budget state at time of removal so an indexer can audit / archive the final values before deleting (or marking removed) the row.
+
+```go
+type MemberBudgetRemovedEvent struct {
+	Budget *MemberBudget
+}
+```
+
+The field's descriptions is as follows:
+
+- `budget` - the full [MemberBudget](./02_state.md#memberbudget) state at time of removal

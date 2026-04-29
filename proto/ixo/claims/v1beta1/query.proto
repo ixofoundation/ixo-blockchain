@@ -40,6 +40,16 @@ service Query {
   rpc IntentList(QueryIntentListRequest) returns (QueryIntentListResponse) {
     option (google.api.http).get = "/ixo/claims/intents";
   }
+  rpc CollectionMember(QueryCollectionMemberRequest)
+      returns (QueryCollectionMemberResponse) {
+    option (google.api.http).get =
+        "/ixo/claims/collection/{collectionId}/member/{memberAddress}";
+  }
+  rpc CollectionMemberList(QueryCollectionMemberListRequest)
+      returns (QueryCollectionMemberListResponse) {
+    option (google.api.http).get =
+        "/ixo/claims/collection/{collectionId}/members";
+  }
 }
 
 message QueryParamsRequest {}
@@ -108,5 +118,24 @@ message QueryIntentListRequest {
 
 message QueryIntentListResponse {
   repeated Intent intents = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryCollectionMemberRequest {
+  string collectionId = 1;
+  string memberAddress = 2;
+}
+
+message QueryCollectionMemberResponse {
+  MemberBudget member_budget = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryCollectionMemberListRequest {
+  string collectionId = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryCollectionMemberListResponse {
+  repeated MemberBudget member_budgets = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

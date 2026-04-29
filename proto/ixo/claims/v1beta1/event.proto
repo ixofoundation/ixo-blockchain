@@ -55,3 +55,19 @@ message ClaimAuthorizationCreatedEvent {
   string collection_id = 5;
   string auth_type = 6;
 }
+
+// MemberBudgetCreatedEvent is an event triggered when a team member budget is
+// added to a collection for the first time.
+message MemberBudgetCreatedEvent { MemberBudget budget = 1; }
+
+// MemberBudgetUpdatedEvent is an event triggered on any state change to an
+// existing member budget — admin-driven update via MsgSetCollectionMembers,
+// period_spent deduction during MsgClaimIntent, period_spent restoration on
+// claim rejection / dispute / invalidation / intent expiration, or lazy period
+// reset.
+message MemberBudgetUpdatedEvent { MemberBudget budget = 1; }
+
+// MemberBudgetRemovedEvent is an event triggered when a team member budget is
+// removed from a collection. Includes the final budget state at the time of
+// removal for indexer audit.
+message MemberBudgetRemovedEvent { MemberBudget budget = 1; }

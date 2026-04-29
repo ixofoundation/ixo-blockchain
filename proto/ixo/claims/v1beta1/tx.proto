@@ -31,6 +31,10 @@ service Msg {
   rpc ClaimIntent(MsgClaimIntent) returns (MsgClaimIntentResponse);
   rpc CreateClaimAuthorization(MsgCreateClaimAuthorization)
       returns (MsgCreateClaimAuthorizationResponse);
+  rpc SetCollectionMembers(MsgSetCollectionMembers)
+      returns (MsgSetCollectionMembersResponse);
+  rpc RemoveCollectionMembers(MsgRemoveCollectionMembers)
+      returns (MsgRemoveCollectionMembersResponse);
 }
 
 message MsgCreateCollection {
@@ -92,6 +96,10 @@ message MsgSubmitClaim {
   // custom cw1155 payments specified by service agent for claim approval
   // NOTE: if all amounts are empty then collection default is used
   repeated CW1155Payment cw1155_payment = 9;
+  // member_address is the team member this claim is on behalf of. Required if
+  // the collection has member budgets. Must match intent's member_address when
+  // use_intent is true.
+  string member_address = 10;
 }
 message MsgSubmitClaimResponse {}
 
@@ -275,6 +283,11 @@ message MsgClaimIntent {
   // NOTE: if all amounts are empty then collection default is used (APPROVAL
   // payment)
   repeated CW1155Payment cw1155_payment = 6;
+  // member_address is the team member this intent is on behalf of. Required if
+  // the collection has member budgets. Validated against the oracle's
+  // SubmitClaimConstraints.member_address to prove the member authorized this
+  // oracle. Used to check and deduct from the member's periodic budget.
+  string member_address = 7;
 }
 
 // MsgClaimIntentResponse defines the response after submitting an intent.
@@ -332,8 +345,75 @@ message MsgCreateClaimAuthorization {
   // Maximum cw1155 payment that can be specified in the authorization (for both
   // submit and evaluate)
   repeated CW1155Payment max_cw1155_payment = 13;
+  // member_address to set on the created SubmitClaimConstraint. Must match
+  // the member_address in the creator's CreateClaimAuthorizationConstraints
+  // to prevent spoofing (enforced in Accept()).
+  string member_address = 14;
 }
 
 // MsgCreateClaimAuthorizationResponse defines the response for creating a claim
 // authorization
 message MsgCreateClaimAuthorizationResponse {}
+
+// MsgSetCollectionMembers adds or updates one or more member budgets on a
+// collection in a single transaction. For each member entry:
+//   - If the member already exists and reset_period_spent is false: budget
+//     limits (period, spend_limit, cw20_spend_limit) are updated, but
+//     period_spent and period_reset_at are preserved. The current period
+//     continues with the new limits applied immediately.
+//   - If the member already exists and reset_period_spent is true:
+//     period_spent is cleared and period_reset_at is set to now + period.
+//     This starts a fresh cycle from the current block time.
+//   - If the member is new: created with period_spent = zero and
+//     period_reset_at = now + period.
+//
+// Handler will reject any member entry where all spend limits are zero —
+// use MsgRemoveCollectionMembers instead. Duplicate member addresses within
+// a single message are rejected.
+message MsgSetCollectionMembers {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
+  // collection_id to add/update members on
+  string collection_id = 1;
+  // admin address, validated against Collection Admin
+  string admin_address = 2;
+  // list of member budgets to set
+  repeated CollectionMemberInput members = 3;
+}
+message MsgSetCollectionMembersResponse {}
+
+// CollectionMemberInput defines the input for a single member budget within
+// MsgSetCollectionMembers
+message CollectionMemberInput {
+  // member's blockchain address
+  string member_address = 1;
+  // period duration for budget reset (e.g., 30 days). Must be at least 24 hours
+  // (MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to
+  // prevent griefing via the lazy-reset loop in the intent handler.
+  google.protobuf.Duration period = 2
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // maximum native coin spend allowed per period
+  repeated cosmos.base.v1beta1.Coin period_spend_limit = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // maximum CW20 spend allowed per period
+  repeated CW20Payment period_cw20_spend_limit = 4;
+  // if true, resets period_spent to zero (useful for manual admin reset)
+  bool reset_period_spent = 5;
+}
+
+// MsgRemoveCollectionMembers removes one or more member budgets from a
+// collection in a single transaction. Does not revoke the members' existing
+// authorization grants — admin should do that separately if needed.
+message MsgRemoveCollectionMembers {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
+  // collection_id to remove members from
+  string collection_id = 1;
+  // admin address, validated against Collection Admin
+  string admin_address = 2;
+  // list of member addresses to remove
+  repeated string member_addresses = 3;
+}
+message MsgRemoveCollectionMembersResponse {}

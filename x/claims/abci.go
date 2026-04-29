@@ -44,6 +44,13 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 				panic(err)
 			}
 
+			// Restore member budget if this intent was on behalf of a team member
+			if intent.MemberAddress != "" {
+				if err := k.RestoreMemberBudget(ctx, intent.CollectionId, intent.MemberAddress, intent.Amount, intent.Cw20Payment); err != nil {
+					panic(err)
+				}
+			}
+
 			// Mark intent as expired
 			intent.Status = types.IntentStatus_expired
 			err = k.RemoveIntentAndEmitEvents(ctx, intent)

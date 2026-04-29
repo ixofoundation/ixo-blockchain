@@ -104,6 +104,7 @@
     - [DisputeData](#ixo.claims.v1beta1.DisputeData)
     - [Evaluation](#ixo.claims.v1beta1.Evaluation)
     - [Intent](#ixo.claims.v1beta1.Intent)
+    - [MemberBudget](#ixo.claims.v1beta1.MemberBudget)
     - [Params](#ixo.claims.v1beta1.Params)
     - [Payment](#ixo.claims.v1beta1.Payment)
     - [Payments](#ixo.claims.v1beta1.Payments)
@@ -150,6 +151,10 @@
     - [QueryClaimResponse](#ixo.claims.v1beta1.QueryClaimResponse)
     - [QueryCollectionListRequest](#ixo.claims.v1beta1.QueryCollectionListRequest)
     - [QueryCollectionListResponse](#ixo.claims.v1beta1.QueryCollectionListResponse)
+    - [QueryCollectionMemberListRequest](#ixo.claims.v1beta1.QueryCollectionMemberListRequest)
+    - [QueryCollectionMemberListResponse](#ixo.claims.v1beta1.QueryCollectionMemberListResponse)
+    - [QueryCollectionMemberRequest](#ixo.claims.v1beta1.QueryCollectionMemberRequest)
+    - [QueryCollectionMemberResponse](#ixo.claims.v1beta1.QueryCollectionMemberResponse)
     - [QueryCollectionRequest](#ixo.claims.v1beta1.QueryCollectionRequest)
     - [QueryCollectionResponse](#ixo.claims.v1beta1.QueryCollectionResponse)
     - [QueryDisputeListRequest](#ixo.claims.v1beta1.QueryDisputeListRequest)
@@ -166,6 +171,7 @@
     - [Query](#ixo.claims.v1beta1.Query)
   
 - [ixo/claims/v1beta1/tx.proto](#ixo/claims/v1beta1/tx.proto)
+    - [CollectionMemberInput](#ixo.claims.v1beta1.CollectionMemberInput)
     - [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent)
     - [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse)
     - [MsgCreateClaimAuthorization](#ixo.claims.v1beta1.MsgCreateClaimAuthorization)
@@ -176,6 +182,10 @@
     - [MsgDisputeClaimResponse](#ixo.claims.v1beta1.MsgDisputeClaimResponse)
     - [MsgEvaluateClaim](#ixo.claims.v1beta1.MsgEvaluateClaim)
     - [MsgEvaluateClaimResponse](#ixo.claims.v1beta1.MsgEvaluateClaimResponse)
+    - [MsgRemoveCollectionMembers](#ixo.claims.v1beta1.MsgRemoveCollectionMembers)
+    - [MsgRemoveCollectionMembersResponse](#ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse)
+    - [MsgSetCollectionMembers](#ixo.claims.v1beta1.MsgSetCollectionMembers)
+    - [MsgSetCollectionMembersResponse](#ixo.claims.v1beta1.MsgSetCollectionMembersResponse)
     - [MsgSubmitClaim](#ixo.claims.v1beta1.MsgSubmitClaim)
     - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
     - [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates)
@@ -1965,6 +1975,7 @@ CW20Output represents a CW20 token output for split payments
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
 | cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
 | cw1155_intent_payment | [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment) | repeated | If intent was used, this is the cw20_payment equivalent but with amounts per token_id to transfer the same tokens to and from the escrow account |
+| member_address | [string](#string) |  | member_address is the team member this claim is on behalf of, if any. Copied from intent when use_intent is true. Used for budget restoration on claim rejection/dispute/invalidation. |
 
 
 
@@ -2122,6 +2133,31 @@ Intent defines the structure for a service agent&#39;s claim intent.
 | escrow_address | [string](#string) |  | the escrow account address |
 | cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | The custom cw1155 payments the agent intends to claim, if any. |
 | cw1155_intent_payment | [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment) | repeated | Same as cw1155_payment but with amounts per token_id to transfer the same tokens to and from the escrow account |
+| member_address | [string](#string) |  | member_address is the team member this intent is on behalf of, if any. Required if the collection has member budgets. Validated against the oracle&#39;s SubmitClaimConstraints.member_address. |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MemberBudget"></a>
+
+### MemberBudget
+MemberBudget defines a team member&#39;s periodic spending budget for a
+collection. Stored as separate state keyed by collectionId/memberAddress
+for gas-efficient O(1) reads and writes independent of team size.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id this budget belongs to |
+| member_address | [string](#string) |  | member&#39;s blockchain address |
+| period | [google.protobuf.Duration](#google.protobuf.Duration) |  | period duration for budget reset (e.g., 30 days) |
+| period_spend_limit | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | maximum native coin spend allowed per period |
+| period_spent | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | native coins already spent (intented) in the current period |
+| period_cw20_spend_limit | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | maximum CW20 spend allowed per period |
+| period_cw20_spent | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | CW20 amount already spent in the current period |
+| period_reset_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | timestamp when current period resets (lazy reset in intent handler, following the feegrant PeriodicAllowance pattern) |
 
 
 
@@ -2323,6 +2359,7 @@ claim authorizations
 | allowed_auth_types | [CreateClaimAuthorizationType](#ixo.claims.v1beta1.CreateClaimAuthorizationType) |  | Types of authorizations the grantee can create (submit, evaluate, or all(both)) |
 | max_intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum intent duration for the authorization allowed (for submit) |
 | max_cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | Maximum cw1155 payment that can be set in created authorizations, if empty then any cw1155 payment is allowed in the created authorizations explicitly set to amount to 0 to disallow any cw1155 payment in the created authorizations |
+| member_address | [string](#string) |  | member_address is the team member this constraint is for. Set by the team admin when granting CreateClaimAuthorizationAuthorization to a member. Enforced in Accept() to prevent a member from spoofing another member&#39;s address when creating oracle authorizations. Empty for individual (non-team) subscriptions. |
 
 
 
@@ -2396,6 +2433,7 @@ claim authorizations
 | max_cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom max_cw20_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed, and default payments from Collection payments are used |
 | intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | intent_duration_ns is the duration for which the intent is active, after which it will expire (in nanoseconds) |
 | max_cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom max_cw1155_payment allowed to be specified by service agent for claim approval, if empty then no custom amount is allowed, and default payments from Collection payments are used |
+| member_address | [string](#string) |  | member_address is the team member who created this constraint via MsgCreateClaimAuthorization. Empty for individual (non-team) subscriptions. Used by Accept() to match the correct member&#39;s constraint when multiple team members authorize the same oracle, and by the intent handler to validate the oracle was authorized by the claimed member. |
 
 
 
@@ -2674,6 +2712,7 @@ GenesisState defines the claims module&#39;s genesis state.
 | claims | [Claim](#ixo.claims.v1beta1.Claim) | repeated |  |
 | disputes | [Dispute](#ixo.claims.v1beta1.Dispute) | repeated |  |
 | intents | [Intent](#ixo.claims.v1beta1.Intent) | repeated |  |
+| member_budgets | [MemberBudget](#ixo.claims.v1beta1.MemberBudget) | repeated |  |
 
 
 
@@ -2782,6 +2821,69 @@ GenesisState defines the claims module&#39;s genesis state.
 | ----- | ---- | ----- | ----------- |
 | collections | [Collection](#ixo.claims.v1beta1.Collection) | repeated |  |
 | pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionMemberListRequest"></a>
+
+### QueryCollectionMemberListRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collectionId | [string](#string) |  |  |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionMemberListResponse"></a>
+
+### QueryCollectionMemberListResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| member_budgets | [MemberBudget](#ixo.claims.v1beta1.MemberBudget) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionMemberRequest"></a>
+
+### QueryCollectionMemberRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collectionId | [string](#string) |  |  |
+| memberAddress | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryCollectionMemberResponse"></a>
+
+### QueryCollectionMemberResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| member_budget | [MemberBudget](#ixo.claims.v1beta1.MemberBudget) |  |  |
 
 
 
@@ -2989,6 +3091,8 @@ Query defines the gRPC querier service.
 | DisputeList | [QueryDisputeListRequest](#ixo.claims.v1beta1.QueryDisputeListRequest) | [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse) |  |
 | Intent | [QueryIntentRequest](#ixo.claims.v1beta1.QueryIntentRequest) | [QueryIntentResponse](#ixo.claims.v1beta1.QueryIntentResponse) |  |
 | IntentList | [QueryIntentListRequest](#ixo.claims.v1beta1.QueryIntentListRequest) | [QueryIntentListResponse](#ixo.claims.v1beta1.QueryIntentListResponse) |  |
+| CollectionMember | [QueryCollectionMemberRequest](#ixo.claims.v1beta1.QueryCollectionMemberRequest) | [QueryCollectionMemberResponse](#ixo.claims.v1beta1.QueryCollectionMemberResponse) |  |
+| CollectionMemberList | [QueryCollectionMemberListRequest](#ixo.claims.v1beta1.QueryCollectionMemberListRequest) | [QueryCollectionMemberListResponse](#ixo.claims.v1beta1.QueryCollectionMemberListResponse) |  |
 
  
 
@@ -2998,6 +3102,26 @@ Query defines the gRPC querier service.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/claims/v1beta1/tx.proto
+
+
+
+<a name="ixo.claims.v1beta1.CollectionMemberInput"></a>
+
+### CollectionMemberInput
+CollectionMemberInput defines the input for a single member budget within
+MsgSetCollectionMembers
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| member_address | [string](#string) |  | member&#39;s blockchain address |
+| period | [google.protobuf.Duration](#google.protobuf.Duration) |  | period duration for budget reset (e.g., 30 days) |
+| period_spend_limit | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | maximum native coin spend allowed per period |
+| period_cw20_spend_limit | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | maximum CW20 spend allowed per period |
+| reset_period_spent | [bool](#bool) |  | if true, resets period_spent to zero (useful for manual admin reset) |
+
+
+
 
 
 
@@ -3015,6 +3139,7 @@ Query defines the gRPC querier service.
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | The desired claim amount, if any. NOTE: if all amounts are empty then collection default is used (APPROVAL payment) |
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | The custom CW20 payment, if any. NOTE: if all amounts are empty then collection default is used (APPROVAL payment) |
 | cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | The custom CW1155 payment, if any. NOTE: if all amounts are empty then collection default is used (APPROVAL payment) |
+| member_address | [string](#string) |  | member_address is the team member this intent is on behalf of. Required if the collection has member budgets. Validated against the oracle&#39;s SubmitClaimConstraints.member_address to prove the member authorized this oracle. Used to check and deduct from the member&#39;s periodic budget. |
 
 
 
@@ -3060,6 +3185,7 @@ or EvaluateClaimAuthorization)
 | intent_duration_ns | [google.protobuf.Duration](#google.protobuf.Duration) |  | Maximum intent duration for the authorization allowed (for submit) |
 | before_date | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | if null then no before_date validation done (for evaluate) |
 | max_cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | Maximum cw1155 payment that can be specified in the authorization (for both submit and evaluate) |
+| member_address | [string](#string) |  | member_address to set on the created SubmitClaimConstraint. Must match the member_address in the creator&#39;s CreateClaimAuthorizationConstraints to prevent spoofing (enforced in Accept()). |
 
 
 
@@ -3176,6 +3302,68 @@ Collection entity, or have authz cap, aka is agent
 
 
 
+<a name="ixo.claims.v1beta1.MsgRemoveCollectionMembers"></a>
+
+### MsgRemoveCollectionMembers
+MsgRemoveCollectionMembers removes one or more member budgets from a
+collection in a single transaction. Does not revoke the members&#39; existing
+authorization grants — admin should do that separately if needed.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id to remove members from |
+| admin_address | [string](#string) |  | admin address, validated against Collection Admin |
+| member_addresses | [string](#string) | repeated | list of member addresses to remove |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse"></a>
+
+### MsgRemoveCollectionMembersResponse
+
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgSetCollectionMembers"></a>
+
+### MsgSetCollectionMembers
+MsgSetCollectionMembers adds or updates one or more member budgets on a
+collection in a single transaction. For each member entry: if the member
+already exists, their budget limits are updated (period_spent is preserved
+unless reset_period_spent is true on that entry). If the member is new,
+they are created with period_spent = zero. Handler will reject any member
+entry where all spend limits are zero — use MsgRemoveCollectionMembers
+instead.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id to add/update members on |
+| admin_address | [string](#string) |  | admin address, validated against Collection Admin |
+| members | [CollectionMemberInput](#ixo.claims.v1beta1.CollectionMemberInput) | repeated | list of member budgets to set |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgSetCollectionMembersResponse"></a>
+
+### MsgSetCollectionMembersResponse
+
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.MsgSubmitClaim"></a>
 
 ### MsgSubmitClaim
@@ -3193,6 +3381,7 @@ Collection entity, or have authz cap, aka is agent
 | amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | custom amount specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
 | cw20_payment | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | custom cw20 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
 | cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
+| member_address | [string](#string) |  | member_address is the team member this claim is on behalf of. Required if the collection has member budgets. Must match intent&#39;s member_address when use_intent is true. |
 
 
 
@@ -3377,6 +3566,8 @@ Msg defines the Msg service.
 | UpdateCollectionIntents | [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents) | [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse) |  |
 | ClaimIntent | [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent) | [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse) |  |
 | CreateClaimAuthorization | [MsgCreateClaimAuthorization](#ixo.claims.v1beta1.MsgCreateClaimAuthorization) | [MsgCreateClaimAuthorizationResponse](#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse) |  |
+| SetCollectionMembers | [MsgSetCollectionMembers](#ixo.claims.v1beta1.MsgSetCollectionMembers) | [MsgSetCollectionMembersResponse](#ixo.claims.v1beta1.MsgSetCollectionMembersResponse) |  |
+| RemoveCollectionMembers | [MsgRemoveCollectionMembers](#ixo.claims.v1beta1.MsgRemoveCollectionMembers) | [MsgRemoveCollectionMembersResponse](#ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse) |  |
 
  
 

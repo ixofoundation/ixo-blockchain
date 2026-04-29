@@ -50844,6 +50844,16 @@ paths:
 
                       per token_id to transfer the same tokens to and from the
                       escrow account
+                  member_address:
+                    type: string
+                    description: >-
+                      member_address is the team member this claim is on behalf
+                      of, if any.
+
+                      Copied from intent when use_intent is true. Used for
+                      budget restoration
+
+                      on claim rejection/dispute/invalidation.
         default:
           description: An unexpected error response.
           schema:
@@ -51247,6 +51257,16 @@ paths:
 
                         per token_id to transfer the same tokens to and from the
                         escrow account
+                    member_address:
+                      type: string
+                      description: >-
+                        member_address is the team member this claim is on
+                        behalf of, if any.
+
+                        Copied from intent when use_intent is true. Used for
+                        budget restoration
+
+                        on claim rejection/dispute/invalidation.
               pagination:
                 type: object
                 properties:
@@ -51298,6 +51318,372 @@ paths:
                       type: string
                       format: byte
       parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /ixo/claims/collection/{collectionId}/member/{memberAddress}:
+    get:
+      operationId: CollectionMember
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              member_budget:
+                type: object
+                properties:
+                  collection_id:
+                    type: string
+                    title: collection_id this budget belongs to
+                  member_address:
+                    type: string
+                    title: member's blockchain address
+                  period:
+                    type: string
+                    title: period duration for budget reset (e.g., 30 days)
+                  period_spend_limit:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    title: maximum native coin spend allowed per period
+                  period_spent:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        denom:
+                          type: string
+                        amount:
+                          type: string
+                      description: >-
+                        Coin defines a token with a denomination and an amount.
+
+
+                        NOTE: The amount field is an Int which implements the
+                        custom method
+
+                        signatures required by gogoproto.
+                    title: >-
+                      native coins already spent (intented) in the current
+                      period
+                  period_cw20_spend_limit:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    title: maximum CW20 spend allowed per period
+                  period_cw20_spent:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        amount:
+                          type: string
+                          format: uint64
+                          title: >-
+                            chose uint64 for now as amounts should be small
+                            enough to fit in a
+
+                            uint64(max 18446744073709551615)
+                    title: CW20 amount already spent in the current period
+                  period_reset_at:
+                    type: string
+                    format: date-time
+                    title: >-
+                      timestamp when current period resets (lazy reset in intent
+                      handler,
+
+                      following the feegrant PeriodicAllowance pattern)
+                description: >-
+                  MemberBudget defines a team member's periodic spending budget
+                  for a
+
+                  collection. Stored as separate state keyed by
+                  collectionId/memberAddress
+
+                  for gas-efficient O(1) reads and writes independent of team
+                  size.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          type: string
+        - name: memberAddress
+          in: path
+          required: true
+          type: string
+      tags:
+        - Query
+  /ixo/claims/collection/{collectionId}/members:
+    get:
+      operationId: CollectionMemberList
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              member_budgets:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    collection_id:
+                      type: string
+                      title: collection_id this budget belongs to
+                    member_address:
+                      type: string
+                      title: member's blockchain address
+                    period:
+                      type: string
+                      title: period duration for budget reset (e.g., 30 days)
+                    period_spend_limit:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      title: maximum native coin spend allowed per period
+                    period_spent:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          denom:
+                            type: string
+                          amount:
+                            type: string
+                        description: >-
+                          Coin defines a token with a denomination and an
+                          amount.
+
+
+                          NOTE: The amount field is an Int which implements the
+                          custom method
+
+                          signatures required by gogoproto.
+                      title: >-
+                        native coins already spent (intented) in the current
+                        period
+                    period_cw20_spend_limit:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      title: maximum CW20 spend allowed per period
+                    period_cw20_spent:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          amount:
+                            type: string
+                            format: uint64
+                            title: >-
+                              chose uint64 for now as amounts should be small
+                              enough to fit in a
+
+                              uint64(max 18446744073709551615)
+                      title: CW20 amount already spent in the current period
+                    period_reset_at:
+                      type: string
+                      format: date-time
+                      title: >-
+                        timestamp when current period resets (lazy reset in
+                        intent handler,
+
+                        following the feegrant PeriodicAllowance pattern)
+                  description: >-
+                    MemberBudget defines a team member's periodic spending
+                    budget for a
+
+                    collection. Stored as separate state keyed by
+                    collectionId/memberAddress
+
+                    for gas-efficient O(1) reads and writes independent of team
+                    size.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: collectionId
+          in: path
+          required: true
+          type: string
         - name: pagination.key
           description: |-
             key is a value returned in PageResponse.next_key to begin
@@ -52878,6 +53264,16 @@ paths:
                       transfer
 
                       the same tokens to and from the escrow account
+                  member_address:
+                    type: string
+                    description: >-
+                      member_address is the team member this intent is on behalf
+                      of, if any.
+
+                      Required if the collection has member budgets. Validated
+                      against the
+
+                      oracle's SubmitClaimConstraints.member_address.
                 description: >-
                   Intent defines the structure for a service agent's claim
                   intent.
@@ -53061,6 +53457,16 @@ paths:
                         transfer
 
                         the same tokens to and from the escrow account
+                    member_address:
+                      type: string
+                      description: >-
+                        member_address is the team member this intent is on
+                        behalf of, if any.
+
+                        Required if the collection has member budgets. Validated
+                        against the
+
+                        oracle's SubmitClaimConstraints.member_address.
                   description: >-
                     Intent defines the structure for a service agent's claim
                     intent.
@@ -89281,6 +89687,15 @@ definitions:
 
           per token_id to transfer the same tokens to and from the escrow
           account
+      member_address:
+        type: string
+        description: >-
+          member_address is the team member this claim is on behalf of, if any.
+
+          Copied from intent when use_intent is true. Used for budget
+          restoration
+
+          on claim rejection/dispute/invalidation.
   ixo.claims.v1beta1.ClaimPayments:
     type: object
     properties:
@@ -90170,6 +90585,12 @@ definitions:
         title: |-
           Same as cw1155_payment but with amounts per token_id to transfer
           the same tokens to and from the escrow account
+      member_address:
+        type: string
+        description: |-
+          member_address is the team member this intent is on behalf of, if any.
+          Required if the collection has member budgets. Validated against the
+          oracle's SubmitClaimConstraints.member_address.
     description: Intent defines the structure for a service agent's claim intent.
   ixo.claims.v1beta1.IntentStatus:
     type: string
@@ -90190,6 +90611,90 @@ definitions:
       or DISPUTE
        - EXPIRED: Expired: Intent has expired, payments have been transferred back out of
       escrow
+  ixo.claims.v1beta1.MemberBudget:
+    type: object
+    properties:
+      collection_id:
+        type: string
+        title: collection_id this budget belongs to
+      member_address:
+        type: string
+        title: member's blockchain address
+      period:
+        type: string
+        title: period duration for budget reset (e.g., 30 days)
+      period_spend_limit:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: maximum native coin spend allowed per period
+      period_spent:
+        type: array
+        items:
+          type: object
+          properties:
+            denom:
+              type: string
+            amount:
+              type: string
+          description: |-
+            Coin defines a token with a denomination and an amount.
+
+            NOTE: The amount field is an Int which implements the custom method
+            signatures required by gogoproto.
+        title: native coins already spent (intented) in the current period
+      period_cw20_spend_limit:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: string
+              format: uint64
+              title: >-
+                chose uint64 for now as amounts should be small enough to fit in
+                a
+
+                uint64(max 18446744073709551615)
+        title: maximum CW20 spend allowed per period
+      period_cw20_spent:
+        type: array
+        items:
+          type: object
+          properties:
+            address:
+              type: string
+            amount:
+              type: string
+              format: uint64
+              title: >-
+                chose uint64 for now as amounts should be small enough to fit in
+                a
+
+                uint64(max 18446744073709551615)
+        title: CW20 amount already spent in the current period
+      period_reset_at:
+        type: string
+        format: date-time
+        title: |-
+          timestamp when current period resets (lazy reset in intent handler,
+          following the feegrant PeriodicAllowance pattern)
+    description: |-
+      MemberBudget defines a team member's periodic spending budget for a
+      collection. Stored as separate state keyed by collectionId/memberAddress
+      for gas-efficient O(1) reads and writes independent of team size.
   ixo.claims.v1beta1.Params:
     type: object
     properties:
@@ -91033,6 +91538,16 @@ definitions:
 
                 per token_id to transfer the same tokens to and from the escrow
                 account
+            member_address:
+              type: string
+              description: >-
+                member_address is the team member this claim is on behalf of, if
+                any.
+
+                Copied from intent when use_intent is true. Used for budget
+                restoration
+
+                on claim rejection/dispute/invalidation.
       pagination:
         type: object
         properties:
@@ -91399,6 +91914,16 @@ definitions:
 
               per token_id to transfer the same tokens to and from the escrow
               account
+          member_address:
+            type: string
+            description: >-
+              member_address is the team member this claim is on behalf of, if
+              any.
+
+              Copied from intent when use_intent is true. Used for budget
+              restoration
+
+              on claim rejection/dispute/invalidation.
   ixo.claims.v1beta1.QueryCollectionListResponse:
     type: object
     properties:
@@ -91942,6 +92467,230 @@ definitions:
                    repeated Bar results = 1;
                    PageResponse page = 2;
            }
+  ixo.claims.v1beta1.QueryCollectionMemberListResponse:
+    type: object
+    properties:
+      member_budgets:
+        type: array
+        items:
+          type: object
+          properties:
+            collection_id:
+              type: string
+              title: collection_id this budget belongs to
+            member_address:
+              type: string
+              title: member's blockchain address
+            period:
+              type: string
+              title: period duration for budget reset (e.g., 30 days)
+            period_spend_limit:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              title: maximum native coin spend allowed per period
+            period_spent:
+              type: array
+              items:
+                type: object
+                properties:
+                  denom:
+                    type: string
+                  amount:
+                    type: string
+                description: >-
+                  Coin defines a token with a denomination and an amount.
+
+
+                  NOTE: The amount field is an Int which implements the custom
+                  method
+
+                  signatures required by gogoproto.
+              title: native coins already spent (intented) in the current period
+            period_cw20_spend_limit:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  amount:
+                    type: string
+                    format: uint64
+                    title: >-
+                      chose uint64 for now as amounts should be small enough to
+                      fit in a
+
+                      uint64(max 18446744073709551615)
+              title: maximum CW20 spend allowed per period
+            period_cw20_spent:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  amount:
+                    type: string
+                    format: uint64
+                    title: >-
+                      chose uint64 for now as amounts should be small enough to
+                      fit in a
+
+                      uint64(max 18446744073709551615)
+              title: CW20 amount already spent in the current period
+            period_reset_at:
+              type: string
+              format: date-time
+              title: >-
+                timestamp when current period resets (lazy reset in intent
+                handler,
+
+                following the feegrant PeriodicAllowance pattern)
+          description: >-
+            MemberBudget defines a team member's periodic spending budget for a
+
+            collection. Stored as separate state keyed by
+            collectionId/memberAddress
+
+            for gas-efficient O(1) reads and writes independent of team size.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
+  ixo.claims.v1beta1.QueryCollectionMemberResponse:
+    type: object
+    properties:
+      member_budget:
+        type: object
+        properties:
+          collection_id:
+            type: string
+            title: collection_id this budget belongs to
+          member_address:
+            type: string
+            title: member's blockchain address
+          period:
+            type: string
+            title: period duration for budget reset (e.g., 30 days)
+          period_spend_limit:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            title: maximum native coin spend allowed per period
+          period_spent:
+            type: array
+            items:
+              type: object
+              properties:
+                denom:
+                  type: string
+                amount:
+                  type: string
+              description: >-
+                Coin defines a token with a denomination and an amount.
+
+
+                NOTE: The amount field is an Int which implements the custom
+                method
+
+                signatures required by gogoproto.
+            title: native coins already spent (intented) in the current period
+          period_cw20_spend_limit:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: maximum CW20 spend allowed per period
+          period_cw20_spent:
+            type: array
+            items:
+              type: object
+              properties:
+                address:
+                  type: string
+                amount:
+                  type: string
+                  format: uint64
+                  title: >-
+                    chose uint64 for now as amounts should be small enough to
+                    fit in a
+
+                    uint64(max 18446744073709551615)
+            title: CW20 amount already spent in the current period
+          period_reset_at:
+            type: string
+            format: date-time
+            title: >-
+              timestamp when current period resets (lazy reset in intent
+              handler,
+
+              following the feegrant PeriodicAllowance pattern)
+        description: >-
+          MemberBudget defines a team member's periodic spending budget for a
+
+          collection. Stored as separate state keyed by
+          collectionId/memberAddress
+
+          for gas-efficient O(1) reads and writes independent of team size.
   ixo.claims.v1beta1.QueryCollectionResponse:
     type: object
     properties:
@@ -92657,6 +93406,16 @@ definitions:
               title: |-
                 Same as cw1155_payment but with amounts per token_id to transfer
                 the same tokens to and from the escrow account
+            member_address:
+              type: string
+              description: >-
+                member_address is the team member this intent is on behalf of,
+                if any.
+
+                Required if the collection has member budgets. Validated against
+                the
+
+                oracle's SubmitClaimConstraints.member_address.
           description: Intent defines the structure for a service agent's claim intent.
       pagination:
         type: object
@@ -92812,6 +93571,16 @@ definitions:
             title: |-
               Same as cw1155_payment but with amounts per token_id to transfer
               the same tokens to and from the escrow account
+          member_address:
+            type: string
+            description: >-
+              member_address is the team member this intent is on behalf of, if
+              any.
+
+              Required if the collection has member budgets. Validated against
+              the
+
+              oracle's SubmitClaimConstraints.member_address.
         description: Intent defines the structure for a service agent's claim intent.
   ixo.claims.v1beta1.QueryParamsResponse:
     type: object

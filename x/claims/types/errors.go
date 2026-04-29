@@ -40,4 +40,11 @@ var (
 	ErrInvalidResponse = errorsmod.Register(ModuleName, 1601, "invalid response")
 
 	ErrInternalError = errorsmod.Register(ModuleName, 1700, "internal error")
+
+	ErrMemberBudgetNotFound    = errorsmod.Register(ModuleName, 1800, "member budget not found")
+	ErrMemberBudgetExceeded    = errorsmod.Register(ModuleName, 1801, "member budget exceeded")
+	ErrMemberBudgetZero        = errorsmod.Register(ModuleName, 1802, "member budget spend limits cannot all be zero, use remove instead")
+	ErrMemberAddressRequired   = errorsmod.Register(ModuleName, 1803, "member_address is required for collections with member budgets")
+	ErrMemberAddressMismatch   = errorsmod.Register(ModuleName, 1804, "member_address does not match")
+	ErrMemberAddressNotAllowed = errorsmod.Register(ModuleName, 1805, "member_address is not allowed for collections without member budgets")
 )

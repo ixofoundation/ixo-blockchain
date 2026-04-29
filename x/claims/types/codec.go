@@ -23,6 +23,8 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateCollectionIntents{}, "claims/UpdateCollectionIntents", nil)
 	cdc.RegisterConcrete(&MsgClaimIntent{}, "claims/ClaimIntent", nil)
 	cdc.RegisterConcrete(&MsgCreateClaimAuthorization{}, "claims/CreateClaimAuthorization", nil)
+	cdc.RegisterConcrete(&MsgSetCollectionMembers{}, "claims/SetCollectionMembers", nil)
+	cdc.RegisterConcrete(&MsgRemoveCollectionMembers{}, "claims/RemoveCollectionMembers", nil)
 }
 
 // RegisterInterfaces registers interfaces and implementations of the x/claims module.
@@ -39,6 +41,8 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgUpdateCollectionIntents{},
 		&MsgClaimIntent{},
 		&MsgCreateClaimAuthorization{},
+		&MsgSetCollectionMembers{},
+		&MsgRemoveCollectionMembers{},
 	)
 
 	registry.RegisterImplementations(

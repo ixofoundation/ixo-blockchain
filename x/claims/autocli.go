@@ -55,6 +55,18 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "agentAddress"}, {ProtoField: "collectionId"}, {ProtoField: "id"}},
 				},
 				{
+					RpcMethod:      "CollectionMemberList",
+					Use:            "collection-member-list [collection-id]",
+					Short:          "Query for all member budgets on a collection",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "collectionId"}},
+				},
+				{
+					RpcMethod:      "CollectionMember",
+					Use:            "collection-member [collection-id] [member-address]",
+					Short:          "Query for a member's budget on a collection",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "collectionId"}, {ProtoField: "memberAddress"}},
+				},
+				{
 					RpcMethod: "Params",
 					Use:       "params",
 					Short:     "Query the current claims parameters",

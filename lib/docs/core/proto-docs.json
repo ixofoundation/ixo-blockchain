@@ -4501,6 +4501,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member_address is the team member this claim is on behalf of, if any.\nCopied from intent when use_intent is true. Used for budget restoration\non claim rejection/dispute/invalidation.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5293,6 +5305,126 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member_address is the team member this intent is on behalf of, if any.\nRequired if the collection has member budgets. Validated against the\noracle's SubmitClaimConstraints.member_address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MemberBudget",
+          "longName": "MemberBudget",
+          "fullName": "ixo.claims.v1beta1.MemberBudget",
+          "description": "MemberBudget defines a team member's periodic spending budget for a\ncollection. Stored as separate state keyed by collectionId/memberAddress\nfor gas-efficient O(1) reads and writes independent of team size.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id this budget belongs to",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member's blockchain address",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period",
+              "description": "period duration for budget reset (e.g., 30 days)",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period_spend_limit",
+              "description": "maximum native coin spend allowed per period",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period_spent",
+              "description": "native coins already spent (intented) in the current period",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period_cw20_spend_limit",
+              "description": "maximum CW20 spend allowed per period",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period_cw20_spent",
+              "description": "CW20 amount already spent in the current period",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period_reset_at",
+              "description": "timestamp when current period resets (lazy reset in intent handler,\nfollowing the feegrant PeriodicAllowance pattern)",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5718,6 +5850,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member_address is the team member this constraint is for. Set by the team\nadmin when granting CreateClaimAuthorizationAuthorization to a member.\nEnforced in Accept() to prevent a member from spoofing another member's\naddress when creating oracle authorizations. Empty for individual\n(non-team) subscriptions.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -5966,6 +6110,18 @@
               "type": "CW1155Payment",
               "longType": "CW1155Payment",
               "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member_address is the team member who created this constraint via\nMsgCreateClaimAuthorization. Empty for individual (non-team) subscriptions.\nUsed by Accept() to match the correct member's constraint when multiple\nteam members authorize the same oracle, and by the intent handler to\nvalidate the oracle was authorized by the claimed member.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6589,6 +6745,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "member_budgets",
+              "description": "",
+              "label": "repeated",
+              "type": "MemberBudget",
+              "longType": "MemberBudget",
+              "fullType": "ixo.claims.v1beta1.MemberBudget",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }
@@ -6767,6 +6935,138 @@
               "type": "PageResponse",
               "longType": "cosmos.base.query.v1beta1.PageResponse",
               "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionMemberListRequest",
+          "longName": "QueryCollectionMemberListRequest",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionMemberListRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collectionId",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionMemberListResponse",
+          "longName": "QueryCollectionMemberListResponse",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionMemberListResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "member_budgets",
+              "description": "",
+              "label": "repeated",
+              "type": "MemberBudget",
+              "longType": "MemberBudget",
+              "fullType": "ixo.claims.v1beta1.MemberBudget",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionMemberRequest",
+          "longName": "QueryCollectionMemberRequest",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionMemberRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collectionId",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "memberAddress",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryCollectionMemberResponse",
+          "longName": "QueryCollectionMemberResponse",
+          "fullName": "ixo.claims.v1beta1.QueryCollectionMemberResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "member_budget",
+              "description": "",
+              "label": "",
+              "type": "MemberBudget",
+              "longType": "MemberBudget",
+              "fullType": "ixo.claims.v1beta1.MemberBudget",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7302,6 +7602,50 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "CollectionMember",
+              "description": "",
+              "requestType": "QueryCollectionMemberRequest",
+              "requestLongType": "QueryCollectionMemberRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryCollectionMemberRequest",
+              "requestStreaming": false,
+              "responseType": "QueryCollectionMemberResponse",
+              "responseLongType": "QueryCollectionMemberResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryCollectionMemberResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claims/collection/{collectionId}/member/{memberAddress}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "CollectionMemberList",
+              "description": "",
+              "requestType": "QueryCollectionMemberListRequest",
+              "requestLongType": "QueryCollectionMemberListRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryCollectionMemberListRequest",
+              "requestStreaming": false,
+              "responseType": "QueryCollectionMemberListResponse",
+              "responseLongType": "QueryCollectionMemberListResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryCollectionMemberListResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claims/collection/{collectionId}/members"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
@@ -7318,6 +7662,78 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "CollectionMemberInput",
+          "longName": "CollectionMemberInput",
+          "fullName": "ixo.claims.v1beta1.CollectionMemberInput",
+          "description": "CollectionMemberInput defines the input for a single member budget within\nMsgSetCollectionMembers",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "member_address",
+              "description": "member's blockchain address",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period",
+              "description": "period duration for budget reset (e.g., 30 days)",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period_spend_limit",
+              "description": "maximum native coin spend allowed per period",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "period_cw20_spend_limit",
+              "description": "maximum CW20 spend allowed per period",
+              "label": "repeated",
+              "type": "CW20Payment",
+              "longType": "CW20Payment",
+              "fullType": "ixo.claims.v1beta1.CW20Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reset_period_spent",
+              "description": "if true, resets period_spent to zero (useful for manual admin reset)",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "MsgClaimIntent",
           "longName": "MsgClaimIntent",
@@ -7395,6 +7811,18 @@
               "type": "CW1155Payment",
               "longType": "CW1155Payment",
               "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member_address is the team member this intent is on behalf of. Required if\nthe collection has member budgets. Validated against the oracle's\nSubmitClaimConstraints.member_address to prove the member authorized this\noracle. Used to check and deduct from the member's periodic budget.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7599,6 +8027,18 @@
               "type": "CW1155Payment",
               "longType": "CW1155Payment",
               "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member_address to set on the created SubmitClaimConstraint. Must match\nthe member_address in the creator's CreateClaimAuthorizationConstraints\nto prevent spoofing (enforced in Accept()).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7999,6 +8439,124 @@
           "fields": []
         },
         {
+          "name": "MsgRemoveCollectionMembers",
+          "longName": "MsgRemoveCollectionMembers",
+          "fullName": "ixo.claims.v1beta1.MsgRemoveCollectionMembers",
+          "description": "MsgRemoveCollectionMembers removes one or more member budgets from a\ncollection in a single transaction. Does not revoke the members' existing\nauthorization grants — admin should do that separately if needed.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id to remove members from",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "member_addresses",
+              "description": "list of member addresses to remove",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgRemoveCollectionMembersResponse",
+          "longName": "MsgRemoveCollectionMembersResponse",
+          "fullName": "ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgSetCollectionMembers",
+          "longName": "MsgSetCollectionMembers",
+          "fullName": "ixo.claims.v1beta1.MsgSetCollectionMembers",
+          "description": "MsgSetCollectionMembers adds or updates one or more member budgets on a\ncollection in a single transaction. For each member entry: if the member\nalready exists, their budget limits are updated (period_spent is preserved\nunless reset_period_spent is true on that entry). If the member is new,\nthey are created with period_spent = zero. Handler will reject any member\nentry where all spend limits are zero — use MsgRemoveCollectionMembers\ninstead.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id to add/update members on",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "members",
+              "description": "list of member budgets to set",
+              "label": "repeated",
+              "type": "CollectionMemberInput",
+              "longType": "CollectionMemberInput",
+              "fullType": "ixo.claims.v1beta1.CollectionMemberInput",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgSetCollectionMembersResponse",
+          "longName": "MsgSetCollectionMembersResponse",
+          "fullName": "ixo.claims.v1beta1.MsgSetCollectionMembersResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
           "name": "MsgSubmitClaim",
           "longName": "MsgSubmitClaim",
           "fullName": "ixo.claims.v1beta1.MsgSubmitClaim",
@@ -8111,6 +8669,18 @@
               "type": "CW1155Payment",
               "longType": "CW1155Payment",
               "fullType": "ixo.claims.v1beta1.CW1155Payment",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "member_address",
+              "description": "member_address is the team member this claim is on behalf of. Required if\nthe collection has member budgets. Must match intent's member_address when\nuse_intent is true.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -8673,6 +9243,30 @@
               "responseType": "MsgCreateClaimAuthorizationResponse",
               "responseLongType": "MsgCreateClaimAuthorizationResponse",
               "responseFullType": "ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "SetCollectionMembers",
+              "description": "",
+              "requestType": "MsgSetCollectionMembers",
+              "requestLongType": "MsgSetCollectionMembers",
+              "requestFullType": "ixo.claims.v1beta1.MsgSetCollectionMembers",
+              "requestStreaming": false,
+              "responseType": "MsgSetCollectionMembersResponse",
+              "responseLongType": "MsgSetCollectionMembersResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgSetCollectionMembersResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "RemoveCollectionMembers",
+              "description": "",
+              "requestType": "MsgRemoveCollectionMembers",
+              "requestLongType": "MsgRemoveCollectionMembers",
+              "requestFullType": "ixo.claims.v1beta1.MsgRemoveCollectionMembers",
+              "requestStreaming": false,
+              "responseType": "MsgRemoveCollectionMembersResponse",
+              "responseLongType": "MsgRemoveCollectionMembersResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse",
               "responseStreaming": false
             }
           ]

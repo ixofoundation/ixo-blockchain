@@ -21,11 +21,17 @@ func KeyPrefix(p string) []byte {
 }
 
 var (
-	CollectionKey = []byte{0x01}
-	ClaimKey      = []byte{0x02}
-	DisputeKey    = []byte{0x03}
-	IntentKey     = []byte{0x04}
+	CollectionKey   = []byte{0x01}
+	ClaimKey        = []byte{0x02}
+	DisputeKey      = []byte{0x03}
+	IntentKey       = []byte{0x04}
+	MemberBudgetKey = []byte{0x05}
 )
+
+// MemberBudgetKeyCreate creates key for MemberBudget KV Store: collectionId+"/"+memberAddress
+func MemberBudgetKeyCreate(collectionId, memberAddress string) []byte {
+	return []byte(collectionId + "/" + memberAddress)
+}
 
 // Create the key for Intents KV Store: agentAddress+"/"+collectionID+"/"+intentID
 func IntentKeyCreate(agentAddress, collectionId, intentID string) []byte {

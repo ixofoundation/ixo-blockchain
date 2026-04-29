@@ -586,6 +586,10 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.MemberBudget"><span class="badge">M</span>MemberBudget</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.Params"><span class="badge">M</span>Params</a>
                 </li>
               
@@ -774,6 +778,22 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.QueryCollectionMemberListRequest"><span class="badge">M</span>QueryCollectionMemberListRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryCollectionMemberListResponse"><span class="badge">M</span>QueryCollectionMemberListResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryCollectionMemberRequest"><span class="badge">M</span>QueryCollectionMemberRequest</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.QueryCollectionMemberResponse"><span class="badge">M</span>QueryCollectionMemberResponse</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.QueryCollectionRequest"><span class="badge">M</span>QueryCollectionRequest</a>
                 </li>
               
@@ -837,6 +857,10 @@
             <ul>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.CollectionMemberInput"><span class="badge">M</span>CollectionMemberInput</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.MsgClaimIntent"><span class="badge">M</span>MsgClaimIntent</a>
                 </li>
               
@@ -874,6 +898,22 @@
               
                 <li>
                   <a href="#ixo.claims.v1beta1.MsgEvaluateClaimResponse"><span class="badge">M</span>MsgEvaluateClaimResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgRemoveCollectionMembers"><span class="badge">M</span>MsgRemoveCollectionMembers</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse"><span class="badge">M</span>MsgRemoveCollectionMembersResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgSetCollectionMembers"><span class="badge">M</span>MsgSetCollectionMembers</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgSetCollectionMembersResponse"><span class="badge">M</span>MsgSetCollectionMembersResponse</a>
                 </li>
               
                 <li>
@@ -5602,6 +5642,15 @@ NOTE: if all amounts are empty then collection default is used </p></td>
 per token_id to transfer the same tokens to and from the escrow account </p></td>
                 </tr>
               
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member_address is the team member this claim is on behalf of, if any.
+Copied from intent when use_intent is true. Used for budget restoration
+on claim rejection/dispute/invalidation. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6161,6 +6210,89 @@ the intent expires. </p></td>
 the same tokens to and from the escrow account </p></td>
                 </tr>
               
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member_address is the team member this intent is on behalf of, if any.
+Required if the collection has member budgets. Validated against the
+oracle&#39;s SubmitClaimConstraints.member_address. </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MemberBudget">MemberBudget</h3>
+        <p>MemberBudget defines a team member's periodic spending budget for a</p><p>collection. Stored as separate state keyed by collectionId/memberAddress</p><p>for gas-efficient O(1) reads and writes independent of team size.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id this budget belongs to </p></td>
+                </tr>
+              
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member&#39;s blockchain address </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period</td>
+                  <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
+                  <td></td>
+                  <td><p>period duration for budget reset (e.g., 30 days) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period_spend_limit</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>maximum native coin spend allowed per period </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period_spent</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>native coins already spent (intented) in the current period </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period_cw20_spend_limit</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>maximum CW20 spend allowed per period </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period_cw20_spent</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>CW20 amount already spent in the current period </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period_reset_at</td>
+                  <td><a href="#google.protobuf.Timestamp">google.protobuf.Timestamp</a></td>
+                  <td></td>
+                  <td><p>timestamp when current period resets (lazy reset in intent handler,
+following the feegrant PeriodicAllowance pattern) </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6712,6 +6844,17 @@ explicitly set to amount to 0 to disallow any cw1155 payment in the created
 authorizations </p></td>
                 </tr>
               
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member_address is the team member this constraint is for. Set by the team
+admin when granting CreateClaimAuthorizationAuthorization to a member.
+Enforced in Accept() to prevent a member from spoofing another member&#39;s
+address when creating oracle authorizations. Empty for individual
+(non-team) subscriptions. </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -6907,6 +7050,17 @@ which it will expire (in nanoseconds) </p></td>
                   <td><p>custom max_cw1155_payment allowed to be specified by service agent for
 claim approval, if empty then no custom amount is allowed, and default
 payments from Collection payments are used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member_address is the team member who created this constraint via
+MsgCreateClaimAuthorization. Empty for individual (non-team) subscriptions.
+Used by Accept() to match the correct member&#39;s constraint when multiple
+team members authorize the same oracle, and by the intent handler to
+validate the oracle was authorized by the claimed member. </p></td>
                 </tr>
               
             </tbody>
@@ -7474,6 +7628,13 @@ token ids </p></td>
                   <td><p> </p></td>
                 </tr>
               
+                <tr>
+                  <td>member_budgets</td>
+                  <td><a href="#ixo.claims.v1beta1.MemberBudget">MemberBudget</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
             </tbody>
           </table>
 
@@ -7642,6 +7803,123 @@ token ids </p></td>
                 <tr>
                   <td>pagination</td>
                   <td><a href="#cosmos.base.query.v1beta1.PageResponse">cosmos.base.query.v1beta1.PageResponse</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryCollectionMemberListRequest">QueryCollectionMemberListRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collectionId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pagination</td>
+                  <td><a href="#cosmos.base.query.v1beta1.PageRequest">cosmos.base.query.v1beta1.PageRequest</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryCollectionMemberListResponse">QueryCollectionMemberListResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>member_budgets</td>
+                  <td><a href="#ixo.claims.v1beta1.MemberBudget">MemberBudget</a></td>
+                  <td>repeated</td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>pagination</td>
+                  <td><a href="#cosmos.base.query.v1beta1.PageResponse">cosmos.base.query.v1beta1.PageResponse</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryCollectionMemberRequest">QueryCollectionMemberRequest</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collectionId</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>memberAddress</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.QueryCollectionMemberResponse">QueryCollectionMemberResponse</h3>
+        <p></p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>member_budget</td>
+                  <td><a href="#ixo.claims.v1beta1.MemberBudget">MemberBudget</a></td>
                   <td></td>
                   <td><p> </p></td>
                 </tr>
@@ -8029,6 +8307,20 @@ token ids </p></td>
                 <td><p></p></td>
               </tr>
             
+              <tr>
+                <td>CollectionMember</td>
+                <td><a href="#ixo.claims.v1beta1.QueryCollectionMemberRequest">QueryCollectionMemberRequest</a></td>
+                <td><a href="#ixo.claims.v1beta1.QueryCollectionMemberResponse">QueryCollectionMemberResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>CollectionMemberList</td>
+                <td><a href="#ixo.claims.v1beta1.QueryCollectionMemberListRequest">QueryCollectionMemberListRequest</a></td>
+                <td><a href="#ixo.claims.v1beta1.QueryCollectionMemberListResponse">QueryCollectionMemberListResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
           </tbody>
         </table>
 
@@ -8137,6 +8429,26 @@ token ids </p></td>
               </tr>
               
             
+              
+              
+              <tr>
+                <td>CollectionMember</td>
+                <td>GET</td>
+                <td>/ixo/claims/collection/{collectionId}/member/{memberAddress}</td>
+                <td></td>
+              </tr>
+              
+            
+              
+              
+              <tr>
+                <td>CollectionMemberList</td>
+                <td>GET</td>
+                <td>/ixo/claims/collection/{collectionId}/members</td>
+                <td></td>
+              </tr>
+              
+            
             </tbody>
           </table>
           
@@ -8148,6 +8460,58 @@ token ids </p></td>
       </div>
       <p></p>
 
+      
+        <h3 id="ixo.claims.v1beta1.CollectionMemberInput">CollectionMemberInput</h3>
+        <p>CollectionMemberInput defines the input for a single member budget within</p><p>MsgSetCollectionMembers</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member&#39;s blockchain address </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period</td>
+                  <td><a href="#google.protobuf.Duration">google.protobuf.Duration</a></td>
+                  <td></td>
+                  <td><p>period duration for budget reset (e.g., 30 days) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period_spend_limit</td>
+                  <td><a href="#cosmos.base.v1beta1.Coin">cosmos.base.v1beta1.Coin</a></td>
+                  <td>repeated</td>
+                  <td><p>maximum native coin spend allowed per period </p></td>
+                </tr>
+              
+                <tr>
+                  <td>period_cw20_spend_limit</td>
+                  <td><a href="#ixo.claims.v1beta1.CW20Payment">CW20Payment</a></td>
+                  <td>repeated</td>
+                  <td><p>maximum CW20 spend allowed per period </p></td>
+                </tr>
+              
+                <tr>
+                  <td>reset_period_spent</td>
+                  <td><a href="#bool">bool</a></td>
+                  <td></td>
+                  <td><p>if true, resets period_spent to zero (useful for manual admin reset) </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
       
         <h3 id="ixo.claims.v1beta1.MsgClaimIntent">MsgClaimIntent</h3>
         <p></p>
@@ -8205,6 +8569,16 @@ payment) </p></td>
                   <td><p>The custom CW1155 payment, if any.
 NOTE: if all amounts are empty then collection default is used (APPROVAL
 payment) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member_address is the team member this intent is on behalf of. Required if
+the collection has member budgets. Validated against the oracle&#39;s
+SubmitClaimConstraints.member_address to prove the member authorized this
+oracle. Used to check and deduct from the member&#39;s periodic budget. </p></td>
                 </tr>
               
             </tbody>
@@ -8352,6 +8726,15 @@ authorization (standard authz behavior) </p></td>
                   <td>repeated</td>
                   <td><p>Maximum cw1155 payment that can be specified in the authorization (for both
 submit and evaluate) </p></td>
+                </tr>
+              
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member_address to set on the created SubmitClaimConstraint. Must match
+the member_address in the creator&#39;s CreateClaimAuthorizationConstraints
+to prevent spoofing (enforced in Accept()). </p></td>
                 </tr>
               
             </tbody>
@@ -8638,6 +9021,96 @@ collection default is used </p></td>
 
         
       
+        <h3 id="ixo.claims.v1beta1.MsgRemoveCollectionMembers">MsgRemoveCollectionMembers</h3>
+        <p>MsgRemoveCollectionMembers removes one or more member budgets from a</p><p>collection in a single transaction. Does not revoke the members' existing</p><p>authorization grants — admin should do that separately if needed.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id to remove members from </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address, validated against Collection Admin </p></td>
+                </tr>
+              
+                <tr>
+                  <td>member_addresses</td>
+                  <td><a href="#string">string</a></td>
+                  <td>repeated</td>
+                  <td><p>list of member addresses to remove </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse">MsgRemoveCollectionMembersResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgSetCollectionMembers">MsgSetCollectionMembers</h3>
+        <p>MsgSetCollectionMembers adds or updates one or more member budgets on a</p><p>collection in a single transaction. For each member entry: if the member</p><p>already exists, their budget limits are updated (period_spent is preserved</p><p>unless reset_period_spent is true on that entry). If the member is new,</p><p>they are created with period_spent = zero. Handler will reject any member</p><p>entry where all spend limits are zero — use MsgRemoveCollectionMembers</p><p>instead.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id to add/update members on </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address, validated against Collection Admin </p></td>
+                </tr>
+              
+                <tr>
+                  <td>members</td>
+                  <td><a href="#ixo.claims.v1beta1.CollectionMemberInput">CollectionMemberInput</a></td>
+                  <td>repeated</td>
+                  <td><p>list of member budgets to set </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgSetCollectionMembersResponse">MsgSetCollectionMembersResponse</h3>
+        <p></p>
+
+        
+
+        
+      
         <h3 id="ixo.claims.v1beta1.MsgSubmitClaim">MsgSubmitClaim</h3>
         <p></p>
 
@@ -8715,6 +9188,15 @@ NOTE: if all amounts are empty then collection default is used </p></td>
                   <td>repeated</td>
                   <td><p>custom cw1155 payments specified by service agent for claim approval
 NOTE: if all amounts are empty then collection default is used </p></td>
+                </tr>
+              
+                <tr>
+                  <td>member_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>member_address is the team member this claim is on behalf of. Required if
+the collection has member budgets. Must match intent&#39;s member_address when
+use_intent is true. </p></td>
                 </tr>
               
             </tbody>
@@ -9134,6 +9616,20 @@ plus the timeout on Collection payments </p></td>
                 <td>CreateClaimAuthorization</td>
                 <td><a href="#ixo.claims.v1beta1.MsgCreateClaimAuthorization">MsgCreateClaimAuthorization</a></td>
                 <td><a href="#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse">MsgCreateClaimAuthorizationResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>SetCollectionMembers</td>
+                <td><a href="#ixo.claims.v1beta1.MsgSetCollectionMembers">MsgSetCollectionMembers</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgSetCollectionMembersResponse">MsgSetCollectionMembersResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>RemoveCollectionMembers</td>
+                <td><a href="#ixo.claims.v1beta1.MsgRemoveCollectionMembers">MsgRemoveCollectionMembers</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse">MsgRemoveCollectionMembersResponse</a></td>
                 <td><p></p></td>
               </tr>
             

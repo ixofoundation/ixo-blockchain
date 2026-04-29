@@ -29,6 +29,11 @@ func (k Keeper) InitGenesis(ctx sdk.Context, gs types.GenesisState) {
 	for _, i := range gs.Intents {
 		k.SetIntent(ctx, i)
 	}
+
+	// save member budgets to the store
+	for _, mb := range gs.MemberBudgets {
+		k.SetMemberBudget(ctx, mb)
+	}
 }
 
 // ExportGenesis returns the x/claims module's exported genesis.
@@ -39,12 +44,14 @@ func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
 	claims := k.GetClaims(ctx)
 	disputes := k.GetDisputes(ctx)
 	intents := k.GetIntents(ctx)
+	memberBudgets := k.GetAllMemberBudgets(ctx)
 
 	return &types.GenesisState{
-		Params:      params,
-		Collections: collections,
-		Disputes:    disputes,
-		Claims:      claims,
-		Intents:     intents,
+		Params:        params,
+		Collections:   collections,
+		Disputes:      disputes,
+		Claims:        claims,
+		Intents:       intents,
+		MemberBudgets: memberBudgets,
 	}
 }

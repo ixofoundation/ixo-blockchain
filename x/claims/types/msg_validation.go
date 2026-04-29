@@ -73,6 +73,14 @@ func (msg MsgSubmitClaim) ValidateBasic() error {
 		return err
 	}
 
+	// member_address is optional but must be valid if provided
+	if msg.MemberAddress != "" {
+		_, err = sdk.AccAddressFromBech32(msg.MemberAddress)
+		if err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid member address (%s)", err)
+		}
+	}
+
 	return nil
 }
 
@@ -286,6 +294,14 @@ func (msg *MsgClaimIntent) ValidateBasic() error {
 		return err
 	}
 
+	// member_address is optional but must be valid if provided
+	if msg.MemberAddress != "" {
+		_, err = sdk.AccAddressFromBech32(msg.MemberAddress)
+		if err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid member address (%s)", err)
+		}
+	}
+
 	return nil
 }
 
@@ -332,5 +348,81 @@ func (msg MsgCreateClaimAuthorization) ValidateBasic() error {
 		return err
 	}
 
+	// member_address is optional but must be valid if provided
+	if msg.MemberAddress != "" {
+		_, err = sdk.AccAddressFromBech32(msg.MemberAddress)
+		if err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid member address (%s)", err)
+		}
+	}
+
+	return nil
+}
+
+// --------------------------
+// SET COLLECTION MEMBERS
+// --------------------------
+func (msg MsgSetCollectionMembers) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+	if len(msg.Members) == 0 {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "members cannot be empty")
+	}
+	seenMembers := make(map[string]bool, len(msg.Members))
+	for _, member := range msg.Members {
+		_, err := sdk.AccAddressFromBech32(member.MemberAddress)
+		if err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid member address (%s)", err)
+		}
+		if seenMembers[member.MemberAddress] {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "duplicate member address %s", member.MemberAddress)
+		}
+		seenMembers[member.MemberAddress] = true
+		if member.Period < MinMemberBudgetPeriod {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "period must be at least %s for member %s", MinMemberBudgetPeriod, member.MemberAddress)
+		}
+		if member.PeriodSpendLimit.IsZero() && len(member.PeriodCw20SpendLimit) == 0 {
+			return errorsmod.Wrapf(ErrMemberBudgetZero, "for member %s", member.MemberAddress)
+		}
+		if err = ValidateCoinsAllowZero(member.PeriodSpendLimit.Sort()); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid period_spend_limit for member %s: %s", member.MemberAddress, err)
+		}
+		if err = ValidateCW20Payments(member.PeriodCw20SpendLimit, true); err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "invalid period_cw20_spend_limit for member %s: %s", member.MemberAddress, err)
+		}
+	}
+	return nil
+}
+
+// --------------------------
+// REMOVE COLLECTION MEMBERS
+// --------------------------
+func (msg MsgRemoveCollectionMembers) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(msg.AdminAddress)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+	if len(msg.MemberAddresses) == 0 {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "member_addresses cannot be empty")
+	}
+	seenAddresses := make(map[string]bool, len(msg.MemberAddresses))
+	for _, addr := range msg.MemberAddresses {
+		_, err := sdk.AccAddressFromBech32(addr)
+		if err != nil {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid member address (%s)", err)
+		}
+		if seenAddresses[addr] {
+			return errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "duplicate member address %s", addr)
+		}
+		seenAddresses[addr] = true
+	}
 	return nil
 }

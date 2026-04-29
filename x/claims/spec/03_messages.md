@@ -135,6 +135,7 @@ The field's descriptions is as follows:
 - `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the custom amount specified by service agent for claim approval. If both amount and CW20 payment are empty, then collection default is used. (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate amount wanted if no intent used)
 - `cw20Payment` - an array of [CW20Payment](02_state.md#cw20payment) containing the custom CW20 payments specified by service agent for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used. (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw20Payment wanted if no intent used)
 - `cw1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) containing the custom CW1155 payments specified by service agent for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used. (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw1155Payment wanted if no intent used)
+- `memberAddress` - an optional string containing the team member this claim is on behalf of. Required when `useIntent` is true and the originating intent has a `memberAddress`; the values must match exactly (strict equality, including both being empty). If `useIntent` is false, `memberAddress` must be empty — without an intent there is no member context to attribute the claim to. The matching constraint on the oracle's [SubmitClaimAuthorization](02_state.md#submitclaimauthorization) is selected by `(collectionId, memberAddress)` strict equality.
 
 ## MsgEvaluateClaim
 
@@ -254,6 +255,10 @@ The field's descriptions is as follows:
 - `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the custom amount specified for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used.
 - `cw20Payment` - an array of [CW20Payment](02_state.md#cw20payment) containing the custom CW20 payments specified for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used.
 - `cw1155Payment` - an array of [CW1155Payment](02_state.md#cw1155payment) containing the custom CW1155 payments specified for claim approval. If amount and CW20 and CW1155 payments are empty, then collection default is used.
+- `memberAddress` - an optional string containing the team member this intent is on behalf of. **Required** when the collection has [MemberBudgets](02_state.md#memberbudget); **must be empty** when the collection does not. When provided, the handler:
+  1. Looks up the matching [SubmitClaimConstraints](02_state.md#submitclaimconstraints) by `(collectionId, memberAddress)` strict equality — the oracle must hold a constraint that this specific member created.
+  2. Loads the member's [MemberBudget](02_state.md#memberbudget), lazily resets the period if expired, and verifies the intent amount fits within the remaining budget.
+  3. Deducts the intent amount from `periodSpent` (and CW20 equivalents).
 
 ## MsgCreateClaimAuthorization
 
@@ -292,3 +297,64 @@ The field's descriptions is as follows:
 - `expiration` - a timestamp of the expiration time for the authorization. Be careful with this as it is the expiration of the authorization itself, not the constraints, meaning if the authorization expires all constraints will be removed with the authorization (standard authz behavior).
 - `intentDurationNs` - a duration containing the maximum intent duration for the authorization allowed (for submit)
 - `beforeDate` - a timestamp after which the grantee can't execute this authz anymore, a cut off date (for evaluate). If null then no before_date validation done.
+- `memberAddress` - an optional string identifying the team member this authorization is being created for. The grantee's [CreateClaimAuthorizationAuthorization](02_state.md#createclaimauthorizationauthorization) constraint must have a matching `memberAddress` — strict equality (both empty for individual; both equal for team). The matched value is propagated onto the resulting [SubmitClaimConstraints](02_state.md#submitclaimconstraints) (or evaluate constraint) so the oracle's authorization carries member attribution downstream. This is the on-chain anti-spoofing primitive: a grantee cannot mint authorizations tagged with a member address other than the one the admin authorized for them.
+
+## MsgSetCollectionMembers
+
+A `MsgSetCollectionMembers` adds or updates one or more [MemberBudget](02_state.md#memberbudget) entries on a collection in a single transaction. The signer must be the collection's admin. Adding the first member to a collection turns it into a "team / enterprise" collection and from that point on every intent on the collection must carry a `memberAddress`.
+
+```go
+type MsgSetCollectionMembers struct {
+	CollectionId string
+	AdminAddress string
+	Members      []*CollectionMemberInput
+}
+
+type CollectionMemberInput struct {
+	MemberAddress         string
+	Period                time.Duration
+	PeriodSpendLimit      github_com_cosmos_cosmos_sdk_types.Coins
+	PeriodCw20SpendLimit  []CW20Payment
+	ResetPeriodSpent      bool
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` to add / update members on
+- `adminAddress` - a string containing the account address of the signer, must equal the Collection `admin` field
+- `members` - a non-empty list of `CollectionMemberInput` entries (no duplicate `memberAddress` allowed within a single message). For each entry:
+  - `memberAddress` - the team member's account address
+  - `period` - the budget reset duration. Must be **at least 24 hours** (`MinMemberBudgetPeriod`); shorter durations are rejected to bound the cost of the lazy-reset roll-forward loop
+  - `periodSpendLimit` - the maximum native coin spend per period. Must be sorted (standard Cosmos `Coins` invariant)
+  - `periodCw20SpendLimit` - the maximum CW20 spend per period
+  - At least one of `periodSpendLimit` or `periodCw20SpendLimit` must be non-empty / non-zero — a budget with no spend allowance is rejected (use `MsgRemoveCollectionMembers` instead to remove a member)
+  - `resetPeriodSpent` - if true and the member already exists, `periodSpent` is cleared and `periodResetAt` is set to `now + period` (a manual mid-period reset). If false (or the member is new), an existing member's `periodSpent` and `periodResetAt` are preserved across the update
+
+Behaviour per member:
+
+- If the member does **not** exist on the collection: a new [MemberBudget](02_state.md#memberbudget) is created with `periodSpent = empty`, `periodResetAt = now + period`. Emits `MemberBudgetCreatedEvent`.
+- If the member already exists and `resetPeriodSpent = false`: `periodSpendLimit` / `periodCw20SpendLimit` / `period` are updated; `periodSpent` / `periodResetAt` are preserved. The new limits apply to the rest of the current period. Emits `MemberBudgetUpdatedEvent`.
+- If the member already exists and `resetPeriodSpent = true`: as above, plus `periodSpent` is zeroed and `periodResetAt = now + period`. Emits `MemberBudgetUpdatedEvent`.
+
+## MsgRemoveCollectionMembers
+
+A `MsgRemoveCollectionMembers` removes one or more [MemberBudget](02_state.md#memberbudget) entries from a collection in a single transaction. The signer must be the collection's admin.
+
+This message does **not** revoke any existing claim authorizations the removed members granted to oracles — the admin should do that separately if needed. New intents from the removed members will fail at the budget lookup. Pending intents from removed members continue to expire and refund escrow normally; the budget restore is silently skipped because the budget no longer exists.
+
+```go
+type MsgRemoveCollectionMembers struct {
+	CollectionId    string
+	AdminAddress    string
+	MemberAddresses []string
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` to remove members from
+- `adminAddress` - a string containing the account address of the signer, must equal the Collection `admin` field
+- `memberAddresses` - a non-empty list of member addresses to remove (no duplicates). Each address must currently exist as a member on the collection — the message fails if any one of them does not, and the entire transaction is rolled back atomically
+
+Emits one `MemberBudgetRemovedEvent` per removed member, carrying the final budget state at the time of removal.

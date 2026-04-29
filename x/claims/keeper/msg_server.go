@@ -210,10 +210,19 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 
 	// if intent then override payments, add intent id and update APPROVAL payment to GUARANTEED
 	if msg.UseIntent {
+		// validate member_address consistency between msg and intent (strict equality,
+		// including both being empty). Prevents a user from spuriously attributing a
+		// claim to a member when the intent has no member context, which would later
+		// cause an incorrect budget restore on rejection.
+		if msg.MemberAddress != intent.MemberAddress {
+			return nil, errorsmod.Wrapf(types.ErrMemberAddressMismatch, "msg member_address %s does not match intent member_address %s", msg.MemberAddress, intent.MemberAddress)
+		}
+
 		claim.Amount = intent.Amount
 		claim.Cw20Payment = intent.Cw20Payment
 		claim.Cw1155Payment = intent.Cw1155Payment
 		claim.Cw1155IntentPayment = intent.Cw1155IntentPayment
+		claim.MemberAddress = intent.MemberAddress
 
 		// if any payment is not empty then APPROVAL payment become GUARANTEED as funds is in escrow account
 		// if all payments is empty or all amounts is 0 then APPROVAL payment stays NO_PAYMENT since no funds are in escrow account
@@ -229,6 +238,10 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 			return nil, err
 		}
 	} else {
+		// without intent there is no member context — reject any provided member_address
+		if msg.MemberAddress != "" {
+			return nil, errorsmod.Wrapf(types.ErrMemberAddressMismatch, "member_address provided without use_intent")
+		}
 		// if no intent used, check if collection approval payment is oracle payment then only native coins allowed
 		if collection.Payments.Approval.IsOraclePayment && (!types.IsZeroCW20Payments(claim.Cw20Payment) || !types.IsZeroCW1155Payments(claim.Cw1155Payment)) {
 			return nil, types.ErrOraclePaymentOnlyNative
@@ -359,6 +372,13 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		err = updatePaymentStatus(types.PaymentType_approval, &claim, types.PaymentStatus_no_payment)
 		if err != nil {
 			return nil, err
+		}
+
+		// Restore member budget if this claim was on behalf of a team member
+		if claim.MemberAddress != "" {
+			if err := s.Keeper.RestoreMemberBudget(ctx, claim.CollectionId, claim.MemberAddress, claim.Amount, claim.Cw20Payment); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -747,6 +767,17 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intents is not allowed for collection %s", msg.CollectionId)
 	}
 
+	// member_address presence must match collection setup:
+	//   - team collection (has member budgets): member_address required
+	//   - individual collection (no member budgets): member_address must be empty
+	hasMemberBudgets := s.Keeper.HasMemberBudgets(ctx, msg.CollectionId)
+	if hasMemberBudgets && msg.MemberAddress == "" {
+		return nil, types.ErrMemberAddressRequired
+	}
+	if !hasMemberBudgets && msg.MemberAddress != "" {
+		return nil, types.ErrMemberAddressNotAllowed
+	}
+
 	agentAddress, err := sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
 		return nil, err
@@ -771,13 +802,22 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 	default:
 		return nil, fmt.Errorf("existing Authorizations for route %s is not of type SubmitClaimAuthorization", authzMsgType)
 	}
-	// get constraint for collection id
+	// get constraint matching collection_id AND member_address (strict equality,
+	// including both being empty for individual subscriptions)
 	var constraint *types.SubmitClaimConstraints
 	for _, con := range constraints {
-		if con.CollectionId == msg.CollectionId {
-			constraint = con
-			break
+		if con.CollectionId != msg.CollectionId {
+			continue
 		}
+		// member_address must match exactly: both empty for individual subscriptions,
+		// or both equal to the specific member for team subscriptions. This prevents
+		// silently picking a member-tagged constraint when the oracle didn't attribute
+		// the intent to a member, or vice versa.
+		if con.MemberAddress != msg.MemberAddress {
+			continue
+		}
+		constraint = con
+		break
 	}
 	// if no authz constraint for collection id then return error
 	if constraint == nil {
@@ -800,6 +840,79 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 		msg.Amount = collection.Payments.Approval.Amount
 		msg.Cw20Payment = collection.Payments.Approval.Cw20Payment
 		msg.Cw1155Payment = collection.Payments.Approval.Cw1155Payment
+	}
+
+	// Member budget check and deduction. Constraint matching above already enforced
+	// that constraint.MemberAddress == msg.MemberAddress, and the early guard ensured
+	// msg.MemberAddress is non-empty when collection has member budgets.
+	if hasMemberBudgets {
+		budget, err := s.Keeper.GetMemberBudget(ctx, msg.CollectionId, msg.MemberAddress)
+		if err != nil {
+			return nil, errorsmod.Wrapf(types.ErrMemberBudgetNotFound, "member %s not found on collection %s", msg.MemberAddress, msg.CollectionId)
+		}
+
+		// Lazy period reset
+		s.Keeper.TryResetMemberBudgetPeriod(ctx, &budget)
+
+		// Check native coin budget
+		if len(msg.Amount) > 0 && !msg.Amount.IsZero() {
+			remaining, hasNeg := budget.PeriodSpendLimit.SafeSub(budget.PeriodSpent...)
+			if hasNeg {
+				return nil, errorsmod.Wrapf(types.ErrMemberBudgetExceeded, "member %s has no remaining budget", msg.MemberAddress)
+			}
+			if !msg.Amount.IsAllLTE(remaining) {
+				return nil, errorsmod.Wrapf(types.ErrMemberBudgetExceeded, "member %s intent amount exceeds remaining budget", msg.MemberAddress)
+			}
+			budget.PeriodSpent = budget.PeriodSpent.Add(msg.Amount...)
+		}
+
+		// Check CW20 budget
+		if len(msg.Cw20Payment) > 0 {
+			for _, payment := range msg.Cw20Payment {
+				if payment.Amount == 0 {
+					continue
+				}
+				var limitAmount uint64
+				for _, limit := range budget.PeriodCw20SpendLimit {
+					if limit.Address == payment.Address {
+						limitAmount = limit.Amount
+						break
+					}
+				}
+				var spentAmount uint64
+				for _, spent := range budget.PeriodCw20Spent {
+					if spent.Address == payment.Address {
+						spentAmount = spent.Amount
+						break
+					}
+				}
+				// Guard against uint64 underflow: if spent already meets or exceeds
+				// limit, there is no remaining budget. Without this check, the
+				// subtraction wraps around to a huge number and the comparison passes.
+				if spentAmount >= limitAmount || payment.Amount > limitAmount-spentAmount {
+					return nil, errorsmod.Wrapf(types.ErrMemberBudgetExceeded, "member %s cw20 intent amount exceeds remaining budget for %s", msg.MemberAddress, payment.Address)
+				}
+				// Deduct CW20 spent
+				found := false
+				for i, spent := range budget.PeriodCw20Spent {
+					if spent.Address == payment.Address {
+						budget.PeriodCw20Spent[i].Amount += payment.Amount
+						found = true
+						break
+					}
+				}
+				if !found {
+					budget.PeriodCw20Spent = append(budget.PeriodCw20Spent, &types.CW20Payment{
+						Address: payment.Address,
+						Amount:  payment.Amount,
+					})
+				}
+			}
+		}
+
+		if err := s.Keeper.SetMemberBudgetAndEmitUpdatedEvent(ctx, budget); err != nil {
+			return nil, err
+		}
 	}
 
 	// Get account used for APPROVAL payments on collection
@@ -842,6 +955,7 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 		EscrowAddress:       escrow.String(),
 		Cw1155Payment:       msg.Cw1155Payment,
 		Cw1155IntentPayment: cw1155IntentPayments,
+		MemberAddress:       msg.MemberAddress,
 	}
 
 	// Save the intent and emit the events
@@ -916,6 +1030,7 @@ func (s msgServer) CreateClaimAuthorization(goCtx context.Context, msg *types.Ms
 			MaxCw20Payment:   msg.MaxCw20Payment,
 			MaxCw1155Payment: msg.MaxCw1155Payment,
 			IntentDurationNs: msg.IntentDurationNs,
+			MemberAddress:    msg.MemberAddress,
 		}
 
 		// Check for existing SubmitClaimAuthorization
@@ -1053,4 +1168,120 @@ func (s msgServer) CreateClaimAuthorization(goCtx context.Context, msg *types.Ms
 	}
 
 	return &types.MsgCreateClaimAuthorizationResponse{}, nil
+}
+
+// --------------------------
+// SET COLLECTION MEMBERS
+// --------------------------
+func (s msgServer) SetCollectionMembers(goCtx context.Context, msg *types.MsgSetCollectionMembers) (*types.MsgSetCollectionMembersResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	now := ctx.BlockTime()
+
+	for _, member := range msg.Members {
+		// Check if member budget already exists
+		existingBudget, getErr := s.Keeper.GetMemberBudget(ctx, msg.CollectionId, member.MemberAddress)
+		isNew := getErr != nil
+
+		budget := types.MemberBudget{
+			CollectionId:         msg.CollectionId,
+			MemberAddress:        member.MemberAddress,
+			Period:               member.Period,
+			PeriodSpendLimit:     member.PeriodSpendLimit,
+			PeriodCw20SpendLimit: member.PeriodCw20SpendLimit,
+		}
+
+		if !isNew {
+			// Existing member - preserve period_spent and period_reset_at unless reset requested
+			if member.ResetPeriodSpent {
+				budget.PeriodSpent = sdk.Coins{}
+				budget.PeriodCw20Spent = nil
+				resetAt := now.Add(member.Period)
+				budget.PeriodResetAt = &resetAt
+			} else {
+				budget.PeriodSpent = existingBudget.PeriodSpent
+				budget.PeriodCw20Spent = existingBudget.PeriodCw20Spent
+				budget.PeriodResetAt = existingBudget.PeriodResetAt
+			}
+		} else {
+			// New member - start fresh
+			budget.PeriodSpent = sdk.Coins{}
+			budget.PeriodCw20Spent = nil
+			resetAt := now.Add(member.Period)
+			budget.PeriodResetAt = &resetAt
+		}
+
+		// New members get MemberBudgetCreatedEvent (one-time emission, indexer
+		// uses INSERT). Existing member updates go through the helper which
+		// emits MemberBudgetUpdatedEvent (indexer uses UPDATE).
+		if isNew {
+			s.Keeper.SetMemberBudget(ctx, budget)
+			if err := ctx.EventManager().EmitTypedEvent(
+				&types.MemberBudgetCreatedEvent{Budget: &budget},
+			); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := s.Keeper.SetMemberBudgetAndEmitUpdatedEvent(ctx, budget); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return &types.MsgSetCollectionMembersResponse{}, nil
+}
+
+// --------------------------
+// REMOVE COLLECTION MEMBERS
+// --------------------------
+// Removes one or more member budgets from a collection. Does NOT revoke any
+// existing claim authorizations the members granted to oracles — admin should
+// do that separately if needed. New intents from the removed members will fail
+// at the GetMemberBudget lookup.
+//
+// Edge case: if a member is removed while they have unresolved intents/claims,
+// budget restoration on rejection or expiration is silently skipped (member
+// budget no longer exists). If the member is later re-added with a fresh budget
+// before those intents resolve, the restore would target the new budget — this
+// could effectively reduce the new period's spent amount by amounts that belong
+// to the old period. This is an accepted trade-off for v1; admins should avoid
+// removing members with active intents in flight.
+func (s msgServer) RemoveCollectionMembers(goCtx context.Context, msg *types.MsgRemoveCollectionMembers) (*types.MsgRemoveCollectionMembersResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	for _, memberAddress := range msg.MemberAddresses {
+		// Verify the member budget exists before removing — also gives us the
+		// final state to include on the event for the indexer.
+		budget, err := s.Keeper.GetMemberBudget(ctx, msg.CollectionId, memberAddress)
+		if err != nil {
+			return nil, errorsmod.Wrapf(types.ErrMemberBudgetNotFound, "member %s not found on collection %s", memberAddress, msg.CollectionId)
+		}
+		if err := s.Keeper.RemoveMemberBudgetAndEmitEvent(ctx, budget); err != nil {
+			return nil, err
+		}
+	}
+
+	return &types.MsgRemoveCollectionMembersResponse{}, nil
 }

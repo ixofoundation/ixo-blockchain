@@ -96,6 +96,13 @@ func (a SubmitClaimAuthorization) Accept(_ context.Context, msg sdk.Msg) (authz.
 			continue
 		}
 
+		// member_address must match exactly between msg and constraint (both empty for
+		// individual subscriptions, or both equal for team member attribution)
+		if constraint.MemberAddress != mSubmit.MemberAddress {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
 		// if reaches here it means it is a possible matching constraint, check amounts needed are within max constraints
 		if len(mSubmit.Amount) != 0 && !IsCoinsInMaxConstraints(mSubmit.Amount, constraint.MaxAmount) {
 			unhandledConstraints = append(unhandledConstraints, constraint)
@@ -607,6 +614,15 @@ func (a CreateClaimAuthorizationAuthorization) Accept(ctx context.Context, msg s
 				unhandledConstraints = append(unhandledConstraints, constraint)
 				continue
 			}
+		}
+
+		// member_address must match exactly between msg and constraint (anti-spoofing).
+		// Both empty for individual subscriptions, or both equal for team members.
+		// Prevents a grantee from creating a member-tagged authorization when the
+		// admin's CCAA constraint has no member context (or vice versa).
+		if constraint.MemberAddress != mCreate.MemberAddress {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
 		}
 
 		// Mark as matched since we've found a valid constraint

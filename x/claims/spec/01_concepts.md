@@ -118,6 +118,20 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
 7. **Recording Counter-Claims Evidence:**
    - In case of disputes, evidence for counter-claims can be recorded, facilitating transparency and conflict resolution.
 
+8. **Team Member Budgets (Team / Enterprise Subscriptions):**
+
+   - A collection can be configured for team / enterprise use by adding one or more **member budgets**, where each member is identified by their account address and assigned a periodic spend cap.
+   - When a collection has member budgets, all intents and claims against it must be attributed to a specific member, and the member's periodic budget is enforced at intent creation time (the actual spend gate, where funds move to escrow).
+   - Each member budget tracks:
+     - A `period` duration (e.g., 30 days, minimum 24 hours)
+     - A `period_spend_limit` for native coins and a `period_cw20_spend_limit` for CW20 tokens
+     - A `period_spent` counter for actual consumption in the current period
+     - A `period_reset_at` timestamp for the next reset boundary
+   - Periods reset **lazily** — when an intent or restore operation runs, the period is rolled forward and `period_spent` zeroed if the reset boundary has passed (no scheduled job needed).
+   - Per-member attribution is enforced through strict equality on the `member_address` field across `MsgCreateClaimAuthorization`, `MsgClaimIntent`, `MsgSubmitClaim`, and the corresponding constraints on `SubmitClaimAuthorization` and `CreateClaimAuthorizationAuthorization`. This prevents one member's budget being consumed by activity attributed to another.
+   - Budget is deducted on intent creation and restored if the resulting claim is rejected, disputed, invalidated, or if the intent expires before being used.
+   - Collections with no member budgets continue to work exactly as before — member budgets are an opt-in feature configured by the collection admin.
+
 ## Conclusion
 
 The Claims module is instrumental in the ixo system, providing a robust infrastructure for the creation, management, evaluation, and verification of claims. With the integration of the W3C standard for VCs, it ensures that all claims are both trustworthy and verifiable. Recent upgrades have expanded payment options and introduced intent-based guarantees, enhancing the flexibility and utility of the claims system for real-world applications.

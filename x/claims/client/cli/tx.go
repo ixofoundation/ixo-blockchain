@@ -27,6 +27,8 @@ func NewTxCmd() *cobra.Command {
 		NewCmdEvaluateClaim(),
 		NewCmdDisputeClaim(),
 		NewCmdWithdrawPayment(),
+		NewCmdSetCollectionMembers(),
+		NewCmdRemoveCollectionMembers(),
 	)
 
 	return cmd
@@ -159,6 +161,54 @@ func NewCmdSubmitIntent() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var msg types.MsgClaimIntent
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdSetCollectionMembers() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "set-collection-members [set-collection-members-doc]",
+		Short: "Add or update one or more member budgets on a collection - flag is raw json with struct of MsgSetCollectionMembers",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgSetCollectionMembers
+			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
+				return err
+			}
+
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
+}
+
+func NewCmdRemoveCollectionMembers() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "remove-collection-members [remove-collection-members-doc]",
+		Short: "Remove one or more member budgets from a collection - flag is raw json with struct of MsgRemoveCollectionMembers",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			var msg types.MsgRemoveCollectionMembers
 			if err := json.Unmarshal([]byte(args[0]), &msg); err != nil {
 				return err
 			}
