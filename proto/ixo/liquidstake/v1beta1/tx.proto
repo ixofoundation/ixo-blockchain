@@ -13,53 +13,77 @@ option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/ty
 
 // Msg defines the liquid staking Msg service.
 service Msg {
-  // LiquidStake defines a method for performing a delegation of coins
-  // from a delegator to whitelisted validators.
+  // LiquidStake delegates native tokens through a pool's proxy account to its
+  // whitelisted validators and mints the pool's LST denom to the delegator.
   rpc LiquidStake(MsgLiquidStake) returns (MsgLiquidStakeResponse);
 
-  // LiquidUnstake defines a method for performing an undelegation of liquid
-  // staking from a delegate.
+  // LiquidUnstake burns LST denom of a specific pool and initiates unbonding
+  // from that pool's whitelisted validators back to the delegator.
   rpc LiquidUnstake(MsgLiquidUnstake) returns (MsgLiquidUnstakeResponse);
 
-  // UpdateParams defines a method to update the module params.
-  rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
+  // CreatePool registers a new liquid staking pool with its own LST denom,
+  // proxy account, admin, and fee configuration. Governance authority only.
+  rpc CreatePool(MsgCreatePool) returns (MsgCreatePoolResponse);
 
-  // UpdateWhitelistedValidators defines a method to update the whitelisted
-  // validators list.
+  // UpdateModuleParams updates global, module-wide parameters (the minimum
+  // liquid stake amount and the global module-paused kill switch).
+  // Governance authority only.
+  rpc UpdateModuleParams(MsgUpdateModuleParams)
+      returns (MsgUpdateModuleParamsResponse);
+
+  // UpdatePool updates the mutable scalar/address fields of a specific pool
+  // (fee rates, fee account, admin address). Governance or the pool's
+  // current admin may call this. Whitelisted validators, weighted rewards
+  // receivers, and the paused flag have their own dedicated update messages.
+  rpc UpdatePool(MsgUpdatePool) returns (MsgUpdatePoolResponse);
+
+  // UpdateWhitelistedValidators updates the validator whitelist of a specific
+  // pool. Governance or the pool's current admin may call this.
   rpc UpdateWhitelistedValidators(MsgUpdateWhitelistedValidators)
       returns (MsgUpdateWhitelistedValidatorsResponse);
 
-  // UpdateWhitelistedValidators defines a method to update the whitelisted
-  // validators list. Only the whitelist admin address can update this list.
+  // UpdateWeightedRewardsReceivers updates the weighted rewards receivers
+  // list of a specific pool. The pool's admin may call this.
   rpc UpdateWeightedRewardsReceivers(MsgUpdateWeightedRewardsReceivers)
       returns (MsgUpdateWeightedRewardsReceiversResponse);
 
-  // SetModulePaused  defines a method to update the module's pause status,
-  // setting value of the safety flag in params.
+  // SetPoolPaused toggles the per-pool paused flag for a specific pool.
+  // Governance or the pool's current admin may call this. Other pools are
+  // unaffected.
+  rpc SetPoolPaused(MsgSetPoolPaused) returns (MsgSetPoolPausedResponse);
+
+  // SetModulePaused toggles the global module-paused flag in ModuleParams.
+  // When paused, ALL pools are halted regardless of their per-pool flag.
+  // Governance authority only.
   rpc SetModulePaused(MsgSetModulePaused) returns (MsgSetModulePausedResponse);
 
-  // Burn defines a method for burning coins.
+  // Burn burns native uixo tokens. Module-level operation, not pool-scoped.
   rpc Burn(MsgBurn) returns (MsgBurnResponse);
 }
 
-// MsgLiquidStake defines a SDK message for performing a liquid stake of coins
-// from a delegator to whitelisted validators.
+// MsgLiquidStake liquid-stakes native tokens into a specific pool.
 message MsgLiquidStake {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
   option (cosmos.msg.v1.signer) = "delegator_address";
   option (amino.name) = "liquidstake/MsgLiquidStake";
 
+  // delegator_address must equal the pool's whitelist_admin_address.
   string delegator_address = 1
       [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
+
+  // pool_id selects which pool to stake into and therefore which LST denom
+  // is minted in return.
+  string pool_id = 2;
+
+  // amount is the native staking-token coin to liquid-stake. Its denom must
+  // match the chain's bond denom.
+  cosmos.base.v1beta1.Coin amount = 3 [ (gogoproto.nullable) = false ];
 }
 
-// MsgLiquidStakeResponse defines the MsgLiquidStake response type.
 message MsgLiquidStakeResponse {}
 
-// MsgLiquidUnstake defines a SDK message for performing an undelegation of
-// liquid staking from a delegate.
+// MsgLiquidUnstake burns LST of a specific pool and initiates unbonding.
 message MsgLiquidUnstake {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
@@ -68,96 +92,211 @@ message MsgLiquidUnstake {
 
   string delegator_address = 1
       [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
+
+  // pool_id must correspond to amount.denom (the pool's liquid_bond_denom);
+  // both are required for explicitness and validated to match.
+  string pool_id = 2;
+
+  // amount is the LST coin to burn. Its denom must equal
+  // Pool(pool_id).liquid_bond_denom.
+  cosmos.base.v1beta1.Coin amount = 3 [ (gogoproto.nullable) = false ];
 }
 
-// MsgLiquidUnstakeResponse defines the MsgLiquidUnstake response type.
 message MsgLiquidUnstakeResponse {
   google.protobuf.Timestamp completion_time = 1
       [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true ];
 }
 
-message MsgUpdateParams {
+// MsgCreatePool registers a new liquid staking pool. Governance only.
+//
+// The proxy account is derived deterministically from pool_id; pool_id and
+// liquid_bond_denom must both be globally unique. The newly created pool
+// starts with an empty whitelisted_validators list, empty
+// weighted_rewards_receivers, zero fee rates, and paused=false. Validators
+// must be added with MsgUpdateWhitelistedValidators before staking is
+// possible (the active-weight-quorum check requires sum >= 33.33%).
+message MsgCreatePool {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
-  option (amino.name) = "liquidstake/MsgUpdateParams";
+  option (amino.name) = "liquidstake/MsgCreatePool";
   option (cosmos.msg.v1.signer) = "authority";
 
-  // authority is the address that controls the module (defaults to x/gov unless
-  // overwritten).
+  // authority must be the governance module address.
   string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  // params defines the parameters to update.
-  // NOTE: denom and whitelisted_validators and weighted_rewards_receivers are
-  // not updated.
-  Params params = 2 [ (gogoproto.nullable) = false ];
+
+  // pool_id is the immutable identifier for the new pool. Validated as
+  // lowercase alphanumeric plus '-', length 2..16, globally unique.
+  string pool_id = 2;
+
+  // liquid_bond_denom is the LST denom for the new pool. Must pass
+  // sdk.ValidateDenom and be globally unique across pools.
+  string liquid_bond_denom = 3;
+
+  // initial_admin_address becomes the pool's whitelist_admin_address.
+  string initial_admin_address = 4
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // initial_fee_account_address becomes the pool's fee_account_address.
+  string initial_fee_account_address = 5
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 }
 
-// MsgUpdateParamsResponse defines the response structure for executing a
-message MsgUpdateParamsResponse {}
+message MsgCreatePoolResponse {
+  // proxy_account_address is the derived bech32 address that will hold this
+  // pool's delegations. Returned for client convenience.
+  string proxy_account_address = 1
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
 
+// MsgUpdateModuleParams updates the global ModuleParams. Governance only.
+message MsgUpdateModuleParams {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (amino.name) = "liquidstake/MsgUpdateModuleParams";
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority must be the governance module address.
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // module_params replaces the current ModuleParams in full.
+  ModuleParams module_params = 2 [ (gogoproto.nullable) = false ];
+}
+
+message MsgUpdateModuleParamsResponse {}
+
+// MsgUpdatePool updates a pool's mutable scalar/address fields. Governance
+// or the pool's current whitelist_admin_address may call this.
+//
+// Whitelisted validators, weighted rewards receivers, and the paused flag
+// each have their own dedicated update message and are NOT touched here.
+// The pool_id, liquid_bond_denom, and proxy_account_address are immutable
+// after creation and cannot be changed via this message.
+message MsgUpdatePool {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (amino.name) = "liquidstake/MsgUpdatePool";
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority must be either governance or the pool's current admin.
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // pool_id selects the pool to update.
+  string pool_id = 2;
+
+  // unstake_fee_rate replaces the pool's current unstake fee rate.
+  string unstake_fee_rate = 3 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // fee_account_address replaces the pool's current fee account.
+  string fee_account_address = 4
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // autocompound_fee_rate replaces the pool's current autocompound fee rate.
+  string autocompound_fee_rate = 5 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // whitelist_admin_address replaces the pool's current admin address.
+  string whitelist_admin_address = 6
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+}
+
+message MsgUpdatePoolResponse {}
+
+// MsgUpdateWhitelistedValidators replaces a pool's validator whitelist.
+// Governance or the pool's current admin may call this. Target weights must
+// sum to 10000.
 message MsgUpdateWhitelistedValidators {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
   option (amino.name) = "liquidstake/MsgUpdateWhitelistedValidators";
   option (cosmos.msg.v1.signer) = "authority";
 
-  // Authority is the address that is allowed to update whitelisted validators,
-  // defined as admin address in params (WhitelistAdminAddress).
+  // authority must be either governance or the pool's current admin.
   string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  // WhitelistedValidators specifies the validators elected to become Active
-  // Liquid Validators.
-  repeated WhitelistedValidator whitelisted_validators = 2
+
+  // pool_id selects the pool whose whitelist is being replaced.
+  string pool_id = 2;
+
+  // whitelisted_validators replaces the pool's validator set.
+  repeated WhitelistedValidator whitelisted_validators = 3
       [ (gogoproto.nullable) = false ];
 }
 
-// MsgUpdateWhitelistedValidatorsResponse defines the response structure for
-// executing a
 message MsgUpdateWhitelistedValidatorsResponse {}
 
+// MsgUpdateWeightedRewardsReceivers replaces a pool's weighted rewards
+// receivers list. Pool admin only (matches pre-v7 admin-only constraint).
 message MsgUpdateWeightedRewardsReceivers {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
   option (amino.name) = "liquidstake/MsgUpdateWeightedRewardsReceivers";
   option (cosmos.msg.v1.signer) = "authority";
 
-  // Authority is the address that is allowed to update wieghted rewards
-  // receivers, defined as admin address in params (WhitelistAdminAddress).
+  // authority must equal the pool's whitelist_admin_address.
   string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  // WhitelistedValidators specifies the validators elected to become Active
-  // Liquid Validators.
-  repeated WeightedAddress weighted_rewards_receivers = 2
+
+  // pool_id selects the pool whose receivers are being replaced.
+  string pool_id = 2;
+
+  // weighted_rewards_receivers replaces the pool's receivers list. Sum of
+  // weights must not exceed 1.
+  repeated WeightedAddress weighted_rewards_receivers = 3
       [ (gogoproto.nullable) = false ];
 }
 
-// MsgUpdateWeightedRewardsReceiversResponse defines the response structure for
-// executing a
 message MsgUpdateWeightedRewardsReceiversResponse {}
 
+// MsgSetPoolPaused toggles a single pool's per-pool paused flag.
+// Governance or the pool's current admin may call this.
+message MsgSetPoolPaused {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (amino.name) = "liquidstake/MsgSetPoolPaused";
+  option (cosmos.msg.v1.signer) = "authority";
+
+  // authority must be either governance or the pool's current admin.
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // pool_id selects the pool whose paused flag is being set.
+  string pool_id = 2;
+
+  // is_paused is the target value of Pool.paused.
+  bool is_paused = 3;
+}
+
+message MsgSetPoolPausedResponse {}
+
+// MsgSetModulePaused toggles the global ModuleParams.module_paused kill
+// switch. When true, every pool is halted regardless of its per-pool flag.
+// Governance authority only.
 message MsgSetModulePaused {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
   option (amino.name) = "liquidstake/MsgSetModulePaused";
   option (cosmos.msg.v1.signer) = "authority";
 
-  // Authority is the address that is allowed to update module's paused state,
-  // defined as admin address in params (WhitelistAdminAddress).
+  // authority must be the governance module address.
   string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  // IsPaused represents the target state of the paused flag.
+
+  // is_paused is the target value of ModuleParams.module_paused.
   bool is_paused = 2;
 }
 
-// MsgSetModulePausedResponse defines the response structure for
-// executing a
 message MsgSetModulePausedResponse {}
 
-// MsgBurn defines a SDK message for performing a burn of coins.
-// NOTE: only ixo native token can be burned
+// MsgBurn burns the signer's native uixo tokens. Module-level operation.
 message MsgBurn {
   option (cosmos.msg.v1.signer) = "burner";
 
   string burner = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
-  // amount is the amount of coins to burn
-  // NOTE: only ixo native token can be burned
+
+  // amount must be denominated in uixo.
   cosmos.base.v1beta1.Coin amount = 2 [ (gogoproto.nullable) = false ];
 }
 

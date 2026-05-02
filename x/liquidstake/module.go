@@ -143,8 +143,7 @@ func (am AppModule) BeginBlock(context context.Context) error {
 	return nil
 }
 
-// ConsensusVersion is a sequence number for state-breaking change of the
-// module. It should be incremented on each consensus-breaking change
-// introduced by the module. To avoid wrong/empty versions, the initial version
-// should be set to 1.
-func (AppModule) ConsensusVersion() uint64 { return 1 }
+// ConsensusVersion is a sequence number for state-breaking changes. v1 was
+// the single-pool layout introduced in chain v4. v2 is the v7 multi-pool
+// layout (ModuleParams + per-pool Pool / LiquidValidator records).
+func (AppModule) ConsensusVersion() uint64 { return 2 }

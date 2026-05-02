@@ -128,8 +128,10 @@ func init() {
 	setWhitelistedQuery("/ixo.mint.v1beta1.Query/Params", &minttypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.mint.v1beta1.Query/EpochProvisions", &minttypes.QueryEpochProvisionsResponse{})
 
-	// liquidstake
-	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/Params", &liquidstaketypes.QueryParamsResponse{})
+	// liquidstake (v7 multi-pool surface)
+	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/ModuleParams", &liquidstaketypes.QueryModuleParamsResponse{})
+	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/Pool", &liquidstaketypes.QueryPoolResponse{})
+	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/Pools", &liquidstaketypes.QueryPoolsResponse{})
 	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/LiquidValidators", &liquidstaketypes.QueryLiquidValidatorsResponse{})
 	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/States", &liquidstaketypes.QueryStatesResponse{})
 }

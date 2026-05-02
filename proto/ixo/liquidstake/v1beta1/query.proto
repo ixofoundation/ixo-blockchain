@@ -3,44 +3,73 @@ package ixo.liquidstake.v1beta1;
 
 import "google/api/annotations.proto";
 import "ixo/liquidstake/v1beta1/liquidstake.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types";
 
 // Query defines the gRPC query service for the liquidstake module.
 service Query {
-  // Params returns parameters of the liquidstake module.
-  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
-    option (google.api.http).get = "/ixo/liquidstake/v1beta1/params";
+  // ModuleParams returns the global, module-wide parameters (minimum stake
+  // amount and global pause flag).
+  rpc ModuleParams(QueryModuleParamsRequest)
+      returns (QueryModuleParamsResponse) {
+    option (google.api.http).get = "/ixo/liquidstake/v1beta1/module_params";
   }
 
-  // LiquidValidators returns liquid validators with states of the liquidstake
-  // module.
+  // Pool returns the configuration of a single pool by pool_id.
+  rpc Pool(QueryPoolRequest) returns (QueryPoolResponse) {
+    option (google.api.http).get = "/ixo/liquidstake/v1beta1/pools/{pool_id}";
+  }
+
+  // Pools returns every registered pool's configuration, paginated.
+  rpc Pools(QueryPoolsRequest) returns (QueryPoolsResponse) {
+    option (google.api.http).get = "/ixo/liquidstake/v1beta1/pools";
+  }
+
+  // LiquidValidators returns liquid validators (with state) for a single
+  // pool.
   rpc LiquidValidators(QueryLiquidValidatorsRequest)
       returns (QueryLiquidValidatorsResponse) {
-    option (google.api.http).get = "/ixo/liquidstake/v1beta1/validators";
+    option (google.api.http).get =
+        "/ixo/liquidstake/v1beta1/pools/{pool_id}/validators";
   }
 
-  // States returns states of the liquidstake module.
+  // States returns the NetAmountState (rates, supplies, balances) for a
+  // single pool.
   rpc States(QueryStatesRequest) returns (QueryStatesResponse) {
-    option (google.api.http).get = "/ixo/liquidstake/v1beta1/states";
+    option (google.api.http).get =
+        "/ixo/liquidstake/v1beta1/pools/{pool_id}/states";
   }
 }
 
-message QueryParamsRequest {}
+message QueryModuleParamsRequest {}
 
-message QueryParamsResponse {
-  Params params = 1 [ (gogoproto.nullable) = false ];
+message QueryModuleParamsResponse {
+  ModuleParams module_params = 1 [ (gogoproto.nullable) = false ];
 }
 
-message QueryLiquidValidatorsRequest {}
+message QueryPoolRequest { string pool_id = 1; }
+
+message QueryPoolResponse { Pool pool = 1 [ (gogoproto.nullable) = false ]; }
+
+message QueryPoolsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryPoolsResponse {
+  repeated Pool pools = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryLiquidValidatorsRequest { string pool_id = 1; }
 
 message QueryLiquidValidatorsResponse {
   repeated LiquidValidatorState liquid_validators = 1
       [ (gogoproto.nullable) = false ];
 }
 
-message QueryStatesRequest {}
+message QueryStatesRequest { string pool_id = 1; }
 
 message QueryStatesResponse {
   NetAmountState net_amount_state = 1 [ (gogoproto.nullable) = false ];

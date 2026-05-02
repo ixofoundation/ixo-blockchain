@@ -8,27 +8,35 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
-// RegisterLegacyAminoCodec registers the necessary x/liquidstake interfaces and concrete types
-// on the provided LegacyAmino codec. These types are used for Amino JSON serialization.
+// RegisterLegacyAminoCodec registers liquidstake's concrete types under the
+// LegacyAmino codec for Amino JSON serialization (used by ledger signing,
+// among other things).
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgLiquidStake{}, "liquidstake/MsgLiquidStake", nil)
 	cdc.RegisterConcrete(&MsgLiquidUnstake{}, "liquidstake/MsgLiquidUnstake", nil)
-	cdc.RegisterConcrete(&MsgUpdateParams{}, "liquidstake/MsgUpdateParams", nil)
+	cdc.RegisterConcrete(&MsgCreatePool{}, "liquidstake/MsgCreatePool", nil)
+	cdc.RegisterConcrete(&MsgUpdateModuleParams{}, "liquidstake/MsgUpdateModuleParams", nil)
+	cdc.RegisterConcrete(&MsgUpdatePool{}, "liquidstake/MsgUpdatePool", nil)
 	cdc.RegisterConcrete(&MsgUpdateWhitelistedValidators{}, "liquidstake/MsgUpdateWhitelistedValidators", nil)
 	cdc.RegisterConcrete(&MsgUpdateWeightedRewardsReceivers{}, "liquidstake/MsgUpdateWeightedRewardsReceivers", nil)
+	cdc.RegisterConcrete(&MsgSetPoolPaused{}, "liquidstake/MsgSetPoolPaused", nil)
 	cdc.RegisterConcrete(&MsgSetModulePaused{}, "liquidstake/MsgSetModulePaused", nil)
 	cdc.RegisterConcrete(&MsgBurn{}, "liquidstake/MsgBurn", nil)
 }
 
-// RegisterInterfaces registers the x/liquidstake interfaces types with the interface registry.
+// RegisterInterfaces registers liquidstake's sdk.Msg implementations and the
+// MsgService descriptor with the interface registry.
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgLiquidStake{},
 		&MsgLiquidUnstake{},
-		&MsgUpdateParams{},
+		&MsgCreatePool{},
+		&MsgUpdateModuleParams{},
+		&MsgUpdatePool{},
 		&MsgUpdateWhitelistedValidators{},
 		&MsgUpdateWeightedRewardsReceivers{},
+		&MsgSetPoolPaused{},
 		&MsgSetModulePaused{},
 		&MsgBurn{},
 	)

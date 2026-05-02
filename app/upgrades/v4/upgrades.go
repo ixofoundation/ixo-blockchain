@@ -214,14 +214,21 @@ func CreateUpgradeHandler(
 		// Set the liquid stake params in the store
 		// -------------------------------------------------
 		ctx.Logger().Info("Set liquid stake params")
-		liquidStakeParams := keepers.LiquidStakeKeeper.GetParams(ctx)
+		// Historic upgrade: this code originally set the pre-v7 single-pool
+		// Params record. Rerouted through {Get,Set}LegacyParams so it
+		// continues to compile and behaves identically when replayed on a
+		// chain syncing from genesis. The v7 upgrade migrates the resulting
+		// legacy state into the multi-pool layout.
+		liquidStakeParams := keepers.LiquidStakeKeeper.GetLegacyParams(ctx)
 		liquidStakeParams.WhitelistedValidators = WhitelistedValidators
 		liquidStakeParams.UnstakeFeeRate = LSMUnstakeFeeRate
 		liquidStakeParams.AutocompoundFeeRate = LSMAutocompoundFeeRate
 		liquidStakeParams.WhitelistAdminAddress = LSMWhitelistAdminAddress
 		liquidStakeParams.WeightedRewardsReceivers = LSMWeightedRewardsReceivers
 		liquidStakeParams.FeeAccountAddress = LSMFeeAccountAddress
-		keepers.LiquidStakeKeeper.SetParams(ctx, liquidStakeParams)
+		if err := keepers.LiquidStakeKeeper.SetLegacyParams(ctx, liquidStakeParams); err != nil {
+			return nil, err
+		}
 
 		// -------------------------------------------------
 		// Set the ICA Host params in the store

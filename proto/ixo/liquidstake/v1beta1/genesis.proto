@@ -11,8 +11,28 @@ message GenesisState {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
-  Params params = 1 [ (gogoproto.nullable) = false ];
+  // module_params holds the global module-wide parameters.
+  ModuleParams module_params = 1 [ (gogoproto.nullable) = false ];
 
+  // pools is the list of every registered liquid staking pool.
+  repeated Pool pools = 2 [ (gogoproto.nullable) = false ];
+
+  // pool_liquid_validators groups each pool's liquid validators by pool_id.
+  // The pool_id of every entry must match a Pool in pools.
+  repeated PoolLiquidValidators pool_liquid_validators = 3
+      [ (gogoproto.nullable) = false ];
+}
+
+// PoolLiquidValidators groups a pool's liquid-validator state for genesis
+// import/export, since validators are scoped per pool in v7+.
+message PoolLiquidValidators {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // pool_id selects the owning pool.
+  string pool_id = 1;
+
+  // liquid_validators is the set of liquid validators known to the pool.
   repeated LiquidValidator liquid_validators = 2
       [ (gogoproto.nullable) = false ];
 }

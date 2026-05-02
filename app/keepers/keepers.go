@@ -1,6 +1,7 @@
 package keepers
 
 import (
+	"context"
 
 	// Wasmd
 	"github.com/CosmWasm/wasmd/x/wasm"
@@ -8,6 +9,7 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	// Cosmos SDK
+	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
@@ -259,6 +261,48 @@ func NewAppKeepers(
 		blockedAddress,
 		govModAddress,
 		bApp.Logger(),
+	)
+
+	// MintCoinsRestriction: enduring bank-level lock that prevents any module
+	// from minting a denom registered as a liquidstake pool's LST denom unless
+	// the call originated from liquidstake itself. liquidstake stamps an
+	// authorisation sentinel onto its sdk.Context immediately before calling
+	// bank.MintCoins (see types.AuthorizeLSTMintContext); this closure honours
+	// that sentinel and rejects every other caller.
+	//
+	// The closure captures appKeepers by pointer so it can resolve
+	// LiquidStakeKeeper lazily at mint time. LiquidStakeKeeper is zero-valued
+	// at the point of installation but is populated later in this same
+	// constructor before NewAppKeepers returns; taking the address here
+	// forces heap allocation of appKeepers so subsequent population is
+	// visible through the captured pointer.
+	//
+	// Installed RIGHT AFTER bank construction so every subsequently-built
+	// module receives the restricted bank. Modules constructed earlier in
+	// this function (AccountKeeper, CrisisKeeper) hold an unrestricted copy,
+	// which is fine because none of them mint denoms that could clash with
+	// liquidstake pools (account never mints; crisis only refunds invariant
+	// breaks against existing supply).
+	appKeepersPtr := &appKeepers
+	appKeepers.BankKeeper = appKeepers.BankKeeper.WithMintCoinsRestriction(
+		func(ctx context.Context, coins sdk.Coins) error {
+			// Pre-restriction calls (e.g. from genesis init before liquidstake
+			// is wired) bypass the rule. By the time real chain traffic runs,
+			// the keeper is fully populated.
+			lsKeeper := appKeepersPtr.LiquidStakeKeeper
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			authorized := liquidstaketypes.IsLSTMintAuthorized(ctx)
+			for _, c := range coins {
+				if lsKeeper.HasPoolWithDenom(sdkCtx, c.Denom) && !authorized {
+					return errorsmod.Wrapf(
+						liquidstaketypes.ErrDenomAlreadyInUse,
+						"denom %s is registered as a liquidstake pool's LST denom and may only be minted by the liquidstake module",
+						c.Denom,
+					)
+				}
+			}
+			return nil
+		},
 	)
 
 	appKeepers.AuthzKeeper = authzkeeper.NewKeeper(

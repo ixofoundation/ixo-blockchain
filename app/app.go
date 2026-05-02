@@ -52,6 +52,7 @@ import (
 	v4 "github.com/ixofoundation/ixo-blockchain/v6/app/upgrades/v4"
 	v5 "github.com/ixofoundation/ixo-blockchain/v6/app/upgrades/v5"
 	v6 "github.com/ixofoundation/ixo-blockchain/v6/app/upgrades/v6"
+	v7 "github.com/ixofoundation/ixo-blockchain/v6/app/upgrades/v7"
 	"github.com/ixofoundation/ixo-blockchain/v6/lib/docs"
 	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
 	"github.com/spf13/cast"
@@ -69,7 +70,7 @@ var (
 	maccPerms = moduleAccountPermissions
 
 	// scheduled upgrades and forks
-	Upgrades = []upgrades.Upgrade{v2.Upgrade, v3.Upgrade, v4.Upgrade, v5.Upgrade, v6.Upgrade}
+	Upgrades = []upgrades.Upgrade{v2.Upgrade, v3.Upgrade, v4.Upgrade, v5.Upgrade, v6.Upgrade, v7.Upgrade}
 	Forks    = []upgrades.Fork{}
 
 	// EmptyWasmOpts defines a type alias for a list of wasm options.

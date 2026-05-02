@@ -8,20 +8,14 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+
 	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 )
 
-// GetProxyAccBalance returns the available spendable balance of the proxy account for the native token.
-func (k Keeper) GetProxyAccBalance(ctx sdk.Context, proxyAcc sdk.AccAddress) (balance sdk.Coin) {
-	bondDenom, err := k.stakingKeeper.BondDenom(ctx)
-	if err != nil {
-		panic(err) // should never happen
-	}
-	return sdk.NewCoin(bondDenom, k.bankKeeper.SpendableCoins(ctx, proxyAcc).AmountOf(bondDenom))
-}
-
-// TryRedelegation attempts redelegation, which is applied only when successful through cached context because there is a constraint that fails if already receiving redelegation.
+// TryRedelegation attempts a single redelegation, atomically through a cached
+// context so a transitive-redelegation rejection does not leak partial state
+// into the parent transaction.
 func (k Keeper) TryRedelegation(ctx sdk.Context, re types.Redelegation) (completionTime time.Time, err error) {
 	dstVal := re.DstValidator.GetOperator()
 	srcVal := re.SrcValidator.GetOperator()
@@ -36,17 +30,16 @@ func (k Keeper) TryRedelegation(ctx sdk.Context, re types.Redelegation) (complet
 	}
 
 	// calculate delShares from tokens with validation
-	_, err = k.stakingKeeper.ValidateUnbondAmount(
-		ctx, re.Delegator, srcVal, re.Amount,
-	)
-	if err != nil {
+	if _, err = k.stakingKeeper.ValidateUnbondAmount(ctx, re.Delegator, srcVal, re.Amount); err != nil {
 		return time.Time{}, fmt.Errorf("failed to validate unbond amount: %w", err)
 	}
 
-	// when last, full redelegation of shares from delegation
+	// On the final transfer-out from a source validator, redelegate the
+	// validator's full liquid-token balance (not the requested amount,
+	// which may have been rounded down) so no dust is left behind.
 	amt := re.Amount
 	if re.Last {
-		amt = re.SrcValidator.GetLiquidTokens(ctx, k.stakingKeeper, false)
+		amt = re.SrcValidator.GetLiquidTokens(ctx, k.stakingKeeper, re.Delegator, false)
 	}
 	cachedCtx, writeCache := ctx.CacheContext()
 	completionTime, err = k.RedelegateWithCap(cachedCtx, re.Delegator, srcVal, dstVal, amt)
@@ -57,27 +50,31 @@ func (k Keeper) TryRedelegation(ctx sdk.Context, re types.Redelegation) (complet
 	return completionTime, nil
 }
 
-// Rebalance argument liquidVals containing ValidatorStatusActive which is containing just added on whitelist(liquidToken 0) and ValidatorStatusInactive to delist
+// Rebalance reshuffles delegation amounts among the pool's liquid validators
+// so each one's stake matches its target weight. Acts only when the per-pool
+// max gap exceeds rebalancingTrigger * totalLiquidTokens.
+//
+// Returns every redelegation it tried (including failed ones with .Error
+// populated), useful for tests and emitted-event accounting.
 func (k Keeper) Rebalance(
 	ctx sdk.Context,
+	poolID string,
 	proxyAcc sdk.AccAddress,
 	liquidVals types.LiquidValidators,
 	whitelistedValsMap types.WhitelistedValsMap,
 	rebalancingTrigger math.LegacyDec,
 ) (redelegations []types.Redelegation) {
-	totalLiquidTokens, liquidTokenMap := liquidVals.TotalLiquidTokens(ctx, k.stakingKeeper, false)
+	totalLiquidTokens, liquidTokenMap := liquidVals.TotalLiquidTokens(ctx, k.stakingKeeper, proxyAcc, false)
 	if !totalLiquidTokens.IsPositive() {
 		return redelegations
 	}
 
 	weightMap, totalWeight := k.GetWeightMap(ctx, liquidVals, whitelistedValsMap)
-
-	// no active liquid validators
 	if !totalWeight.IsPositive() {
 		return redelegations
 	}
 
-	// calculate rebalancing target map
+	// Per-validator target = totalLiquidTokens * weight / totalWeight.
 	targetMap := map[string]math.Int{}
 	totalTargetMap := math.ZeroInt()
 	for _, val := range liquidVals {
@@ -88,7 +85,7 @@ func (k Keeper) Rebalance(
 	if !totalTargetMap.IsPositive() {
 		return redelegations
 	}
-	// crumb to first non zero liquid validator
+	// Add the rounding crumb to the first non-zero-target validator.
 	for _, val := range liquidVals {
 		if targetMap[val.OperatorAddress].IsPositive() {
 			targetMap[val.OperatorAddress] = targetMap[val.OperatorAddress].Add(crumb)
@@ -101,17 +98,18 @@ func (k Keeper) Rebalance(
 	redelegations = make([]types.Redelegation, 0, liquidVals.Len())
 
 	for i := 0; i < liquidVals.Len(); i++ {
-		// get min, max of liquid token gap
 		minVal, maxVal, amountNeeded, last := liquidVals.MinMaxGap(targetMap, liquidTokenMap)
+		// Skip if the gap is below the trigger on the very first iteration —
+		// avoids churn for routine reward fluctuations.
 		if amountNeeded.IsZero() || (i == 0 && !amountNeeded.GT(rebalancingThresholdAmt)) {
 			break
 		}
 
-		// sync liquidTokenMap applied rebalancing
+		// Locally update liquidTokenMap so the next MinMaxGap reflects the
+		// transfer we're about to attempt.
 		liquidTokenMap[maxVal.OperatorAddress] = liquidTokenMap[maxVal.OperatorAddress].Sub(amountNeeded)
 		liquidTokenMap[minVal.OperatorAddress] = liquidTokenMap[minVal.OperatorAddress].Add(amountNeeded)
 
-		// try redelegation from max validator to min validator
 		redelegation := types.Redelegation{
 			Delegator:    proxyAcc,
 			SrcValidator: maxVal,
@@ -119,14 +117,12 @@ func (k Keeper) Rebalance(
 			Amount:       amountNeeded,
 			Last:         last,
 		}
-
-		_, err := k.TryRedelegation(ctx, redelegation)
-		if err != nil {
+		if _, err := k.TryRedelegation(ctx, redelegation); err != nil {
 			redelegation.Error = err
 			failCount++
-
 			k.Logger(ctx).Error(
 				"redelegation failed",
+				"pool_id", poolID,
 				"delegator", proxyAcc.String(),
 				"src_validator", maxVal.OperatorAddress,
 				"dst_validator", minVal.OperatorAddress,
@@ -134,92 +130,83 @@ func (k Keeper) Rebalance(
 				"error", err.Error(),
 			)
 		}
-
 		redelegations = append(redelegations, redelegation)
 	}
 
 	if len(redelegations) != 0 {
-		// Emit the events
 		if err := ctx.EventManager().EmitTypedEvent(
 			&types.RebalancedLiquidStakeEvent{
+				PoolId:                poolID,
 				Delegator:             proxyAcc.String(),
-				RedelegationCount:     strconv.Itoa(len(redelegations)),
-				RedelegationFailCount: strconv.Itoa(failCount),
+				RedelegationCount:     uint32(len(redelegations)),
+				RedelegationFailCount: uint32(failCount),
 			},
 		); err != nil {
-			k.Logger(ctx).Error(
-				"failed to emit rebalanced liquid stake event",
-				"error", err,
-			)
+			k.Logger(ctx).Error("failed to emit rebalanced liquid stake event", "pool_id", poolID, "error", err)
 		}
 		k.Logger(ctx).Info(
 			"Rebalance",
+			"pool_id", poolID,
 			"module", types.ModuleName,
 			"delegator", proxyAcc.String(),
 			"redelegation_count", strconv.Itoa(len(redelegations)),
 			"redelegation_fail_count", strconv.Itoa(failCount),
 		)
 	}
-
 	return redelegations
 }
 
-func (k Keeper) UpdateLiquidValidatorSet(ctx sdk.Context, redelegate bool) (redelegations []types.Redelegation) {
-	params := k.GetParams(ctx)
-	liquidValidators := k.GetAllLiquidValidators(ctx)
+// UpdateLiquidValidatorSet refreshes a single pool's LiquidValidator set so
+// any newly whitelisted active validators are persisted, and (when
+// redelegate=true) attempts to rebalance towards the configured weights.
+//
+// Returns redelegations for testing visibility; production callers (BeginBlock,
+// epoch hook) discard the return value.
+func (k Keeper) UpdateLiquidValidatorSet(ctx sdk.Context, p types.Pool, redelegate bool) (redelegations []types.Redelegation) {
+	liquidValidators := k.GetAllLiquidValidatorsForPool(ctx, p.PoolId)
 	liquidValsMap := liquidValidators.Map()
-	whitelistedValsMap := types.GetWhitelistedValsMap(params.WhitelistedValidators)
+	whitelistedValsMap := p.WhitelistedValsMap()
 
-	// Set Liquid validators for added whitelist validators
-	for _, wv := range params.WhitelistedValidators {
+	for _, wv := range p.WhitelistedValidators {
 		if _, ok := liquidValsMap[wv.ValidatorAddress]; !ok {
-			lv := types.LiquidValidator{
-				OperatorAddress: wv.ValidatorAddress,
-			}
+			lv := types.LiquidValidator{OperatorAddress: wv.ValidatorAddress}
 			if k.IsActiveLiquidValidator(ctx, lv, whitelistedValsMap) {
-				k.SetLiquidValidator(ctx, lv)
+				k.SetLiquidValidator(ctx, p.PoolId, lv)
 				liquidValidators = append(liquidValidators, lv)
-				// Emit the events
 				if err := ctx.EventManager().EmitTypedEvent(
-					&types.AddLiquidValidatorEvent{
-						Validator: lv.OperatorAddress,
-					},
+					&types.AddLiquidValidatorEvent{PoolId: p.PoolId, Validator: lv.OperatorAddress},
 				); err != nil {
-					k.Logger(ctx).Error(
-						"failed to emit add liquid validator event",
-						"error", err,
-					)
+					k.Logger(ctx).Error("failed to emit add liquid validator event", "pool_id", p.PoolId, "error", err)
 				}
 			}
 		}
 	}
 
-	// rebalancing based updated liquid validators status with threshold, try by cachedCtx
-	// tombstone status also handled on Rebalance
+	// Tombstone-state changes are also handled inside Rebalance via
+	// IsActiveLiquidValidator / GetWeightMap.
 	if redelegate {
 		redelegations = k.Rebalance(
-			ctx,
-			types.LiquidStakeProxyAcc,
-			liquidValidators,
-			whitelistedValsMap,
+			ctx, p.PoolId, p.GetProxyAccount(),
+			liquidValidators, whitelistedValsMap,
 			types.RebalancingTrigger,
 		)
-
-		// if there are inactive liquid validators, do not unbond,
-		// instead let validator selection and rebalancing take care of it.
-
+		// Inactive liquid validators stay in the set; LiquidUnstake drains
+		// them ahead of healthy ones (see PrioritiseInactiveLiquidValidators).
 		return redelegations
 	}
 	return nil
 }
 
-// AutocompoundStakingRewards withdraws staking rewards and re-stakes when over threshold.
-func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap types.WhitelistedValsMap) {
-	// withdraw rewards of LiquidStakeProxyAcc
-	k.WithdrawLiquidRewards(ctx, types.LiquidStakeProxyAcc)
+// AutocompoundStakingRewards withdraws all staking rewards for a pool, takes
+// the autocompound fee, distributes the configured weighted-rewards portion,
+// and re-stakes whatever remains. Each step uses a cached context so a
+// failure in one phase does not corrupt prior state.
+func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, p types.Pool, whitelistedValsMap types.WhitelistedValsMap) {
+	proxyAcc := p.GetProxyAccount()
+	k.WithdrawLiquidRewards(ctx, proxyAcc)
 
 	// skip when no active liquid validator
-	activeVals := k.GetActiveLiquidValidators(ctx, whitelistedValsMap)
+	activeVals := k.GetActiveLiquidValidatorsForPool(ctx, p.PoolId, whitelistedValsMap)
 	if len(activeVals) == 0 {
 		return
 	}
@@ -229,126 +216,109 @@ func (k Keeper) AutocompoundStakingRewards(ctx sdk.Context, whitelistedValsMap t
 		panic(err) // should never happen
 	}
 
-	// use all available funds in the proxy account as autocompoundable amount
-	proxyAccBalance := k.GetProxyAccBalance(ctx, types.LiquidStakeProxyAcc)
+	// Source of compoundable funds: every spendable bondDenom token in the
+	// proxy account (rewards just withdrawn plus any leftover from prior
+	// epochs).
+	proxyAccBalance := k.GetProxyAccBalance(ctx, proxyAcc)
 	autoCompoundableAmount := proxyAccBalance.Amount
 
-	// calculate autocompounding fee
-	params := k.GetParams(ctx)
 	autocompoundFee := sdk.NewCoin(bondDenom, math.ZeroInt())
-	if !params.AutocompoundFeeRate.IsZero() && autoCompoundableAmount.IsPositive() {
-		autocompoundFee = sdk.NewCoin(
-			bondDenom,
-			params.AutocompoundFeeRate.MulInt(autoCompoundableAmount).TruncateInt(),
-		)
+	if !p.AutocompoundFeeRate.IsZero() && autoCompoundableAmount.IsPositive() {
+		autocompoundFee = sdk.NewCoin(bondDenom, p.AutocompoundFeeRate.MulInt(autoCompoundableAmount).TruncateInt())
 	}
-
-	// delegatableAmount is the autoCompoundableAmount minus the autocompoundFee
 	delegatableAmount := autoCompoundableAmount.Sub(autocompoundFee.Amount)
 
-	// distribute rewards to weighted rewards receivers first
+	// Distribute weighted rewards first so receivers cannot be diluted by
+	// re-staked amounts that haven't yet earned them.
 	rewardsCoin := sdk.NewCoin(bondDenom, delegatableAmount)
-	totalDistributedAmount, err := k.DistributeWeightedRewards(ctx, rewardsCoin, params.WeightedRewardsReceivers)
+	totalDistributedAmount, err := k.DistributeWeightedRewards(ctx, proxyAcc, rewardsCoin, p.WeightedRewardsReceivers)
 	if err != nil {
-		// skip errors as don't want to panic in beginblock. Can see logs for fails
-		// and next epoch will attempt distribution of rewards again
-		k.Logger(ctx).Error(
-			"failed to distribute weighted rewards",
-			"error", err,
-		)
+		// Don't panic in BeginBlock; next epoch will retry.
+		k.Logger(ctx).Error("failed to distribute weighted rewards", "pool_id", p.PoolId, "error", err)
 		return
 	}
-
 	delegatableAmount = delegatableAmount.Sub(totalDistributedAmount)
 
 	// if there are still delegatable amount, re-stake the accumulated rewards
 	if delegatableAmount.IsPositive() {
-		// re-staking of the accumulated rewards
 		cachedCtx, writeCache := ctx.CacheContext()
-		err = k.LiquidDelegate(cachedCtx, types.LiquidStakeProxyAcc, activeVals, delegatableAmount, whitelistedValsMap)
-		if err != nil {
-			k.Logger(ctx).Error(
-				"failed to re-stake the accumulated rewards",
-				"error", err,
-			)
+		if err = k.LiquidDelegate(cachedCtx, proxyAcc, activeVals, delegatableAmount, whitelistedValsMap); err != nil {
+			k.Logger(ctx).Error("failed to re-stake the accumulated rewards", "pool_id", p.PoolId, "error", err)
 			return
-			// skip errors as they might occur due to reaching global liquid cap
+			// hitting global liquid cap surfaces here too — let next epoch retry
 		}
 		writeCache()
 	}
 
-	// move autocompounding fee from the balance to fee account
-	feeAccountAddr := sdk.MustAccAddressFromBech32(params.FeeAccountAddress)
-	err = k.bankKeeper.SendCoins(ctx, types.LiquidStakeProxyAcc, feeAccountAddr, sdk.NewCoins(autocompoundFee))
+	// Pay out the autocompound fee last so it does not consume from the
+	// re-staking budget if delegation fails.
+	feeAccountAddr, err := sdk.AccAddressFromBech32(p.FeeAccountAddress)
 	if err != nil {
-		k.Logger(ctx).Error(
-			"failed to send autocompound fee to fee account",
-			"error", err,
-		)
+		k.Logger(ctx).Error("invalid fee_account_address", "pool_id", p.PoolId, "error", err)
 		return
 	}
+	if autocompoundFee.Amount.IsPositive() {
+		if err := k.bankKeeper.SendCoins(ctx, proxyAcc, feeAccountAddr, sdk.NewCoins(autocompoundFee)); err != nil {
+			k.Logger(ctx).Error("failed to send autocompound fee to fee account", "pool_id", p.PoolId, "error", err)
+			return
+		}
+	}
 
-	// Emit the events
 	if err := ctx.EventManager().EmitTypedEvent(
 		&types.AutocompoundStakingRewardsEvent{
-			Delegator:             types.LiquidStakeProxyAcc.String(),
-			TotalAmount:           autoCompoundableAmount.String(),
-			FeeAmount:             autocompoundFee.String(),
-			RedelegateAmount:      delegatableAmount.String(),
-			WeightedRewardsAmount: totalDistributedAmount.String(),
+			PoolId:                p.PoolId,
+			Delegator:             proxyAcc.String(),
+			TotalAmount:           sdk.NewCoin(bondDenom, autoCompoundableAmount),
+			FeeAmount:             autocompoundFee,
+			RedelegateAmount:      sdk.NewCoin(bondDenom, delegatableAmount),
+			WeightedRewardsAmount: sdk.NewCoin(bondDenom, totalDistributedAmount),
 		},
 	); err != nil {
-		k.Logger(ctx).Error(
-			"failed to emit autocompound staking rewards event",
-			"error", err,
-		)
+		k.Logger(ctx).Error("failed to emit autocompound staking rewards event", "pool_id", p.PoolId, "error", err)
 		return
 	}
 	k.Logger(ctx).Info(
 		"AutocompoundStakingRewards",
+		"pool_id", p.PoolId,
 		"module", types.ModuleName,
-		"delegator", types.LiquidStakeProxyAcc.String(),
+		"delegator", proxyAcc.String(),
 		"autocompound_amount", delegatableAmount.String(),
 		"autocompound_fee", autocompoundFee.String(),
 	)
 }
 
-// DistributeWeightedRewards distributes the staking rewards to the given list of weightedRewardsReceivers based on their
-// weights, if there are any. Returns the total amount distributed.
-func (k Keeper) DistributeWeightedRewards(ctx sdk.Context, rewardsCoin sdk.Coin, weightedRewardsReceivers []types.WeightedAddress) (ixomath.Int, error) {
+// DistributeWeightedRewards splits rewardsCoin among receivers proportionally
+// to their weights, sending from sender. Returns the aggregate amount sent.
+// Receivers' weights are pre-validated to sum to <= 1; the unused remainder
+// is left for the autocompounder to re-stake.
+func (k Keeper) DistributeWeightedRewards(ctx sdk.Context, sender sdk.AccAddress, rewardsCoin sdk.Coin, weightedRewardsReceivers []types.WeightedAddress) (ixomath.Int, error) {
 	// counter for total distributed amount, used instead of rewardsCoin to avoid rounding discrepancies.
 	totalDistributedAmount := ixomath.ZeroInt()
-
-	// if rewardsCoin is empty, or no weighted rewards receivers provided, return 0
 	if rewardsCoin.IsZero() || len(weightedRewardsReceivers) == 0 {
 		return totalDistributedAmount, nil
 	}
 
-	// allocate weighted rewards to addresses by weight
 	for _, w := range weightedRewardsReceivers {
-		weightedRewardPortionCoin, err := getProportions(rewardsCoin, w.Weight)
+		portion, err := getProportions(rewardsCoin, w.Weight)
 		if err != nil {
 			return ixomath.Int{}, err
 		}
-
-		// distribute impact rewards to the address
-		weightedRewardsAddr, err := sdk.AccAddressFromBech32(w.Address)
+		if !portion.Amount.IsPositive() {
+			continue
+		}
+		receiverAddr, err := sdk.AccAddressFromBech32(w.Address)
 		if err != nil {
 			return ixomath.Int{}, err
 		}
-		err = k.bankKeeper.SendCoins(ctx, types.LiquidStakeProxyAcc, weightedRewardsAddr, sdk.NewCoins(weightedRewardPortionCoin))
-		if err != nil {
+		if err := k.bankKeeper.SendCoins(ctx, sender, receiverAddr, sdk.NewCoins(portion)); err != nil {
 			return ixomath.Int{}, err
 		}
-
-		// update total distributed amount
-		totalDistributedAmount = totalDistributedAmount.Add(weightedRewardPortionCoin.Amount)
+		totalDistributedAmount = totalDistributedAmount.Add(portion.Amount)
 	}
-
 	return totalDistributedAmount, nil
 }
 
-// getProportions gets the balance of the inout coin returns a coin according to the
+// getProportions gets the balance of the input coin returns a coin according to the
 // allocation ratio. Returns error if ratio is greater than 1.
 func getProportions(coin sdk.Coin, ratio ixomath.Dec) (sdk.Coin, error) {
 	if ratio.GT(ixomath.OneDec()) {

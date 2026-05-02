@@ -5,17 +5,22 @@ package types
 
 import (
 	fmt "fmt"
+	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
+	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
+	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"
 	math_bits "math/bits"
+	time "time"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
+var _ = time.Kitchen
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -23,24 +28,25 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// LiquidStakeParamsUpdatedEvent is triggered when a the Params is updated.
-type LiquidStakeParamsUpdatedEvent struct {
-	Params    *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
-	Authority string  `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
+// ModuleParamsUpdatedEvent is emitted when the global ModuleParams change
+// (either via MsgUpdateModuleParams or MsgSetModulePaused).
+type ModuleParamsUpdatedEvent struct {
+	ModuleParams *ModuleParams `protobuf:"bytes,1,opt,name=module_params,json=moduleParams,proto3" json:"module_params,omitempty"`
+	Authority    string        `protobuf:"bytes,2,opt,name=authority,proto3" json:"authority,omitempty"`
 }
 
-func (m *LiquidStakeParamsUpdatedEvent) Reset()         { *m = LiquidStakeParamsUpdatedEvent{} }
-func (m *LiquidStakeParamsUpdatedEvent) String() string { return proto.CompactTextString(m) }
-func (*LiquidStakeParamsUpdatedEvent) ProtoMessage()    {}
-func (*LiquidStakeParamsUpdatedEvent) Descriptor() ([]byte, []int) {
+func (m *ModuleParamsUpdatedEvent) Reset()         { *m = ModuleParamsUpdatedEvent{} }
+func (m *ModuleParamsUpdatedEvent) String() string { return proto.CompactTextString(m) }
+func (*ModuleParamsUpdatedEvent) ProtoMessage()    {}
+func (*ModuleParamsUpdatedEvent) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c2774d61dc12f431, []int{0}
 }
-func (m *LiquidStakeParamsUpdatedEvent) XXX_Unmarshal(b []byte) error {
+func (m *ModuleParamsUpdatedEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-func (m *LiquidStakeParamsUpdatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+func (m *ModuleParamsUpdatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
-		return xxx_messageInfo_LiquidStakeParamsUpdatedEvent.Marshal(b, m, deterministic)
+		return xxx_messageInfo_ModuleParamsUpdatedEvent.Marshal(b, m, deterministic)
 	} else {
 		b = b[:cap(b)]
 		n, err := m.MarshalToSizedBuffer(b)
@@ -50,30 +56,124 @@ func (m *LiquidStakeParamsUpdatedEvent) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-func (m *LiquidStakeParamsUpdatedEvent) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_LiquidStakeParamsUpdatedEvent.Merge(m, src)
+func (m *ModuleParamsUpdatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ModuleParamsUpdatedEvent.Merge(m, src)
 }
-func (m *LiquidStakeParamsUpdatedEvent) XXX_Size() int {
+func (m *ModuleParamsUpdatedEvent) XXX_Size() int {
 	return m.Size()
 }
-func (m *LiquidStakeParamsUpdatedEvent) XXX_DiscardUnknown() {
-	xxx_messageInfo_LiquidStakeParamsUpdatedEvent.DiscardUnknown(m)
+func (m *ModuleParamsUpdatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_ModuleParamsUpdatedEvent.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_LiquidStakeParamsUpdatedEvent proto.InternalMessageInfo
+var xxx_messageInfo_ModuleParamsUpdatedEvent proto.InternalMessageInfo
 
-// LiquidStakeEvent is triggered when a liquid stake is performed.
+// PoolCreatedEvent is emitted when a new pool is registered via
+// MsgCreatePool.
+type PoolCreatedEvent struct {
+	PoolId    string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	Pool      *Pool  `protobuf:"bytes,2,opt,name=pool,proto3" json:"pool,omitempty"`
+	Authority string `protobuf:"bytes,3,opt,name=authority,proto3" json:"authority,omitempty"`
+}
+
+func (m *PoolCreatedEvent) Reset()         { *m = PoolCreatedEvent{} }
+func (m *PoolCreatedEvent) String() string { return proto.CompactTextString(m) }
+func (*PoolCreatedEvent) ProtoMessage()    {}
+func (*PoolCreatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c2774d61dc12f431, []int{1}
+}
+func (m *PoolCreatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PoolCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PoolCreatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PoolCreatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PoolCreatedEvent.Merge(m, src)
+}
+func (m *PoolCreatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *PoolCreatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_PoolCreatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PoolCreatedEvent proto.InternalMessageInfo
+
+// PoolUpdatedEvent is emitted when a pool's configuration changes via any
+// of: MsgUpdatePool, MsgUpdateWhitelistedValidators,
+// MsgUpdateWeightedRewardsReceivers, MsgSetPoolPaused.
+type PoolUpdatedEvent struct {
+	PoolId    string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	Pool      *Pool  `protobuf:"bytes,2,opt,name=pool,proto3" json:"pool,omitempty"`
+	Authority string `protobuf:"bytes,3,opt,name=authority,proto3" json:"authority,omitempty"`
+}
+
+func (m *PoolUpdatedEvent) Reset()         { *m = PoolUpdatedEvent{} }
+func (m *PoolUpdatedEvent) String() string { return proto.CompactTextString(m) }
+func (*PoolUpdatedEvent) ProtoMessage()    {}
+func (*PoolUpdatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c2774d61dc12f431, []int{2}
+}
+func (m *PoolUpdatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PoolUpdatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PoolUpdatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PoolUpdatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PoolUpdatedEvent.Merge(m, src)
+}
+func (m *PoolUpdatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *PoolUpdatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_PoolUpdatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PoolUpdatedEvent proto.InternalMessageInfo
+
+// LiquidStakeEvent is emitted when a liquid stake is performed against a
+// specific pool.
+//
+// Field tag numbers preserved from the pre-v7 single-pool layout
+// (delegator=1, liquid_amount=2, stk_ixo_minted_amount=3) so wire-level
+// proto compatibility is preserved for any consumer decoding historical
+// v6 events with v7 codegen — pool_id simply shows as empty for those.
+// The liquid_amount and stk_ixo_minted_amount fields were upgraded from
+// the v6 string format ("100000000uixo") to typed Coin in v7 to remove
+// regex parsing on the indexer side; the tag is unchanged but the wire
+// encoding for that tag is now a length-delimited Coin sub-message.
 type LiquidStakeEvent struct {
-	Delegator          string `protobuf:"bytes,1,opt,name=delegator,proto3" json:"delegator,omitempty"`
-	LiquidAmount       string `protobuf:"bytes,2,opt,name=liquid_amount,json=liquidAmount,proto3" json:"liquid_amount,omitempty"`
-	StkIxoMintedAmount string `protobuf:"bytes,3,opt,name=stk_ixo_minted_amount,json=stkIxoMintedAmount,proto3" json:"stk_ixo_minted_amount,omitempty"`
+	Delegator          string     `protobuf:"bytes,1,opt,name=delegator,proto3" json:"delegator,omitempty"`
+	LiquidAmount       types.Coin `protobuf:"bytes,2,opt,name=liquid_amount,json=liquidAmount,proto3" json:"liquid_amount"`
+	StkIxoMintedAmount types.Coin `protobuf:"bytes,3,opt,name=stk_ixo_minted_amount,json=stkIxoMintedAmount,proto3" json:"stk_ixo_minted_amount"`
+	PoolId             string     `protobuf:"bytes,4,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 }
 
 func (m *LiquidStakeEvent) Reset()         { *m = LiquidStakeEvent{} }
 func (m *LiquidStakeEvent) String() string { return proto.CompactTextString(m) }
 func (*LiquidStakeEvent) ProtoMessage()    {}
 func (*LiquidStakeEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c2774d61dc12f431, []int{1}
+	return fileDescriptor_c2774d61dc12f431, []int{3}
 }
 func (m *LiquidStakeEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -102,20 +202,27 @@ func (m *LiquidStakeEvent) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LiquidStakeEvent proto.InternalMessageInfo
 
-// LiquidUnstakeEvent is triggered when a liquid unstake is performed.
+// LiquidUnstakeEvent is emitted when a liquid unstake is performed against
+// a specific pool.
+//
+// Field tag numbers preserved from v6. completion_time upgraded from RFC3339
+// string to google.protobuf.Timestamp to match
+// MsgLiquidUnstakeResponse.completion_time. Amount fields upgraded from
+// "<amount><denom>" strings to typed Coin.
 type LiquidUnstakeEvent struct {
-	Delegator       string `protobuf:"bytes,1,opt,name=delegator,proto3" json:"delegator,omitempty"`
-	UnstakeAmount   string `protobuf:"bytes,2,opt,name=unstake_amount,json=unstakeAmount,proto3" json:"unstake_amount,omitempty"`
-	UnbondingAmount string `protobuf:"bytes,3,opt,name=unbonding_amount,json=unbondingAmount,proto3" json:"unbonding_amount,omitempty"`
-	UnbondedAmount  string `protobuf:"bytes,4,opt,name=unbonded_amount,json=unbondedAmount,proto3" json:"unbonded_amount,omitempty"`
-	CompletionTime  string `protobuf:"bytes,5,opt,name=completion_time,json=completionTime,proto3" json:"completion_time,omitempty"`
+	Delegator       string     `protobuf:"bytes,1,opt,name=delegator,proto3" json:"delegator,omitempty"`
+	UnstakeAmount   types.Coin `protobuf:"bytes,2,opt,name=unstake_amount,json=unstakeAmount,proto3" json:"unstake_amount"`
+	UnbondingAmount types.Coin `protobuf:"bytes,3,opt,name=unbonding_amount,json=unbondingAmount,proto3" json:"unbonding_amount"`
+	UnbondedAmount  types.Coin `protobuf:"bytes,4,opt,name=unbonded_amount,json=unbondedAmount,proto3" json:"unbonded_amount"`
+	CompletionTime  time.Time  `protobuf:"bytes,5,opt,name=completion_time,json=completionTime,proto3,stdtime" json:"completion_time"`
+	PoolId          string     `protobuf:"bytes,6,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 }
 
 func (m *LiquidUnstakeEvent) Reset()         { *m = LiquidUnstakeEvent{} }
 func (m *LiquidUnstakeEvent) String() string { return proto.CompactTextString(m) }
 func (*LiquidUnstakeEvent) ProtoMessage()    {}
 func (*LiquidUnstakeEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c2774d61dc12f431, []int{2}
+	return fileDescriptor_c2774d61dc12f431, []int{4}
 }
 func (m *LiquidUnstakeEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -144,16 +251,20 @@ func (m *LiquidUnstakeEvent) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LiquidUnstakeEvent proto.InternalMessageInfo
 
-// LiquidRedelegateEvent is triggered when a liquid validator is added.
+// AddLiquidValidatorEvent is emitted when a newly whitelisted validator is
+// activated for a pool.
+//
+// Field tag preserved from v6 (validator=1); pool_id added at the end.
 type AddLiquidValidatorEvent struct {
 	Validator string `protobuf:"bytes,1,opt,name=validator,proto3" json:"validator,omitempty"`
+	PoolId    string `protobuf:"bytes,2,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 }
 
 func (m *AddLiquidValidatorEvent) Reset()         { *m = AddLiquidValidatorEvent{} }
 func (m *AddLiquidValidatorEvent) String() string { return proto.CompactTextString(m) }
 func (*AddLiquidValidatorEvent) ProtoMessage()    {}
 func (*AddLiquidValidatorEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c2774d61dc12f431, []int{3}
+	return fileDescriptor_c2774d61dc12f431, []int{5}
 }
 func (m *AddLiquidValidatorEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -182,18 +293,22 @@ func (m *AddLiquidValidatorEvent) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_AddLiquidValidatorEvent proto.InternalMessageInfo
 
-// RebalancedEvent is triggered after a rebalance is performed.
+// RebalancedLiquidStakeEvent is emitted after a pool's rebalancing pass.
+//
+// Field tag numbers preserved from v6. Count fields upgraded from
+// strconv-formatted strings to typed uint32.
 type RebalancedLiquidStakeEvent struct {
 	Delegator             string `protobuf:"bytes,1,opt,name=delegator,proto3" json:"delegator,omitempty"`
-	RedelegationCount     string `protobuf:"bytes,2,opt,name=redelegation_count,json=redelegationCount,proto3" json:"redelegation_count,omitempty"`
-	RedelegationFailCount string `protobuf:"bytes,3,opt,name=redelegation_fail_count,json=redelegationFailCount,proto3" json:"redelegation_fail_count,omitempty"`
+	RedelegationCount     uint32 `protobuf:"varint,2,opt,name=redelegation_count,json=redelegationCount,proto3" json:"redelegation_count,omitempty"`
+	RedelegationFailCount uint32 `protobuf:"varint,3,opt,name=redelegation_fail_count,json=redelegationFailCount,proto3" json:"redelegation_fail_count,omitempty"`
+	PoolId                string `protobuf:"bytes,4,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 }
 
 func (m *RebalancedLiquidStakeEvent) Reset()         { *m = RebalancedLiquidStakeEvent{} }
 func (m *RebalancedLiquidStakeEvent) String() string { return proto.CompactTextString(m) }
 func (*RebalancedLiquidStakeEvent) ProtoMessage()    {}
 func (*RebalancedLiquidStakeEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c2774d61dc12f431, []int{4}
+	return fileDescriptor_c2774d61dc12f431, []int{6}
 }
 func (m *RebalancedLiquidStakeEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -222,20 +337,25 @@ func (m *RebalancedLiquidStakeEvent) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_RebalancedLiquidStakeEvent proto.InternalMessageInfo
 
-// AutocompoundEvent is triggered after a epoch is triggered for autocompound.
+// AutocompoundStakingRewardsEvent is emitted when a pool's autocompound
+// epoch hook runs successfully.
+//
+// Field tag numbers preserved from v6. Amount fields upgraded from
+// "<amount><denom>" strings to typed Coin.
 type AutocompoundStakingRewardsEvent struct {
-	Delegator             string `protobuf:"bytes,1,opt,name=delegator,proto3" json:"delegator,omitempty"`
-	TotalAmount           string `protobuf:"bytes,2,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount,omitempty"`
-	FeeAmount             string `protobuf:"bytes,3,opt,name=fee_amount,json=feeAmount,proto3" json:"fee_amount,omitempty"`
-	RedelegateAmount      string `protobuf:"bytes,4,opt,name=redelegate_amount,json=redelegateAmount,proto3" json:"redelegate_amount,omitempty"`
-	WeightedRewardsAmount string `protobuf:"bytes,5,opt,name=weighted_rewards_amount,json=weightedRewardsAmount,proto3" json:"weighted_rewards_amount,omitempty"`
+	Delegator             string     `protobuf:"bytes,1,opt,name=delegator,proto3" json:"delegator,omitempty"`
+	TotalAmount           types.Coin `protobuf:"bytes,2,opt,name=total_amount,json=totalAmount,proto3" json:"total_amount"`
+	FeeAmount             types.Coin `protobuf:"bytes,3,opt,name=fee_amount,json=feeAmount,proto3" json:"fee_amount"`
+	RedelegateAmount      types.Coin `protobuf:"bytes,4,opt,name=redelegate_amount,json=redelegateAmount,proto3" json:"redelegate_amount"`
+	WeightedRewardsAmount types.Coin `protobuf:"bytes,5,opt,name=weighted_rewards_amount,json=weightedRewardsAmount,proto3" json:"weighted_rewards_amount"`
+	PoolId                string     `protobuf:"bytes,6,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
 }
 
 func (m *AutocompoundStakingRewardsEvent) Reset()         { *m = AutocompoundStakingRewardsEvent{} }
 func (m *AutocompoundStakingRewardsEvent) String() string { return proto.CompactTextString(m) }
 func (*AutocompoundStakingRewardsEvent) ProtoMessage()    {}
 func (*AutocompoundStakingRewardsEvent) Descriptor() ([]byte, []int) {
-	return fileDescriptor_c2774d61dc12f431, []int{5}
+	return fileDescriptor_c2774d61dc12f431, []int{7}
 }
 func (m *AutocompoundStakingRewardsEvent) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -265,7 +385,9 @@ func (m *AutocompoundStakingRewardsEvent) XXX_DiscardUnknown() {
 var xxx_messageInfo_AutocompoundStakingRewardsEvent proto.InternalMessageInfo
 
 func init() {
-	proto.RegisterType((*LiquidStakeParamsUpdatedEvent)(nil), "ixo.liquidstake.v1beta1.LiquidStakeParamsUpdatedEvent")
+	proto.RegisterType((*ModuleParamsUpdatedEvent)(nil), "ixo.liquidstake.v1beta1.ModuleParamsUpdatedEvent")
+	proto.RegisterType((*PoolCreatedEvent)(nil), "ixo.liquidstake.v1beta1.PoolCreatedEvent")
+	proto.RegisterType((*PoolUpdatedEvent)(nil), "ixo.liquidstake.v1beta1.PoolUpdatedEvent")
 	proto.RegisterType((*LiquidStakeEvent)(nil), "ixo.liquidstake.v1beta1.LiquidStakeEvent")
 	proto.RegisterType((*LiquidUnstakeEvent)(nil), "ixo.liquidstake.v1beta1.LiquidUnstakeEvent")
 	proto.RegisterType((*AddLiquidValidatorEvent)(nil), "ixo.liquidstake.v1beta1.AddLiquidValidatorEvent")
@@ -278,47 +400,57 @@ func init() {
 }
 
 var fileDescriptor_c2774d61dc12f431 = []byte{
-	// 578 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x54, 0x4f, 0x6b, 0xd4, 0x4e,
-	0x18, 0xde, 0xf9, 0xfd, 0xb4, 0xb8, 0x6f, 0xff, 0x58, 0x83, 0xcb, 0x2e, 0x4b, 0x9b, 0xad, 0x2d,
-	0x62, 0x8b, 0x34, 0x61, 0x15, 0x56, 0xf0, 0x20, 0xac, 0x45, 0x41, 0x50, 0x90, 0xd5, 0x8a, 0x78,
-	0x59, 0x26, 0xc9, 0x6c, 0x76, 0xd8, 0x64, 0x66, 0x4d, 0x26, 0xdb, 0xf4, 0xe6, 0xd1, 0xa3, 0xf8,
-	0x09, 0x7a, 0xf7, 0x8b, 0x78, 0xec, 0xd1, 0x63, 0xd9, 0xbd, 0x78, 0xf4, 0x23, 0x48, 0x66, 0x26,
-	0x9b, 0xa4, 0x50, 0xa8, 0xb7, 0xe4, 0x79, 0x9f, 0xf7, 0x9d, 0xe7, 0x79, 0x9f, 0x61, 0x60, 0x8f,
-	0xa6, 0xdc, 0x0e, 0xe8, 0xe7, 0x84, 0x7a, 0xb1, 0xc0, 0x13, 0x62, 0xcf, 0xba, 0x0e, 0x11, 0xb8,
-	0x6b, 0x93, 0x19, 0x61, 0xc2, 0x9a, 0x46, 0x5c, 0x70, 0xa3, 0x49, 0x53, 0x6e, 0x95, 0x48, 0x96,
-	0x26, 0xb5, 0xef, 0xfa, 0xdc, 0xe7, 0x92, 0x63, 0x67, 0x5f, 0x8a, 0xde, 0x3e, 0xb8, 0x6a, 0x66,
-	0x79, 0x84, 0xa4, 0xee, 0x7e, 0x41, 0xb0, 0xfd, 0x5a, 0xa2, 0xef, 0x32, 0xf4, 0x2d, 0x8e, 0x70,
-	0x18, 0x1f, 0x4f, 0x3d, 0x2c, 0x88, 0xf7, 0x22, 0x53, 0x60, 0x3c, 0x81, 0x95, 0xa9, 0x44, 0x5b,
-	0x68, 0x07, 0xed, 0xaf, 0x3e, 0xea, 0x58, 0x57, 0x88, 0xb1, 0x54, 0xf3, 0x40, 0xd3, 0x8d, 0x2d,
-	0xa8, 0xe3, 0x44, 0x8c, 0x79, 0x44, 0xc5, 0x69, 0xeb, 0xbf, 0x1d, 0xb4, 0x5f, 0x1f, 0x14, 0xc0,
-	0xd3, 0x5b, 0x5f, 0xcf, 0x3a, 0xb5, 0xdf, 0x67, 0x9d, 0xda, 0xee, 0x77, 0x04, 0x9b, 0x25, 0x09,
-	0xea, 0xd4, 0x2d, 0xa8, 0x7b, 0x24, 0x20, 0x3e, 0x16, 0x3c, 0x92, 0x07, 0xd7, 0x07, 0x05, 0x60,
-	0xec, 0xc1, 0xba, 0x12, 0x30, 0xc4, 0x21, 0x4f, 0x98, 0xd0, 0xe3, 0xd7, 0x14, 0xd8, 0x97, 0x98,
-	0xd1, 0x85, 0x46, 0x2c, 0x26, 0x43, 0x9a, 0xf2, 0x61, 0x48, 0x99, 0x20, 0x4b, 0xf2, 0xff, 0x92,
-	0x6c, 0xc4, 0x62, 0xf2, 0x2a, 0xe5, 0x6f, 0x64, 0x49, 0xb5, 0x94, 0x44, 0x5d, 0x20, 0x30, 0x94,
-	0xa8, 0x63, 0x16, 0x5f, 0x57, 0xd6, 0x7d, 0xd8, 0x48, 0x14, 0xbb, 0xaa, 0x6b, 0x5d, 0xa3, 0x5a,
-	0xd8, 0x01, 0x6c, 0x26, 0xcc, 0xe1, 0xcc, 0xa3, 0xcc, 0xaf, 0x6a, 0xba, 0xbd, 0xc4, 0x35, 0xf5,
-	0x01, 0x68, 0xa8, 0x50, 0x7f, 0x43, 0x32, 0x37, 0x72, 0xb8, 0x20, 0xba, 0x3c, 0x9c, 0x06, 0x44,
-	0x50, 0xce, 0x86, 0x82, 0x86, 0xa4, 0x75, 0x53, 0x11, 0x0b, 0xf8, 0x3d, 0x0d, 0x49, 0xc9, 0x62,
-	0x1f, 0x9a, 0x7d, 0xcf, 0x53, 0x26, 0x3f, 0xe0, 0x80, 0x7a, 0x99, 0x87, 0xa5, 0xcd, 0x59, 0x8e,
-	0xe4, 0x36, 0x97, 0x40, 0x69, 0xc4, 0x0f, 0x04, 0xed, 0x01, 0x71, 0x70, 0x80, 0x99, 0x4b, 0xbc,
-	0x7f, 0x0c, 0xf1, 0x10, 0x8c, 0x88, 0xe8, 0xdf, 0x4c, 0xb4, 0x5b, 0xda, 0xd8, 0x9d, 0x72, 0xe5,
-	0x48, 0x3a, 0xec, 0x41, 0xb3, 0x42, 0x1f, 0x61, 0x1a, 0xe8, 0x1e, 0xb5, 0xbc, 0x46, 0xb9, 0xfc,
-	0x12, 0xd3, 0xe0, 0xe8, 0x52, 0xa6, 0x7f, 0x10, 0x74, 0xfa, 0x89, 0xe0, 0xd9, 0x46, 0x78, 0xc2,
-	0xa4, 0x52, 0xca, 0xfc, 0x01, 0x39, 0xc1, 0x91, 0x17, 0x5f, 0x47, 0xf2, 0x3d, 0x58, 0x13, 0x5c,
-	0xe0, 0xa0, 0x1a, 0xef, 0xaa, 0xc4, 0x74, 0x10, 0xdb, 0x00, 0x23, 0x42, 0xaa, 0xb1, 0xd6, 0x47,
-	0x24, 0xcf, 0xfe, 0x21, 0x14, 0xd6, 0x48, 0x35, 0xd2, 0xcd, 0xa2, 0xa0, 0xc9, 0x3d, 0x68, 0x9e,
-	0x10, 0xea, 0x8f, 0xb3, 0xbb, 0x1b, 0x29, 0x95, 0x79, 0x8b, 0x0a, 0xb7, 0x91, 0x97, 0xb5, 0x87,
-	0xcb, 0xd7, 0xf8, 0xf9, 0xc7, 0x9f, 0x73, 0x13, 0x9d, 0xcf, 0x4d, 0x74, 0x31, 0x37, 0xd1, 0xb7,
-	0x85, 0x59, 0x3b, 0x5f, 0x98, 0xb5, 0x5f, 0x0b, 0xb3, 0xf6, 0xe9, 0x99, 0x4f, 0xc5, 0x38, 0x71,
-	0x2c, 0x97, 0x87, 0x36, 0x4d, 0xf9, 0x28, 0x5b, 0x88, 0xdc, 0x5c, 0xf6, 0x77, 0xe8, 0x04, 0xdc,
-	0x9d, 0xb8, 0x63, 0x4c, 0x99, 0x3d, 0xeb, 0xd9, 0x69, 0xe5, 0x31, 0x11, 0xa7, 0x53, 0x12, 0x3b,
-	0x2b, 0xf2, 0xfd, 0x78, 0xfc, 0x37, 0x00, 0x00, 0xff, 0xff, 0xf9, 0xa1, 0x41, 0xe6, 0xc0, 0x04,
-	0x00, 0x00,
+	// 745 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xc4, 0x55, 0x41, 0x4f, 0xdb, 0x48,
+	0x14, 0x8e, 0x49, 0x60, 0xc9, 0x40, 0x20, 0x6b, 0x2d, 0x4a, 0x36, 0x62, 0x13, 0xc4, 0x6a, 0x25,
+	0xf6, 0x80, 0x2d, 0x58, 0x89, 0xc3, 0x1e, 0x90, 0x48, 0x5a, 0x54, 0x10, 0x48, 0xc8, 0x2d, 0x6d,
+	0xc5, 0x25, 0x1a, 0xdb, 0x13, 0x67, 0x14, 0xdb, 0x2f, 0xb5, 0xc7, 0x21, 0x5c, 0x7b, 0xa8, 0x7a,
+	0x69, 0xc5, 0x4f, 0xe0, 0xc7, 0xf4, 0xc0, 0x91, 0x63, 0x4f, 0x6d, 0x05, 0x97, 0x5e, 0xfa, 0x1f,
+	0xaa, 0x19, 0x8f, 0x63, 0x47, 0x55, 0xd4, 0xe4, 0xd4, 0x9b, 0x67, 0xde, 0xfb, 0xbe, 0x7c, 0xef,
+	0x7b, 0x6f, 0x5e, 0xd0, 0xdf, 0x74, 0x08, 0xba, 0x4b, 0x5f, 0x45, 0xd4, 0x0e, 0x19, 0xee, 0x11,
+	0x7d, 0xb0, 0x63, 0x12, 0x86, 0x77, 0x74, 0x32, 0x20, 0x3e, 0xd3, 0xfa, 0x01, 0x30, 0x50, 0x2b,
+	0x74, 0x08, 0x5a, 0x26, 0x49, 0x93, 0x49, 0xb5, 0x3f, 0x1c, 0x70, 0x40, 0xe4, 0xe8, 0xfc, 0x2b,
+	0x4e, 0xaf, 0xd5, 0x2d, 0x08, 0x3d, 0x08, 0x75, 0x13, 0x87, 0x29, 0x9f, 0x05, 0xd4, 0x97, 0xf1,
+	0x86, 0x03, 0xe0, 0xb8, 0x44, 0x17, 0x27, 0x33, 0xea, 0xe8, 0x8c, 0x7a, 0x24, 0x64, 0xd8, 0xeb,
+	0xcb, 0x84, 0x7f, 0x27, 0x89, 0xca, 0x6a, 0x10, 0xa9, 0x9b, 0xef, 0x15, 0x54, 0x3d, 0x05, 0x3b,
+	0x72, 0xc9, 0x19, 0x0e, 0xb0, 0x17, 0x9e, 0xf7, 0x6d, 0xcc, 0x88, 0xfd, 0x98, 0xab, 0x57, 0x8f,
+	0x51, 0xc9, 0x13, 0xb1, 0x76, 0x5f, 0x04, 0xab, 0xca, 0x86, 0xb2, 0xb5, 0xb4, 0xfb, 0x8f, 0x36,
+	0xa1, 0x1e, 0x2d, 0xcb, 0x64, 0x2c, 0x7b, 0x99, 0x93, 0xba, 0x8e, 0x8a, 0x38, 0x62, 0x5d, 0x08,
+	0x28, 0xbb, 0xaa, 0xce, 0x6d, 0x28, 0x5b, 0x45, 0x23, 0xbd, 0xf8, 0x7f, 0xf1, 0xed, 0x4d, 0x23,
+	0xf7, 0xf5, 0xa6, 0x91, 0xdb, 0x7c, 0xa3, 0xa0, 0xf2, 0x19, 0x80, 0xdb, 0x0a, 0x48, 0x2a, 0xa4,
+	0x82, 0x7e, 0xeb, 0x03, 0xb8, 0x6d, 0x6a, 0x0b, 0x09, 0x45, 0x63, 0x81, 0x1f, 0x8f, 0x6c, 0x75,
+	0x07, 0x15, 0xf8, 0x97, 0x20, 0x5c, 0xda, 0xfd, 0x6b, 0xa2, 0x30, 0xce, 0x68, 0x88, 0xd4, 0x71,
+	0x21, 0xf9, 0x9f, 0x0b, 0x19, 0x73, 0xe4, 0x57, 0x08, 0xf9, 0xa6, 0xa0, 0xf2, 0x89, 0xa0, 0x7a,
+	0xca, 0xa9, 0x62, 0x21, 0xeb, 0xa8, 0x68, 0x13, 0x97, 0x38, 0x98, 0x41, 0x20, 0xa5, 0xa4, 0x17,
+	0xea, 0x23, 0x54, 0x8a, 0x7f, 0xbc, 0x8d, 0x3d, 0x88, 0x7c, 0x26, 0x65, 0xfd, 0xa9, 0xc5, 0x93,
+	0xa5, 0xf1, 0xc9, 0x1a, 0x49, 0x6a, 0x01, 0xf5, 0x9b, 0x85, 0xdb, 0x4f, 0x8d, 0x9c, 0xb1, 0x1c,
+	0xa3, 0x0e, 0x04, 0x48, 0x35, 0xd0, 0x5a, 0xc8, 0x7a, 0x6d, 0x3a, 0x84, 0xb6, 0x47, 0x7d, 0x46,
+	0x46, 0x6c, 0xf9, 0xe9, 0xd8, 0xd4, 0x90, 0xf5, 0x8e, 0x86, 0x70, 0x2a, 0xb0, 0x92, 0x33, 0x63,
+	0x60, 0x21, 0x6b, 0x60, 0xa6, 0xde, 0xd7, 0x79, 0xa4, 0xc6, 0xf5, 0x9e, 0xfb, 0xe1, 0xb4, 0x15,
+	0x1f, 0xa2, 0x95, 0x28, 0xce, 0x9e, 0xb1, 0xe4, 0x92, 0x84, 0x49, 0x7d, 0xc7, 0xa8, 0x1c, 0xf9,
+	0x26, 0xf8, 0x36, 0xf5, 0x9d, 0x19, 0xcb, 0x5d, 0x1d, 0x01, 0x25, 0xd7, 0x13, 0x24, 0xaf, 0x52,
+	0xe7, 0x0a, 0xd3, 0x51, 0xad, 0x24, 0x38, 0xc9, 0x74, 0x8a, 0x56, 0x2d, 0xf0, 0xfa, 0x2e, 0x61,
+	0x14, 0xfc, 0x36, 0x7f, 0xee, 0xd5, 0x79, 0xc1, 0x54, 0xd3, 0xe2, 0x5d, 0xa0, 0x25, 0xbb, 0x40,
+	0x7b, 0x96, 0xec, 0x82, 0xe6, 0x22, 0xa7, 0xba, 0xfe, 0xdc, 0x50, 0x8c, 0x95, 0x14, 0xcc, 0xc3,
+	0xd9, 0x26, 0x2c, 0x4c, 0x68, 0xc2, 0x05, 0xaa, 0x1c, 0xd8, 0x76, 0xdc, 0x86, 0xe7, 0xd8, 0xa5,
+	0x36, 0x77, 0x79, 0xd4, 0x88, 0x41, 0x72, 0x93, 0x34, 0x62, 0x74, 0x91, 0xe5, 0x9e, 0x9b, 0xc0,
+	0xfd, 0x41, 0x41, 0x35, 0x83, 0x98, 0xd8, 0xc5, 0xbe, 0x45, 0xec, 0x19, 0x47, 0x7b, 0x1b, 0xa9,
+	0x01, 0x91, 0x47, 0x6e, 0x86, 0x35, 0x6a, 0x76, 0xc9, 0xf8, 0x3d, 0x1b, 0x69, 0x09, 0xe7, 0xf6,
+	0x50, 0x65, 0x2c, 0xbd, 0x83, 0xa9, 0x2b, 0x31, 0x79, 0x81, 0x59, 0xcb, 0x86, 0x0f, 0x31, 0x75,
+	0x5b, 0xd3, 0xce, 0xe9, 0xbb, 0x3c, 0x6a, 0x1c, 0x44, 0x0c, 0xb8, 0xb9, 0x10, 0xf9, 0xa2, 0x04,
+	0xea, 0x3b, 0x06, 0xb9, 0xc4, 0x81, 0x1d, 0x4e, 0x53, 0x4b, 0x13, 0x2d, 0x33, 0x60, 0xd8, 0x9d,
+	0x71, 0x64, 0x97, 0x04, 0x48, 0x8e, 0xc6, 0x3e, 0x42, 0x1d, 0x42, 0x66, 0x1c, 0xd5, 0x62, 0x87,
+	0x24, 0x03, 0x7f, 0x82, 0x52, 0xd7, 0xc8, 0x8c, 0x63, 0x5a, 0x4e, 0x91, 0x92, 0xed, 0x05, 0xaa,
+	0x5c, 0x12, 0xea, 0x74, 0xf9, 0xb2, 0x08, 0x62, 0x23, 0x12, 0xce, 0xf9, 0xe9, 0x38, 0xd7, 0x12,
+	0xbc, 0xf4, 0xf1, 0xc7, 0xbd, 0x31, 0x61, 0x64, 0x9b, 0x2f, 0x6f, 0xef, 0xeb, 0xca, 0xdd, 0x7d,
+	0x5d, 0xf9, 0x72, 0x5f, 0x57, 0xae, 0x1f, 0xea, 0xb9, 0xbb, 0x87, 0x7a, 0xee, 0xe3, 0x43, 0x3d,
+	0x77, 0xb1, 0xef, 0x50, 0xd6, 0x8d, 0x4c, 0xcd, 0x02, 0x4f, 0xa7, 0x43, 0xe8, 0xf0, 0x6e, 0x89,
+	0x7e, 0xf3, 0xd3, 0xb6, 0xe9, 0x82, 0xd5, 0xb3, 0xba, 0x98, 0xfa, 0xfa, 0x60, 0x4f, 0x1f, 0x8e,
+	0xfd, 0x71, 0xb2, 0xab, 0x3e, 0x09, 0xcd, 0x05, 0xf1, 0xba, 0xfe, 0xfb, 0x1e, 0x00, 0x00, 0xff,
+	0xff, 0xb9, 0xfc, 0x41, 0x13, 0xed, 0x07, 0x00, 0x00,
 }
 
-func (m *LiquidStakeParamsUpdatedEvent) Marshal() (dAtA []byte, err error) {
+func (m *ModuleParamsUpdatedEvent) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
 	n, err := m.MarshalToSizedBuffer(dAtA[:size])
@@ -328,12 +460,12 @@ func (m *LiquidStakeParamsUpdatedEvent) Marshal() (dAtA []byte, err error) {
 	return dAtA[:n], nil
 }
 
-func (m *LiquidStakeParamsUpdatedEvent) MarshalTo(dAtA []byte) (int, error) {
+func (m *ModuleParamsUpdatedEvent) MarshalTo(dAtA []byte) (int, error) {
 	size := m.Size()
 	return m.MarshalToSizedBuffer(dAtA[:size])
 }
 
-func (m *LiquidStakeParamsUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+func (m *ModuleParamsUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	i := len(dAtA)
 	_ = i
 	var l int
@@ -345,15 +477,113 @@ func (m *LiquidStakeParamsUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, 
 		i--
 		dAtA[i] = 0x12
 	}
-	if m.Params != nil {
+	if m.ModuleParams != nil {
 		{
-			size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
+			size, err := m.ModuleParams.MarshalToSizedBuffer(dAtA[:i])
 			if err != nil {
 				return 0, err
 			}
 			i -= size
 			i = encodeVarintEvent(dAtA, i, uint64(size))
 		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PoolCreatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PoolCreatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PoolCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Authority) > 0 {
+		i -= len(m.Authority)
+		copy(dAtA[i:], m.Authority)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Authority)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Pool != nil {
+		{
+			size, err := m.Pool.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.PoolId)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PoolUpdatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PoolUpdatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PoolUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.Authority) > 0 {
+		i -= len(m.Authority)
+		copy(dAtA[i:], m.Authority)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.Authority)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if m.Pool != nil {
+		{
+			size, err := m.Pool.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.PoolId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -380,20 +610,33 @@ func (m *LiquidStakeEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.StkIxoMintedAmount) > 0 {
-		i -= len(m.StkIxoMintedAmount)
-		copy(dAtA[i:], m.StkIxoMintedAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.StkIxoMintedAmount)))
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.PoolId)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
-	if len(m.LiquidAmount) > 0 {
-		i -= len(m.LiquidAmount)
-		copy(dAtA[i:], m.LiquidAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.LiquidAmount)))
-		i--
-		dAtA[i] = 0x12
+	{
+		size, err := m.StkIxoMintedAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.LiquidAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
 	if len(m.Delegator) > 0 {
 		i -= len(m.Delegator)
 		copy(dAtA[i:], m.Delegator)
@@ -424,34 +667,51 @@ func (m *LiquidUnstakeEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if len(m.CompletionTime) > 0 {
-		i -= len(m.CompletionTime)
-		copy(dAtA[i:], m.CompletionTime)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.CompletionTime)))
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.PoolId)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x32
 	}
-	if len(m.UnbondedAmount) > 0 {
-		i -= len(m.UnbondedAmount)
-		copy(dAtA[i:], m.UnbondedAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.UnbondedAmount)))
-		i--
-		dAtA[i] = 0x22
+	n6, err6 := github_com_cosmos_gogoproto_types.StdTimeMarshalTo(m.CompletionTime, dAtA[i-github_com_cosmos_gogoproto_types.SizeOfStdTime(m.CompletionTime):])
+	if err6 != nil {
+		return 0, err6
 	}
-	if len(m.UnbondingAmount) > 0 {
-		i -= len(m.UnbondingAmount)
-		copy(dAtA[i:], m.UnbondingAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.UnbondingAmount)))
-		i--
-		dAtA[i] = 0x1a
+	i -= n6
+	i = encodeVarintEvent(dAtA, i, uint64(n6))
+	i--
+	dAtA[i] = 0x2a
+	{
+		size, err := m.UnbondedAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
 	}
-	if len(m.UnstakeAmount) > 0 {
-		i -= len(m.UnstakeAmount)
-		copy(dAtA[i:], m.UnstakeAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.UnstakeAmount)))
-		i--
-		dAtA[i] = 0x12
+	i--
+	dAtA[i] = 0x22
+	{
+		size, err := m.UnbondingAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.UnstakeAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
 	if len(m.Delegator) > 0 {
 		i -= len(m.Delegator)
 		copy(dAtA[i:], m.Delegator)
@@ -482,6 +742,13 @@ func (m *AddLiquidValidatorEvent) MarshalToSizedBuffer(dAtA []byte) (int, error)
 	_ = i
 	var l int
 	_ = l
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.PoolId)))
+		i--
+		dAtA[i] = 0x12
+	}
 	if len(m.Validator) > 0 {
 		i -= len(m.Validator)
 		copy(dAtA[i:], m.Validator)
@@ -512,19 +779,22 @@ func (m *RebalancedLiquidStakeEvent) MarshalToSizedBuffer(dAtA []byte) (int, err
 	_ = i
 	var l int
 	_ = l
-	if len(m.RedelegationFailCount) > 0 {
-		i -= len(m.RedelegationFailCount)
-		copy(dAtA[i:], m.RedelegationFailCount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.RedelegationFailCount)))
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.PoolId)))
 		i--
-		dAtA[i] = 0x1a
+		dAtA[i] = 0x22
 	}
-	if len(m.RedelegationCount) > 0 {
-		i -= len(m.RedelegationCount)
-		copy(dAtA[i:], m.RedelegationCount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.RedelegationCount)))
+	if m.RedelegationFailCount != 0 {
+		i = encodeVarintEvent(dAtA, i, uint64(m.RedelegationFailCount))
 		i--
-		dAtA[i] = 0x12
+		dAtA[i] = 0x18
+	}
+	if m.RedelegationCount != 0 {
+		i = encodeVarintEvent(dAtA, i, uint64(m.RedelegationCount))
+		i--
+		dAtA[i] = 0x10
 	}
 	if len(m.Delegator) > 0 {
 		i -= len(m.Delegator)
@@ -556,34 +826,53 @@ func (m *AutocompoundStakingRewardsEvent) MarshalToSizedBuffer(dAtA []byte) (int
 	_ = i
 	var l int
 	_ = l
-	if len(m.WeightedRewardsAmount) > 0 {
-		i -= len(m.WeightedRewardsAmount)
-		copy(dAtA[i:], m.WeightedRewardsAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.WeightedRewardsAmount)))
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintEvent(dAtA, i, uint64(len(m.PoolId)))
 		i--
-		dAtA[i] = 0x2a
+		dAtA[i] = 0x32
 	}
-	if len(m.RedelegateAmount) > 0 {
-		i -= len(m.RedelegateAmount)
-		copy(dAtA[i:], m.RedelegateAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.RedelegateAmount)))
-		i--
-		dAtA[i] = 0x22
+	{
+		size, err := m.WeightedRewardsAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
 	}
-	if len(m.FeeAmount) > 0 {
-		i -= len(m.FeeAmount)
-		copy(dAtA[i:], m.FeeAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.FeeAmount)))
-		i--
-		dAtA[i] = 0x1a
+	i--
+	dAtA[i] = 0x2a
+	{
+		size, err := m.RedelegateAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
 	}
-	if len(m.TotalAmount) > 0 {
-		i -= len(m.TotalAmount)
-		copy(dAtA[i:], m.TotalAmount)
-		i = encodeVarintEvent(dAtA, i, uint64(len(m.TotalAmount)))
-		i--
-		dAtA[i] = 0x12
+	i--
+	dAtA[i] = 0x22
+	{
+		size, err := m.FeeAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
 	}
+	i--
+	dAtA[i] = 0x1a
+	{
+		size, err := m.TotalAmount.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintEvent(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x12
 	if len(m.Delegator) > 0 {
 		i -= len(m.Delegator)
 		copy(dAtA[i:], m.Delegator)
@@ -605,14 +894,56 @@ func encodeVarintEvent(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-func (m *LiquidStakeParamsUpdatedEvent) Size() (n int) {
+func (m *ModuleParamsUpdatedEvent) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
-	if m.Params != nil {
-		l = m.Params.Size()
+	if m.ModuleParams != nil {
+		l = m.ModuleParams.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.Authority)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *PoolCreatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PoolId)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	if m.Pool != nil {
+		l = m.Pool.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	l = len(m.Authority)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *PoolUpdatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PoolId)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	if m.Pool != nil {
+		l = m.Pool.Size()
 		n += 1 + l + sovEvent(uint64(l))
 	}
 	l = len(m.Authority)
@@ -632,11 +963,11 @@ func (m *LiquidStakeEvent) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
-	l = len(m.LiquidAmount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	l = len(m.StkIxoMintedAmount)
+	l = m.LiquidAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = m.StkIxoMintedAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = len(m.PoolId)
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
@@ -653,19 +984,15 @@ func (m *LiquidUnstakeEvent) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
-	l = len(m.UnstakeAmount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	l = len(m.UnbondingAmount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	l = len(m.UnbondedAmount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	l = len(m.CompletionTime)
+	l = m.UnstakeAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = m.UnbondingAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = m.UnbondedAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = github_com_cosmos_gogoproto_types.SizeOfStdTime(m.CompletionTime)
+	n += 1 + l + sovEvent(uint64(l))
+	l = len(m.PoolId)
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
@@ -682,6 +1009,10 @@ func (m *AddLiquidValidatorEvent) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
+	l = len(m.PoolId)
+	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
 	return n
 }
 
@@ -695,11 +1026,13 @@ func (m *RebalancedLiquidStakeEvent) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
-	l = len(m.RedelegationCount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
+	if m.RedelegationCount != 0 {
+		n += 1 + sovEvent(uint64(m.RedelegationCount))
 	}
-	l = len(m.RedelegationFailCount)
+	if m.RedelegationFailCount != 0 {
+		n += 1 + sovEvent(uint64(m.RedelegationFailCount))
+	}
+	l = len(m.PoolId)
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
@@ -716,19 +1049,15 @@ func (m *AutocompoundStakingRewardsEvent) Size() (n int) {
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
-	l = len(m.TotalAmount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	l = len(m.FeeAmount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	l = len(m.RedelegateAmount)
-	if l > 0 {
-		n += 1 + l + sovEvent(uint64(l))
-	}
-	l = len(m.WeightedRewardsAmount)
+	l = m.TotalAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = m.FeeAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = m.RedelegateAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = m.WeightedRewardsAmount.Size()
+	n += 1 + l + sovEvent(uint64(l))
+	l = len(m.PoolId)
 	if l > 0 {
 		n += 1 + l + sovEvent(uint64(l))
 	}
@@ -741,7 +1070,7 @@ func sovEvent(x uint64) (n int) {
 func sozEvent(x uint64) (n int) {
 	return sovEvent(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-func (m *LiquidStakeParamsUpdatedEvent) Unmarshal(dAtA []byte) error {
+func (m *ModuleParamsUpdatedEvent) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
 	for iNdEx < l {
@@ -764,15 +1093,15 @@ func (m *LiquidStakeParamsUpdatedEvent) Unmarshal(dAtA []byte) error {
 		fieldNum := int32(wire >> 3)
 		wireType := int(wire & 0x7)
 		if wireType == 4 {
-			return fmt.Errorf("proto: LiquidStakeParamsUpdatedEvent: wiretype end group for non-group")
+			return fmt.Errorf("proto: ModuleParamsUpdatedEvent: wiretype end group for non-group")
 		}
 		if fieldNum <= 0 {
-			return fmt.Errorf("proto: LiquidStakeParamsUpdatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+			return fmt.Errorf("proto: ModuleParamsUpdatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ModuleParams", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -799,14 +1128,314 @@ func (m *LiquidStakeParamsUpdatedEvent) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.Params == nil {
-				m.Params = &Params{}
+			if m.ModuleParams == nil {
+				m.ModuleParams = &ModuleParams{}
 			}
-			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ModuleParams.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Authority = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PoolCreatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PoolCreatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PoolCreatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pool", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pool == nil {
+				m.Pool = &Pool{}
+			}
+			if err := m.Pool.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Authority = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PoolUpdatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PoolUpdatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PoolUpdatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pool", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Pool == nil {
+				m.Pool = &Pool{}
+			}
+			if err := m.Pool.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Authority", wireType)
 			}
@@ -924,7 +1553,7 @@ func (m *LiquidStakeEvent) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field LiquidAmount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -934,28 +1563,62 @@ func (m *LiquidStakeEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.LiquidAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.LiquidAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field StkIxoMintedAmount", wireType)
 			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.StkIxoMintedAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
@@ -982,7 +1645,7 @@ func (m *LiquidStakeEvent) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.StkIxoMintedAmount = string(dAtA[iNdEx:postIndex])
+			m.PoolId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1070,7 +1733,7 @@ func (m *LiquidUnstakeEvent) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UnstakeAmount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -1080,29 +1743,30 @@ func (m *LiquidUnstakeEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.UnstakeAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.UnstakeAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UnbondingAmount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -1112,29 +1776,30 @@ func (m *LiquidUnstakeEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.UnbondingAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.UnbondingAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field UnbondedAmount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -1144,28 +1809,62 @@ func (m *LiquidUnstakeEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.UnbondedAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.UnbondedAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field CompletionTime", wireType)
 			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := github_com_cosmos_gogoproto_types.StdTimeUnmarshal(&m.CompletionTime, dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
@@ -1192,7 +1891,7 @@ func (m *LiquidUnstakeEvent) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.CompletionTime = string(dAtA[iNdEx:postIndex])
+			m.PoolId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1275,6 +1974,38 @@ func (m *AddLiquidValidatorEvent) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Validator = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1359,10 +2090,10 @@ func (m *RebalancedLiquidStakeEvent) Unmarshal(dAtA []byte) error {
 			m.Delegator = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RedelegationCount", wireType)
 			}
-			var stringLen uint64
+			m.RedelegationCount = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -1372,28 +2103,34 @@ func (m *RebalancedLiquidStakeEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				m.RedelegationCount |= uint32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthEvent
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthEvent
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.RedelegationCount = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		case 3:
-			if wireType != 2 {
+			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RedelegationFailCount", wireType)
 			}
+			m.RedelegationFailCount = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.RedelegationFailCount |= uint32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
@@ -1420,7 +2157,7 @@ func (m *RebalancedLiquidStakeEvent) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RedelegationFailCount = string(dAtA[iNdEx:postIndex])
+			m.PoolId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
@@ -1508,7 +2245,7 @@ func (m *AutocompoundStakingRewardsEvent) Unmarshal(dAtA []byte) error {
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field TotalAmount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -1518,29 +2255,30 @@ func (m *AutocompoundStakingRewardsEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.TotalAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.TotalAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field FeeAmount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -1550,29 +2288,30 @@ func (m *AutocompoundStakingRewardsEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.FeeAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.FeeAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 4:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field RedelegateAmount", wireType)
 			}
-			var stringLen uint64
+			var msglen int
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowEvent
@@ -1582,28 +2321,62 @@ func (m *AutocompoundStakingRewardsEvent) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
+				msglen |= int(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
+			if msglen < 0 {
 				return ErrInvalidLengthEvent
 			}
-			postIndex := iNdEx + intStringLen
+			postIndex := iNdEx + msglen
 			if postIndex < 0 {
 				return ErrInvalidLengthEvent
 			}
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.RedelegateAmount = string(dAtA[iNdEx:postIndex])
+			if err := m.RedelegateAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		case 5:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field WeightedRewardsAmount", wireType)
 			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.WeightedRewardsAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
 			var stringLen uint64
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
@@ -1630,7 +2403,7 @@ func (m *AutocompoundStakingRewardsEvent) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			m.WeightedRewardsAmount = string(dAtA[iNdEx:postIndex])
+			m.PoolId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

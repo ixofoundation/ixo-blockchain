@@ -57,47 +57,23 @@ func (ValidatorStatus) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_ce5a4f2e01ee4d8c, []int{0}
 }
 
-// Params defines the set of params for the liquidstake module.
+// Params defines the legacy single-pool params layout.
+//
+// DEPRECATED: kept only so the v7 upgrade migration can unmarshal pre-upgrade
+// state from the KV store. New code must use ModuleParams (global) and Pool
+// (per-pool). Do not reference this from new application logic.
+//
+// Deprecated: Do not use.
 type Params struct {
-	// LiquidBondDenom specifies the denomination of the token receiving after
-	// liquid stake, The value is calculated through NetAmount.
-	LiquidBondDenom string `protobuf:"bytes,1,opt,name=liquid_bond_denom,json=liquidBondDenom,proto3" json:"liquid_bond_denom,omitempty"`
-	// WhitelistedValidators specifies the validators elected to become Active
-	// Liquid Validators.
-	WhitelistedValidators []WhitelistedValidator `protobuf:"bytes,2,rep,name=whitelisted_validators,json=whitelistedValidators,proto3" json:"whitelisted_validators"`
-	// UnstakeFeeRate specifies the fee rate when liquid unstake is requested,
-	// unbonded by subtracting it from unbondingAmount
-	UnstakeFeeRate cosmossdk_io_math.LegacyDec `protobuf:"bytes,3,opt,name=unstake_fee_rate,json=unstakeFeeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"unstake_fee_rate"`
-	// MinLiquidStakingAmount specifies the minimum number of coins to be staked
-	// to the active liquid validators on liquid staking to minimize decimal loss
-	// and consider gas efficiency.
-	MinLiquidStakeAmount cosmossdk_io_math.Int `protobuf:"bytes,4,opt,name=min_liquid_stake_amount,json=minLiquidStakeAmount,proto3,customtype=cosmossdk.io/math.Int" json:"min_liquid_stake_amount"`
-	// FeeAccountAddress defines the bech32-encoded address of
-	// an account responsible for accumulating protocol fees.
-	FeeAccountAddress string `protobuf:"bytes,5,opt,name=fee_account_address,json=feeAccountAddress,proto3" json:"fee_account_address,omitempty"`
-	// AutocompoundFeeRate specifies the fee rate for auto redelegating the stake
-	// rewards. The fee is taken in favour of the fee account (see
-	// FeeAccountAddress).
-	AutocompoundFeeRate cosmossdk_io_math.LegacyDec `protobuf:"bytes,6,opt,name=autocompound_fee_rate,json=autocompoundFeeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"autocompound_fee_rate"`
-	// WhitelistAdminAddress the bech32-encoded address of an admin authority
-	// that is allowed to update whitelisted validators or pause liquidstaking
-	// module entirely. It is also the only address that can update the
-	// weighted_rewards_receivers.
-	// The key is controlled by the ZERO dao.
-	// Pausing of the module can be required during important migrations or
-	// failures.
-	WhitelistAdminAddress string `protobuf:"bytes,7,opt,name=whitelist_admin_address,json=whitelistAdminAddress,proto3" json:"whitelist_admin_address,omitempty"`
-	// ModulePaused is a safety toggle that allows to stop main module functions
-	// such as stake/unstake/stake-to-lp and the BeginBlocker logic.
-	ModulePaused bool `protobuf:"varint,8,opt,name=module_paused,json=modulePaused,proto3" json:"module_paused,omitempty"`
-	// weighted_rewards_receivers is the addresses to receive the staking
-	// rewards on autocompounding with weights assigned to each address.
-	// The total of weights in the list in not allowed to be greater than 1.
-	//
-	// Eg. if the list has 1 address with weight 0.2, then on autocompounding
-	// the staking rewards will be split between 0.2 for the weighted receiver
-	// and 0.8 gets auto-compounded to the proxy account.
-	WeightedRewardsReceivers []WeightedAddress `protobuf:"bytes,9,rep,name=weighted_rewards_receivers,json=weightedRewardsReceivers,proto3" json:"weighted_rewards_receivers" yaml:"impact_rewards_receiver"`
+	LiquidBondDenom          string                      `protobuf:"bytes,1,opt,name=liquid_bond_denom,json=liquidBondDenom,proto3" json:"liquid_bond_denom,omitempty"`
+	WhitelistedValidators    []WhitelistedValidator      `protobuf:"bytes,2,rep,name=whitelisted_validators,json=whitelistedValidators,proto3" json:"whitelisted_validators"`
+	UnstakeFeeRate           cosmossdk_io_math.LegacyDec `protobuf:"bytes,3,opt,name=unstake_fee_rate,json=unstakeFeeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"unstake_fee_rate"`
+	MinLiquidStakeAmount     cosmossdk_io_math.Int       `protobuf:"bytes,4,opt,name=min_liquid_stake_amount,json=minLiquidStakeAmount,proto3,customtype=cosmossdk.io/math.Int" json:"min_liquid_stake_amount"`
+	FeeAccountAddress        string                      `protobuf:"bytes,5,opt,name=fee_account_address,json=feeAccountAddress,proto3" json:"fee_account_address,omitempty"`
+	AutocompoundFeeRate      cosmossdk_io_math.LegacyDec `protobuf:"bytes,6,opt,name=autocompound_fee_rate,json=autocompoundFeeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"autocompound_fee_rate"`
+	WhitelistAdminAddress    string                      `protobuf:"bytes,7,opt,name=whitelist_admin_address,json=whitelistAdminAddress,proto3" json:"whitelist_admin_address,omitempty"`
+	ModulePaused             bool                        `protobuf:"varint,8,opt,name=module_paused,json=modulePaused,proto3" json:"module_paused,omitempty"`
+	WeightedRewardsReceivers []WeightedAddress           `protobuf:"bytes,9,rep,name=weighted_rewards_receivers,json=weightedRewardsReceivers,proto3" json:"weighted_rewards_receivers" yaml:"impact_rewards_receiver"`
 }
 
 func (m *Params) Reset()      { *m = Params{} }
@@ -132,6 +108,134 @@ func (m *Params) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Params proto.InternalMessageInfo
 
+// ModuleParams defines global, module-wide parameters that apply across every
+// liquid staking pool.
+type ModuleParams struct {
+	// min_liquid_stake_amount is the minimum amount of native tokens that can
+	// be liquid-staked into any pool, applied across the entire module to
+	// minimise decimal loss and gas waste from dust amounts.
+	MinLiquidStakeAmount cosmossdk_io_math.Int `protobuf:"bytes,1,opt,name=min_liquid_stake_amount,json=minLiquidStakeAmount,proto3,customtype=cosmossdk.io/math.Int" json:"min_liquid_stake_amount"`
+	// module_paused is a global emergency kill switch. When true, ALL pools
+	// are paused regardless of their per-pool paused flag: liquid_stake,
+	// liquid_unstake, autocompounding, rebalancing, and BeginBlocker logic
+	// are halted module-wide. Used for migrations or critical incidents.
+	ModulePaused bool `protobuf:"varint,2,opt,name=module_paused,json=modulePaused,proto3" json:"module_paused,omitempty"`
+}
+
+func (m *ModuleParams) Reset()      { *m = ModuleParams{} }
+func (*ModuleParams) ProtoMessage() {}
+func (*ModuleParams) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5a4f2e01ee4d8c, []int{1}
+}
+func (m *ModuleParams) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *ModuleParams) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_ModuleParams.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *ModuleParams) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ModuleParams.Merge(m, src)
+}
+func (m *ModuleParams) XXX_Size() int {
+	return m.Size()
+}
+func (m *ModuleParams) XXX_DiscardUnknown() {
+	xxx_messageInfo_ModuleParams.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ModuleParams proto.InternalMessageInfo
+
+// Pool defines a single liquid staking instance with its own LST denom,
+// validator whitelist, admin, and fee configuration. Each pool maintains an
+// independent NetAmount/Supply ratio, so two pools' LST tokens are NOT
+// fungible with each other and may diverge in IXO value over time.
+type Pool struct {
+	// pool_id is the unique, immutable identifier for this pool (e.g. "zero",
+	// "qi"). Used in storage keys, message routing, and proxy account
+	// derivation. Set at pool creation; cannot be changed.
+	PoolId string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	// liquid_bond_denom is the denomination of the LST minted by this pool
+	// (e.g. "uzero"). Must be globally unique across all pools. Immutable.
+	LiquidBondDenom string `protobuf:"bytes,2,opt,name=liquid_bond_denom,json=liquidBondDenom,proto3" json:"liquid_bond_denom,omitempty"`
+	// proxy_account_address is the bech32-encoded address of the per-pool
+	// delegation proxy account. All delegations, redelegations, unbondings,
+	// and reward withdrawals for this pool flow through this account.
+	// Derived deterministically from pool_id at creation; immutable.
+	// For the legacy "zero" pool migrated from pre-v7 state, this field
+	// holds the original LiquidStakeProxyAcc address so existing
+	// delegations are preserved without state migration.
+	ProxyAccountAddress string `protobuf:"bytes,3,opt,name=proxy_account_address,json=proxyAccountAddress,proto3" json:"proxy_account_address,omitempty"`
+	// whitelisted_validators are the validators eligible for delegation from
+	// this pool's proxy account. Target weights must sum to 10000.
+	WhitelistedValidators []WhitelistedValidator `protobuf:"bytes,4,rep,name=whitelisted_validators,json=whitelistedValidators,proto3" json:"whitelisted_validators"`
+	// unstake_fee_rate is deducted from the unbonding amount when an unstake
+	// is requested against this pool.
+	UnstakeFeeRate cosmossdk_io_math.LegacyDec `protobuf:"bytes,5,opt,name=unstake_fee_rate,json=unstakeFeeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"unstake_fee_rate"`
+	// fee_account_address is the bech32-encoded address that accumulates the
+	// autocompound fee for this pool.
+	FeeAccountAddress string `protobuf:"bytes,6,opt,name=fee_account_address,json=feeAccountAddress,proto3" json:"fee_account_address,omitempty"`
+	// autocompound_fee_rate is the fraction of accrued staking rewards taken
+	// by this pool as a protocol fee on each autocompound epoch and sent to
+	// fee_account_address.
+	AutocompoundFeeRate cosmossdk_io_math.LegacyDec `protobuf:"bytes,7,opt,name=autocompound_fee_rate,json=autocompoundFeeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"autocompound_fee_rate"`
+	// whitelist_admin_address is the bech32-encoded address authorised to
+	// update this pool's whitelisted_validators, weighted_rewards_receivers,
+	// paused flag, and other mutable pool fields. Governance can also update
+	// these fields. The admin is also the only address allowed to call
+	// LiquidStake against this pool.
+	WhitelistAdminAddress string `protobuf:"bytes,8,opt,name=whitelist_admin_address,json=whitelistAdminAddress,proto3" json:"whitelist_admin_address,omitempty"`
+	// paused is a per-pool safety toggle. When true, this specific pool's
+	// stake/unstake, autocompounding, and rebalancing are halted; other
+	// pools are unaffected. The global ModuleParams.module_paused flag
+	// overrides this and pauses every pool regardless of its per-pool value.
+	Paused bool `protobuf:"varint,9,opt,name=paused,proto3" json:"paused,omitempty"`
+	// weighted_rewards_receivers are the addresses that receive a weighted
+	// share of this pool's autocompound rewards. The sum of weights must
+	// not exceed 1; the remainder is restaked to validators.
+	WeightedRewardsReceivers []WeightedAddress `protobuf:"bytes,10,rep,name=weighted_rewards_receivers,json=weightedRewardsReceivers,proto3" json:"weighted_rewards_receivers" yaml:"impact_rewards_receiver"`
+}
+
+func (m *Pool) Reset()      { *m = Pool{} }
+func (*Pool) ProtoMessage() {}
+func (*Pool) Descriptor() ([]byte, []int) {
+	return fileDescriptor_ce5a4f2e01ee4d8c, []int{2}
+}
+func (m *Pool) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Pool) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Pool.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Pool) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Pool.Merge(m, src)
+}
+func (m *Pool) XXX_Size() int {
+	return m.Size()
+}
+func (m *Pool) XXX_DiscardUnknown() {
+	xxx_messageInfo_Pool.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Pool proto.InternalMessageInfo
+
 // WeightedAddress represents an address with a weight assigned to it.
 // The weight is used to determine the proportion of autocompounding
 // rewards to be paid to the address.
@@ -144,7 +248,7 @@ func (m *WeightedAddress) Reset()         { *m = WeightedAddress{} }
 func (m *WeightedAddress) String() string { return proto.CompactTextString(m) }
 func (*WeightedAddress) ProtoMessage()    {}
 func (*WeightedAddress) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ce5a4f2e01ee4d8c, []int{1}
+	return fileDescriptor_ce5a4f2e01ee4d8c, []int{3}
 }
 func (m *WeightedAddress) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -190,7 +294,7 @@ func (m *WhitelistedValidator) Reset()         { *m = WhitelistedValidator{} }
 func (m *WhitelistedValidator) String() string { return proto.CompactTextString(m) }
 func (*WhitelistedValidator) ProtoMessage()    {}
 func (*WhitelistedValidator) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ce5a4f2e01ee4d8c, []int{2}
+	return fileDescriptor_ce5a4f2e01ee4d8c, []int{4}
 }
 func (m *WhitelistedValidator) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -232,7 +336,7 @@ func (m *LiquidValidator) Reset()         { *m = LiquidValidator{} }
 func (m *LiquidValidator) String() string { return proto.CompactTextString(m) }
 func (*LiquidValidator) ProtoMessage()    {}
 func (*LiquidValidator) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ce5a4f2e01ee4d8c, []int{3}
+	return fileDescriptor_ce5a4f2e01ee4d8c, []int{5}
 }
 func (m *LiquidValidator) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -282,7 +386,7 @@ func (m *LiquidValidatorState) Reset()         { *m = LiquidValidatorState{} }
 func (m *LiquidValidatorState) String() string { return proto.CompactTextString(m) }
 func (*LiquidValidatorState) ProtoMessage()    {}
 func (*LiquidValidatorState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ce5a4f2e01ee4d8c, []int{4}
+	return fileDescriptor_ce5a4f2e01ee4d8c, []int{6}
 }
 func (m *LiquidValidatorState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -311,30 +415,37 @@ func (m *LiquidValidatorState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_LiquidValidatorState proto.InternalMessageInfo
 
-// NetAmountState is type for net amount raw data and mint rate, This is a value
-// that depends on the several module state every time, so it is used only for
-// calculation and query and is not stored in kv.
+// NetAmountState holds the raw amounts and exchange rates for a single pool.
+// Computed on the fly from pool state every time (never persisted), and used
+// for unstake-rate calculation and queries. Each pool has its own independent
+// NetAmountState.
 type NetAmountState struct {
-	// stake_rate is the rate at which the liquid staking module mints stkIXO
+	// stake_rate is the mint rate when staking into this pool.
+	// Always 1.0: 1 native token mints 1 LST regardless of accrued rewards.
 	StakeRate cosmossdk_io_math.LegacyDec `protobuf:"bytes,1,opt,name=stake_rate,json=stakeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"stake_rate"`
-	// unstake_rate is the rate at which the liquid staking module burns stkIXO
+	// unstake_rate is the burn rate when unstaking from this pool, equal to
+	// net_amount / stkixo_total_supply. Diverges from 1.0 as rewards accrue
+	// or slashing occurs.
 	UnstakeRate cosmossdk_io_math.LegacyDec `protobuf:"bytes,2,opt,name=unstake_rate,json=unstakeRate,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"unstake_rate"`
-	// btoken_total_supply returns the total supply of uzero (stkIXO denom)
+	// stkixo_total_supply is the total supply of this pool's LST denom.
 	StkixoTotalSupply cosmossdk_io_math.Int `protobuf:"bytes,3,opt,name=stkixo_total_supply,json=stkixoTotalSupply,proto3,customtype=cosmossdk.io/math.Int" json:"stkixo_total_supply"`
-	// net_amount is proxy account's total liquid tokens + total unbonding balance
+	// net_amount is this pool's total liquid tokens + total unbonding balance,
+	// measured at its own proxy account.
 	NetAmount cosmossdk_io_math.LegacyDec `protobuf:"bytes,4,opt,name=net_amount,json=netAmount,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"net_amount"`
-	// total_del_shares define the delegation shares of all liquid validators
+	// total_del_shares is the sum of delegation shares held by this pool's
+	// proxy account across all of its liquid validators.
 	TotalDelShares cosmossdk_io_math.LegacyDec `protobuf:"bytes,5,opt,name=total_del_shares,json=totalDelShares,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"total_del_shares"`
-	// total_liquid_tokens define the token amount worth of delegation shares of
-	// all liquid validator (slashing applied amount)
+	// total_liquid_tokens is the token-equivalent of total_del_shares with
+	// slashing applied, summed across this pool's liquid validators.
 	TotalLiquidTokens cosmossdk_io_math.Int `protobuf:"bytes,6,opt,name=total_liquid_tokens,json=totalLiquidTokens,proto3,customtype=cosmossdk.io/math.Int" json:"total_liquid_tokens"`
-	// total_remaining_rewards define the sum of remaining rewards of proxy
-	// account by all liquid validators
+	// total_remaining_rewards is the sum of unwithdrawn staking rewards owed
+	// to this pool's proxy account from all its liquid validators.
 	TotalRemainingRewards cosmossdk_io_math.LegacyDec `protobuf:"bytes,7,opt,name=total_remaining_rewards,json=totalRemainingRewards,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"total_remaining_rewards"`
-	// total_unbonding_balance define the unbonding balance of proxy account by
-	// all liquid validator (slashing applied amount)
+	// total_unbonding_balance is the sum of unbonding amounts (slashing
+	// applied) for this pool's proxy account.
 	TotalUnbondingBalance cosmossdk_io_math.Int `protobuf:"bytes,8,opt,name=total_unbonding_balance,json=totalUnbondingBalance,proto3,customtype=cosmossdk.io/math.Int" json:"total_unbonding_balance"`
-	// proxy_acc_balance define the balance of proxy account for the native token
+	// proxy_acc_balance is the spendable native-token balance currently sitting
+	// in this pool's proxy account (rewards withdrawn but not yet redelegated).
 	ProxyAccBalance cosmossdk_io_math.Int `protobuf:"bytes,9,opt,name=proxy_acc_balance,json=proxyAccBalance,proto3,customtype=cosmossdk.io/math.Int" json:"proxy_acc_balance"`
 }
 
@@ -342,7 +453,7 @@ func (m *NetAmountState) Reset()         { *m = NetAmountState{} }
 func (m *NetAmountState) String() string { return proto.CompactTextString(m) }
 func (*NetAmountState) ProtoMessage()    {}
 func (*NetAmountState) Descriptor() ([]byte, []int) {
-	return fileDescriptor_ce5a4f2e01ee4d8c, []int{5}
+	return fileDescriptor_ce5a4f2e01ee4d8c, []int{7}
 }
 func (m *NetAmountState) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -374,6 +485,8 @@ var xxx_messageInfo_NetAmountState proto.InternalMessageInfo
 func init() {
 	proto.RegisterEnum("ixo.liquidstake.v1beta1.ValidatorStatus", ValidatorStatus_name, ValidatorStatus_value)
 	proto.RegisterType((*Params)(nil), "ixo.liquidstake.v1beta1.Params")
+	proto.RegisterType((*ModuleParams)(nil), "ixo.liquidstake.v1beta1.ModuleParams")
+	proto.RegisterType((*Pool)(nil), "ixo.liquidstake.v1beta1.Pool")
 	proto.RegisterType((*WeightedAddress)(nil), "ixo.liquidstake.v1beta1.WeightedAddress")
 	proto.RegisterType((*WhitelistedValidator)(nil), "ixo.liquidstake.v1beta1.WhitelistedValidator")
 	proto.RegisterType((*LiquidValidator)(nil), "ixo.liquidstake.v1beta1.LiquidValidator")
@@ -386,76 +499,84 @@ func init() {
 }
 
 var fileDescriptor_ce5a4f2e01ee4d8c = []byte{
-	// 1104 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x96, 0x4d, 0x4f, 0x1b, 0x47,
-	0x18, 0xc7, 0xbd, 0x40, 0x1c, 0x98, 0x00, 0x86, 0x05, 0x6a, 0xe3, 0x54, 0xb6, 0xe5, 0x4a, 0x15,
-	0xa5, 0xc2, 0x16, 0x6d, 0x95, 0x03, 0x87, 0x2a, 0x36, 0x26, 0xaa, 0x25, 0x44, 0xad, 0xb5, 0x81,
-	0xaa, 0x1c, 0xb6, 0xe3, 0xdd, 0xc1, 0x9e, 0xb2, 0x3b, 0xe3, 0xee, 0xcc, 0x82, 0xf9, 0x06, 0x11,
-	0x87, 0x2a, 0xc7, 0x5e, 0x90, 0x22, 0xb5, 0xb7, 0x5e, 0xd3, 0xef, 0x90, 0x4b, 0xa5, 0x28, 0xea,
-	0xa1, 0xea, 0x01, 0x55, 0x70, 0xe9, 0x99, 0x4f, 0x50, 0xcd, 0xcb, 0x82, 0x6d, 0x42, 0x5b, 0x5b,
-	0xbd, 0xd9, 0x33, 0xfb, 0xff, 0x3d, 0xaf, 0xf3, 0xcc, 0x80, 0x8f, 0x70, 0x97, 0x16, 0x3d, 0xfc,
-	0x5d, 0x88, 0x5d, 0xc6, 0xe1, 0x11, 0x2a, 0x1e, 0xaf, 0x37, 0x11, 0x87, 0xeb, 0xbd, 0x6b, 0x85,
-	0x4e, 0x40, 0x39, 0x35, 0x93, 0xb8, 0x4b, 0x0b, 0xbd, 0xcb, 0xfa, 0xd3, 0xf4, 0x62, 0x8b, 0xb6,
-	0xa8, 0xfc, 0xa6, 0x28, 0x7e, 0xa9, 0xcf, 0xd3, 0xcb, 0x0e, 0x65, 0x3e, 0x65, 0xb6, 0xda, 0x50,
-	0x7f, 0xd4, 0x56, 0xfe, 0xa7, 0x38, 0x88, 0xd7, 0x60, 0x00, 0x7d, 0x66, 0xae, 0x82, 0x79, 0x85,
-	0xb4, 0x9b, 0x94, 0xb8, 0xb6, 0x8b, 0x08, 0xf5, 0x53, 0x46, 0xce, 0x58, 0x99, 0xb2, 0x12, 0x6a,
-	0xa3, 0x4c, 0x89, 0x5b, 0x11, 0xcb, 0xe6, 0xb7, 0xe0, 0xbd, 0x93, 0x36, 0xe6, 0xc8, 0xc3, 0x8c,
-	0x23, 0xd7, 0x3e, 0x86, 0x1e, 0x76, 0x21, 0xa7, 0x01, 0x4b, 0x8d, 0xe5, 0xc6, 0x57, 0x1e, 0x7d,
-	0xb2, 0x56, 0xb8, 0xc7, 0xc3, 0xc2, 0xfe, 0xad, 0x6c, 0x2f, 0x52, 0x95, 0x27, 0x5e, 0x5f, 0x64,
-	0x63, 0xd6, 0xd2, 0xc9, 0x3b, 0xf6, 0x98, 0x79, 0x00, 0xe6, 0x42, 0x22, 0x21, 0xf6, 0x21, 0x42,
-	0x76, 0x00, 0x39, 0x4a, 0x8d, 0x0b, 0xb7, 0xca, 0xeb, 0x42, 0xf6, 0xc7, 0x45, 0xf6, 0xb1, 0x0a,
-	0x89, 0xb9, 0x47, 0x05, 0x4c, 0x8b, 0x3e, 0xe4, 0xed, 0xc2, 0x36, 0x6a, 0x41, 0xe7, 0xb4, 0x82,
-	0x9c, 0xb7, 0xaf, 0xd6, 0x80, 0x8e, 0xb8, 0x82, 0x1c, 0x6b, 0x56, 0xa3, 0x9e, 0x21, 0x64, 0x41,
-	0x8e, 0xcc, 0x26, 0x48, 0xfa, 0x98, 0xd8, 0x3a, 0x70, 0x65, 0x05, 0xfa, 0x34, 0x24, 0x3c, 0x35,
-	0x21, 0x6d, 0x7c, 0xac, 0x6d, 0x2c, 0xdd, 0xb5, 0x51, 0x25, 0xbc, 0x87, 0x5e, 0x25, 0xdc, 0x5a,
-	0xf4, 0x31, 0xd9, 0x96, 0xa8, 0xba, 0x20, 0x95, 0x24, 0xc8, 0xfc, 0x02, 0x2c, 0x08, 0xc7, 0xa1,
-	0xe3, 0x88, 0xbf, 0x36, 0x74, 0xdd, 0x00, 0x31, 0x96, 0x7a, 0x20, 0xf9, 0xa9, 0xb7, 0xaf, 0xd6,
-	0x16, 0x35, 0xa2, 0xa4, 0x76, 0xea, 0x3c, 0xc0, 0xa4, 0x65, 0xcd, 0x1f, 0x22, 0x54, 0x52, 0x1a,
-	0xbd, 0x61, 0x22, 0xb0, 0x04, 0x43, 0x4e, 0x1d, 0xea, 0x77, 0x68, 0x48, 0xdc, 0xdb, 0x7c, 0xc4,
-	0x47, 0xcd, 0xc7, 0x42, 0x2f, 0x2f, 0x4a, 0x4a, 0x0d, 0x24, 0x6f, 0x4a, 0x61, 0x43, 0x57, 0x24,
-	0x28, 0x72, 0xfa, 0xe1, 0xbf, 0x38, 0x7d, 0x5b, 0xc3, 0x92, 0xd0, 0x45, 0x8e, 0x7f, 0x00, 0x66,
-	0x7c, 0xea, 0x86, 0x1e, 0xb2, 0x3b, 0x30, 0x64, 0xc8, 0x4d, 0x4d, 0xe6, 0x8c, 0x95, 0x49, 0x6b,
-	0x5a, 0x2d, 0xd6, 0xe4, 0x9a, 0xf9, 0xbd, 0x01, 0xd2, 0x27, 0x08, 0xb7, 0xda, 0xa2, 0xa5, 0x02,
-	0x74, 0x02, 0x03, 0x97, 0xd9, 0x01, 0x72, 0x10, 0x3e, 0x46, 0x01, 0x4b, 0x4d, 0xc9, 0xce, 0x5a,
-	0xb9, 0xbf, 0xb3, 0xb4, 0x54, 0xdb, 0x2c, 0x7f, 0x28, 0xb2, 0x71, 0x7d, 0x91, 0xcd, 0x9c, 0x42,
-	0xdf, 0xdb, 0xc8, 0x63, 0xbf, 0x03, 0x1d, 0x7e, 0x87, 0x9b, 0xb7, 0x52, 0x91, 0x4d, 0x4b, 0x6d,
-	0x59, 0x91, 0xc5, 0x8d, 0xc9, 0xe7, 0x2f, 0xb3, 0xb1, 0x1f, 0x5e, 0x66, 0x63, 0xf9, 0x9f, 0x0d,
-	0x90, 0x18, 0xe0, 0x9b, 0x15, 0xf0, 0x30, 0xca, 0x8a, 0x3c, 0x25, 0xe5, 0xd5, 0xeb, 0x8b, 0xec,
-	0xac, 0x32, 0xa6, 0x37, 0xf2, 0xf7, 0xe6, 0x29, 0x92, 0x9a, 0xdb, 0x20, 0xae, 0xec, 0xa7, 0xc6,
-	0x24, 0xe4, 0xb3, 0xff, 0x50, 0xc3, 0xeb, 0x8b, 0xec, 0x8c, 0xb2, 0xa3, 0xa4, 0x79, 0x4b, 0x33,
-	0x36, 0x26, 0x84, 0xc7, 0xf9, 0x5f, 0x0c, 0xb0, 0xf8, 0xae, 0x73, 0x66, 0x6e, 0x81, 0xf9, 0x9b,
-	0xa3, 0x6a, 0xf7, 0x3b, 0x7f, 0x7f, 0x49, 0xe7, 0x6e, 0x24, 0x51, 0xe4, 0x35, 0x30, 0xc3, 0x61,
-	0xd0, 0x42, 0xdc, 0xee, 0x73, 0x7d, 0xa8, 0xa3, 0x32, 0xad, 0x08, 0xfb, 0xbd, 0x7e, 0x7f, 0x03,
-	0x12, 0xea, 0xf4, 0xdc, 0x7a, 0xbc, 0x09, 0xe6, 0x68, 0x07, 0x05, 0x43, 0x39, 0x9c, 0x88, 0x14,
-	0x7a, 0x59, 0xd5, 0xf1, 0x2f, 0x61, 0xe1, 0xc5, 0x38, 0x58, 0x1c, 0x30, 0x51, 0xe7, 0xa2, 0xe5,
-	0xff, 0x0f, 0x3b, 0xe6, 0xe6, 0x40, 0x2d, 0x87, 0x4a, 0x88, 0x96, 0x9a, 0x4f, 0x41, 0x9c, 0x71,
-	0xc8, 0x43, 0x26, 0x87, 0xdc, 0xec, 0x3f, 0x34, 0x7c, 0x5f, 0x08, 0x21, 0xb3, 0xb4, 0xce, 0xac,
-	0x01, 0xe0, 0x22, 0xcf, 0x66, 0x6d, 0x18, 0x20, 0xa6, 0xc7, 0xd8, 0x08, 0xa3, 0x61, 0xca, 0x45,
-	0x5e, 0x5d, 0x32, 0x44, 0xc1, 0xf5, 0x84, 0xe4, 0xf4, 0x08, 0x91, 0x68, 0x76, 0x0d, 0x57, 0x70,
-	0x45, 0x68, 0x48, 0x40, 0x4f, 0x49, 0x7e, 0x8b, 0x83, 0xd9, 0x1d, 0xc4, 0xd5, 0xac, 0x54, 0xc5,
-	0xa8, 0x01, 0xa0, 0x26, 0xb1, 0x9c, 0x6d, 0xc6, 0xc8, 0x01, 0x48, 0x88, 0x9c, 0x68, 0x0d, 0x30,
-	0x1d, 0xdd, 0x21, 0x92, 0x39, 0x36, 0x2a, 0xf3, 0x91, 0xc6, 0x48, 0xea, 0x01, 0x58, 0x60, 0xfc,
-	0x08, 0x77, 0xa9, 0xcd, 0x29, 0x87, 0x9e, 0xcd, 0xc2, 0x4e, 0xc7, 0x3b, 0xd5, 0x97, 0xd3, 0x50,
-	0xc9, 0x99, 0x57, 0x9c, 0x86, 0xc0, 0xd4, 0x25, 0x45, 0x24, 0x81, 0x20, 0xde, 0x7f, 0x19, 0x8d,
-	0x92, 0x04, 0x12, 0xe5, 0x56, 0x5c, 0xa4, 0xca, 0xcf, 0x9e, 0xee, 0x78, 0x30, 0xf2, 0x45, 0x2a,
-	0x51, 0x95, 0x9b, 0x16, 0x39, 0x00, 0x0b, 0x0a, 0xde, 0xdf, 0x28, 0xf1, 0x11, 0x72, 0x21, 0x39,
-	0xdb, 0x3d, 0xdd, 0x62, 0x62, 0x90, 0x54, 0xf0, 0x00, 0xf9, 0x10, 0x13, 0x4c, 0x5a, 0xd1, 0x1c,
-	0xd7, 0x17, 0xd2, 0x08, 0x01, 0x2c, 0x49, 0xa2, 0x15, 0x01, 0xf5, 0xf0, 0x37, 0x9d, 0xc8, 0x54,
-	0x48, 0xc4, 0x33, 0x48, 0x98, 0x6a, 0x42, 0x0f, 0x12, 0x07, 0xc9, 0x3b, 0x6b, 0xc8, 0x58, 0x94,
-	0x91, 0xdd, 0x08, 0x55, 0x56, 0x24, 0x73, 0x1f, 0xcc, 0x77, 0x02, 0xda, 0x3d, 0x15, 0x6f, 0x82,
-	0x1b, 0xfc, 0xd4, 0xf0, 0xf8, 0x84, 0xa4, 0x94, 0x1c, 0x47, 0x83, 0xe5, 0xb1, 0x32, 0xc4, 0xb1,
-	0x5a, 0xfd, 0xd5, 0x00, 0x89, 0x81, 0x01, 0x61, 0x3e, 0x05, 0xef, 0xef, 0x95, 0xb6, 0xab, 0x95,
-	0x52, 0xe3, 0x4b, 0xcb, 0xae, 0x37, 0x4a, 0x8d, 0xdd, 0xba, 0xbd, 0xbb, 0x53, 0xaf, 0x6d, 0x6d,
-	0x56, 0x9f, 0x55, 0xb7, 0x2a, 0x73, 0xb1, 0x74, 0xe6, 0xec, 0x3c, 0x97, 0x1e, 0x90, 0xed, 0x12,
-	0xd6, 0x41, 0x0e, 0x3e, 0xc4, 0xc8, 0x35, 0x9f, 0x80, 0xe4, 0x1d, 0x42, 0x69, 0xb3, 0x51, 0xdd,
-	0xdb, 0x9a, 0x33, 0xd2, 0xcb, 0x67, 0xe7, 0xb9, 0xa5, 0x01, 0x71, 0xc9, 0xe1, 0xf8, 0x18, 0x99,
-	0x1b, 0x60, 0xf9, 0x8e, 0xae, 0xba, 0xa3, 0x95, 0x63, 0xe9, 0xc7, 0x67, 0xe7, 0xb9, 0xe4, 0x80,
-	0xb2, 0x4a, 0xa0, 0xd4, 0xa6, 0x27, 0x9e, 0xff, 0x98, 0x89, 0x95, 0xbf, 0x7a, 0x7d, 0x99, 0x31,
-	0xde, 0x5c, 0x66, 0x8c, 0x3f, 0x2f, 0x33, 0xc6, 0x8b, 0xab, 0x4c, 0xec, 0xcd, 0x55, 0x26, 0xf6,
-	0xfb, 0x55, 0x26, 0xf6, 0xf5, 0xe7, 0x2d, 0xcc, 0xdb, 0x61, 0xb3, 0xe0, 0x50, 0xbf, 0x88, 0xbb,
-	0xf4, 0x50, 0xbc, 0x64, 0x20, 0xc7, 0x94, 0x88, 0x7f, 0x6b, 0x4d, 0x8f, 0x3a, 0x47, 0x4e, 0x1b,
-	0x62, 0x52, 0x3c, 0x7e, 0x52, 0xec, 0xf6, 0x3d, 0xb0, 0xf9, 0x69, 0x07, 0xb1, 0x66, 0x5c, 0xbe,
-	0x84, 0x3f, 0xfd, 0x3b, 0x00, 0x00, 0xff, 0xff, 0x8b, 0x1e, 0xa9, 0x17, 0x80, 0x0b, 0x00, 0x00,
+	// 1222 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x97, 0x4f, 0x6f, 0x1a, 0xc7,
+	0x1b, 0xc7, 0x59, 0x9b, 0xac, 0xed, 0x89, 0x63, 0xec, 0xb5, 0x09, 0x84, 0xfc, 0x04, 0x88, 0x9f,
+	0x54, 0xb9, 0xa9, 0x0c, 0x4a, 0x5b, 0xe5, 0xe0, 0x43, 0x15, 0x30, 0x8e, 0x8a, 0x44, 0x53, 0xb4,
+	0xe0, 0xa4, 0x6a, 0x0e, 0xdb, 0x61, 0x77, 0x0c, 0x53, 0xef, 0xee, 0xd0, 0xdd, 0x59, 0x1b, 0xbf,
+	0x83, 0x28, 0x87, 0x2a, 0xc7, 0x5c, 0x2c, 0xa5, 0xaa, 0xd4, 0x4b, 0xaf, 0xe9, 0x7b, 0xc8, 0xa5,
+	0x52, 0x14, 0xf5, 0x50, 0xf5, 0x60, 0x55, 0xf6, 0xa5, 0x67, 0xbf, 0x82, 0x6a, 0xfe, 0x2c, 0xe6,
+	0x8f, 0x89, 0x0b, 0xb2, 0x7c, 0x63, 0x66, 0xf6, 0xfb, 0x79, 0x9e, 0x79, 0xe6, 0x79, 0x9e, 0x19,
+	0xc0, 0xc7, 0xb8, 0x4b, 0x0a, 0x36, 0xfe, 0x21, 0xc0, 0x96, 0x4f, 0xe1, 0x1e, 0x2a, 0xec, 0xdf,
+	0x6f, 0x22, 0x0a, 0xef, 0xf7, 0xcf, 0xe5, 0x3b, 0x1e, 0xa1, 0x44, 0x4b, 0xe0, 0x2e, 0xc9, 0xf7,
+	0x4f, 0xcb, 0x4f, 0x53, 0x6b, 0x2d, 0xd2, 0x22, 0xfc, 0x9b, 0x02, 0xfb, 0x25, 0x3e, 0x4f, 0xdd,
+	0x31, 0x89, 0xef, 0x10, 0xdf, 0x10, 0x0b, 0x62, 0x20, 0x96, 0x72, 0xbf, 0xa8, 0x40, 0xad, 0x41,
+	0x0f, 0x3a, 0xbe, 0x76, 0x0f, 0xac, 0x08, 0xa4, 0xd1, 0x24, 0xae, 0x65, 0x58, 0xc8, 0x25, 0x4e,
+	0x52, 0xc9, 0x2a, 0xeb, 0x0b, 0x7a, 0x4c, 0x2c, 0x94, 0x88, 0x6b, 0x95, 0xd9, 0xb4, 0xf6, 0x3d,
+	0xb8, 0x7d, 0xd0, 0xc6, 0x14, 0xd9, 0xd8, 0xa7, 0xc8, 0x32, 0xf6, 0xa1, 0x8d, 0x2d, 0x48, 0x89,
+	0xe7, 0x27, 0x67, 0xb2, 0xb3, 0xeb, 0x37, 0x3f, 0xdd, 0xc8, 0x8f, 0xf1, 0x30, 0xff, 0xf4, 0x5c,
+	0xf6, 0x24, 0x54, 0x95, 0xa2, 0x6f, 0x8f, 0x33, 0x11, 0x3d, 0x7e, 0x70, 0xc1, 0x9a, 0xaf, 0x3d,
+	0x03, 0xcb, 0x81, 0xcb, 0x21, 0xc6, 0x2e, 0x42, 0x86, 0x07, 0x29, 0x4a, 0xce, 0x32, 0xb7, 0x4a,
+	0xf7, 0x99, 0xec, 0xaf, 0xe3, 0xcc, 0x5d, 0xb1, 0x25, 0xdf, 0xda, 0xcb, 0x63, 0x52, 0x70, 0x20,
+	0x6d, 0xe7, 0xab, 0xa8, 0x05, 0xcd, 0xc3, 0x32, 0x32, 0xdf, 0xbf, 0xd9, 0x00, 0x72, 0xc7, 0x65,
+	0x64, 0xea, 0x4b, 0x12, 0xf5, 0x08, 0x21, 0x1d, 0x52, 0xa4, 0x35, 0x41, 0xc2, 0xc1, 0xae, 0x21,
+	0x37, 0x2e, 0xac, 0x40, 0x87, 0x04, 0x2e, 0x4d, 0x46, 0xb9, 0x8d, 0x4f, 0xa4, 0x8d, 0xf8, 0xa8,
+	0x8d, 0x8a, 0x4b, 0xfb, 0xe8, 0x15, 0x97, 0xea, 0x6b, 0x0e, 0x76, 0xab, 0x1c, 0x55, 0x67, 0xa4,
+	0x22, 0x07, 0x69, 0x5f, 0x82, 0x55, 0xe6, 0x38, 0x34, 0x4d, 0x36, 0x34, 0xa0, 0x65, 0x79, 0xc8,
+	0xf7, 0x93, 0x37, 0x38, 0x3f, 0xf9, 0xfe, 0xcd, 0xc6, 0x9a, 0x44, 0x14, 0xc5, 0x4a, 0x9d, 0x7a,
+	0xd8, 0x6d, 0xe9, 0x2b, 0xbb, 0x08, 0x15, 0x85, 0x46, 0x2e, 0x68, 0x08, 0xc4, 0x61, 0x40, 0x89,
+	0x49, 0x9c, 0x0e, 0x09, 0x5c, 0xeb, 0x3c, 0x1e, 0xea, 0xb4, 0xf1, 0x58, 0xed, 0xe7, 0x85, 0x41,
+	0xa9, 0x81, 0x44, 0xef, 0x28, 0x0c, 0x68, 0xb1, 0x00, 0x85, 0x4e, 0xcf, 0x5d, 0xe2, 0xf4, 0xf9,
+	0x19, 0x16, 0x99, 0x2e, 0x74, 0xfc, 0xff, 0xe0, 0x96, 0x43, 0xac, 0xc0, 0x46, 0x46, 0x07, 0x06,
+	0x3e, 0xb2, 0x92, 0xf3, 0x59, 0x65, 0x7d, 0x5e, 0x5f, 0x14, 0x93, 0x35, 0x3e, 0xa7, 0xfd, 0xa8,
+	0x80, 0xd4, 0x01, 0xc2, 0xad, 0x36, 0x4b, 0x29, 0x0f, 0x1d, 0x40, 0xcf, 0xf2, 0x0d, 0x0f, 0x99,
+	0x08, 0xef, 0x23, 0xcf, 0x4f, 0x2e, 0xf0, 0xcc, 0x5a, 0x1f, 0x9f, 0x59, 0x52, 0x2a, 0x6d, 0x96,
+	0x3e, 0x62, 0xd1, 0x38, 0x3b, 0xce, 0xa4, 0x0f, 0xa1, 0x63, 0x6f, 0xe6, 0xb0, 0xd3, 0x81, 0x26,
+	0x1d, 0xe1, 0xe6, 0xf4, 0x64, 0x68, 0x53, 0x17, 0x4b, 0x7a, 0x68, 0x71, 0x13, 0x3c, 0x7f, 0x9d,
+	0x89, 0xbc, 0x7a, 0x9d, 0x89, 0x24, 0x95, 0xdc, 0x4f, 0x0a, 0x58, 0xfc, 0x4a, 0x7a, 0xcb, 0xcb,
+	0xe5, 0x03, 0x99, 0xa3, 0x5c, 0x55, 0xe6, 0x8c, 0x84, 0x6d, 0x66, 0x34, 0x6c, 0x9b, 0xf3, 0xa1,
+	0x97, 0xb9, 0x57, 0x2a, 0x88, 0xd6, 0x08, 0xb1, 0xb5, 0x04, 0x98, 0xeb, 0x10, 0x62, 0x1b, 0xd8,
+	0x92, 0x05, 0xac, 0xb2, 0x61, 0xc5, 0xba, 0xb8, 0xc6, 0x67, 0x2e, 0xae, 0xf1, 0x2a, 0x88, 0x77,
+	0x3c, 0xd2, 0x3d, 0x1c, 0x49, 0xdc, 0xd9, 0x4b, 0x72, 0x60, 0x95, 0xcb, 0x86, 0x52, 0x77, 0x7c,
+	0xc7, 0x88, 0x5e, 0x4b, 0xc7, 0xb8, 0x71, 0x55, 0x1d, 0x63, 0x4c, 0x35, 0xab, 0x57, 0x58, 0xcd,
+	0x73, 0xd7, 0x55, 0xcd, 0xf3, 0xd3, 0x55, 0xf3, 0x6d, 0xa0, 0xca, 0x7c, 0x5c, 0xe0, 0xf9, 0x28,
+	0x47, 0x97, 0x15, 0x30, 0xb8, 0xf6, 0x02, 0x3e, 0x2f, 0x8d, 0x5f, 0x15, 0x10, 0x1b, 0xe2, 0x6b,
+	0x65, 0x30, 0x17, 0x06, 0x42, 0x54, 0xec, 0xbd, 0xb3, 0xe3, 0xcc, 0x92, 0x30, 0x26, 0x17, 0x72,
+	0x63, 0x43, 0x13, 0x4a, 0xb5, 0x2a, 0x50, 0x85, 0x7d, 0x51, 0x47, 0xa5, 0xcf, 0xff, 0xc3, 0xb1,
+	0x9d, 0x1d, 0x67, 0x6e, 0x09, 0x3b, 0x42, 0x9a, 0xd3, 0x25, 0x63, 0x33, 0xca, 0x3c, 0xce, 0xfd,
+	0xa6, 0x80, 0xb5, 0x8b, 0xd2, 0x5e, 0xdb, 0x06, 0x2b, 0xbd, 0xca, 0x31, 0x06, 0x9d, 0x1f, 0x7f,
+	0x8a, 0xcb, 0x3d, 0x49, 0xb8, 0xf3, 0x1a, 0xb8, 0x45, 0xa1, 0xd7, 0x42, 0xd4, 0x18, 0x70, 0x7d,
+	0xa2, 0x8e, 0xb5, 0x28, 0x08, 0x4f, 0xfb, 0xfd, 0xfe, 0x0e, 0xc4, 0x44, 0x13, 0x3b, 0xf7, 0x78,
+	0x0b, 0x2c, 0x93, 0x0e, 0xf2, 0x26, 0x72, 0x38, 0x16, 0x2a, 0xe4, 0xb4, 0x38, 0xc7, 0x7f, 0x98,
+	0x85, 0x97, 0xb3, 0x60, 0x6d, 0xc8, 0x44, 0x9d, 0xb2, 0x2c, 0xbf, 0x0a, 0x3b, 0xda, 0xd6, 0xd0,
+	0x59, 0x4e, 0x14, 0x10, 0x29, 0xd5, 0x1e, 0x02, 0xd5, 0xa7, 0x90, 0x06, 0xa2, 0x51, 0x2e, 0x7d,
+	0x20, 0xe1, 0x07, 0xb6, 0x10, 0xf8, 0xba, 0xd4, 0x69, 0x35, 0x00, 0x2c, 0x64, 0x1b, 0x7e, 0x1b,
+	0x7a, 0xc8, 0x97, 0xef, 0x90, 0x29, 0xba, 0xc1, 0x82, 0x85, 0xec, 0x3a, 0x67, 0xb0, 0x03, 0x97,
+	0x7d, 0x9f, 0x92, 0x3d, 0xe4, 0x86, 0x8f, 0x8f, 0xc9, 0x0e, 0x5c, 0x10, 0x1a, 0x1c, 0xd0, 0x77,
+	0x24, 0x7f, 0xa8, 0x60, 0xe9, 0x31, 0xa2, 0xe2, 0xca, 0x12, 0x87, 0x51, 0x03, 0x40, 0xb4, 0x5f,
+	0xde, 0xce, 0x94, 0xa9, 0x37, 0xc0, 0x21, 0xbc, 0x89, 0x35, 0xc0, 0x62, 0xd8, 0xd2, 0x39, 0x73,
+	0x66, 0x5a, 0xe6, 0x4d, 0x89, 0xe1, 0xd4, 0x67, 0x60, 0xd5, 0xa7, 0x7b, 0xb8, 0x4b, 0x0c, 0x4a,
+	0x28, 0xb4, 0x0d, 0x3f, 0xe8, 0x74, 0xec, 0x43, 0x79, 0xc1, 0x4d, 0x14, 0x9c, 0x15, 0xc1, 0x69,
+	0x30, 0x4c, 0x9d, 0x53, 0x58, 0x10, 0x5c, 0x44, 0x07, 0x5f, 0x93, 0xd3, 0x04, 0xc1, 0x0d, 0x63,
+	0xcb, 0xee, 0x35, 0xe1, 0x67, 0x5f, 0x76, 0x4c, 0x7f, 0xaf, 0x71, 0x54, 0xb9, 0x97, 0x22, 0xcf,
+	0xc0, 0xaa, 0x80, 0x0f, 0x26, 0x8a, 0x3a, 0x45, 0x2c, 0x38, 0xa7, 0xda, 0x97, 0x2d, 0x1a, 0x06,
+	0x09, 0x01, 0xf7, 0x90, 0x03, 0xb1, 0x8b, 0xdd, 0x56, 0xd8, 0xc7, 0xa7, 0xbf, 0xec, 0xe2, 0x9c,
+	0xa8, 0x87, 0x40, 0xd9, 0xfc, 0x35, 0x33, 0x34, 0x15, 0xb8, 0xec, 0x8d, 0xc3, 0x4c, 0x35, 0xa1,
+	0x0d, 0x5d, 0x13, 0xc9, 0xeb, 0x6e, 0xa2, 0xbd, 0x08, 0x23, 0x3b, 0x21, 0xaa, 0x24, 0x48, 0xda,
+	0x53, 0xb0, 0xd2, 0x7b, 0x1b, 0xf5, 0xf0, 0x0b, 0x93, 0xe3, 0x63, 0xe1, 0x53, 0x49, 0x82, 0x79,
+	0x59, 0x29, 0xac, 0xac, 0xee, 0xfd, 0xae, 0x80, 0xd8, 0x50, 0x83, 0xd0, 0x1e, 0x82, 0xff, 0x3d,
+	0x29, 0x56, 0x2b, 0xe5, 0x62, 0xe3, 0x6b, 0xdd, 0xa8, 0x37, 0x8a, 0x8d, 0x9d, 0xba, 0xb1, 0xf3,
+	0xb8, 0x5e, 0xdb, 0xde, 0xaa, 0x3c, 0xaa, 0x6c, 0x97, 0x97, 0x23, 0xa9, 0xf4, 0x8b, 0xa3, 0x6c,
+	0x6a, 0x48, 0xb6, 0xe3, 0xfa, 0x1d, 0x64, 0xe2, 0x5d, 0x8c, 0x2c, 0xed, 0x01, 0x48, 0x8c, 0x10,
+	0x8a, 0x5b, 0x8d, 0xca, 0x93, 0xed, 0x65, 0x25, 0x75, 0xe7, 0xc5, 0x51, 0x36, 0x3e, 0x24, 0x2e,
+	0x9a, 0x14, 0xef, 0x23, 0x6d, 0x13, 0xdc, 0x19, 0xd1, 0x55, 0x1e, 0x4b, 0xe5, 0x4c, 0xea, 0xee,
+	0x8b, 0xa3, 0x6c, 0x62, 0x48, 0x59, 0x71, 0x21, 0xd7, 0xa6, 0xa2, 0xcf, 0x7f, 0x4e, 0x47, 0x4a,
+	0xdf, 0xbc, 0x3d, 0x49, 0x2b, 0xef, 0x4e, 0xd2, 0xca, 0xdf, 0x27, 0x69, 0xe5, 0xe5, 0x69, 0x3a,
+	0xf2, 0xee, 0x34, 0x1d, 0xf9, 0xf3, 0x34, 0x1d, 0xf9, 0xf6, 0x8b, 0x16, 0xa6, 0xed, 0xa0, 0x99,
+	0x37, 0x89, 0x53, 0xc0, 0x5d, 0xb2, 0xcb, 0x1e, 0x2f, 0x90, 0x62, 0xe2, 0xb2, 0xd1, 0x46, 0xd3,
+	0x26, 0xe6, 0x9e, 0xd9, 0x86, 0xd8, 0x2d, 0xec, 0x3f, 0x28, 0x74, 0x07, 0xfe, 0x21, 0xd3, 0xc3,
+	0x0e, 0xf2, 0x9b, 0x2a, 0xff, 0x2b, 0xfb, 0xd9, 0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0x36, 0xff,
+	0xd6, 0x12, 0x41, 0x0f, 0x00, 0x00,
 }
 
 func (m *Params) Marshal() (dAtA []byte, err error) {
@@ -564,6 +685,165 @@ func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.LiquidBondDenom)
 		copy(dAtA[i:], m.LiquidBondDenom)
 		i = encodeVarintLiquidstake(dAtA, i, uint64(len(m.LiquidBondDenom)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *ModuleParams) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *ModuleParams) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *ModuleParams) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.ModulePaused {
+		i--
+		if m.ModulePaused {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x10
+	}
+	{
+		size := m.MinLiquidStakeAmount.Size()
+		i -= size
+		if _, err := m.MinLiquidStakeAmount.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstake(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *Pool) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Pool) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Pool) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.WeightedRewardsReceivers) > 0 {
+		for iNdEx := len(m.WeightedRewardsReceivers) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.WeightedRewardsReceivers[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintLiquidstake(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x52
+		}
+	}
+	if m.Paused {
+		i--
+		if m.Paused {
+			dAtA[i] = 1
+		} else {
+			dAtA[i] = 0
+		}
+		i--
+		dAtA[i] = 0x48
+	}
+	if len(m.WhitelistAdminAddress) > 0 {
+		i -= len(m.WhitelistAdminAddress)
+		copy(dAtA[i:], m.WhitelistAdminAddress)
+		i = encodeVarintLiquidstake(dAtA, i, uint64(len(m.WhitelistAdminAddress)))
+		i--
+		dAtA[i] = 0x42
+	}
+	{
+		size := m.AutocompoundFeeRate.Size()
+		i -= size
+		if _, err := m.AutocompoundFeeRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstake(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x3a
+	if len(m.FeeAccountAddress) > 0 {
+		i -= len(m.FeeAccountAddress)
+		copy(dAtA[i:], m.FeeAccountAddress)
+		i = encodeVarintLiquidstake(dAtA, i, uint64(len(m.FeeAccountAddress)))
+		i--
+		dAtA[i] = 0x32
+	}
+	{
+		size := m.UnstakeFeeRate.Size()
+		i -= size
+		if _, err := m.UnstakeFeeRate.MarshalTo(dAtA[i:]); err != nil {
+			return 0, err
+		}
+		i = encodeVarintLiquidstake(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x2a
+	if len(m.WhitelistedValidators) > 0 {
+		for iNdEx := len(m.WhitelistedValidators) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.WhitelistedValidators[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintLiquidstake(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x22
+		}
+	}
+	if len(m.ProxyAccountAddress) > 0 {
+		i -= len(m.ProxyAccountAddress)
+		copy(dAtA[i:], m.ProxyAccountAddress)
+		i = encodeVarintLiquidstake(dAtA, i, uint64(len(m.ProxyAccountAddress)))
+		i--
+		dAtA[i] = 0x1a
+	}
+	if len(m.LiquidBondDenom) > 0 {
+		i -= len(m.LiquidBondDenom)
+		copy(dAtA[i:], m.LiquidBondDenom)
+		i = encodeVarintLiquidstake(dAtA, i, uint64(len(m.LiquidBondDenom)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintLiquidstake(dAtA, i, uint64(len(m.PoolId)))
 		i--
 		dAtA[i] = 0xa
 	}
@@ -900,6 +1180,68 @@ func (m *Params) Size() (n int) {
 		n += 1 + l + sovLiquidstake(uint64(l))
 	}
 	if m.ModulePaused {
+		n += 2
+	}
+	if len(m.WeightedRewardsReceivers) > 0 {
+		for _, e := range m.WeightedRewardsReceivers {
+			l = e.Size()
+			n += 1 + l + sovLiquidstake(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *ModuleParams) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = m.MinLiquidStakeAmount.Size()
+	n += 1 + l + sovLiquidstake(uint64(l))
+	if m.ModulePaused {
+		n += 2
+	}
+	return n
+}
+
+func (m *Pool) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PoolId)
+	if l > 0 {
+		n += 1 + l + sovLiquidstake(uint64(l))
+	}
+	l = len(m.LiquidBondDenom)
+	if l > 0 {
+		n += 1 + l + sovLiquidstake(uint64(l))
+	}
+	l = len(m.ProxyAccountAddress)
+	if l > 0 {
+		n += 1 + l + sovLiquidstake(uint64(l))
+	}
+	if len(m.WhitelistedValidators) > 0 {
+		for _, e := range m.WhitelistedValidators {
+			l = e.Size()
+			n += 1 + l + sovLiquidstake(uint64(l))
+		}
+	}
+	l = m.UnstakeFeeRate.Size()
+	n += 1 + l + sovLiquidstake(uint64(l))
+	l = len(m.FeeAccountAddress)
+	if l > 0 {
+		n += 1 + l + sovLiquidstake(uint64(l))
+	}
+	l = m.AutocompoundFeeRate.Size()
+	n += 1 + l + sovLiquidstake(uint64(l))
+	l = len(m.WhitelistAdminAddress)
+	if l > 0 {
+		n += 1 + l + sovLiquidstake(uint64(l))
+	}
+	if m.Paused {
 		n += 2
 	}
 	if len(m.WeightedRewardsReceivers) > 0 {
@@ -1291,6 +1633,476 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 			}
 			m.ModulePaused = bool(v != 0)
 		case 9:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WeightedRewardsReceivers", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WeightedRewardsReceivers = append(m.WeightedRewardsReceivers, WeightedAddress{})
+			if err := m.WeightedRewardsReceivers[len(m.WeightedRewardsReceivers)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipLiquidstake(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *ModuleParams) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowLiquidstake
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: ModuleParams: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: ModuleParams: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MinLiquidStakeAmount", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.MinLiquidStakeAmount.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ModulePaused", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.ModulePaused = bool(v != 0)
+		default:
+			iNdEx = preIndex
+			skippy, err := skipLiquidstake(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Pool) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowLiquidstake
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Pool: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Pool: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field LiquidBondDenom", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.LiquidBondDenom = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProxyAccountAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ProxyAccountAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistedValidators", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WhitelistedValidators = append(m.WhitelistedValidators, WhitelistedValidator{})
+			if err := m.WhitelistedValidators[len(m.WhitelistedValidators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field UnstakeFeeRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.UnstakeFeeRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 6:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FeeAccountAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FeeAccountAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 7:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field AutocompoundFeeRate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.AutocompoundFeeRate.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 8:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WhitelistAdminAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthLiquidstake
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.WhitelistAdminAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 9:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Paused", wireType)
+			}
+			var v int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowLiquidstake
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				v |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			m.Paused = bool(v != 0)
+		case 10:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field WeightedRewardsReceivers", wireType)
 			}

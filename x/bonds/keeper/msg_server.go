@@ -110,6 +110,23 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 		return nil, types.ErrReservedBondToken
 	}
 
+	// Refuse a bond token symbol that is already in active use elsewhere in
+	// the bank module — non-zero supply OR registered denom metadata. Without
+	// this guard, a bond minting the same denom as a liquidstake LST pool
+	// (or any other module-managed denom) would either intermingle supply
+	// invisibly OR — if the denom is locked by a MintCoinsRestriction —
+	// halt the chain when the bond's batch processor calls MintCoins from
+	// EndBlock. Symmetric to the equivalent guard in
+	// x/liquidstake/keeper/pool.go::registerPool.
+	if !k.BankKeeper.GetSupply(ctx, msg.Token).Amount.IsZero() {
+		return nil, errorsmod.Wrapf(types.ErrBondTokenAlreadyInUse,
+			"denom %s already has non-zero bank supply", msg.Token)
+	}
+	if k.BankKeeper.HasDenomMetaData(ctx, msg.Token) {
+		return nil, errorsmod.Wrapf(types.ErrBondTokenAlreadyInUse,
+			"denom %s already has bank denom metadata registered", msg.Token)
+	}
+
 	// Set state to open by default (overridden below if augmented function)
 	state := types.OpenState
 

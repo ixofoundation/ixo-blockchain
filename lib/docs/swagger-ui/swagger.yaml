@@ -51396,7 +51396,15 @@ paths:
                     title: member's blockchain address
                   period:
                     type: string
-                    title: period duration for budget reset (e.g., 30 days)
+                    description: >-
+                      period duration for budget reset (e.g., 30 days). Must be
+                      at least 24 hours
+
+                      (MinMemberBudgetPeriod). Periods shorter than 24 hours are
+                      rejected to
+
+                      prevent griefing via the lazy-reset loop in the intent
+                      handler.
                   period_spend_limit:
                     type: array
                     items:
@@ -51539,7 +51547,15 @@ paths:
                       title: member's blockchain address
                     period:
                       type: string
-                      title: period duration for budget reset (e.g., 30 days)
+                      description: >-
+                        period duration for budget reset (e.g., 30 days). Must
+                        be at least 24 hours
+
+                        (MinMemberBudgetPeriod). Periods shorter than 24 hours
+                        are rejected to
+
+                        prevent griefing via the lazy-reset loop in the intent
+                        handler.
                     period_spend_limit:
                       type: array
                       items:
@@ -55383,26 +55399,417 @@ paths:
           type: string
       tags:
         - Query
-  /ixo/liquidstake/v1beta1/params:
+  /ixo/liquidstake/v1beta1/module_params:
     get:
-      summary: Params returns parameters of the liquidstake module.
-      operationId: IXOLiquidStakeParams
+      summary: |-
+        ModuleParams returns the global, module-wide parameters (minimum stake
+        amount and global pause flag).
+      operationId: IXOLiquidStakeModuleParams
       responses:
         '200':
           description: A successful response.
           schema:
             type: object
             properties:
-              params:
+              module_params:
                 type: object
                 properties:
+                  min_liquid_stake_amount:
+                    type: string
+                    description: >-
+                      min_liquid_stake_amount is the minimum amount of native
+                      tokens that can
+
+                      be liquid-staked into any pool, applied across the entire
+                      module to
+
+                      minimise decimal loss and gas waste from dust amounts.
+                  module_paused:
+                    type: boolean
+                    description: >-
+                      module_paused is a global emergency kill switch. When
+                      true, ALL pools
+
+                      are paused regardless of their per-pool paused flag:
+                      liquid_stake,
+
+                      liquid_unstake, autocompounding, rebalancing, and
+                      BeginBlocker logic
+
+                      are halted module-wide. Used for migrations or critical
+                      incidents.
+                description: >-
+                  ModuleParams defines global, module-wide parameters that apply
+                  across every
+
+                  liquid staking pool.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      tags:
+        - Query
+  /ixo/liquidstake/v1beta1/pools:
+    get:
+      summary: Pools returns every registered pool's configuration, paginated.
+      operationId: IXOLiquidStakePools
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pools:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    pool_id:
+                      type: string
+                      description: >-
+                        pool_id is the unique, immutable identifier for this
+                        pool (e.g. "zero",
+
+                        "qi"). Used in storage keys, message routing, and proxy
+                        account
+
+                        derivation. Set at pool creation; cannot be changed.
+                    liquid_bond_denom:
+                      type: string
+                      description: >-
+                        liquid_bond_denom is the denomination of the LST minted
+                        by this pool
+
+                        (e.g. "uzero"). Must be globally unique across all
+                        pools. Immutable.
+                    proxy_account_address:
+                      type: string
+                      description: >-
+                        proxy_account_address is the bech32-encoded address of
+                        the per-pool
+
+                        delegation proxy account. All delegations,
+                        redelegations, unbondings,
+
+                        and reward withdrawals for this pool flow through this
+                        account.
+
+                        Derived deterministically from pool_id at creation;
+                        immutable.
+
+                        For the legacy "zero" pool migrated from pre-v7 state,
+                        this field
+
+                        holds the original LiquidStakeProxyAcc address so
+                        existing
+
+                        delegations are preserved without state migration.
+                    whitelisted_validators:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          validator_address:
+                            type: string
+                            title: >-
+                              validator_address defines the bech32-encoded
+                              address of the whitelisted
+
+                              validator
+                          target_weight:
+                            type: string
+                            title: >-
+                              target_weight specifies the target weight for
+                              liquid staking, unstaking
+
+                              amount, which is a value for calculating the real
+                              weight to be derived
+
+                              according to the active status
+                        description: >-
+                          WhitelistedValidator consists of the validator
+                          operator address and the
+
+                          target weight, which is a value for calculating the
+                          real weight to be derived
+
+                          according to the active status.
+                      description: >-
+                        whitelisted_validators are the validators eligible for
+                        delegation from
+
+                        this pool's proxy account. Target weights must sum to
+                        10000.
+                    unstake_fee_rate:
+                      type: string
+                      description: >-
+                        unstake_fee_rate is deducted from the unbonding amount
+                        when an unstake
+
+                        is requested against this pool.
+                    fee_account_address:
+                      type: string
+                      description: >-
+                        fee_account_address is the bech32-encoded address that
+                        accumulates the
+
+                        autocompound fee for this pool.
+                    autocompound_fee_rate:
+                      type: string
+                      description: >-
+                        autocompound_fee_rate is the fraction of accrued staking
+                        rewards taken
+
+                        by this pool as a protocol fee on each autocompound
+                        epoch and sent to
+
+                        fee_account_address.
+                    whitelist_admin_address:
+                      type: string
+                      description: >-
+                        whitelist_admin_address is the bech32-encoded address
+                        authorised to
+
+                        update this pool's whitelisted_validators,
+                        weighted_rewards_receivers,
+
+                        paused flag, and other mutable pool fields. Governance
+                        can also update
+
+                        these fields. The admin is also the only address allowed
+                        to call
+
+                        LiquidStake against this pool.
+                    paused:
+                      type: boolean
+                      description: >-
+                        paused is a per-pool safety toggle. When true, this
+                        specific pool's
+
+                        stake/unstake, autocompounding, and rebalancing are
+                        halted; other
+
+                        pools are unaffected. The global
+                        ModuleParams.module_paused flag
+
+                        overrides this and pauses every pool regardless of its
+                        per-pool value.
+                    weighted_rewards_receivers:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          address:
+                            type: string
+                          weight:
+                            type: string
+                        description: >-
+                          WeightedAddress represents an address with a weight
+                          assigned to it.
+
+                          The weight is used to determine the proportion of
+                          autocompounding
+
+                          rewards to be paid to the address.
+                      description: >-
+                        weighted_rewards_receivers are the addresses that
+                        receive a weighted
+
+                        share of this pool's autocompound rewards. The sum of
+                        weights must
+
+                        not exceed 1; the remainder is restaked to validators.
+                  description: >-
+                    Pool defines a single liquid staking instance with its own
+                    LST denom,
+
+                    validator whitelist, admin, and fee configuration. Each pool
+                    maintains an
+
+                    independent NetAmount/Supply ratio, so two pools' LST tokens
+                    are NOT
+
+                    fungible with each other and may diverge in IXO value over
+                    time.
+              pagination:
+                type: object
+                properties:
+                  next_key:
+                    type: string
+                    format: byte
+                    description: |-
+                      next_key is the key to be passed to PageRequest.key to
+                      query the next page most efficiently. It will be empty if
+                      there are no more results.
+                  total:
+                    type: string
+                    format: uint64
+                    title: >-
+                      total is total number of results available if
+                      PageRequest.count_total
+
+                      was set, its value is undefined otherwise
+                description: >-
+                  PageResponse is to be embedded in gRPC response messages where
+                  the
+
+                  corresponding request message has used PageRequest.
+
+                   message SomeResponse {
+                           repeated Bar results = 1;
+                           PageResponse page = 2;
+                   }
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type_url:
+                      type: string
+                    value:
+                      type: string
+                      format: byte
+      parameters:
+        - name: pagination.key
+          description: |-
+            key is a value returned in PageResponse.next_key to begin
+            querying the next page most efficiently. Only one of offset or key
+            should be set.
+          in: query
+          required: false
+          type: string
+          format: byte
+        - name: pagination.offset
+          description: >-
+            offset is a numeric offset that can be used when key is unavailable.
+
+            It is less efficient than using key. Only one of offset or key
+            should
+
+            be set.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.limit
+          description: >-
+            limit is the total number of results to be returned in the result
+            page.
+
+            If left empty it will default to a value to be set by each app.
+          in: query
+          required: false
+          type: string
+          format: uint64
+        - name: pagination.count_total
+          description: >-
+            count_total is set to true  to indicate that the result set should
+            include
+
+            a count of the total number of items available for pagination in
+            UIs.
+
+            count_total is only respected when offset is used. It is ignored
+            when key
+
+            is set.
+          in: query
+          required: false
+          type: boolean
+        - name: pagination.reverse
+          description: >-
+            reverse is set to true if results are to be returned in the
+            descending order.
+
+
+            Since: cosmos-sdk 0.43
+          in: query
+          required: false
+          type: boolean
+      tags:
+        - Query
+  /ixo/liquidstake/v1beta1/pools/{pool_id}:
+    get:
+      summary: Pool returns the configuration of a single pool by pool_id.
+      operationId: IXOLiquidStakePool
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              pool:
+                type: object
+                properties:
+                  pool_id:
+                    type: string
+                    description: >-
+                      pool_id is the unique, immutable identifier for this pool
+                      (e.g. "zero",
+
+                      "qi"). Used in storage keys, message routing, and proxy
+                      account
+
+                      derivation. Set at pool creation; cannot be changed.
                   liquid_bond_denom:
                     type: string
                     description: >-
-                      LiquidBondDenom specifies the denomination of the token
-                      receiving after
+                      liquid_bond_denom is the denomination of the LST minted by
+                      this pool
 
-                      liquid stake, The value is calculated through NetAmount.
+                      (e.g. "uzero"). Must be globally unique across all pools.
+                      Immutable.
+                  proxy_account_address:
+                    type: string
+                    description: >-
+                      proxy_account_address is the bech32-encoded address of the
+                      per-pool
+
+                      delegation proxy account. All delegations, redelegations,
+                      unbondings,
+
+                      and reward withdrawals for this pool flow through this
+                      account.
+
+                      Derived deterministically from pool_id at creation;
+                      immutable.
+
+                      For the legacy "zero" pool migrated from pre-v7 state,
+                      this field
+
+                      holds the original LiquidStakeProxyAcc address so existing
+
+                      delegations are preserved without state migration.
                   whitelisted_validators:
                     type: array
                     items:
@@ -55434,70 +55841,65 @@ paths:
 
                         according to the active status.
                     description: >-
-                      WhitelistedValidators specifies the validators elected to
-                      become Active
+                      whitelisted_validators are the validators eligible for
+                      delegation from
 
-                      Liquid Validators.
+                      this pool's proxy account. Target weights must sum to
+                      10000.
                   unstake_fee_rate:
                     type: string
-                    title: >-
-                      UnstakeFeeRate specifies the fee rate when liquid unstake
-                      is requested,
-
-                      unbonded by subtracting it from unbondingAmount
-                  min_liquid_stake_amount:
-                    type: string
                     description: >-
-                      MinLiquidStakingAmount specifies the minimum number of
-                      coins to be staked
+                      unstake_fee_rate is deducted from the unbonding amount
+                      when an unstake
 
-                      to the active liquid validators on liquid staking to
-                      minimize decimal loss
-
-                      and consider gas efficiency.
+                      is requested against this pool.
                   fee_account_address:
                     type: string
-                    description: |-
-                      FeeAccountAddress defines the bech32-encoded address of
-                      an account responsible for accumulating protocol fees.
+                    description: >-
+                      fee_account_address is the bech32-encoded address that
+                      accumulates the
+
+                      autocompound fee for this pool.
                   autocompound_fee_rate:
                     type: string
                     description: >-
-                      AutocompoundFeeRate specifies the fee rate for auto
-                      redelegating the stake
+                      autocompound_fee_rate is the fraction of accrued staking
+                      rewards taken
 
-                      rewards. The fee is taken in favour of the fee account
-                      (see
+                      by this pool as a protocol fee on each autocompound epoch
+                      and sent to
 
-                      FeeAccountAddress).
+                      fee_account_address.
                   whitelist_admin_address:
                     type: string
                     description: >-
-                      WhitelistAdminAddress the bech32-encoded address of an
-                      admin authority
+                      whitelist_admin_address is the bech32-encoded address
+                      authorised to
 
-                      that is allowed to update whitelisted validators or pause
-                      liquidstaking
+                      update this pool's whitelisted_validators,
+                      weighted_rewards_receivers,
 
-                      module entirely. It is also the only address that can
-                      update the
+                      paused flag, and other mutable pool fields. Governance can
+                      also update
 
-                      weighted_rewards_receivers.
+                      these fields. The admin is also the only address allowed
+                      to call
 
-                      The key is controlled by the ZERO dao.
-
-                      Pausing of the module can be required during important
-                      migrations or
-
-                      failures.
-                  module_paused:
+                      LiquidStake against this pool.
+                  paused:
                     type: boolean
                     description: >-
-                      ModulePaused is a safety toggle that allows to stop main
-                      module functions
+                      paused is a per-pool safety toggle. When true, this
+                      specific pool's
 
-                      such as stake/unstake/stake-to-lp and the BeginBlocker
-                      logic.
+                      stake/unstake, autocompounding, and rebalancing are
+                      halted; other
+
+                      pools are unaffected. The global
+                      ModuleParams.module_paused flag
+
+                      overrides this and pauses every pool regardless of its
+                      per-pool value.
                   weighted_rewards_receivers:
                     type: array
                     items:
@@ -55516,24 +55918,25 @@ paths:
 
                         rewards to be paid to the address.
                     description: >-
-                      weighted_rewards_receivers is the addresses to receive the
-                      staking
+                      weighted_rewards_receivers are the addresses that receive
+                      a weighted
 
-                      rewards on autocompounding with weights assigned to each
-                      address.
+                      share of this pool's autocompound rewards. The sum of
+                      weights must
 
-                      The total of weights in the list in not allowed to be
-                      greater than 1.
+                      not exceed 1; the remainder is restaked to validators.
+                description: >-
+                  Pool defines a single liquid staking instance with its own LST
+                  denom,
 
+                  validator whitelist, admin, and fee configuration. Each pool
+                  maintains an
 
-                      Eg. if the list has 1 address with weight 0.2, then on
-                      autocompounding
+                  independent NetAmount/Supply ratio, so two pools' LST tokens
+                  are NOT
 
-                      the staking rewards will be split between 0.2 for the
-                      weighted receiver
-
-                      and 0.8 gets auto-compounded to the proxy account.
-                description: Params defines the set of params for the liquidstake module.
+                  fungible with each other and may diverge in IXO value over
+                  time.
         default:
           description: An unexpected error response.
           schema:
@@ -55556,12 +55959,19 @@ paths:
                     value:
                       type: string
                       format: byte
+      parameters:
+        - name: pool_id
+          in: path
+          required: true
+          type: string
       tags:
         - Query
-  /ixo/liquidstake/v1beta1/states:
+  /ixo/liquidstake/v1beta1/pools/{pool_id}/states:
     get:
-      summary: States returns states of the liquidstake module.
-      operationId: States
+      summary: |-
+        States returns the NetAmountState (rates, supplies, balances) for a
+        single pool.
+      operationId: IXOLiquidStakeStates
       responses:
         '200':
           description: A successful response.
@@ -55573,63 +55983,82 @@ paths:
                 properties:
                   stake_rate:
                     type: string
-                    title: >-
-                      stake_rate is the rate at which the liquid staking module
-                      mints stkIXO
+                    description: >-
+                      stake_rate is the mint rate when staking into this pool.
+
+                      Always 1.0: 1 native token mints 1 LST regardless of
+                      accrued rewards.
                   unstake_rate:
                     type: string
-                    title: >-
-                      unstake_rate is the rate at which the liquid staking
-                      module burns stkIXO
+                    description: >-
+                      unstake_rate is the burn rate when unstaking from this
+                      pool, equal to
+
+                      net_amount / stkixo_total_supply. Diverges from 1.0 as
+                      rewards accrue
+
+                      or slashing occurs.
                   stkixo_total_supply:
                     type: string
-                    title: >-
-                      btoken_total_supply returns the total supply of uzero
-                      (stkIXO denom)
+                    description: >-
+                      stkixo_total_supply is the total supply of this pool's LST
+                      denom.
                   net_amount:
                     type: string
-                    title: >-
-                      net_amount is proxy account's total liquid tokens + total
-                      unbonding balance
+                    description: >-
+                      net_amount is this pool's total liquid tokens + total
+                      unbonding balance,
+
+                      measured at its own proxy account.
                   total_del_shares:
                     type: string
-                    title: >-
-                      total_del_shares define the delegation shares of all
-                      liquid validators
+                    description: >-
+                      total_del_shares is the sum of delegation shares held by
+                      this pool's
+
+                      proxy account across all of its liquid validators.
                   total_liquid_tokens:
                     type: string
-                    title: >-
-                      total_liquid_tokens define the token amount worth of
-                      delegation shares of
+                    description: >-
+                      total_liquid_tokens is the token-equivalent of
+                      total_del_shares with
 
-                      all liquid validator (slashing applied amount)
+                      slashing applied, summed across this pool's liquid
+                      validators.
                   total_remaining_rewards:
                     type: string
-                    title: >-
-                      total_remaining_rewards define the sum of remaining
-                      rewards of proxy
+                    description: >-
+                      total_remaining_rewards is the sum of unwithdrawn staking
+                      rewards owed
 
-                      account by all liquid validators
+                      to this pool's proxy account from all its liquid
+                      validators.
                   total_unbonding_balance:
                     type: string
-                    title: >-
-                      total_unbonding_balance define the unbonding balance of
-                      proxy account by
+                    description: >-
+                      total_unbonding_balance is the sum of unbonding amounts
+                      (slashing
 
-                      all liquid validator (slashing applied amount)
+                      applied) for this pool's proxy account.
                   proxy_acc_balance:
                     type: string
-                    title: >-
-                      proxy_acc_balance define the balance of proxy account for
-                      the native token
+                    description: >-
+                      proxy_acc_balance is the spendable native-token balance
+                      currently sitting
+
+                      in this pool's proxy account (rewards withdrawn but not
+                      yet redelegated).
                 description: >-
-                  NetAmountState is type for net amount raw data and mint rate,
-                  This is a value
+                  NetAmountState holds the raw amounts and exchange rates for a
+                  single pool.
 
-                  that depends on the several module state every time, so it is
-                  used only for
+                  Computed on the fly from pool state every time (never
+                  persisted), and used
 
-                  calculation and query and is not stored in kv.
+                  for unstake-rate calculation and queries. Each pool has its
+                  own independent
+
+                  NetAmountState.
         default:
           description: An unexpected error response.
           schema:
@@ -55652,16 +56081,19 @@ paths:
                     value:
                       type: string
                       format: byte
+      parameters:
+        - name: pool_id
+          in: path
+          required: true
+          type: string
       tags:
         - Query
-  /ixo/liquidstake/v1beta1/validators:
+  /ixo/liquidstake/v1beta1/pools/{pool_id}/validators:
     get:
-      summary: >-
-        LiquidValidators returns liquid validators with states of the
-        liquidstake
-
-        module.
-      operationId: LiquidValidators
+      summary: |-
+        LiquidValidators returns liquid validators (with state) for a single
+        pool.
+      operationId: IXOLiquidStakeLiquidValidators
       responses:
         '200':
           description: A successful response.
@@ -55737,6 +56169,11 @@ paths:
                     value:
                       type: string
                       format: byte
+      parameters:
+        - name: pool_id
+          in: path
+          required: true
+          type: string
       tags:
         - Query
   /ixo/mint/v1beta1/epoch_provisions:
@@ -90622,7 +91059,13 @@ definitions:
         title: member's blockchain address
       period:
         type: string
-        title: period duration for budget reset (e.g., 30 days)
+        description: >-
+          period duration for budget reset (e.g., 30 days). Must be at least 24
+          hours
+
+          (MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to
+
+          prevent griefing via the lazy-reset loop in the intent handler.
       period_spend_limit:
         type: array
         items:
@@ -92483,7 +92926,14 @@ definitions:
               title: member's blockchain address
             period:
               type: string
-              title: period duration for budget reset (e.g., 30 days)
+              description: >-
+                period duration for budget reset (e.g., 30 days). Must be at
+                least 24 hours
+
+                (MinMemberBudgetPeriod). Periods shorter than 24 hours are
+                rejected to
+
+                prevent griefing via the lazy-reset loop in the intent handler.
             period_spend_limit:
               type: array
               items:
@@ -92607,7 +93057,14 @@ definitions:
             title: member's blockchain address
           period:
             type: string
-            title: period duration for budget reset (e.g., 30 days)
+            description: >-
+              period duration for budget reset (e.g., 30 days). Must be at least
+              24 hours
+
+              (MinMemberBudgetPeriod). Periods shorter than 24 hours are
+              rejected to
+
+              prevent griefing via the lazy-reset loop in the intent handler.
           period_spend_limit:
             type: array
             items:
@@ -95385,70 +95842,118 @@ definitions:
     description: |-
       LiquidValidatorState is type LiquidValidator with state added to return to
       query results.
+  ixo.liquidstake.v1beta1.ModuleParams:
+    type: object
+    properties:
+      min_liquid_stake_amount:
+        type: string
+        description: >-
+          min_liquid_stake_amount is the minimum amount of native tokens that
+          can
+
+          be liquid-staked into any pool, applied across the entire module to
+
+          minimise decimal loss and gas waste from dust amounts.
+      module_paused:
+        type: boolean
+        description: |-
+          module_paused is a global emergency kill switch. When true, ALL pools
+          are paused regardless of their per-pool paused flag: liquid_stake,
+          liquid_unstake, autocompounding, rebalancing, and BeginBlocker logic
+          are halted module-wide. Used for migrations or critical incidents.
+    description: >-
+      ModuleParams defines global, module-wide parameters that apply across
+      every
+
+      liquid staking pool.
   ixo.liquidstake.v1beta1.NetAmountState:
     type: object
     properties:
       stake_rate:
         type: string
-        title: stake_rate is the rate at which the liquid staking module mints stkIXO
+        description: |-
+          stake_rate is the mint rate when staking into this pool.
+          Always 1.0: 1 native token mints 1 LST regardless of accrued rewards.
       unstake_rate:
         type: string
-        title: >-
-          unstake_rate is the rate at which the liquid staking module burns
-          stkIXO
+        description: |-
+          unstake_rate is the burn rate when unstaking from this pool, equal to
+          net_amount / stkixo_total_supply. Diverges from 1.0 as rewards accrue
+          or slashing occurs.
       stkixo_total_supply:
         type: string
-        title: btoken_total_supply returns the total supply of uzero (stkIXO denom)
+        description: stkixo_total_supply is the total supply of this pool's LST denom.
       net_amount:
         type: string
-        title: >-
-          net_amount is proxy account's total liquid tokens + total unbonding
-          balance
+        description: >-
+          net_amount is this pool's total liquid tokens + total unbonding
+          balance,
+
+          measured at its own proxy account.
       total_del_shares:
         type: string
-        title: total_del_shares define the delegation shares of all liquid validators
+        description: |-
+          total_del_shares is the sum of delegation shares held by this pool's
+          proxy account across all of its liquid validators.
       total_liquid_tokens:
         type: string
-        title: >-
-          total_liquid_tokens define the token amount worth of delegation shares
-          of
-
-          all liquid validator (slashing applied amount)
+        description: |-
+          total_liquid_tokens is the token-equivalent of total_del_shares with
+          slashing applied, summed across this pool's liquid validators.
       total_remaining_rewards:
         type: string
-        title: |-
-          total_remaining_rewards define the sum of remaining rewards of proxy
-          account by all liquid validators
+        description: |-
+          total_remaining_rewards is the sum of unwithdrawn staking rewards owed
+          to this pool's proxy account from all its liquid validators.
       total_unbonding_balance:
         type: string
-        title: >-
-          total_unbonding_balance define the unbonding balance of proxy account
-          by
-
-          all liquid validator (slashing applied amount)
+        description: |-
+          total_unbonding_balance is the sum of unbonding amounts (slashing
+          applied) for this pool's proxy account.
       proxy_acc_balance:
         type: string
-        title: >-
-          proxy_acc_balance define the balance of proxy account for the native
-          token
+        description: >-
+          proxy_acc_balance is the spendable native-token balance currently
+          sitting
+
+          in this pool's proxy account (rewards withdrawn but not yet
+          redelegated).
     description: >-
-      NetAmountState is type for net amount raw data and mint rate, This is a
-      value
+      NetAmountState holds the raw amounts and exchange rates for a single pool.
 
-      that depends on the several module state every time, so it is used only
-      for
+      Computed on the fly from pool state every time (never persisted), and used
 
-      calculation and query and is not stored in kv.
-  ixo.liquidstake.v1beta1.Params:
+      for unstake-rate calculation and queries. Each pool has its own
+      independent
+
+      NetAmountState.
+  ixo.liquidstake.v1beta1.Pool:
     type: object
     properties:
-      liquid_bond_denom:
+      pool_id:
         type: string
         description: >-
-          LiquidBondDenom specifies the denomination of the token receiving
-          after
+          pool_id is the unique, immutable identifier for this pool (e.g.
+          "zero",
 
-          liquid stake, The value is calculated through NetAmount.
+          "qi"). Used in storage keys, message routing, and proxy account
+
+          derivation. Set at pool creation; cannot be changed.
+      liquid_bond_denom:
+        type: string
+        description: |-
+          liquid_bond_denom is the denomination of the LST minted by this pool
+          (e.g. "uzero"). Must be globally unique across all pools. Immutable.
+      proxy_account_address:
+        type: string
+        description: |-
+          proxy_account_address is the bech32-encoded address of the per-pool
+          delegation proxy account. All delegations, redelegations, unbondings,
+          and reward withdrawals for this pool flow through this account.
+          Derived deterministically from pool_id at creation; immutable.
+          For the legacy "zero" pool migrated from pre-v7 state, this field
+          holds the original LiquidStakeProxyAcc address so existing
+          delegations are preserved without state migration.
       whitelisted_validators:
         type: array
         items:
@@ -95479,66 +95984,40 @@ definitions:
             be derived
 
             according to the active status.
-        description: >-
-          WhitelistedValidators specifies the validators elected to become
-          Active
-
-          Liquid Validators.
+        description: |-
+          whitelisted_validators are the validators eligible for delegation from
+          this pool's proxy account. Target weights must sum to 10000.
       unstake_fee_rate:
         type: string
-        title: >-
-          UnstakeFeeRate specifies the fee rate when liquid unstake is
-          requested,
-
-          unbonded by subtracting it from unbondingAmount
-      min_liquid_stake_amount:
-        type: string
-        description: >-
-          MinLiquidStakingAmount specifies the minimum number of coins to be
-          staked
-
-          to the active liquid validators on liquid staking to minimize decimal
-          loss
-
-          and consider gas efficiency.
+        description: |-
+          unstake_fee_rate is deducted from the unbonding amount when an unstake
+          is requested against this pool.
       fee_account_address:
         type: string
         description: |-
-          FeeAccountAddress defines the bech32-encoded address of
-          an account responsible for accumulating protocol fees.
+          fee_account_address is the bech32-encoded address that accumulates the
+          autocompound fee for this pool.
       autocompound_fee_rate:
         type: string
-        description: >-
-          AutocompoundFeeRate specifies the fee rate for auto redelegating the
-          stake
-
-          rewards. The fee is taken in favour of the fee account (see
-
-          FeeAccountAddress).
+        description: |-
+          autocompound_fee_rate is the fraction of accrued staking rewards taken
+          by this pool as a protocol fee on each autocompound epoch and sent to
+          fee_account_address.
       whitelist_admin_address:
         type: string
-        description: >-
-          WhitelistAdminAddress the bech32-encoded address of an admin authority
-
-          that is allowed to update whitelisted validators or pause
-          liquidstaking
-
-          module entirely. It is also the only address that can update the
-
-          weighted_rewards_receivers.
-
-          The key is controlled by the ZERO dao.
-
-          Pausing of the module can be required during important migrations or
-
-          failures.
-      module_paused:
+        description: |-
+          whitelist_admin_address is the bech32-encoded address authorised to
+          update this pool's whitelisted_validators, weighted_rewards_receivers,
+          paused flag, and other mutable pool fields. Governance can also update
+          these fields. The admin is also the only address allowed to call
+          LiquidStake against this pool.
+      paused:
         type: boolean
-        description: >-
-          ModulePaused is a safety toggle that allows to stop main module
-          functions
-
-          such as stake/unstake/stake-to-lp and the BeginBlocker logic.
+        description: |-
+          paused is a per-pool safety toggle. When true, this specific pool's
+          stake/unstake, autocompounding, and rebalancing are halted; other
+          pools are unaffected. The global ModuleParams.module_paused flag
+          overrides this and pauses every pool regardless of its per-pool value.
       weighted_rewards_receivers:
         type: array
         items:
@@ -95552,21 +96031,15 @@ definitions:
             WeightedAddress represents an address with a weight assigned to it.
             The weight is used to determine the proportion of autocompounding
             rewards to be paid to the address.
-        description: >-
-          weighted_rewards_receivers is the addresses to receive the staking
-
-          rewards on autocompounding with weights assigned to each address.
-
-          The total of weights in the list in not allowed to be greater than 1.
-
-
-          Eg. if the list has 1 address with weight 0.2, then on autocompounding
-
-          the staking rewards will be split between 0.2 for the weighted
-          receiver
-
-          and 0.8 gets auto-compounded to the proxy account.
-    description: Params defines the set of params for the liquidstake module.
+        description: |-
+          weighted_rewards_receivers are the addresses that receive a weighted
+          share of this pool's autocompound rewards. The sum of weights must
+          not exceed 1; the remainder is restaked to validators.
+    description: |-
+      Pool defines a single liquid staking instance with its own LST denom,
+      validator whitelist, admin, and fee configuration. Each pool maintains an
+      independent NetAmount/Supply ratio, so two pools' LST tokens are NOT
+      fungible with each other and may diverge in IXO value over time.
   ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse:
     type: object
     properties:
@@ -95614,19 +96087,80 @@ definitions:
             return to
 
             query results.
-  ixo.liquidstake.v1beta1.QueryParamsResponse:
+  ixo.liquidstake.v1beta1.QueryModuleParamsResponse:
     type: object
     properties:
-      params:
+      module_params:
         type: object
         properties:
+          min_liquid_stake_amount:
+            type: string
+            description: >-
+              min_liquid_stake_amount is the minimum amount of native tokens
+              that can
+
+              be liquid-staked into any pool, applied across the entire module
+              to
+
+              minimise decimal loss and gas waste from dust amounts.
+          module_paused:
+            type: boolean
+            description: >-
+              module_paused is a global emergency kill switch. When true, ALL
+              pools
+
+              are paused regardless of their per-pool paused flag: liquid_stake,
+
+              liquid_unstake, autocompounding, rebalancing, and BeginBlocker
+              logic
+
+              are halted module-wide. Used for migrations or critical incidents.
+        description: >-
+          ModuleParams defines global, module-wide parameters that apply across
+          every
+
+          liquid staking pool.
+  ixo.liquidstake.v1beta1.QueryPoolResponse:
+    type: object
+    properties:
+      pool:
+        type: object
+        properties:
+          pool_id:
+            type: string
+            description: >-
+              pool_id is the unique, immutable identifier for this pool (e.g.
+              "zero",
+
+              "qi"). Used in storage keys, message routing, and proxy account
+
+              derivation. Set at pool creation; cannot be changed.
           liquid_bond_denom:
             type: string
             description: >-
-              LiquidBondDenom specifies the denomination of the token receiving
-              after
+              liquid_bond_denom is the denomination of the LST minted by this
+              pool
 
-              liquid stake, The value is calculated through NetAmount.
+              (e.g. "uzero"). Must be globally unique across all pools.
+              Immutable.
+          proxy_account_address:
+            type: string
+            description: >-
+              proxy_account_address is the bech32-encoded address of the
+              per-pool
+
+              delegation proxy account. All delegations, redelegations,
+              unbondings,
+
+              and reward withdrawals for this pool flow through this account.
+
+              Derived deterministically from pool_id at creation; immutable.
+
+              For the legacy "zero" pool migrated from pre-v7 state, this field
+
+              holds the original LiquidStakeProxyAcc address so existing
+
+              delegations are preserved without state migration.
           whitelisted_validators:
             type: array
             items:
@@ -95658,67 +96192,61 @@ definitions:
 
                 according to the active status.
             description: >-
-              WhitelistedValidators specifies the validators elected to become
-              Active
+              whitelisted_validators are the validators eligible for delegation
+              from
 
-              Liquid Validators.
+              this pool's proxy account. Target weights must sum to 10000.
           unstake_fee_rate:
             type: string
-            title: >-
-              UnstakeFeeRate specifies the fee rate when liquid unstake is
-              requested,
-
-              unbonded by subtracting it from unbondingAmount
-          min_liquid_stake_amount:
-            type: string
             description: >-
-              MinLiquidStakingAmount specifies the minimum number of coins to be
-              staked
+              unstake_fee_rate is deducted from the unbonding amount when an
+              unstake
 
-              to the active liquid validators on liquid staking to minimize
-              decimal loss
-
-              and consider gas efficiency.
+              is requested against this pool.
           fee_account_address:
             type: string
-            description: |-
-              FeeAccountAddress defines the bech32-encoded address of
-              an account responsible for accumulating protocol fees.
+            description: >-
+              fee_account_address is the bech32-encoded address that accumulates
+              the
+
+              autocompound fee for this pool.
           autocompound_fee_rate:
             type: string
             description: >-
-              AutocompoundFeeRate specifies the fee rate for auto redelegating
-              the stake
+              autocompound_fee_rate is the fraction of accrued staking rewards
+              taken
 
-              rewards. The fee is taken in favour of the fee account (see
+              by this pool as a protocol fee on each autocompound epoch and sent
+              to
 
-              FeeAccountAddress).
+              fee_account_address.
           whitelist_admin_address:
             type: string
             description: >-
-              WhitelistAdminAddress the bech32-encoded address of an admin
-              authority
+              whitelist_admin_address is the bech32-encoded address authorised
+              to
 
-              that is allowed to update whitelisted validators or pause
-              liquidstaking
+              update this pool's whitelisted_validators,
+              weighted_rewards_receivers,
 
-              module entirely. It is also the only address that can update the
+              paused flag, and other mutable pool fields. Governance can also
+              update
 
-              weighted_rewards_receivers.
+              these fields. The admin is also the only address allowed to call
 
-              The key is controlled by the ZERO dao.
-
-              Pausing of the module can be required during important migrations
-              or
-
-              failures.
-          module_paused:
+              LiquidStake against this pool.
+          paused:
             type: boolean
             description: >-
-              ModulePaused is a safety toggle that allows to stop main module
-              functions
+              paused is a per-pool safety toggle. When true, this specific
+              pool's
 
-              such as stake/unstake/stake-to-lp and the BeginBlocker logic.
+              stake/unstake, autocompounding, and rebalancing are halted; other
+
+              pools are unaffected. The global ModuleParams.module_paused flag
+
+              overrides this and pauses every pool regardless of its per-pool
+              value.
           weighted_rewards_receivers:
             type: array
             items:
@@ -95737,22 +96265,213 @@ definitions:
 
                 rewards to be paid to the address.
             description: >-
-              weighted_rewards_receivers is the addresses to receive the staking
+              weighted_rewards_receivers are the addresses that receive a
+              weighted
 
-              rewards on autocompounding with weights assigned to each address.
+              share of this pool's autocompound rewards. The sum of weights must
 
-              The total of weights in the list in not allowed to be greater than
-              1.
+              not exceed 1; the remainder is restaked to validators.
+        description: >-
+          Pool defines a single liquid staking instance with its own LST denom,
 
+          validator whitelist, admin, and fee configuration. Each pool maintains
+          an
 
-              Eg. if the list has 1 address with weight 0.2, then on
-              autocompounding
+          independent NetAmount/Supply ratio, so two pools' LST tokens are NOT
 
-              the staking rewards will be split between 0.2 for the weighted
-              receiver
+          fungible with each other and may diverge in IXO value over time.
+  ixo.liquidstake.v1beta1.QueryPoolsResponse:
+    type: object
+    properties:
+      pools:
+        type: array
+        items:
+          type: object
+          properties:
+            pool_id:
+              type: string
+              description: >-
+                pool_id is the unique, immutable identifier for this pool (e.g.
+                "zero",
 
-              and 0.8 gets auto-compounded to the proxy account.
-        description: Params defines the set of params for the liquidstake module.
+                "qi"). Used in storage keys, message routing, and proxy account
+
+                derivation. Set at pool creation; cannot be changed.
+            liquid_bond_denom:
+              type: string
+              description: >-
+                liquid_bond_denom is the denomination of the LST minted by this
+                pool
+
+                (e.g. "uzero"). Must be globally unique across all pools.
+                Immutable.
+            proxy_account_address:
+              type: string
+              description: >-
+                proxy_account_address is the bech32-encoded address of the
+                per-pool
+
+                delegation proxy account. All delegations, redelegations,
+                unbondings,
+
+                and reward withdrawals for this pool flow through this account.
+
+                Derived deterministically from pool_id at creation; immutable.
+
+                For the legacy "zero" pool migrated from pre-v7 state, this
+                field
+
+                holds the original LiquidStakeProxyAcc address so existing
+
+                delegations are preserved without state migration.
+            whitelisted_validators:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator_address:
+                    type: string
+                    title: >-
+                      validator_address defines the bech32-encoded address of
+                      the whitelisted
+
+                      validator
+                  target_weight:
+                    type: string
+                    title: >-
+                      target_weight specifies the target weight for liquid
+                      staking, unstaking
+
+                      amount, which is a value for calculating the real weight
+                      to be derived
+
+                      according to the active status
+                description: >-
+                  WhitelistedValidator consists of the validator operator
+                  address and the
+
+                  target weight, which is a value for calculating the real
+                  weight to be derived
+
+                  according to the active status.
+              description: >-
+                whitelisted_validators are the validators eligible for
+                delegation from
+
+                this pool's proxy account. Target weights must sum to 10000.
+            unstake_fee_rate:
+              type: string
+              description: >-
+                unstake_fee_rate is deducted from the unbonding amount when an
+                unstake
+
+                is requested against this pool.
+            fee_account_address:
+              type: string
+              description: >-
+                fee_account_address is the bech32-encoded address that
+                accumulates the
+
+                autocompound fee for this pool.
+            autocompound_fee_rate:
+              type: string
+              description: >-
+                autocompound_fee_rate is the fraction of accrued staking rewards
+                taken
+
+                by this pool as a protocol fee on each autocompound epoch and
+                sent to
+
+                fee_account_address.
+            whitelist_admin_address:
+              type: string
+              description: >-
+                whitelist_admin_address is the bech32-encoded address authorised
+                to
+
+                update this pool's whitelisted_validators,
+                weighted_rewards_receivers,
+
+                paused flag, and other mutable pool fields. Governance can also
+                update
+
+                these fields. The admin is also the only address allowed to call
+
+                LiquidStake against this pool.
+            paused:
+              type: boolean
+              description: >-
+                paused is a per-pool safety toggle. When true, this specific
+                pool's
+
+                stake/unstake, autocompounding, and rebalancing are halted;
+                other
+
+                pools are unaffected. The global ModuleParams.module_paused flag
+
+                overrides this and pauses every pool regardless of its per-pool
+                value.
+            weighted_rewards_receivers:
+              type: array
+              items:
+                type: object
+                properties:
+                  address:
+                    type: string
+                  weight:
+                    type: string
+                description: >-
+                  WeightedAddress represents an address with a weight assigned
+                  to it.
+
+                  The weight is used to determine the proportion of
+                  autocompounding
+
+                  rewards to be paid to the address.
+              description: >-
+                weighted_rewards_receivers are the addresses that receive a
+                weighted
+
+                share of this pool's autocompound rewards. The sum of weights
+                must
+
+                not exceed 1; the remainder is restaked to validators.
+          description: >-
+            Pool defines a single liquid staking instance with its own LST
+            denom,
+
+            validator whitelist, admin, and fee configuration. Each pool
+            maintains an
+
+            independent NetAmount/Supply ratio, so two pools' LST tokens are NOT
+
+            fungible with each other and may diverge in IXO value over time.
+      pagination:
+        type: object
+        properties:
+          next_key:
+            type: string
+            format: byte
+            description: |-
+              next_key is the key to be passed to PageRequest.key to
+              query the next page most efficiently. It will be empty if
+              there are no more results.
+          total:
+            type: string
+            format: uint64
+            title: >-
+              total is total number of results available if
+              PageRequest.count_total
+
+              was set, its value is undefined otherwise
+        description: |-
+          PageResponse is to be embedded in gRPC response messages where the
+          corresponding request message has used PageRequest.
+
+           message SomeResponse {
+                   repeated Bar results = 1;
+                   PageResponse page = 2;
+           }
   ixo.liquidstake.v1beta1.QueryStatesResponse:
     type: object
     properties:
@@ -95761,63 +96480,76 @@ definitions:
         properties:
           stake_rate:
             type: string
-            title: >-
-              stake_rate is the rate at which the liquid staking module mints
-              stkIXO
+            description: >-
+              stake_rate is the mint rate when staking into this pool.
+
+              Always 1.0: 1 native token mints 1 LST regardless of accrued
+              rewards.
           unstake_rate:
             type: string
-            title: >-
-              unstake_rate is the rate at which the liquid staking module burns
-              stkIXO
+            description: >-
+              unstake_rate is the burn rate when unstaking from this pool, equal
+              to
+
+              net_amount / stkixo_total_supply. Diverges from 1.0 as rewards
+              accrue
+
+              or slashing occurs.
           stkixo_total_supply:
             type: string
-            title: >-
-              btoken_total_supply returns the total supply of uzero (stkIXO
-              denom)
+            description: stkixo_total_supply is the total supply of this pool's LST denom.
           net_amount:
             type: string
-            title: >-
-              net_amount is proxy account's total liquid tokens + total
-              unbonding balance
+            description: >-
+              net_amount is this pool's total liquid tokens + total unbonding
+              balance,
+
+              measured at its own proxy account.
           total_del_shares:
             type: string
-            title: >-
-              total_del_shares define the delegation shares of all liquid
-              validators
+            description: >-
+              total_del_shares is the sum of delegation shares held by this
+              pool's
+
+              proxy account across all of its liquid validators.
           total_liquid_tokens:
             type: string
-            title: >-
-              total_liquid_tokens define the token amount worth of delegation
-              shares of
+            description: >-
+              total_liquid_tokens is the token-equivalent of total_del_shares
+              with
 
-              all liquid validator (slashing applied amount)
+              slashing applied, summed across this pool's liquid validators.
           total_remaining_rewards:
             type: string
-            title: >-
-              total_remaining_rewards define the sum of remaining rewards of
-              proxy
+            description: >-
+              total_remaining_rewards is the sum of unwithdrawn staking rewards
+              owed
 
-              account by all liquid validators
+              to this pool's proxy account from all its liquid validators.
           total_unbonding_balance:
             type: string
-            title: >-
-              total_unbonding_balance define the unbonding balance of proxy
-              account by
-
-              all liquid validator (slashing applied amount)
+            description: |-
+              total_unbonding_balance is the sum of unbonding amounts (slashing
+              applied) for this pool's proxy account.
           proxy_acc_balance:
             type: string
-            title: >-
-              proxy_acc_balance define the balance of proxy account for the
-              native token
+            description: >-
+              proxy_acc_balance is the spendable native-token balance currently
+              sitting
+
+              in this pool's proxy account (rewards withdrawn but not yet
+              redelegated).
         description: >-
-          NetAmountState is type for net amount raw data and mint rate, This is
-          a value
+          NetAmountState holds the raw amounts and exchange rates for a single
+          pool.
 
-          that depends on the several module state every time, so it is used
-          only for
+          Computed on the fly from pool state every time (never persisted), and
+          used
 
-          calculation and query and is not stored in kv.
+          for unstake-rate calculation and queries. Each pool has its own
+          independent
+
+          NetAmountState.
   ixo.liquidstake.v1beta1.ValidatorStatus:
     type: string
     enum:

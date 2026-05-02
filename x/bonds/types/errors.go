@@ -54,4 +54,5 @@ var (
 	ErrInvalidStateProgression              = errorsmod.Register(DefaultCodespace, 44, "invalid state progression requested")
 	ErrCannotAllowSellsAndWithdrawals       = errorsmod.Register(DefaultCodespace, 45, "cannot allow both sells and reserve withdrawals")
 	ErrInsufficientReserveForWithdraw       = errorsmod.Register(DefaultCodespace, 46, "requested withdraw amount is greater than available reserve")
+	ErrBondTokenAlreadyInUse                = errorsmod.Register(DefaultCodespace, 47, "bond token denom is already in active use elsewhere in the bank module (registered metadata or non-zero supply); pick a different token symbol")
 )

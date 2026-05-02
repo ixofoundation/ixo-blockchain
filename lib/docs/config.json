@@ -240,7 +240,11 @@
       "url": "./tmp-swagger-gen/ixo/liquidstake/v1beta1/query.swagger.json",
       "operationIds": {
         "rename": {
-          "Params": "IXOLiquidStakeParams"
+          "ModuleParams": "IXOLiquidStakeModuleParams",
+          "Pool": "IXOLiquidStakePool",
+          "Pools": "IXOLiquidStakePools",
+          "LiquidValidators": "IXOLiquidStakeLiquidValidators",
+          "States": "IXOLiquidStakeStates"
         }
       }
     },

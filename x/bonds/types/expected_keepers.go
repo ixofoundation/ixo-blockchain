@@ -28,5 +28,7 @@ type BankKeeper interface {
 	MintCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
 	BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error
 	GetBalance(ctx context.Context, addr sdk.AccAddress, denom string) sdk.Coin
+	GetSupply(ctx context.Context, denom string) sdk.Coin
+	HasDenomMetaData(ctx context.Context, denom string) bool
 	IterateAllBalances(ctx context.Context, cb func(address sdk.AccAddress, coin sdk.Coin) (stop bool))
 }

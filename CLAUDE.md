@@ -83,7 +83,7 @@ Each module in `/x/{module}/` follows standard Cosmos SDK structure:
 - `types/` - Messages, genesis, keys, errors, events
 - `keeper/` - State management and business logic
 - `client/cli/` - CLI commands
-- `spec/` - Module specification docs (for bonds, iid, entity, claims, token)
+- `spec/` - Module specification docs (for bonds, iid, entity, claims, token, liquidstake)
 
 ### Key Dependencies
 - Cosmos SDK modules: auth, bank, staking, gov, distribution, slashing, evidence, feegrant, authz, params, crisis, consensus, upgrade

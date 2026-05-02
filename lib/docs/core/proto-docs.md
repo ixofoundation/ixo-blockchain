@@ -138,6 +138,9 @@
     - [CollectionUpdatedEvent](#ixo.claims.v1beta1.CollectionUpdatedEvent)
     - [IntentSubmittedEvent](#ixo.claims.v1beta1.IntentSubmittedEvent)
     - [IntentUpdatedEvent](#ixo.claims.v1beta1.IntentUpdatedEvent)
+    - [MemberBudgetCreatedEvent](#ixo.claims.v1beta1.MemberBudgetCreatedEvent)
+    - [MemberBudgetRemovedEvent](#ixo.claims.v1beta1.MemberBudgetRemovedEvent)
+    - [MemberBudgetUpdatedEvent](#ixo.claims.v1beta1.MemberBudgetUpdatedEvent)
     - [PaymentWithdrawCreatedEvent](#ixo.claims.v1beta1.PaymentWithdrawCreatedEvent)
     - [PaymentWithdrawnEvent](#ixo.claims.v1beta1.PaymentWithdrawnEvent)
   
@@ -350,8 +353,10 @@
 - [ixo/liquidstake/v1beta1/liquidstake.proto](#ixo/liquidstake/v1beta1/liquidstake.proto)
     - [LiquidValidator](#ixo.liquidstake.v1beta1.LiquidValidator)
     - [LiquidValidatorState](#ixo.liquidstake.v1beta1.LiquidValidatorState)
+    - [ModuleParams](#ixo.liquidstake.v1beta1.ModuleParams)
     - [NetAmountState](#ixo.liquidstake.v1beta1.NetAmountState)
     - [Params](#ixo.liquidstake.v1beta1.Params)
+    - [Pool](#ixo.liquidstake.v1beta1.Pool)
     - [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress)
     - [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator)
   
@@ -361,18 +366,25 @@
     - [AddLiquidValidatorEvent](#ixo.liquidstake.v1beta1.AddLiquidValidatorEvent)
     - [AutocompoundStakingRewardsEvent](#ixo.liquidstake.v1beta1.AutocompoundStakingRewardsEvent)
     - [LiquidStakeEvent](#ixo.liquidstake.v1beta1.LiquidStakeEvent)
-    - [LiquidStakeParamsUpdatedEvent](#ixo.liquidstake.v1beta1.LiquidStakeParamsUpdatedEvent)
     - [LiquidUnstakeEvent](#ixo.liquidstake.v1beta1.LiquidUnstakeEvent)
+    - [ModuleParamsUpdatedEvent](#ixo.liquidstake.v1beta1.ModuleParamsUpdatedEvent)
+    - [PoolCreatedEvent](#ixo.liquidstake.v1beta1.PoolCreatedEvent)
+    - [PoolUpdatedEvent](#ixo.liquidstake.v1beta1.PoolUpdatedEvent)
     - [RebalancedLiquidStakeEvent](#ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent)
   
 - [ixo/liquidstake/v1beta1/genesis.proto](#ixo/liquidstake/v1beta1/genesis.proto)
     - [GenesisState](#ixo.liquidstake.v1beta1.GenesisState)
+    - [PoolLiquidValidators](#ixo.liquidstake.v1beta1.PoolLiquidValidators)
   
 - [ixo/liquidstake/v1beta1/query.proto](#ixo/liquidstake/v1beta1/query.proto)
     - [QueryLiquidValidatorsRequest](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest)
     - [QueryLiquidValidatorsResponse](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse)
-    - [QueryParamsRequest](#ixo.liquidstake.v1beta1.QueryParamsRequest)
-    - [QueryParamsResponse](#ixo.liquidstake.v1beta1.QueryParamsResponse)
+    - [QueryModuleParamsRequest](#ixo.liquidstake.v1beta1.QueryModuleParamsRequest)
+    - [QueryModuleParamsResponse](#ixo.liquidstake.v1beta1.QueryModuleParamsResponse)
+    - [QueryPoolRequest](#ixo.liquidstake.v1beta1.QueryPoolRequest)
+    - [QueryPoolResponse](#ixo.liquidstake.v1beta1.QueryPoolResponse)
+    - [QueryPoolsRequest](#ixo.liquidstake.v1beta1.QueryPoolsRequest)
+    - [QueryPoolsResponse](#ixo.liquidstake.v1beta1.QueryPoolsResponse)
     - [QueryStatesRequest](#ixo.liquidstake.v1beta1.QueryStatesRequest)
     - [QueryStatesResponse](#ixo.liquidstake.v1beta1.QueryStatesResponse)
   
@@ -381,14 +393,20 @@
 - [ixo/liquidstake/v1beta1/tx.proto](#ixo/liquidstake/v1beta1/tx.proto)
     - [MsgBurn](#ixo.liquidstake.v1beta1.MsgBurn)
     - [MsgBurnResponse](#ixo.liquidstake.v1beta1.MsgBurnResponse)
+    - [MsgCreatePool](#ixo.liquidstake.v1beta1.MsgCreatePool)
+    - [MsgCreatePoolResponse](#ixo.liquidstake.v1beta1.MsgCreatePoolResponse)
     - [MsgLiquidStake](#ixo.liquidstake.v1beta1.MsgLiquidStake)
     - [MsgLiquidStakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidStakeResponse)
     - [MsgLiquidUnstake](#ixo.liquidstake.v1beta1.MsgLiquidUnstake)
     - [MsgLiquidUnstakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse)
     - [MsgSetModulePaused](#ixo.liquidstake.v1beta1.MsgSetModulePaused)
     - [MsgSetModulePausedResponse](#ixo.liquidstake.v1beta1.MsgSetModulePausedResponse)
-    - [MsgUpdateParams](#ixo.liquidstake.v1beta1.MsgUpdateParams)
-    - [MsgUpdateParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateParamsResponse)
+    - [MsgSetPoolPaused](#ixo.liquidstake.v1beta1.MsgSetPoolPaused)
+    - [MsgSetPoolPausedResponse](#ixo.liquidstake.v1beta1.MsgSetPoolPausedResponse)
+    - [MsgUpdateModuleParams](#ixo.liquidstake.v1beta1.MsgUpdateModuleParams)
+    - [MsgUpdateModuleParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse)
+    - [MsgUpdatePool](#ixo.liquidstake.v1beta1.MsgUpdatePool)
+    - [MsgUpdatePoolResponse](#ixo.liquidstake.v1beta1.MsgUpdatePoolResponse)
     - [MsgUpdateWeightedRewardsReceivers](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers)
     - [MsgUpdateWeightedRewardsReceiversResponse](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse)
     - [MsgUpdateWhitelistedValidators](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators)
@@ -2152,7 +2170,7 @@ for gas-efficient O(1) reads and writes independent of team size.
 | ----- | ---- | ----- | ----------- |
 | collection_id | [string](#string) |  | collection_id this budget belongs to |
 | member_address | [string](#string) |  | member&#39;s blockchain address |
-| period | [google.protobuf.Duration](#google.protobuf.Duration) |  | period duration for budget reset (e.g., 30 days) |
+| period | [google.protobuf.Duration](#google.protobuf.Duration) |  | period duration for budget reset (e.g., 30 days). Must be at least 24 hours (MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to prevent griefing via the lazy-reset loop in the intent handler. |
 | period_spend_limit | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | maximum native coin spend allowed per period |
 | period_spent | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | native coins already spent (intented) in the current period |
 | period_cw20_spend_limit | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | maximum CW20 spend allowed per period |
@@ -2651,6 +2669,58 @@ IntentUpdatedEvent is an event triggered on an Intent update
 
 
 
+<a name="ixo.claims.v1beta1.MemberBudgetCreatedEvent"></a>
+
+### MemberBudgetCreatedEvent
+MemberBudgetCreatedEvent is an event triggered when a team member budget is
+added to a collection for the first time.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| budget | [MemberBudget](#ixo.claims.v1beta1.MemberBudget) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MemberBudgetRemovedEvent"></a>
+
+### MemberBudgetRemovedEvent
+MemberBudgetRemovedEvent is an event triggered when a team member budget is
+removed from a collection. Includes the final budget state at the time of
+removal for indexer audit.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| budget | [MemberBudget](#ixo.claims.v1beta1.MemberBudget) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MemberBudgetUpdatedEvent"></a>
+
+### MemberBudgetUpdatedEvent
+MemberBudgetUpdatedEvent is an event triggered on any state change to an
+existing member budget — admin-driven update via MsgSetCollectionMembers,
+period_spent deduction during MsgClaimIntent, period_spent restoration on
+claim rejection / dispute / invalidation / intent expiration, or lazy period
+reset.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| budget | [MemberBudget](#ixo.claims.v1beta1.MemberBudget) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.PaymentWithdrawCreatedEvent"></a>
 
 ### PaymentWithdrawCreatedEvent
@@ -3115,7 +3185,7 @@ MsgSetCollectionMembers
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | member_address | [string](#string) |  | member&#39;s blockchain address |
-| period | [google.protobuf.Duration](#google.protobuf.Duration) |  | period duration for budget reset (e.g., 30 days) |
+| period | [google.protobuf.Duration](#google.protobuf.Duration) |  | period duration for budget reset (e.g., 30 days). Must be at least 24 hours (MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to prevent griefing via the lazy-reset loop in the intent handler. |
 | period_spend_limit | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | maximum native coin spend allowed per period |
 | period_cw20_spend_limit | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | maximum CW20 spend allowed per period |
 | reset_period_spent | [bool](#bool) |  | if true, resets period_spent to zero (useful for manual admin reset) |
@@ -3335,12 +3405,20 @@ authorization grants — admin should do that separately if needed.
 
 ### MsgSetCollectionMembers
 MsgSetCollectionMembers adds or updates one or more member budgets on a
-collection in a single transaction. For each member entry: if the member
-already exists, their budget limits are updated (period_spent is preserved
-unless reset_period_spent is true on that entry). If the member is new,
-they are created with period_spent = zero. Handler will reject any member
-entry where all spend limits are zero — use MsgRemoveCollectionMembers
-instead.
+collection in a single transaction. For each member entry:
+  - If the member already exists and reset_period_spent is false: budget
+    limits (period, spend_limit, cw20_spend_limit) are updated, but
+    period_spent and period_reset_at are preserved. The current period
+    continues with the new limits applied immediately.
+  - If the member already exists and reset_period_spent is true:
+    period_spent is cleared and period_reset_at is set to now &#43; period.
+    This starts a fresh cycle from the current block time.
+  - If the member is new: created with period_spent = zero and
+    period_reset_at = now &#43; period.
+
+Handler will reject any member entry where all spend limits are zero —
+use MsgRemoveCollectionMembers instead. Duplicate member addresses within
+a single message are rejected.
 
 
 | Field | Type | Label | Description |
@@ -5585,25 +5663,43 @@ query results.
 
 
 
-<a name="ixo.liquidstake.v1beta1.NetAmountState"></a>
+<a name="ixo.liquidstake.v1beta1.ModuleParams"></a>
 
-### NetAmountState
-NetAmountState is type for net amount raw data and mint rate, This is a value
-that depends on the several module state every time, so it is used only for
-calculation and query and is not stored in kv.
+### ModuleParams
+ModuleParams defines global, module-wide parameters that apply across every
+liquid staking pool.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| stake_rate | [string](#string) |  | stake_rate is the rate at which the liquid staking module mints stkIXO |
-| unstake_rate | [string](#string) |  | unstake_rate is the rate at which the liquid staking module burns stkIXO |
-| stkixo_total_supply | [string](#string) |  | btoken_total_supply returns the total supply of uzero (stkIXO denom) |
-| net_amount | [string](#string) |  | net_amount is proxy account&#39;s total liquid tokens &#43; total unbonding balance |
-| total_del_shares | [string](#string) |  | total_del_shares define the delegation shares of all liquid validators |
-| total_liquid_tokens | [string](#string) |  | total_liquid_tokens define the token amount worth of delegation shares of all liquid validator (slashing applied amount) |
-| total_remaining_rewards | [string](#string) |  | total_remaining_rewards define the sum of remaining rewards of proxy account by all liquid validators |
-| total_unbonding_balance | [string](#string) |  | total_unbonding_balance define the unbonding balance of proxy account by all liquid validator (slashing applied amount) |
-| proxy_acc_balance | [string](#string) |  | proxy_acc_balance define the balance of proxy account for the native token |
+| min_liquid_stake_amount | [string](#string) |  | min_liquid_stake_amount is the minimum amount of native tokens that can be liquid-staked into any pool, applied across the entire module to minimise decimal loss and gas waste from dust amounts. |
+| module_paused | [bool](#bool) |  | module_paused is a global emergency kill switch. When true, ALL pools are paused regardless of their per-pool paused flag: liquid_stake, liquid_unstake, autocompounding, rebalancing, and BeginBlocker logic are halted module-wide. Used for migrations or critical incidents. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.NetAmountState"></a>
+
+### NetAmountState
+NetAmountState holds the raw amounts and exchange rates for a single pool.
+Computed on the fly from pool state every time (never persisted), and used
+for unstake-rate calculation and queries. Each pool has its own independent
+NetAmountState.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| stake_rate | [string](#string) |  | stake_rate is the mint rate when staking into this pool. Always 1.0: 1 native token mints 1 LST regardless of accrued rewards. |
+| unstake_rate | [string](#string) |  | unstake_rate is the burn rate when unstaking from this pool, equal to net_amount / stkixo_total_supply. Diverges from 1.0 as rewards accrue or slashing occurs. |
+| stkixo_total_supply | [string](#string) |  | stkixo_total_supply is the total supply of this pool&#39;s LST denom. |
+| net_amount | [string](#string) |  | net_amount is this pool&#39;s total liquid tokens &#43; total unbonding balance, measured at its own proxy account. |
+| total_del_shares | [string](#string) |  | total_del_shares is the sum of delegation shares held by this pool&#39;s proxy account across all of its liquid validators. |
+| total_liquid_tokens | [string](#string) |  | total_liquid_tokens is the token-equivalent of total_del_shares with slashing applied, summed across this pool&#39;s liquid validators. |
+| total_remaining_rewards | [string](#string) |  | total_remaining_rewards is the sum of unwithdrawn staking rewards owed to this pool&#39;s proxy account from all its liquid validators. |
+| total_unbonding_balance | [string](#string) |  | total_unbonding_balance is the sum of unbonding amounts (slashing applied) for this pool&#39;s proxy account. |
+| proxy_acc_balance | [string](#string) |  | proxy_acc_balance is the spendable native-token balance currently sitting in this pool&#39;s proxy account (rewards withdrawn but not yet redelegated). |
 
 
 
@@ -5613,22 +5709,51 @@ calculation and query and is not stored in kv.
 <a name="ixo.liquidstake.v1beta1.Params"></a>
 
 ### Params
-Params defines the set of params for the liquidstake module.
+Params defines the legacy single-pool params layout.
+
+DEPRECATED: kept only so the v7 upgrade migration can unmarshal pre-upgrade
+state from the KV store. New code must use ModuleParams (global) and Pool
+(per-pool). Do not reference this from new application logic.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| liquid_bond_denom | [string](#string) |  | LiquidBondDenom specifies the denomination of the token receiving after liquid stake, The value is calculated through NetAmount. |
-| whitelisted_validators | [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator) | repeated | WhitelistedValidators specifies the validators elected to become Active Liquid Validators. |
-| unstake_fee_rate | [string](#string) |  | UnstakeFeeRate specifies the fee rate when liquid unstake is requested, unbonded by subtracting it from unbondingAmount |
-| min_liquid_stake_amount | [string](#string) |  | MinLiquidStakingAmount specifies the minimum number of coins to be staked to the active liquid validators on liquid staking to minimize decimal loss and consider gas efficiency. |
-| fee_account_address | [string](#string) |  | FeeAccountAddress defines the bech32-encoded address of an account responsible for accumulating protocol fees. |
-| autocompound_fee_rate | [string](#string) |  | AutocompoundFeeRate specifies the fee rate for auto redelegating the stake rewards. The fee is taken in favour of the fee account (see FeeAccountAddress). |
-| whitelist_admin_address | [string](#string) |  | WhitelistAdminAddress the bech32-encoded address of an admin authority that is allowed to update whitelisted validators or pause liquidstaking module entirely. It is also the only address that can update the weighted_rewards_receivers. The key is controlled by the ZERO dao. Pausing of the module can be required during important migrations or failures. |
-| module_paused | [bool](#bool) |  | ModulePaused is a safety toggle that allows to stop main module functions such as stake/unstake/stake-to-lp and the BeginBlocker logic. |
-| weighted_rewards_receivers | [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress) | repeated | weighted_rewards_receivers is the addresses to receive the staking rewards on autocompounding with weights assigned to each address. The total of weights in the list in not allowed to be greater than 1.
+| liquid_bond_denom | [string](#string) |  |  |
+| whitelisted_validators | [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator) | repeated |  |
+| unstake_fee_rate | [string](#string) |  |  |
+| min_liquid_stake_amount | [string](#string) |  |  |
+| fee_account_address | [string](#string) |  |  |
+| autocompound_fee_rate | [string](#string) |  |  |
+| whitelist_admin_address | [string](#string) |  |  |
+| module_paused | [bool](#bool) |  |  |
+| weighted_rewards_receivers | [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress) | repeated |  |
 
-Eg. if the list has 1 address with weight 0.2, then on autocompounding the staking rewards will be split between 0.2 for the weighted receiver and 0.8 gets auto-compounded to the proxy account. |
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.Pool"></a>
+
+### Pool
+Pool defines a single liquid staking instance with its own LST denom,
+validator whitelist, admin, and fee configuration. Each pool maintains an
+independent NetAmount/Supply ratio, so two pools&#39; LST tokens are NOT
+fungible with each other and may diverge in IXO value over time.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  | pool_id is the unique, immutable identifier for this pool (e.g. &#34;zero&#34;, &#34;qi&#34;). Used in storage keys, message routing, and proxy account derivation. Set at pool creation; cannot be changed. |
+| liquid_bond_denom | [string](#string) |  | liquid_bond_denom is the denomination of the LST minted by this pool (e.g. &#34;uzero&#34;). Must be globally unique across all pools. Immutable. |
+| proxy_account_address | [string](#string) |  | proxy_account_address is the bech32-encoded address of the per-pool delegation proxy account. All delegations, redelegations, unbondings, and reward withdrawals for this pool flow through this account. Derived deterministically from pool_id at creation; immutable. For the legacy &#34;zero&#34; pool migrated from pre-v7 state, this field holds the original LiquidStakeProxyAcc address so existing delegations are preserved without state migration. |
+| whitelisted_validators | [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator) | repeated | whitelisted_validators are the validators eligible for delegation from this pool&#39;s proxy account. Target weights must sum to 10000. |
+| unstake_fee_rate | [string](#string) |  | unstake_fee_rate is deducted from the unbonding amount when an unstake is requested against this pool. |
+| fee_account_address | [string](#string) |  | fee_account_address is the bech32-encoded address that accumulates the autocompound fee for this pool. |
+| autocompound_fee_rate | [string](#string) |  | autocompound_fee_rate is the fraction of accrued staking rewards taken by this pool as a protocol fee on each autocompound epoch and sent to fee_account_address. |
+| whitelist_admin_address | [string](#string) |  | whitelist_admin_address is the bech32-encoded address authorised to update this pool&#39;s whitelisted_validators, weighted_rewards_receivers, paused flag, and other mutable pool fields. Governance can also update these fields. The admin is also the only address allowed to call LiquidStake against this pool. |
+| paused | [bool](#bool) |  | paused is a per-pool safety toggle. When true, this specific pool&#39;s stake/unstake, autocompounding, and rebalancing are halted; other pools are unaffected. The global ModuleParams.module_paused flag overrides this and pauses every pool regardless of its per-pool value. |
+| weighted_rewards_receivers | [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress) | repeated | weighted_rewards_receivers are the addresses that receive a weighted share of this pool&#39;s autocompound rewards. The sum of weights must not exceed 1; the remainder is restaked to validators. |
 
 
 
@@ -5703,11 +5828,13 @@ ValidatorStatus enumerates the status of a liquid validator.
 <a name="ixo.liquidstake.v1beta1.AddLiquidValidatorEvent"></a>
 
 ### AddLiquidValidatorEvent
-LiquidRedelegateEvent is triggered when a liquid validator is added.
+AddLiquidValidatorEvent is emitted when a newly whitelisted validator is
+activated for a pool.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
 | validator | [string](#string) |  |  |
 
 
@@ -5718,11 +5845,13 @@ LiquidRedelegateEvent is triggered when a liquid validator is added.
 <a name="ixo.liquidstake.v1beta1.AutocompoundStakingRewardsEvent"></a>
 
 ### AutocompoundStakingRewardsEvent
-AutocompoundEvent is triggered after a epoch is triggered for autocompound.
+AutocompoundStakingRewardsEvent is emitted when a pool&#39;s autocompound
+epoch hook runs successfully.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
 | total_amount | [string](#string) |  |  |
 | fee_amount | [string](#string) |  |  |
@@ -5737,11 +5866,13 @@ AutocompoundEvent is triggered after a epoch is triggered for autocompound.
 <a name="ixo.liquidstake.v1beta1.LiquidStakeEvent"></a>
 
 ### LiquidStakeEvent
-LiquidStakeEvent is triggered when a liquid stake is performed.
+LiquidStakeEvent is emitted when a liquid stake is performed against a
+specific pool.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
 | liquid_amount | [string](#string) |  |  |
 | stk_ixo_minted_amount | [string](#string) |  |  |
@@ -5751,30 +5882,16 @@ LiquidStakeEvent is triggered when a liquid stake is performed.
 
 
 
-<a name="ixo.liquidstake.v1beta1.LiquidStakeParamsUpdatedEvent"></a>
-
-### LiquidStakeParamsUpdatedEvent
-LiquidStakeParamsUpdatedEvent is triggered when a the Params is updated.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| params | [Params](#ixo.liquidstake.v1beta1.Params) |  |  |
-| authority | [string](#string) |  |  |
-
-
-
-
-
-
 <a name="ixo.liquidstake.v1beta1.LiquidUnstakeEvent"></a>
 
 ### LiquidUnstakeEvent
-LiquidUnstakeEvent is triggered when a liquid unstake is performed.
+LiquidUnstakeEvent is emitted when a liquid unstake is performed against
+a specific pool.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
 | unstake_amount | [string](#string) |  |  |
 | unbonding_amount | [string](#string) |  |  |
@@ -5786,14 +5903,69 @@ LiquidUnstakeEvent is triggered when a liquid unstake is performed.
 
 
 
-<a name="ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent"></a>
+<a name="ixo.liquidstake.v1beta1.ModuleParamsUpdatedEvent"></a>
 
-### RebalancedLiquidStakeEvent
-RebalancedEvent is triggered after a rebalance is performed.
+### ModuleParamsUpdatedEvent
+ModuleParamsUpdatedEvent is emitted when the global ModuleParams change
+(either via MsgUpdateModuleParams or MsgSetModulePaused).
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| module_params | [ModuleParams](#ixo.liquidstake.v1beta1.ModuleParams) |  |  |
+| authority | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.PoolCreatedEvent"></a>
+
+### PoolCreatedEvent
+PoolCreatedEvent is emitted when a new pool is registered via
+MsgCreatePool.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
+| pool | [Pool](#ixo.liquidstake.v1beta1.Pool) |  |  |
+| authority | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.PoolUpdatedEvent"></a>
+
+### PoolUpdatedEvent
+PoolUpdatedEvent is emitted when a pool&#39;s configuration changes via any
+of: MsgUpdatePool, MsgUpdateWhitelistedValidators,
+MsgUpdateWeightedRewardsReceivers, MsgSetPoolPaused.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
+| pool | [Pool](#ixo.liquidstake.v1beta1.Pool) |  |  |
+| authority | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent"></a>
+
+### RebalancedLiquidStakeEvent
+RebalancedLiquidStakeEvent is emitted after a pool&#39;s rebalancing pass.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
 | redelegation_count | [string](#string) |  |  |
 | redelegation_fail_count | [string](#string) |  |  |
@@ -5827,8 +5999,26 @@ GenesisState defines the liquidstake module&#39;s genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| params | [Params](#ixo.liquidstake.v1beta1.Params) |  |  |
-| liquid_validators | [LiquidValidator](#ixo.liquidstake.v1beta1.LiquidValidator) | repeated |  |
+| module_params | [ModuleParams](#ixo.liquidstake.v1beta1.ModuleParams) |  | module_params holds the global module-wide parameters. |
+| pools | [Pool](#ixo.liquidstake.v1beta1.Pool) | repeated | pools is the list of every registered liquid staking pool. |
+| pool_liquid_validators | [PoolLiquidValidators](#ixo.liquidstake.v1beta1.PoolLiquidValidators) | repeated | pool_liquid_validators groups each pool&#39;s liquid validators by pool_id. The pool_id of every entry must match a Pool in pools. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.PoolLiquidValidators"></a>
+
+### PoolLiquidValidators
+PoolLiquidValidators groups a pool&#39;s liquid-validator state for genesis
+import/export, since validators are scoped per pool in v7&#43;.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  | pool_id selects the owning pool. |
+| liquid_validators | [LiquidValidator](#ixo.liquidstake.v1beta1.LiquidValidator) | repeated | liquid_validators is the set of liquid validators known to the pool. |
 
 
 
@@ -5857,6 +6047,11 @@ GenesisState defines the liquidstake module&#39;s genesis state.
 
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
+
+
 
 
 
@@ -5876,25 +6071,86 @@ GenesisState defines the liquidstake module&#39;s genesis state.
 
 
 
-<a name="ixo.liquidstake.v1beta1.QueryParamsRequest"></a>
+<a name="ixo.liquidstake.v1beta1.QueryModuleParamsRequest"></a>
 
-### QueryParamsRequest
-
-
+### QueryModuleParamsRequest
 
 
 
 
 
-<a name="ixo.liquidstake.v1beta1.QueryParamsResponse"></a>
 
-### QueryParamsResponse
+
+<a name="ixo.liquidstake.v1beta1.QueryModuleParamsResponse"></a>
+
+### QueryModuleParamsResponse
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| params | [Params](#ixo.liquidstake.v1beta1.Params) |  |  |
+| module_params | [ModuleParams](#ixo.liquidstake.v1beta1.ModuleParams) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryPoolRequest"></a>
+
+### QueryPoolRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryPoolResponse"></a>
+
+### QueryPoolResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool | [Pool](#ixo.liquidstake.v1beta1.Pool) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryPoolsRequest"></a>
+
+### QueryPoolsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.QueryPoolsResponse"></a>
+
+### QueryPoolsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pools | [Pool](#ixo.liquidstake.v1beta1.Pool) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
 
 
 
@@ -5905,6 +6161,11 @@ GenesisState defines the liquidstake module&#39;s genesis state.
 
 ### QueryStatesRequest
 
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pool_id | [string](#string) |  |  |
 
 
 
@@ -5939,9 +6200,11 @@ Query defines the gRPC query service for the liquidstake module.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| Params | [QueryParamsRequest](#ixo.liquidstake.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.liquidstake.v1beta1.QueryParamsResponse) | Params returns parameters of the liquidstake module. |
-| LiquidValidators | [QueryLiquidValidatorsRequest](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest) | [QueryLiquidValidatorsResponse](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse) | LiquidValidators returns liquid validators with states of the liquidstake module. |
-| States | [QueryStatesRequest](#ixo.liquidstake.v1beta1.QueryStatesRequest) | [QueryStatesResponse](#ixo.liquidstake.v1beta1.QueryStatesResponse) | States returns states of the liquidstake module. |
+| ModuleParams | [QueryModuleParamsRequest](#ixo.liquidstake.v1beta1.QueryModuleParamsRequest) | [QueryModuleParamsResponse](#ixo.liquidstake.v1beta1.QueryModuleParamsResponse) | ModuleParams returns the global, module-wide parameters (minimum stake amount and global pause flag). |
+| Pool | [QueryPoolRequest](#ixo.liquidstake.v1beta1.QueryPoolRequest) | [QueryPoolResponse](#ixo.liquidstake.v1beta1.QueryPoolResponse) | Pool returns the configuration of a single pool by pool_id. |
+| Pools | [QueryPoolsRequest](#ixo.liquidstake.v1beta1.QueryPoolsRequest) | [QueryPoolsResponse](#ixo.liquidstake.v1beta1.QueryPoolsResponse) | Pools returns every registered pool&#39;s configuration, paginated. |
+| LiquidValidators | [QueryLiquidValidatorsRequest](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest) | [QueryLiquidValidatorsResponse](#ixo.liquidstake.v1beta1.QueryLiquidValidatorsResponse) | LiquidValidators returns liquid validators (with state) for a single pool. |
+| States | [QueryStatesRequest](#ixo.liquidstake.v1beta1.QueryStatesRequest) | [QueryStatesResponse](#ixo.liquidstake.v1beta1.QueryStatesResponse) | States returns the NetAmountState (rates, supplies, balances) for a single pool. |
 
  
 
@@ -5957,14 +6220,13 @@ Query defines the gRPC query service for the liquidstake module.
 <a name="ixo.liquidstake.v1beta1.MsgBurn"></a>
 
 ### MsgBurn
-MsgBurn defines a SDK message for performing a burn of coins.
-NOTE: only ixo native token can be burned
+MsgBurn burns the signer&#39;s native uixo tokens. Module-level operation.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | burner | [string](#string) |  |  |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | amount is the amount of coins to burn NOTE: only ixo native token can be burned |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | amount must be denominated in uixo. |
 
 
 
@@ -5981,17 +6243,58 @@ NOTE: only ixo native token can be burned
 
 
 
-<a name="ixo.liquidstake.v1beta1.MsgLiquidStake"></a>
+<a name="ixo.liquidstake.v1beta1.MsgCreatePool"></a>
 
-### MsgLiquidStake
-MsgLiquidStake defines a SDK message for performing a liquid stake of coins
-from a delegator to whitelisted validators.
+### MsgCreatePool
+MsgCreatePool registers a new liquid staking pool. Governance only.
+
+The proxy account is derived deterministically from pool_id; pool_id and
+liquid_bond_denom must both be globally unique. The newly created pool
+starts with an empty whitelisted_validators list, empty
+weighted_rewards_receivers, zero fee rates, and paused=false. Validators
+must be added with MsgUpdateWhitelistedValidators before staking is
+possible (the active-weight-quorum check requires sum &gt;= 33.33%).
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| delegator_address | [string](#string) |  |  |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| authority | [string](#string) |  | authority must be the governance module address. |
+| pool_id | [string](#string) |  | pool_id is the immutable identifier for the new pool. Validated as lowercase alphanumeric plus &#39;-&#39;, length 2..16, globally unique. |
+| liquid_bond_denom | [string](#string) |  | liquid_bond_denom is the LST denom for the new pool. Must pass sdk.ValidateDenom and be globally unique across pools. |
+| initial_admin_address | [string](#string) |  | initial_admin_address becomes the pool&#39;s whitelist_admin_address. |
+| initial_fee_account_address | [string](#string) |  | initial_fee_account_address becomes the pool&#39;s fee_account_address. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgCreatePoolResponse"></a>
+
+### MsgCreatePoolResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| proxy_account_address | [string](#string) |  | proxy_account_address is the derived bech32 address that will hold this pool&#39;s delegations. Returned for client convenience. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgLiquidStake"></a>
+
+### MsgLiquidStake
+MsgLiquidStake liquid-stakes native tokens into a specific pool.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| delegator_address | [string](#string) |  | delegator_address must equal the pool&#39;s whitelist_admin_address. |
+| pool_id | [string](#string) |  | pool_id selects which pool to stake into and therefore which LST denom is minted in return. |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | amount is the native staking-token coin to liquid-stake. Its denom must match the chain&#39;s bond denom. |
 
 
 
@@ -6001,7 +6304,7 @@ from a delegator to whitelisted validators.
 <a name="ixo.liquidstake.v1beta1.MsgLiquidStakeResponse"></a>
 
 ### MsgLiquidStakeResponse
-MsgLiquidStakeResponse defines the MsgLiquidStake response type.
+
 
 
 
@@ -6011,14 +6314,14 @@ MsgLiquidStakeResponse defines the MsgLiquidStake response type.
 <a name="ixo.liquidstake.v1beta1.MsgLiquidUnstake"></a>
 
 ### MsgLiquidUnstake
-MsgLiquidUnstake defines a SDK message for performing an undelegation of
-liquid staking from a delegate.
+MsgLiquidUnstake burns LST of a specific pool and initiates unbonding.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | delegator_address | [string](#string) |  |  |
-| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| pool_id | [string](#string) |  | pool_id must correspond to amount.denom (the pool&#39;s liquid_bond_denom); both are required for explicitness and validated to match. |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  | amount is the LST coin to burn. Its denom must equal Pool(pool_id).liquid_bond_denom. |
 
 
 
@@ -6028,7 +6331,7 @@ liquid staking from a delegate.
 <a name="ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse"></a>
 
 ### MsgLiquidUnstakeResponse
-MsgLiquidUnstakeResponse defines the MsgLiquidUnstake response type.
+
 
 
 | Field | Type | Label | Description |
@@ -6043,13 +6346,15 @@ MsgLiquidUnstakeResponse defines the MsgLiquidUnstake response type.
 <a name="ixo.liquidstake.v1beta1.MsgSetModulePaused"></a>
 
 ### MsgSetModulePaused
-
+MsgSetModulePaused toggles the global ModuleParams.module_paused kill
+switch. When true, every pool is halted regardless of its per-pool flag.
+Governance authority only.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| authority | [string](#string) |  | Authority is the address that is allowed to update module&#39;s paused state, defined as admin address in params (WhitelistAdminAddress). |
-| is_paused | [bool](#bool) |  | IsPaused represents the target state of the paused flag. |
+| authority | [string](#string) |  | authority must be the governance module address. |
+| is_paused | [bool](#bool) |  | is_paused is the target value of ModuleParams.module_paused. |
 
 
 
@@ -6059,34 +6364,97 @@ MsgLiquidUnstakeResponse defines the MsgLiquidUnstake response type.
 <a name="ixo.liquidstake.v1beta1.MsgSetModulePausedResponse"></a>
 
 ### MsgSetModulePausedResponse
-MsgSetModulePausedResponse defines the response structure for
-executing a
 
 
 
 
 
 
-<a name="ixo.liquidstake.v1beta1.MsgUpdateParams"></a>
 
-### MsgUpdateParams
+<a name="ixo.liquidstake.v1beta1.MsgSetPoolPaused"></a>
 
+### MsgSetPoolPaused
+MsgSetPoolPaused toggles a single pool&#39;s per-pool paused flag.
+Governance or the pool&#39;s current admin may call this.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| authority | [string](#string) |  | authority is the address that controls the module (defaults to x/gov unless overwritten). |
-| params | [Params](#ixo.liquidstake.v1beta1.Params) |  | params defines the parameters to update. NOTE: denom and whitelisted_validators and weighted_rewards_receivers are not updated. |
+| authority | [string](#string) |  | authority must be either governance or the pool&#39;s current admin. |
+| pool_id | [string](#string) |  | pool_id selects the pool whose paused flag is being set. |
+| is_paused | [bool](#bool) |  | is_paused is the target value of Pool.paused. |
 
 
 
 
 
 
-<a name="ixo.liquidstake.v1beta1.MsgUpdateParamsResponse"></a>
+<a name="ixo.liquidstake.v1beta1.MsgSetPoolPausedResponse"></a>
 
-### MsgUpdateParamsResponse
-MsgUpdateParamsResponse defines the response structure for executing a
+### MsgSetPoolPausedResponse
+
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateModuleParams"></a>
+
+### MsgUpdateModuleParams
+MsgUpdateModuleParams updates the global ModuleParams. Governance only.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | authority must be the governance module address. |
+| module_params | [ModuleParams](#ixo.liquidstake.v1beta1.ModuleParams) |  | module_params replaces the current ModuleParams in full. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse"></a>
+
+### MsgUpdateModuleParamsResponse
+
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdatePool"></a>
+
+### MsgUpdatePool
+MsgUpdatePool updates a pool&#39;s mutable scalar/address fields. Governance
+or the pool&#39;s current whitelist_admin_address may call this.
+
+Whitelisted validators, weighted rewards receivers, and the paused flag
+each have their own dedicated update message and are NOT touched here.
+The pool_id, liquid_bond_denom, and proxy_account_address are immutable
+after creation and cannot be changed via this message.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | authority must be either governance or the pool&#39;s current admin. |
+| pool_id | [string](#string) |  | pool_id selects the pool to update. |
+| unstake_fee_rate | [string](#string) |  | unstake_fee_rate replaces the pool&#39;s current unstake fee rate. |
+| fee_account_address | [string](#string) |  | fee_account_address replaces the pool&#39;s current fee account. |
+| autocompound_fee_rate | [string](#string) |  | autocompound_fee_rate replaces the pool&#39;s current autocompound fee rate. |
+| whitelist_admin_address | [string](#string) |  | whitelist_admin_address replaces the pool&#39;s current admin address. |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdatePoolResponse"></a>
+
+### MsgUpdatePoolResponse
+
 
 
 
@@ -6096,13 +6464,15 @@ MsgUpdateParamsResponse defines the response structure for executing a
 <a name="ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers"></a>
 
 ### MsgUpdateWeightedRewardsReceivers
-
+MsgUpdateWeightedRewardsReceivers replaces a pool&#39;s weighted rewards
+receivers list. Pool admin only (matches pre-v7 admin-only constraint).
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| authority | [string](#string) |  | Authority is the address that is allowed to update wieghted rewards receivers, defined as admin address in params (WhitelistAdminAddress). |
-| weighted_rewards_receivers | [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress) | repeated | WhitelistedValidators specifies the validators elected to become Active Liquid Validators. |
+| authority | [string](#string) |  | authority must equal the pool&#39;s whitelist_admin_address. |
+| pool_id | [string](#string) |  | pool_id selects the pool whose receivers are being replaced. |
+| weighted_rewards_receivers | [WeightedAddress](#ixo.liquidstake.v1beta1.WeightedAddress) | repeated | weighted_rewards_receivers replaces the pool&#39;s receivers list. Sum of weights must not exceed 1. |
 
 
 
@@ -6112,8 +6482,7 @@ MsgUpdateParamsResponse defines the response structure for executing a
 <a name="ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse"></a>
 
 ### MsgUpdateWeightedRewardsReceiversResponse
-MsgUpdateWeightedRewardsReceiversResponse defines the response structure for
-executing a
+
 
 
 
@@ -6123,13 +6492,16 @@ executing a
 <a name="ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators"></a>
 
 ### MsgUpdateWhitelistedValidators
-
+MsgUpdateWhitelistedValidators replaces a pool&#39;s validator whitelist.
+Governance or the pool&#39;s current admin may call this. Target weights must
+sum to 10000.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| authority | [string](#string) |  | Authority is the address that is allowed to update whitelisted validators, defined as admin address in params (WhitelistAdminAddress). |
-| whitelisted_validators | [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator) | repeated | WhitelistedValidators specifies the validators elected to become Active Liquid Validators. |
+| authority | [string](#string) |  | authority must be either governance or the pool&#39;s current admin. |
+| pool_id | [string](#string) |  | pool_id selects the pool whose whitelist is being replaced. |
+| whitelisted_validators | [WhitelistedValidator](#ixo.liquidstake.v1beta1.WhitelistedValidator) | repeated | whitelisted_validators replaces the pool&#39;s validator set. |
 
 
 
@@ -6139,8 +6511,7 @@ executing a
 <a name="ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse"></a>
 
 ### MsgUpdateWhitelistedValidatorsResponse
-MsgUpdateWhitelistedValidatorsResponse defines the response structure for
-executing a
+
 
 
 
@@ -6160,13 +6531,16 @@ Msg defines the liquid staking Msg service.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| LiquidStake | [MsgLiquidStake](#ixo.liquidstake.v1beta1.MsgLiquidStake) | [MsgLiquidStakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidStakeResponse) | LiquidStake defines a method for performing a delegation of coins from a delegator to whitelisted validators. |
-| LiquidUnstake | [MsgLiquidUnstake](#ixo.liquidstake.v1beta1.MsgLiquidUnstake) | [MsgLiquidUnstakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse) | LiquidUnstake defines a method for performing an undelegation of liquid staking from a delegate. |
-| UpdateParams | [MsgUpdateParams](#ixo.liquidstake.v1beta1.MsgUpdateParams) | [MsgUpdateParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateParamsResponse) | UpdateParams defines a method to update the module params. |
-| UpdateWhitelistedValidators | [MsgUpdateWhitelistedValidators](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators) | [MsgUpdateWhitelistedValidatorsResponse](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse) | UpdateWhitelistedValidators defines a method to update the whitelisted validators list. |
-| UpdateWeightedRewardsReceivers | [MsgUpdateWeightedRewardsReceivers](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers) | [MsgUpdateWeightedRewardsReceiversResponse](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse) | UpdateWhitelistedValidators defines a method to update the whitelisted validators list. Only the whitelist admin address can update this list. |
-| SetModulePaused | [MsgSetModulePaused](#ixo.liquidstake.v1beta1.MsgSetModulePaused) | [MsgSetModulePausedResponse](#ixo.liquidstake.v1beta1.MsgSetModulePausedResponse) | SetModulePaused defines a method to update the module&#39;s pause status, setting value of the safety flag in params. |
-| Burn | [MsgBurn](#ixo.liquidstake.v1beta1.MsgBurn) | [MsgBurnResponse](#ixo.liquidstake.v1beta1.MsgBurnResponse) | Burn defines a method for burning coins. |
+| LiquidStake | [MsgLiquidStake](#ixo.liquidstake.v1beta1.MsgLiquidStake) | [MsgLiquidStakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidStakeResponse) | LiquidStake delegates native tokens through a pool&#39;s proxy account to its whitelisted validators and mints the pool&#39;s LST denom to the delegator. |
+| LiquidUnstake | [MsgLiquidUnstake](#ixo.liquidstake.v1beta1.MsgLiquidUnstake) | [MsgLiquidUnstakeResponse](#ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse) | LiquidUnstake burns LST denom of a specific pool and initiates unbonding from that pool&#39;s whitelisted validators back to the delegator. |
+| CreatePool | [MsgCreatePool](#ixo.liquidstake.v1beta1.MsgCreatePool) | [MsgCreatePoolResponse](#ixo.liquidstake.v1beta1.MsgCreatePoolResponse) | CreatePool registers a new liquid staking pool with its own LST denom, proxy account, admin, and fee configuration. Governance authority only. |
+| UpdateModuleParams | [MsgUpdateModuleParams](#ixo.liquidstake.v1beta1.MsgUpdateModuleParams) | [MsgUpdateModuleParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse) | UpdateModuleParams updates global, module-wide parameters (the minimum liquid stake amount and the global module-paused kill switch). Governance authority only. |
+| UpdatePool | [MsgUpdatePool](#ixo.liquidstake.v1beta1.MsgUpdatePool) | [MsgUpdatePoolResponse](#ixo.liquidstake.v1beta1.MsgUpdatePoolResponse) | UpdatePool updates the mutable scalar/address fields of a specific pool (fee rates, fee account, admin address). Governance or the pool&#39;s current admin may call this. Whitelisted validators, weighted rewards receivers, and the paused flag have their own dedicated update messages. |
+| UpdateWhitelistedValidators | [MsgUpdateWhitelistedValidators](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators) | [MsgUpdateWhitelistedValidatorsResponse](#ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse) | UpdateWhitelistedValidators updates the validator whitelist of a specific pool. Governance or the pool&#39;s current admin may call this. |
+| UpdateWeightedRewardsReceivers | [MsgUpdateWeightedRewardsReceivers](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers) | [MsgUpdateWeightedRewardsReceiversResponse](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse) | UpdateWeightedRewardsReceivers updates the weighted rewards receivers list of a specific pool. The pool&#39;s admin may call this. |
+| SetPoolPaused | [MsgSetPoolPaused](#ixo.liquidstake.v1beta1.MsgSetPoolPaused) | [MsgSetPoolPausedResponse](#ixo.liquidstake.v1beta1.MsgSetPoolPausedResponse) | SetPoolPaused toggles the per-pool paused flag for a specific pool. Governance or the pool&#39;s current admin may call this. Other pools are unaffected. |
+| SetModulePaused | [MsgSetModulePaused](#ixo.liquidstake.v1beta1.MsgSetModulePaused) | [MsgSetModulePausedResponse](#ixo.liquidstake.v1beta1.MsgSetModulePausedResponse) | SetModulePaused toggles the global module-paused flag in ModuleParams. When paused, ALL pools are halted regardless of their per-pool flag. Governance authority only. |
+| Burn | [MsgBurn](#ixo.liquidstake.v1beta1.MsgBurn) | [MsgBurnResponse](#ixo.liquidstake.v1beta1.MsgBurnResponse) | Burn burns native uixo tokens. Module-level operation, not pool-scoped. |
 
  
 

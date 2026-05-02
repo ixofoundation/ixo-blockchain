@@ -5356,7 +5356,7 @@
             },
             {
               "name": "period",
-              "description": "period duration for budget reset (e.g., 30 days)",
+              "description": "period duration for budget reset (e.g., 30 days). Must be at least 24 hours\n(MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to\nprevent griefing via the lazy-reset loop in the intent handler.",
               "label": "",
               "type": "Duration",
               "longType": "google.protobuf.Duration",
@@ -6591,6 +6591,78 @@
           ]
         },
         {
+          "name": "MemberBudgetCreatedEvent",
+          "longName": "MemberBudgetCreatedEvent",
+          "fullName": "ixo.claims.v1beta1.MemberBudgetCreatedEvent",
+          "description": "MemberBudgetCreatedEvent is an event triggered when a team member budget is\nadded to a collection for the first time.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "budget",
+              "description": "",
+              "label": "",
+              "type": "MemberBudget",
+              "longType": "MemberBudget",
+              "fullType": "ixo.claims.v1beta1.MemberBudget",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MemberBudgetRemovedEvent",
+          "longName": "MemberBudgetRemovedEvent",
+          "fullName": "ixo.claims.v1beta1.MemberBudgetRemovedEvent",
+          "description": "MemberBudgetRemovedEvent is an event triggered when a team member budget is\nremoved from a collection. Includes the final budget state at the time of\nremoval for indexer audit.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "budget",
+              "description": "",
+              "label": "",
+              "type": "MemberBudget",
+              "longType": "MemberBudget",
+              "fullType": "ixo.claims.v1beta1.MemberBudget",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MemberBudgetUpdatedEvent",
+          "longName": "MemberBudgetUpdatedEvent",
+          "fullName": "ixo.claims.v1beta1.MemberBudgetUpdatedEvent",
+          "description": "MemberBudgetUpdatedEvent is an event triggered on any state change to an\nexisting member budget — admin-driven update via MsgSetCollectionMembers,\nperiod_spent deduction during MsgClaimIntent, period_spent restoration on\nclaim rejection / dispute / invalidation / intent expiration, or lazy period\nreset.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "budget",
+              "description": "",
+              "label": "",
+              "type": "MemberBudget",
+              "longType": "MemberBudget",
+              "fullType": "ixo.claims.v1beta1.MemberBudget",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "PaymentWithdrawCreatedEvent",
           "longName": "PaymentWithdrawCreatedEvent",
           "fullName": "ixo.claims.v1beta1.PaymentWithdrawCreatedEvent",
@@ -7686,7 +7758,7 @@
             },
             {
               "name": "period",
-              "description": "period duration for budget reset (e.g., 30 days)",
+              "description": "period duration for budget reset (e.g., 30 days). Must be at least 24 hours\n(MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to\nprevent griefing via the lazy-reset loop in the intent handler.",
               "label": "",
               "type": "Duration",
               "longType": "google.protobuf.Duration",
@@ -8501,7 +8573,7 @@
           "name": "MsgSetCollectionMembers",
           "longName": "MsgSetCollectionMembers",
           "fullName": "ixo.claims.v1beta1.MsgSetCollectionMembers",
-          "description": "MsgSetCollectionMembers adds or updates one or more member budgets on a\ncollection in a single transaction. For each member entry: if the member\nalready exists, their budget limits are updated (period_spent is preserved\nunless reset_period_spent is true on that entry). If the member is new,\nthey are created with period_spent = zero. Handler will reject any member\nentry where all spend limits are zero — use MsgRemoveCollectionMembers\ninstead.",
+          "description": "MsgSetCollectionMembers adds or updates one or more member budgets on a\ncollection in a single transaction. For each member entry:\n  - If the member already exists and reset_period_spent is false: budget\n    limits (period, spend_limit, cw20_spend_limit) are updated, but\n    period_spent and period_reset_at are preserved. The current period\n    continues with the new limits applied immediately.\n  - If the member already exists and reset_period_spent is true:\n    period_spent is cleared and period_reset_at is set to now + period.\n    This starts a fresh cycle from the current block time.\n  - If the member is new: created with period_spent = zero and\n    period_reset_at = now + period.\n\nHandler will reject any member entry where all spend limits are zero —\nuse MsgRemoveCollectionMembers instead. Duplicate member addresses within\na single message are rejected.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -14667,10 +14739,46 @@
           ]
         },
         {
+          "name": "ModuleParams",
+          "longName": "ModuleParams",
+          "fullName": "ixo.liquidstake.v1beta1.ModuleParams",
+          "description": "ModuleParams defines global, module-wide parameters that apply across every\nliquid staking pool.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "min_liquid_stake_amount",
+              "description": "min_liquid_stake_amount is the minimum amount of native tokens that can\nbe liquid-staked into any pool, applied across the entire module to\nminimise decimal loss and gas waste from dust amounts.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "module_paused",
+              "description": "module_paused is a global emergency kill switch. When true, ALL pools\nare paused regardless of their per-pool paused flag: liquid_stake,\nliquid_unstake, autocompounding, rebalancing, and BeginBlocker logic\nare halted module-wide. Used for migrations or critical incidents.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "NetAmountState",
           "longName": "NetAmountState",
           "fullName": "ixo.liquidstake.v1beta1.NetAmountState",
-          "description": "NetAmountState is type for net amount raw data and mint rate, This is a value\nthat depends on the several module state every time, so it is used only for\ncalculation and query and is not stored in kv.",
+          "description": "NetAmountState holds the raw amounts and exchange rates for a single pool.\nComputed on the fly from pool state every time (never persisted), and used\nfor unstake-rate calculation and queries. Each pool has its own independent\nNetAmountState.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -14678,7 +14786,7 @@
           "fields": [
             {
               "name": "stake_rate",
-              "description": "stake_rate is the rate at which the liquid staking module mints stkIXO",
+              "description": "stake_rate is the mint rate when staking into this pool.\nAlways 1.0: 1 native token mints 1 LST regardless of accrued rewards.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14690,7 +14798,7 @@
             },
             {
               "name": "unstake_rate",
-              "description": "unstake_rate is the rate at which the liquid staking module burns stkIXO",
+              "description": "unstake_rate is the burn rate when unstaking from this pool, equal to\nnet_amount / stkixo_total_supply. Diverges from 1.0 as rewards accrue\nor slashing occurs.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14702,7 +14810,7 @@
             },
             {
               "name": "stkixo_total_supply",
-              "description": "btoken_total_supply returns the total supply of uzero (stkIXO denom)",
+              "description": "stkixo_total_supply is the total supply of this pool's LST denom.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14714,7 +14822,7 @@
             },
             {
               "name": "net_amount",
-              "description": "net_amount is proxy account's total liquid tokens + total unbonding balance",
+              "description": "net_amount is this pool's total liquid tokens + total unbonding balance,\nmeasured at its own proxy account.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14726,7 +14834,7 @@
             },
             {
               "name": "total_del_shares",
-              "description": "total_del_shares define the delegation shares of all liquid validators",
+              "description": "total_del_shares is the sum of delegation shares held by this pool's\nproxy account across all of its liquid validators.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14738,7 +14846,7 @@
             },
             {
               "name": "total_liquid_tokens",
-              "description": "total_liquid_tokens define the token amount worth of delegation shares of\nall liquid validator (slashing applied amount)",
+              "description": "total_liquid_tokens is the token-equivalent of total_del_shares with\nslashing applied, summed across this pool's liquid validators.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14750,7 +14858,7 @@
             },
             {
               "name": "total_remaining_rewards",
-              "description": "total_remaining_rewards define the sum of remaining rewards of proxy\naccount by all liquid validators",
+              "description": "total_remaining_rewards is the sum of unwithdrawn staking rewards owed\nto this pool's proxy account from all its liquid validators.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14762,7 +14870,7 @@
             },
             {
               "name": "total_unbonding_balance",
-              "description": "total_unbonding_balance define the unbonding balance of proxy account by\nall liquid validator (slashing applied amount)",
+              "description": "total_unbonding_balance is the sum of unbonding amounts (slashing\napplied) for this pool's proxy account.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14774,7 +14882,7 @@
             },
             {
               "name": "proxy_acc_balance",
-              "description": "proxy_acc_balance define the balance of proxy account for the native token",
+              "description": "proxy_acc_balance is the spendable native-token balance currently sitting\nin this pool's proxy account (rewards withdrawn but not yet redelegated).",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14790,7 +14898,7 @@
           "name": "Params",
           "longName": "Params",
           "fullName": "ixo.liquidstake.v1beta1.Params",
-          "description": "Params defines the set of params for the liquidstake module.",
+          "description": "Params defines the legacy single-pool params layout.\n\nDEPRECATED: kept only so the v7 upgrade migration can unmarshal pre-upgrade\nstate from the KV store. New code must use ModuleParams (global) and Pool\n(per-pool). Do not reference this from new application logic.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -14798,7 +14906,7 @@
           "fields": [
             {
               "name": "liquid_bond_denom",
-              "description": "LiquidBondDenom specifies the denomination of the token receiving after\nliquid stake, The value is calculated through NetAmount.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14810,7 +14918,7 @@
             },
             {
               "name": "whitelisted_validators",
-              "description": "WhitelistedValidators specifies the validators elected to become Active\nLiquid Validators.",
+              "description": "",
               "label": "repeated",
               "type": "WhitelistedValidator",
               "longType": "WhitelistedValidator",
@@ -14822,7 +14930,7 @@
             },
             {
               "name": "unstake_fee_rate",
-              "description": "UnstakeFeeRate specifies the fee rate when liquid unstake is requested,\nunbonded by subtracting it from unbondingAmount",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14834,7 +14942,7 @@
             },
             {
               "name": "min_liquid_stake_amount",
-              "description": "MinLiquidStakingAmount specifies the minimum number of coins to be staked\nto the active liquid validators on liquid staking to minimize decimal loss\nand consider gas efficiency.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14846,7 +14954,7 @@
             },
             {
               "name": "fee_account_address",
-              "description": "FeeAccountAddress defines the bech32-encoded address of\nan account responsible for accumulating protocol fees.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14858,7 +14966,7 @@
             },
             {
               "name": "autocompound_fee_rate",
-              "description": "AutocompoundFeeRate specifies the fee rate for auto redelegating the stake\nrewards. The fee is taken in favour of the fee account (see\nFeeAccountAddress).",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14870,7 +14978,7 @@
             },
             {
               "name": "whitelist_admin_address",
-              "description": "WhitelistAdminAddress the bech32-encoded address of an admin authority\nthat is allowed to update whitelisted validators or pause liquidstaking\nmodule entirely. It is also the only address that can update the\nweighted_rewards_receivers.\nThe key is controlled by the ZERO dao.\nPausing of the module can be required during important migrations or\nfailures.",
+              "description": "",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -14882,7 +14990,7 @@
             },
             {
               "name": "module_paused",
-              "description": "ModulePaused is a safety toggle that allows to stop main module functions\nsuch as stake/unstake/stake-to-lp and the BeginBlocker logic.",
+              "description": "",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -14894,7 +15002,142 @@
             },
             {
               "name": "weighted_rewards_receivers",
-              "description": "weighted_rewards_receivers is the addresses to receive the staking\nrewards on autocompounding with weights assigned to each address.\nThe total of weights in the list in not allowed to be greater than 1.\n\nEg. if the list has 1 address with weight 0.2, then on autocompounding\nthe staking rewards will be split between 0.2 for the weighted receiver\nand 0.8 gets auto-compounded to the proxy account.",
+              "description": "",
+              "label": "repeated",
+              "type": "WeightedAddress",
+              "longType": "WeightedAddress",
+              "fullType": "ixo.liquidstake.v1beta1.WeightedAddress",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ],
+          "options": {
+            "deprecated": true
+          }
+        },
+        {
+          "name": "Pool",
+          "longName": "Pool",
+          "fullName": "ixo.liquidstake.v1beta1.Pool",
+          "description": "Pool defines a single liquid staking instance with its own LST denom,\nvalidator whitelist, admin, and fee configuration. Each pool maintains an\nindependent NetAmount/Supply ratio, so two pools' LST tokens are NOT\nfungible with each other and may diverge in IXO value over time.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "pool_id is the unique, immutable identifier for this pool (e.g. \"zero\",\n\"qi\"). Used in storage keys, message routing, and proxy account\nderivation. Set at pool creation; cannot be changed.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "liquid_bond_denom",
+              "description": "liquid_bond_denom is the denomination of the LST minted by this pool\n(e.g. \"uzero\"). Must be globally unique across all pools. Immutable.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "proxy_account_address",
+              "description": "proxy_account_address is the bech32-encoded address of the per-pool\ndelegation proxy account. All delegations, redelegations, unbondings,\nand reward withdrawals for this pool flow through this account.\nDerived deterministically from pool_id at creation; immutable.\nFor the legacy \"zero\" pool migrated from pre-v7 state, this field\nholds the original LiquidStakeProxyAcc address so existing\ndelegations are preserved without state migration.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "whitelisted_validators",
+              "description": "whitelisted_validators are the validators eligible for delegation from\nthis pool's proxy account. Target weights must sum to 10000.",
+              "label": "repeated",
+              "type": "WhitelistedValidator",
+              "longType": "WhitelistedValidator",
+              "fullType": "ixo.liquidstake.v1beta1.WhitelistedValidator",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unstake_fee_rate",
+              "description": "unstake_fee_rate is deducted from the unbonding amount when an unstake\nis requested against this pool.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "fee_account_address",
+              "description": "fee_account_address is the bech32-encoded address that accumulates the\nautocompound fee for this pool.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "autocompound_fee_rate",
+              "description": "autocompound_fee_rate is the fraction of accrued staking rewards taken\nby this pool as a protocol fee on each autocompound epoch and sent to\nfee_account_address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "whitelist_admin_address",
+              "description": "whitelist_admin_address is the bech32-encoded address authorised to\nupdate this pool's whitelisted_validators, weighted_rewards_receivers,\npaused flag, and other mutable pool fields. Governance can also update\nthese fields. The admin is also the only address allowed to call\nLiquidStake against this pool.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "paused",
+              "description": "paused is a per-pool safety toggle. When true, this specific pool's\nstake/unstake, autocompounding, and rebalancing are halted; other\npools are unaffected. The global ModuleParams.module_paused flag\noverrides this and pauses every pool regardless of its per-pool value.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "weighted_rewards_receivers",
+              "description": "weighted_rewards_receivers are the addresses that receive a weighted\nshare of this pool's autocompound rewards. The sum of weights must\nnot exceed 1; the remainder is restaked to validators.",
               "label": "repeated",
               "type": "WeightedAddress",
               "longType": "WeightedAddress",
@@ -14996,12 +15239,24 @@
           "name": "AddLiquidValidatorEvent",
           "longName": "AddLiquidValidatorEvent",
           "fullName": "ixo.liquidstake.v1beta1.AddLiquidValidatorEvent",
-          "description": "LiquidRedelegateEvent is triggered when a liquid validator is added.",
+          "description": "AddLiquidValidatorEvent is emitted when a newly whitelisted validator is\nactivated for a pool.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
             {
               "name": "validator",
               "description": "",
@@ -15020,12 +15275,24 @@
           "name": "AutocompoundStakingRewardsEvent",
           "longName": "AutocompoundStakingRewardsEvent",
           "fullName": "ixo.liquidstake.v1beta1.AutocompoundStakingRewardsEvent",
-          "description": "AutocompoundEvent is triggered after a epoch is triggered for autocompound.",
+          "description": "AutocompoundStakingRewardsEvent is emitted when a pool's autocompound\nepoch hook runs successfully.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
             {
               "name": "delegator",
               "description": "",
@@ -15092,12 +15359,24 @@
           "name": "LiquidStakeEvent",
           "longName": "LiquidStakeEvent",
           "fullName": "ixo.liquidstake.v1beta1.LiquidStakeEvent",
-          "description": "LiquidStakeEvent is triggered when a liquid stake is performed.",
+          "description": "LiquidStakeEvent is emitted when a liquid stake is performed against a\nspecific pool.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
             {
               "name": "delegator",
               "description": "",
@@ -15137,29 +15416,17 @@
           ]
         },
         {
-          "name": "LiquidStakeParamsUpdatedEvent",
-          "longName": "LiquidStakeParamsUpdatedEvent",
-          "fullName": "ixo.liquidstake.v1beta1.LiquidStakeParamsUpdatedEvent",
-          "description": "LiquidStakeParamsUpdatedEvent is triggered when a the Params is updated.",
+          "name": "LiquidUnstakeEvent",
+          "longName": "LiquidUnstakeEvent",
+          "fullName": "ixo.liquidstake.v1beta1.LiquidUnstakeEvent",
+          "description": "LiquidUnstakeEvent is emitted when a liquid unstake is performed against\na specific pool.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
             {
-              "name": "params",
-              "description": "",
-              "label": "",
-              "type": "Params",
-              "longType": "Params",
-              "fullType": "ixo.liquidstake.v1beta1.Params",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
-            {
-              "name": "authority",
+              "name": "pool_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -15169,19 +15436,7 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
-            }
-          ]
-        },
-        {
-          "name": "LiquidUnstakeEvent",
-          "longName": "LiquidUnstakeEvent",
-          "fullName": "ixo.liquidstake.v1beta1.LiquidUnstakeEvent",
-          "description": "LiquidUnstakeEvent is triggered when a liquid unstake is performed.",
-          "hasExtensions": false,
-          "hasFields": true,
-          "hasOneofs": false,
-          "extensions": [],
-          "fields": [
+            },
             {
               "name": "delegator",
               "description": "",
@@ -15245,15 +15500,159 @@
           ]
         },
         {
-          "name": "RebalancedLiquidStakeEvent",
-          "longName": "RebalancedLiquidStakeEvent",
-          "fullName": "ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent",
-          "description": "RebalancedEvent is triggered after a rebalance is performed.",
+          "name": "ModuleParamsUpdatedEvent",
+          "longName": "ModuleParamsUpdatedEvent",
+          "fullName": "ixo.liquidstake.v1beta1.ModuleParamsUpdatedEvent",
+          "description": "ModuleParamsUpdatedEvent is emitted when the global ModuleParams change\n(either via MsgUpdateModuleParams or MsgSetModulePaused).",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
+            {
+              "name": "module_params",
+              "description": "",
+              "label": "",
+              "type": "ModuleParams",
+              "longType": "ModuleParams",
+              "fullType": "ixo.liquidstake.v1beta1.ModuleParams",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authority",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PoolCreatedEvent",
+          "longName": "PoolCreatedEvent",
+          "fullName": "ixo.liquidstake.v1beta1.PoolCreatedEvent",
+          "description": "PoolCreatedEvent is emitted when a new pool is registered via\nMsgCreatePool.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool",
+              "description": "",
+              "label": "",
+              "type": "Pool",
+              "longType": "Pool",
+              "fullType": "ixo.liquidstake.v1beta1.Pool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authority",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PoolUpdatedEvent",
+          "longName": "PoolUpdatedEvent",
+          "fullName": "ixo.liquidstake.v1beta1.PoolUpdatedEvent",
+          "description": "PoolUpdatedEvent is emitted when a pool's configuration changes via any\nof: MsgUpdatePool, MsgUpdateWhitelistedValidators,\nMsgUpdateWeightedRewardsReceivers, MsgSetPoolPaused.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool",
+              "description": "",
+              "label": "",
+              "type": "Pool",
+              "longType": "Pool",
+              "fullType": "ixo.liquidstake.v1beta1.Pool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authority",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "RebalancedLiquidStakeEvent",
+          "longName": "RebalancedLiquidStakeEvent",
+          "fullName": "ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent",
+          "description": "RebalancedLiquidStakeEvent is emitted after a pool's rebalancing pass.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
             {
               "name": "delegator",
               "description": "",
@@ -15317,12 +15716,60 @@
           "extensions": [],
           "fields": [
             {
-              "name": "params",
-              "description": "",
+              "name": "module_params",
+              "description": "module_params holds the global module-wide parameters.",
               "label": "",
-              "type": "Params",
-              "longType": "Params",
-              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "type": "ModuleParams",
+              "longType": "ModuleParams",
+              "fullType": "ixo.liquidstake.v1beta1.ModuleParams",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pools",
+              "description": "pools is the list of every registered liquid staking pool.",
+              "label": "repeated",
+              "type": "Pool",
+              "longType": "Pool",
+              "fullType": "ixo.liquidstake.v1beta1.Pool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_liquid_validators",
+              "description": "pool_liquid_validators groups each pool's liquid validators by pool_id.\nThe pool_id of every entry must match a Pool in pools.",
+              "label": "repeated",
+              "type": "PoolLiquidValidators",
+              "longType": "PoolLiquidValidators",
+              "fullType": "ixo.liquidstake.v1beta1.PoolLiquidValidators",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "PoolLiquidValidators",
+          "longName": "PoolLiquidValidators",
+          "fullName": "ixo.liquidstake.v1beta1.PoolLiquidValidators",
+          "description": "PoolLiquidValidators groups a pool's liquid-validator state for genesis\nimport/export, since validators are scoped per pool in v7+.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "pool_id selects the owning pool.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15330,7 +15777,7 @@
             },
             {
               "name": "liquid_validators",
-              "description": "",
+              "description": "liquid_validators is the set of liquid validators known to the pool.",
               "label": "repeated",
               "type": "LiquidValidator",
               "longType": "LiquidValidator",
@@ -15362,10 +15809,23 @@
           "fullName": "ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest",
           "description": "",
           "hasExtensions": false,
-          "hasFields": false,
+          "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
-          "fields": []
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         },
         {
           "name": "QueryLiquidValidatorsResponse",
@@ -15392,9 +15852,9 @@
           ]
         },
         {
-          "name": "QueryParamsRequest",
-          "longName": "QueryParamsRequest",
-          "fullName": "ixo.liquidstake.v1beta1.QueryParamsRequest",
+          "name": "QueryModuleParamsRequest",
+          "longName": "QueryModuleParamsRequest",
+          "fullName": "ixo.liquidstake.v1beta1.QueryModuleParamsRequest",
           "description": "",
           "hasExtensions": false,
           "hasFields": false,
@@ -15403,9 +15863,9 @@
           "fields": []
         },
         {
-          "name": "QueryParamsResponse",
-          "longName": "QueryParamsResponse",
-          "fullName": "ixo.liquidstake.v1beta1.QueryParamsResponse",
+          "name": "QueryModuleParamsResponse",
+          "longName": "QueryModuleParamsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.QueryModuleParamsResponse",
           "description": "",
           "hasExtensions": false,
           "hasFields": true,
@@ -15413,12 +15873,120 @@
           "extensions": [],
           "fields": [
             {
-              "name": "params",
+              "name": "module_params",
               "description": "",
               "label": "",
-              "type": "Params",
-              "longType": "Params",
-              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "type": "ModuleParams",
+              "longType": "ModuleParams",
+              "fullType": "ixo.liquidstake.v1beta1.ModuleParams",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryPoolRequest",
+          "longName": "QueryPoolRequest",
+          "fullName": "ixo.liquidstake.v1beta1.QueryPoolRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryPoolResponse",
+          "longName": "QueryPoolResponse",
+          "fullName": "ixo.liquidstake.v1beta1.QueryPoolResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pool",
+              "description": "",
+              "label": "",
+              "type": "Pool",
+              "longType": "Pool",
+              "fullType": "ixo.liquidstake.v1beta1.Pool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryPoolsRequest",
+          "longName": "QueryPoolsRequest",
+          "fullName": "ixo.liquidstake.v1beta1.QueryPoolsRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryPoolsResponse",
+          "longName": "QueryPoolsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.QueryPoolsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pools",
+              "description": "",
+              "label": "repeated",
+              "type": "Pool",
+              "longType": "Pool",
+              "fullType": "ixo.liquidstake.v1beta1.Pool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15432,10 +16000,23 @@
           "fullName": "ixo.liquidstake.v1beta1.QueryStatesRequest",
           "description": "",
           "hasExtensions": false,
-          "hasFields": false,
+          "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
-          "fields": []
+          "fields": [
+            {
+              "name": "pool_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         },
         {
           "name": "QueryStatesResponse",
@@ -15470,22 +16051,66 @@
           "description": "Query defines the gRPC query service for the liquidstake module.",
           "methods": [
             {
-              "name": "Params",
-              "description": "Params returns parameters of the liquidstake module.",
-              "requestType": "QueryParamsRequest",
-              "requestLongType": "QueryParamsRequest",
-              "requestFullType": "ixo.liquidstake.v1beta1.QueryParamsRequest",
+              "name": "ModuleParams",
+              "description": "ModuleParams returns the global, module-wide parameters (minimum stake\namount and global pause flag).",
+              "requestType": "QueryModuleParamsRequest",
+              "requestLongType": "QueryModuleParamsRequest",
+              "requestFullType": "ixo.liquidstake.v1beta1.QueryModuleParamsRequest",
               "requestStreaming": false,
-              "responseType": "QueryParamsResponse",
-              "responseLongType": "QueryParamsResponse",
-              "responseFullType": "ixo.liquidstake.v1beta1.QueryParamsResponse",
+              "responseType": "QueryModuleParamsResponse",
+              "responseLongType": "QueryModuleParamsResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.QueryModuleParamsResponse",
               "responseStreaming": false,
               "options": {
                 "google.api.http": {
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/liquidstake/v1beta1/params"
+                      "pattern": "/ixo/liquidstake/v1beta1/module_params"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Pool",
+              "description": "Pool returns the configuration of a single pool by pool_id.",
+              "requestType": "QueryPoolRequest",
+              "requestLongType": "QueryPoolRequest",
+              "requestFullType": "ixo.liquidstake.v1beta1.QueryPoolRequest",
+              "requestStreaming": false,
+              "responseType": "QueryPoolResponse",
+              "responseLongType": "QueryPoolResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.QueryPoolResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/liquidstake/v1beta1/pools/{pool_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Pools",
+              "description": "Pools returns every registered pool's configuration, paginated.",
+              "requestType": "QueryPoolsRequest",
+              "requestLongType": "QueryPoolsRequest",
+              "requestFullType": "ixo.liquidstake.v1beta1.QueryPoolsRequest",
+              "requestStreaming": false,
+              "responseType": "QueryPoolsResponse",
+              "responseLongType": "QueryPoolsResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.QueryPoolsResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/liquidstake/v1beta1/pools"
                     }
                   ]
                 }
@@ -15493,7 +16118,7 @@
             },
             {
               "name": "LiquidValidators",
-              "description": "LiquidValidators returns liquid validators with states of the liquidstake\nmodule.",
+              "description": "LiquidValidators returns liquid validators (with state) for a single\npool.",
               "requestType": "QueryLiquidValidatorsRequest",
               "requestLongType": "QueryLiquidValidatorsRequest",
               "requestFullType": "ixo.liquidstake.v1beta1.QueryLiquidValidatorsRequest",
@@ -15507,7 +16132,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/liquidstake/v1beta1/validators"
+                      "pattern": "/ixo/liquidstake/v1beta1/pools/{pool_id}/validators"
                     }
                   ]
                 }
@@ -15515,7 +16140,7 @@
             },
             {
               "name": "States",
-              "description": "States returns states of the liquidstake module.",
+              "description": "States returns the NetAmountState (rates, supplies, balances) for a\nsingle pool.",
               "requestType": "QueryStatesRequest",
               "requestLongType": "QueryStatesRequest",
               "requestFullType": "ixo.liquidstake.v1beta1.QueryStatesRequest",
@@ -15529,7 +16154,7 @@
                   "rules": [
                     {
                       "method": "GET",
-                      "pattern": "/ixo/liquidstake/v1beta1/states"
+                      "pattern": "/ixo/liquidstake/v1beta1/pools/{pool_id}/states"
                     }
                   ]
                 }
@@ -15554,7 +16179,7 @@
           "name": "MsgBurn",
           "longName": "MsgBurn",
           "fullName": "ixo.liquidstake.v1beta1.MsgBurn",
-          "description": "MsgBurn defines a SDK message for performing a burn of coins.\nNOTE: only ixo native token can be burned",
+          "description": "MsgBurn burns the signer's native uixo tokens. Module-level operation.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15574,7 +16199,7 @@
             },
             {
               "name": "amount",
-              "description": "amount is the amount of coins to burn\nNOTE: only ixo native token can be burned",
+              "description": "amount must be denominated in uixo.",
               "label": "",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -15598,10 +16223,106 @@
           "fields": []
         },
         {
+          "name": "MsgCreatePool",
+          "longName": "MsgCreatePool",
+          "fullName": "ixo.liquidstake.v1beta1.MsgCreatePool",
+          "description": "MsgCreatePool registers a new liquid staking pool. Governance only.\n\nThe proxy account is derived deterministically from pool_id; pool_id and\nliquid_bond_denom must both be globally unique. The newly created pool\nstarts with an empty whitelisted_validators list, empty\nweighted_rewards_receivers, zero fee rates, and paused=false. Validators\nmust be added with MsgUpdateWhitelistedValidators before staking is\npossible (the active-weight-quorum check requires sum \u003e= 33.33%).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "authority must be the governance module address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
+              "description": "pool_id is the immutable identifier for the new pool. Validated as\nlowercase alphanumeric plus '-', length 2..16, globally unique.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "liquid_bond_denom",
+              "description": "liquid_bond_denom is the LST denom for the new pool. Must pass\nsdk.ValidateDenom and be globally unique across pools.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "initial_admin_address",
+              "description": "initial_admin_address becomes the pool's whitelist_admin_address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "initial_fee_account_address",
+              "description": "initial_fee_account_address becomes the pool's fee_account_address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCreatePoolResponse",
+          "longName": "MsgCreatePoolResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgCreatePoolResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "proxy_account_address",
+              "description": "proxy_account_address is the derived bech32 address that will hold this\npool's delegations. Returned for client convenience.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "MsgLiquidStake",
           "longName": "MsgLiquidStake",
           "fullName": "ixo.liquidstake.v1beta1.MsgLiquidStake",
-          "description": "MsgLiquidStake defines a SDK message for performing a liquid stake of coins\nfrom a delegator to whitelisted validators.",
+          "description": "MsgLiquidStake liquid-stakes native tokens into a specific pool.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15609,7 +16330,19 @@
           "fields": [
             {
               "name": "delegator_address",
-              "description": "",
+              "description": "delegator_address must equal the pool's whitelist_admin_address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
+              "description": "pool_id selects which pool to stake into and therefore which LST denom\nis minted in return.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15621,7 +16354,7 @@
             },
             {
               "name": "amount",
-              "description": "",
+              "description": "amount is the native staking-token coin to liquid-stake. Its denom must\nmatch the chain's bond denom.",
               "label": "",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -15637,7 +16370,7 @@
           "name": "MsgLiquidStakeResponse",
           "longName": "MsgLiquidStakeResponse",
           "fullName": "ixo.liquidstake.v1beta1.MsgLiquidStakeResponse",
-          "description": "MsgLiquidStakeResponse defines the MsgLiquidStake response type.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": false,
           "hasOneofs": false,
@@ -15648,7 +16381,7 @@
           "name": "MsgLiquidUnstake",
           "longName": "MsgLiquidUnstake",
           "fullName": "ixo.liquidstake.v1beta1.MsgLiquidUnstake",
-          "description": "MsgLiquidUnstake defines a SDK message for performing an undelegation of\nliquid staking from a delegate.",
+          "description": "MsgLiquidUnstake burns LST of a specific pool and initiates unbonding.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15667,8 +16400,20 @@
               "defaultValue": ""
             },
             {
+              "name": "pool_id",
+              "description": "pool_id must correspond to amount.denom (the pool's liquid_bond_denom);\nboth are required for explicitness and validated to match.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
               "name": "amount",
-              "description": "",
+              "description": "amount is the LST coin to burn. Its denom must equal\nPool(pool_id).liquid_bond_denom.",
               "label": "",
               "type": "Coin",
               "longType": "cosmos.base.v1beta1.Coin",
@@ -15684,7 +16429,7 @@
           "name": "MsgLiquidUnstakeResponse",
           "longName": "MsgLiquidUnstakeResponse",
           "fullName": "ixo.liquidstake.v1beta1.MsgLiquidUnstakeResponse",
-          "description": "MsgLiquidUnstakeResponse defines the MsgLiquidUnstake response type.",
+          "description": "",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15708,7 +16453,7 @@
           "name": "MsgSetModulePaused",
           "longName": "MsgSetModulePaused",
           "fullName": "ixo.liquidstake.v1beta1.MsgSetModulePaused",
-          "description": "",
+          "description": "MsgSetModulePaused toggles the global ModuleParams.module_paused kill\nswitch. When true, every pool is halted regardless of its per-pool flag.\nGovernance authority only.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15716,7 +16461,7 @@
           "fields": [
             {
               "name": "authority",
-              "description": "Authority is the address that is allowed to update module's paused state,\ndefined as admin address in params (WhitelistAdminAddress).",
+              "description": "authority must be the governance module address.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15728,7 +16473,7 @@
             },
             {
               "name": "is_paused",
-              "description": "IsPaused represents the target state of the paused flag.",
+              "description": "is_paused is the target value of ModuleParams.module_paused.",
               "label": "",
               "type": "bool",
               "longType": "bool",
@@ -15744,7 +16489,7 @@
           "name": "MsgSetModulePausedResponse",
           "longName": "MsgSetModulePausedResponse",
           "fullName": "ixo.liquidstake.v1beta1.MsgSetModulePausedResponse",
-          "description": "MsgSetModulePausedResponse defines the response structure for\nexecuting a",
+          "description": "",
           "hasExtensions": false,
           "hasFields": false,
           "hasOneofs": false,
@@ -15752,10 +16497,10 @@
           "fields": []
         },
         {
-          "name": "MsgUpdateParams",
-          "longName": "MsgUpdateParams",
-          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateParams",
-          "description": "",
+          "name": "MsgSetPoolPaused",
+          "longName": "MsgSetPoolPaused",
+          "fullName": "ixo.liquidstake.v1beta1.MsgSetPoolPaused",
+          "description": "MsgSetPoolPaused toggles a single pool's per-pool paused flag.\nGovernance or the pool's current admin may call this.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15763,7 +16508,7 @@
           "fields": [
             {
               "name": "authority",
-              "description": "authority is the address that controls the module (defaults to x/gov unless\noverwritten).",
+              "description": "authority must be either governance or the pool's current admin.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15774,12 +16519,24 @@
               "defaultValue": ""
             },
             {
-              "name": "params",
-              "description": "params defines the parameters to update.\nNOTE: denom and whitelisted_validators and weighted_rewards_receivers are\nnot updated.",
+              "name": "pool_id",
+              "description": "pool_id selects the pool whose paused flag is being set.",
               "label": "",
-              "type": "Params",
-              "longType": "Params",
-              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "is_paused",
+              "description": "is_paused is the target value of Pool.paused.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15788,10 +16545,152 @@
           ]
         },
         {
-          "name": "MsgUpdateParamsResponse",
-          "longName": "MsgUpdateParamsResponse",
-          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateParamsResponse",
-          "description": "MsgUpdateParamsResponse defines the response structure for executing a",
+          "name": "MsgSetPoolPausedResponse",
+          "longName": "MsgSetPoolPausedResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgSetPoolPausedResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateModuleParams",
+          "longName": "MsgUpdateModuleParams",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateModuleParams",
+          "description": "MsgUpdateModuleParams updates the global ModuleParams. Governance only.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "authority must be the governance module address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "module_params",
+              "description": "module_params replaces the current ModuleParams in full.",
+              "label": "",
+              "type": "ModuleParams",
+              "longType": "ModuleParams",
+              "fullType": "ixo.liquidstake.v1beta1.ModuleParams",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateModuleParamsResponse",
+          "longName": "MsgUpdateModuleParamsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdatePool",
+          "longName": "MsgUpdatePool",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdatePool",
+          "description": "MsgUpdatePool updates a pool's mutable scalar/address fields. Governance\nor the pool's current whitelist_admin_address may call this.\n\nWhitelisted validators, weighted rewards receivers, and the paused flag\neach have their own dedicated update message and are NOT touched here.\nThe pool_id, liquid_bond_denom, and proxy_account_address are immutable\nafter creation and cannot be changed via this message.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "authority must be either governance or the pool's current admin.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
+              "description": "pool_id selects the pool to update.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "unstake_fee_rate",
+              "description": "unstake_fee_rate replaces the pool's current unstake fee rate.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "fee_account_address",
+              "description": "fee_account_address replaces the pool's current fee account.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "autocompound_fee_rate",
+              "description": "autocompound_fee_rate replaces the pool's current autocompound fee rate.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "whitelist_admin_address",
+              "description": "whitelist_admin_address replaces the pool's current admin address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdatePoolResponse",
+          "longName": "MsgUpdatePoolResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdatePoolResponse",
+          "description": "",
           "hasExtensions": false,
           "hasFields": false,
           "hasOneofs": false,
@@ -15802,7 +16701,7 @@
           "name": "MsgUpdateWeightedRewardsReceivers",
           "longName": "MsgUpdateWeightedRewardsReceivers",
           "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers",
-          "description": "",
+          "description": "MsgUpdateWeightedRewardsReceivers replaces a pool's weighted rewards\nreceivers list. Pool admin only (matches pre-v7 admin-only constraint).",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15810,7 +16709,19 @@
           "fields": [
             {
               "name": "authority",
-              "description": "Authority is the address that is allowed to update wieghted rewards\nreceivers, defined as admin address in params (WhitelistAdminAddress).",
+              "description": "authority must equal the pool's whitelist_admin_address.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
+              "description": "pool_id selects the pool whose receivers are being replaced.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15822,7 +16733,7 @@
             },
             {
               "name": "weighted_rewards_receivers",
-              "description": "WhitelistedValidators specifies the validators elected to become Active\nLiquid Validators.",
+              "description": "weighted_rewards_receivers replaces the pool's receivers list. Sum of\nweights must not exceed 1.",
               "label": "repeated",
               "type": "WeightedAddress",
               "longType": "WeightedAddress",
@@ -15838,7 +16749,7 @@
           "name": "MsgUpdateWeightedRewardsReceiversResponse",
           "longName": "MsgUpdateWeightedRewardsReceiversResponse",
           "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceiversResponse",
-          "description": "MsgUpdateWeightedRewardsReceiversResponse defines the response structure for\nexecuting a",
+          "description": "",
           "hasExtensions": false,
           "hasFields": false,
           "hasOneofs": false,
@@ -15849,7 +16760,7 @@
           "name": "MsgUpdateWhitelistedValidators",
           "longName": "MsgUpdateWhitelistedValidators",
           "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators",
-          "description": "",
+          "description": "MsgUpdateWhitelistedValidators replaces a pool's validator whitelist.\nGovernance or the pool's current admin may call this. Target weights must\nsum to 10000.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
@@ -15857,7 +16768,19 @@
           "fields": [
             {
               "name": "authority",
-              "description": "Authority is the address that is allowed to update whitelisted validators,\ndefined as admin address in params (WhitelistAdminAddress).",
+              "description": "authority must be either governance or the pool's current admin.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
+              "description": "pool_id selects the pool whose whitelist is being replaced.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -15869,7 +16792,7 @@
             },
             {
               "name": "whitelisted_validators",
-              "description": "WhitelistedValidators specifies the validators elected to become Active\nLiquid Validators.",
+              "description": "whitelisted_validators replaces the pool's validator set.",
               "label": "repeated",
               "type": "WhitelistedValidator",
               "longType": "WhitelistedValidator",
@@ -15885,7 +16808,7 @@
           "name": "MsgUpdateWhitelistedValidatorsResponse",
           "longName": "MsgUpdateWhitelistedValidatorsResponse",
           "fullName": "ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidatorsResponse",
-          "description": "MsgUpdateWhitelistedValidatorsResponse defines the response structure for\nexecuting a",
+          "description": "",
           "hasExtensions": false,
           "hasFields": false,
           "hasOneofs": false,
@@ -15902,7 +16825,7 @@
           "methods": [
             {
               "name": "LiquidStake",
-              "description": "LiquidStake defines a method for performing a delegation of coins\nfrom a delegator to whitelisted validators.",
+              "description": "LiquidStake delegates native tokens through a pool's proxy account to its\nwhitelisted validators and mints the pool's LST denom to the delegator.",
               "requestType": "MsgLiquidStake",
               "requestLongType": "MsgLiquidStake",
               "requestFullType": "ixo.liquidstake.v1beta1.MsgLiquidStake",
@@ -15914,7 +16837,7 @@
             },
             {
               "name": "LiquidUnstake",
-              "description": "LiquidUnstake defines a method for performing an undelegation of liquid\nstaking from a delegate.",
+              "description": "LiquidUnstake burns LST denom of a specific pool and initiates unbonding\nfrom that pool's whitelisted validators back to the delegator.",
               "requestType": "MsgLiquidUnstake",
               "requestLongType": "MsgLiquidUnstake",
               "requestFullType": "ixo.liquidstake.v1beta1.MsgLiquidUnstake",
@@ -15925,20 +16848,44 @@
               "responseStreaming": false
             },
             {
-              "name": "UpdateParams",
-              "description": "UpdateParams defines a method to update the module params.",
-              "requestType": "MsgUpdateParams",
-              "requestLongType": "MsgUpdateParams",
-              "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdateParams",
+              "name": "CreatePool",
+              "description": "CreatePool registers a new liquid staking pool with its own LST denom,\nproxy account, admin, and fee configuration. Governance authority only.",
+              "requestType": "MsgCreatePool",
+              "requestLongType": "MsgCreatePool",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgCreatePool",
               "requestStreaming": false,
-              "responseType": "MsgUpdateParamsResponse",
-              "responseLongType": "MsgUpdateParamsResponse",
-              "responseFullType": "ixo.liquidstake.v1beta1.MsgUpdateParamsResponse",
+              "responseType": "MsgCreatePoolResponse",
+              "responseLongType": "MsgCreatePoolResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgCreatePoolResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateModuleParams",
+              "description": "UpdateModuleParams updates global, module-wide parameters (the minimum\nliquid stake amount and the global module-paused kill switch).\nGovernance authority only.",
+              "requestType": "MsgUpdateModuleParams",
+              "requestLongType": "MsgUpdateModuleParams",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdateModuleParams",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateModuleParamsResponse",
+              "responseLongType": "MsgUpdateModuleParamsResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdatePool",
+              "description": "UpdatePool updates the mutable scalar/address fields of a specific pool\n(fee rates, fee account, admin address). Governance or the pool's\ncurrent admin may call this. Whitelisted validators, weighted rewards\nreceivers, and the paused flag have their own dedicated update messages.",
+              "requestType": "MsgUpdatePool",
+              "requestLongType": "MsgUpdatePool",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdatePool",
+              "requestStreaming": false,
+              "responseType": "MsgUpdatePoolResponse",
+              "responseLongType": "MsgUpdatePoolResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgUpdatePoolResponse",
               "responseStreaming": false
             },
             {
               "name": "UpdateWhitelistedValidators",
-              "description": "UpdateWhitelistedValidators defines a method to update the whitelisted\nvalidators list.",
+              "description": "UpdateWhitelistedValidators updates the validator whitelist of a specific\npool. Governance or the pool's current admin may call this.",
               "requestType": "MsgUpdateWhitelistedValidators",
               "requestLongType": "MsgUpdateWhitelistedValidators",
               "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdateWhitelistedValidators",
@@ -15950,7 +16897,7 @@
             },
             {
               "name": "UpdateWeightedRewardsReceivers",
-              "description": "UpdateWhitelistedValidators defines a method to update the whitelisted\nvalidators list. Only the whitelist admin address can update this list.",
+              "description": "UpdateWeightedRewardsReceivers updates the weighted rewards receivers\nlist of a specific pool. The pool's admin may call this.",
               "requestType": "MsgUpdateWeightedRewardsReceivers",
               "requestLongType": "MsgUpdateWeightedRewardsReceivers",
               "requestFullType": "ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers",
@@ -15961,8 +16908,20 @@
               "responseStreaming": false
             },
             {
+              "name": "SetPoolPaused",
+              "description": "SetPoolPaused toggles the per-pool paused flag for a specific pool.\nGovernance or the pool's current admin may call this. Other pools are\nunaffected.",
+              "requestType": "MsgSetPoolPaused",
+              "requestLongType": "MsgSetPoolPaused",
+              "requestFullType": "ixo.liquidstake.v1beta1.MsgSetPoolPaused",
+              "requestStreaming": false,
+              "responseType": "MsgSetPoolPausedResponse",
+              "responseLongType": "MsgSetPoolPausedResponse",
+              "responseFullType": "ixo.liquidstake.v1beta1.MsgSetPoolPausedResponse",
+              "responseStreaming": false
+            },
+            {
               "name": "SetModulePaused",
-              "description": "SetModulePaused  defines a method to update the module's pause status,\nsetting value of the safety flag in params.",
+              "description": "SetModulePaused toggles the global module-paused flag in ModuleParams.\nWhen paused, ALL pools are halted regardless of their per-pool flag.\nGovernance authority only.",
               "requestType": "MsgSetModulePaused",
               "requestLongType": "MsgSetModulePaused",
               "requestFullType": "ixo.liquidstake.v1beta1.MsgSetModulePaused",
@@ -15974,7 +16933,7 @@
             },
             {
               "name": "Burn",
-              "description": "Burn defines a method for burning coins.",
+              "description": "Burn burns native uixo tokens. Module-level operation, not pool-scoped.",
               "requestType": "MsgBurn",
               "requestLongType": "MsgBurn",
               "requestFullType": "ixo.liquidstake.v1beta1.MsgBurn",
