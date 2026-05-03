@@ -1,0 +1,166 @@
+syntax = "proto3";
+package ixo.names.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "cosmos/msg/v1/msg.proto";
+import "ixo/names/v1beta1/names.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/names/types";
+
+// Msg defines the names module Msg service.
+service Msg {
+  // CreateNamespace creates a new namespace. Authority-only (gov).
+  rpc CreateNamespace(MsgCreateNamespace) returns (MsgCreateNamespaceResponse);
+  // UpdateNamespace replaces an existing namespace's configuration.
+  // Authority-only (gov). All Namespace fields supplied in the message become
+  // the new state.
+  rpc UpdateNamespace(MsgUpdateNamespace) returns (MsgUpdateNamespaceResponse);
+
+  // RegisterName lets a user register a name in a namespace that allows
+  // self-registration. The signer must control owner_did.
+  rpc RegisterName(MsgRegisterName) returns (MsgRegisterNameResponse);
+  // RegisterNameByRegistrar lets a registrar register a name on behalf of
+  // owner_did. The signer must be a registrar of the namespace.
+  rpc RegisterNameByRegistrar(MsgRegisterNameByRegistrar)
+      returns (MsgRegisterNameByRegistrarResponse);
+
+  // UpdateNameByRegistrar lets a registrar update the verification metadata
+  // (verified flag, verified_by, evidence_hash, source) of an existing record.
+  // The signer must be a registrar of the namespace. Owner DID is not
+  // changed by this message; use TransferName for that.
+  rpc UpdateNameByRegistrar(MsgUpdateNameByRegistrar)
+      returns (MsgUpdateNameByRegistrarResponse);
+
+  // TransferName transfers ownership of a name to another DID. Permitted for
+  // the current owner; permitted for a registrar when the namespace has
+  // allow_registrar_override = true.
+  rpc TransferName(MsgTransferName) returns (MsgTransferNameResponse);
+
+  // SetNameStatus changes the lifecycle status of a name (suspend, revoke,
+  // tombstone, or restore to active). Permitted for registrars and the
+  // governance authority.
+  rpc SetNameStatus(MsgSetNameStatus) returns (MsgSetNameStatusResponse);
+}
+
+// -------------------------------
+// Namespace governance messages
+// -------------------------------
+
+message MsgCreateNamespace {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (gogoproto.equal) = false;
+
+  // authority is the address allowed to create namespaces (the gov module
+  // address).
+  string authority = 1;
+  // namespace is the full configuration of the new namespace.
+  Namespace namespace = 2;
+}
+
+message MsgCreateNamespaceResponse {}
+
+message MsgUpdateNamespace {
+  option (cosmos.msg.v1.signer) = "authority";
+  option (gogoproto.equal) = false;
+
+  // authority is the address allowed to update namespaces (the gov module
+  // address).
+  string authority = 1;
+  // namespace replaces the existing namespace configuration; the
+  // namespace.name selects the target.
+  Namespace namespace = 2;
+}
+
+message MsgUpdateNamespaceResponse {}
+
+// -------------------------------
+// User and registrar messages
+// -------------------------------
+
+message MsgRegisterName {
+  option (cosmos.msg.v1.signer) = "signer";
+  option (gogoproto.equal) = false;
+
+  // signer is the bech32 address signing the tx; must control owner_did via
+  // an authentication verification method on the IID document.
+  string signer = 1;
+  // namespace is the namespace under which the name is being registered.
+  string namespace = 2;
+  // name is the display name (preserves case); will be normalized for
+  // uniqueness.
+  string name = 3;
+  // owner_did is the DID this name will resolve to.
+  string owner_did = 4;
+}
+
+message MsgRegisterNameResponse {
+  // normalized_name is the canonical form stored.
+  string normalized_name = 1;
+}
+
+message MsgRegisterNameByRegistrar {
+  option (cosmos.msg.v1.signer) = "registrar";
+  option (gogoproto.equal) = false;
+
+  // registrar is the bech32 address signing the tx; must be in the
+  // namespace's registrar_accounts.
+  string registrar = 1;
+  string namespace = 2;
+  string name = 3;
+  string owner_did = 4;
+  // verified marks the record as attested. Registrars typically set this true
+  // after off-chain verification; user-driven self-register sets it false.
+  bool verified = 5;
+  // evidence_hash is an optional hash of the off-chain attestation evidence.
+  string evidence_hash = 6;
+  // source is a free-form tag describing the verification source.
+  string source = 7;
+}
+
+message MsgRegisterNameByRegistrarResponse { string normalized_name = 1; }
+
+message MsgUpdateNameByRegistrar {
+  option (cosmos.msg.v1.signer) = "registrar";
+  option (gogoproto.equal) = false;
+
+  string registrar = 1;
+  string namespace = 2;
+  // normalized_name is the canonical name to update.
+  string normalized_name = 3;
+  bool verified = 4;
+  string evidence_hash = 5;
+  string source = 6;
+}
+
+message MsgUpdateNameByRegistrarResponse {}
+
+message MsgTransferName {
+  option (cosmos.msg.v1.signer) = "signer";
+  option (gogoproto.equal) = false;
+
+  // signer is the bech32 address submitting the transfer; must control the
+  // current owner_did, OR be a registrar when allow_registrar_override is
+  // enabled.
+  string signer = 1;
+  string namespace = 2;
+  string normalized_name = 3;
+  // new_owner_did is the DID that will own the name after the transfer.
+  string new_owner_did = 4;
+}
+
+message MsgTransferNameResponse {}
+
+message MsgSetNameStatus {
+  option (cosmos.msg.v1.signer) = "signer";
+  option (gogoproto.equal) = false;
+
+  // signer is either a namespace registrar or the governance authority.
+  string signer = 1;
+  string namespace = 2;
+  string normalized_name = 3;
+  NameStatus status = 4;
+  // reason is a free-form string surfaced in the audit event.
+  string reason = 5;
+}
+
+message MsgSetNameStatusResponse {}

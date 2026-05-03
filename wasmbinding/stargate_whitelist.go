@@ -21,6 +21,7 @@ import (
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
 	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 	minttypes "github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
 	tokentypes "github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
 )
@@ -101,11 +102,15 @@ func init() {
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Dispute", &claimstypes.QueryDisputeResponse{})
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/Intent", &claimstypes.QueryIntentResponse{})
 	setWhitelistedQuery("/ixo.claims.v1beta1.Query/IntentList", &claimstypes.QueryIntentListResponse{})
+	setWhitelistedQuery("/ixo.claims.v1beta1.Query/CollectionMember", &claimstypes.QueryCollectionMemberResponse{})
+	setWhitelistedQuery("/ixo.claims.v1beta1.Query/CollectionMemberList", &claimstypes.QueryCollectionMemberListResponse{})
 
 	// entity
 	setWhitelistedQuery("/ixo.entity.v1beta1.Query/Params", &entitytypes.QueryParamsResponse{})
 	setWhitelistedQuery("/ixo.entity.v1beta1.Query/Entity", &entitytypes.QueryEntityResponse{})
 	setWhitelistedQuery("/ixo.entity.v1beta1.Query/EntityVerified", &entitytypes.QueryEntityVerifiedResponse{})
+	setWhitelistedQuery("/ixo.entity.v1beta1.Query/EntityMetaData", &entitytypes.QueryEntityMetadataResponse{})
+	setWhitelistedQuery("/ixo.entity.v1beta1.Query/EntityIidDocument", &entitytypes.QueryEntityIidDocumentResponse{})
 
 	// iid
 	setWhitelistedQuery("/ixo.iid.v1beta1.Query/IidDocument", &iidtypes.QueryIidDocumentResponse{})
@@ -134,6 +139,16 @@ func init() {
 	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/Pools", &liquidstaketypes.QueryPoolsResponse{})
 	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/LiquidValidators", &liquidstaketypes.QueryLiquidValidatorsResponse{})
 	setWhitelistedQuery("/ixo.liquidstake.v1beta1.Query/States", &liquidstaketypes.QueryStatesResponse{})
+
+	// names (chain-level name service, IXO-1123). All queries are pure
+	// reads of indexed KV state with no time/RNG/external calls — safe to
+	// expose to Wasm contracts.
+	setWhitelistedQuery("/ixo.names.v1beta1.Query/Namespace", &namestypes.QueryNamespaceResponse{})
+	setWhitelistedQuery("/ixo.names.v1beta1.Query/Namespaces", &namestypes.QueryNamespacesResponse{})
+	setWhitelistedQuery("/ixo.names.v1beta1.Query/ResolveName", &namestypes.QueryResolveNameResponse{})
+	setWhitelistedQuery("/ixo.names.v1beta1.Query/GetName", &namestypes.QueryGetNameResponse{})
+	setWhitelistedQuery("/ixo.names.v1beta1.Query/NamesByNamespace", &namestypes.QueryNamesByNamespaceResponse{})
+	setWhitelistedQuery("/ixo.names.v1beta1.Query/NamesByOwner", &namestypes.QueryNamesByOwnerResponse{})
 }
 
 // IsWhitelistedQuery returns if the query is not whitelisted.

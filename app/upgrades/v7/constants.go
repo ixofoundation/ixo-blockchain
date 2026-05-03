@@ -4,6 +4,7 @@ import (
 	store "cosmossdk.io/store/types"
 
 	"github.com/ixofoundation/ixo-blockchain/v6/app/upgrades"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
 )
 
 // UpgradeName is the on-chain identifier for the v7 multi-pool liquidstake
@@ -17,13 +18,14 @@ const (
 	LegacyPoolID = "zero"
 )
 
-// Upgrade is registered in app.go alongside earlier versions. No new store
-// keys are added — v7 reshapes the existing liquidstake KV store.
+// Upgrade is registered in app.go alongside earlier versions. v7 reshapes the
+// existing liquidstake KV store and introduces the new x/names KV store for
+// the chain-level name service (IXO-1123).
 var Upgrade = upgrades.Upgrade{
 	UpgradeName:          UpgradeName,
 	CreateUpgradeHandler: CreateUpgradeHandler,
 	StoreUpgrades: store.StoreUpgrades{
-		Added:   []string{},
+		Added:   []string{namestypes.StoreKey},
 		Deleted: []string{},
 	},
 }

@@ -71,6 +71,8 @@ import (
 	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/mint"
 	minttypes "github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
+	namesmodule "github.com/ixofoundation/ixo-blockchain/v6/x/names"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
 	smartaccount "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account"
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
 	tokenmodule "github.com/ixofoundation/ixo-blockchain/v6/x/token"
@@ -146,6 +148,7 @@ func appModules(
 		smartaccount.NewAppModule(*app.SmartAccountKeeper),
 		epochs.NewAppModule(*app.EpochsKeeper),
 		liquidstake.NewAppModule(app.LiquidStakeKeeper),
+		namesmodule.NewAppModule(app.NamesKeeper),
 	}
 }
 
@@ -247,6 +250,7 @@ func OrderBeginBlockers() []string {
 		tokentypes.ModuleName,
 		claimsmoduletypes.ModuleName,
 		liquidstaketypes.ModuleName,
+		namestypes.ModuleName,
 	}
 }
 
@@ -291,6 +295,7 @@ func OrderEndBlockers() []string {
 		bondstypes.ModuleName,
 		claimsmoduletypes.ModuleName,
 		liquidstaketypes.ModuleName,
+		namestypes.ModuleName,
 	}
 }
 
@@ -341,6 +346,7 @@ func OrderInitGenesis() []string {
 		entitytypes.ModuleName,
 		claimsmoduletypes.ModuleName,
 		liquidstaketypes.ModuleName,
+		namestypes.ModuleName,
 	}
 }
 

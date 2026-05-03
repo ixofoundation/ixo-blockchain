@@ -97,6 +97,8 @@ import (
 	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 	mintkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/mint/keeper"
 	minttypes "github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
+	nameskeeper "github.com/ixofoundation/ixo-blockchain/v6/x/names/keeper"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/authenticator"
 	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/keeper"
 	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
@@ -152,6 +154,7 @@ type AppKeepers struct {
 	EpochsKeeper         *epochskeeper.Keeper
 	MintKeeper           *mintkeeper.Keeper
 	LiquidStakeKeeper    liquidstakekeeper.Keeper
+	NamesKeeper          nameskeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
@@ -536,6 +539,13 @@ func NewAppKeepers(
 		appKeepers.keys[iidtypes.StoreKey],
 	)
 
+	appKeepers.NamesKeeper = nameskeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[namestypes.StoreKey],
+		appKeepers.IidKeeper,
+		govModAddress,
+	)
+
 	appKeepers.BondsKeeper = bondskeeper.NewKeeper(
 		appCodec,
 		appKeepers.BankKeeper,
@@ -809,5 +819,6 @@ func KVStoreKeys() []string {
 		smartaccounttypes.StoreKey,
 		epochstypes.StoreKey,
 		liquidstaketypes.StoreKey,
+		namestypes.StoreKey,
 	}
 }

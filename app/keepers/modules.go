@@ -41,6 +41,7 @@ import (
 	"github.com/ixofoundation/ixo-blockchain/v6/x/iid"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/mint"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/names"
 	smartaccount "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/token"
 	tokenclient "github.com/ixofoundation/ixo-blockchain/v6/x/token/client"
@@ -90,4 +91,5 @@ var AppModuleBasics = module.NewBasicManager(
 	smartaccount.AppModuleBasic{},
 	epochs.AppModuleBasic{},
 	liquidstake.AppModuleBasic{},
+	names.AppModuleBasic{},
 )
