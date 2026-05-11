@@ -25,5 +25,6 @@
 	"rust-analyzer.checkOnSave": false,
 	"yaml.schemas": {
 		"https://golangci-lint.run/jsonschema/golangci.jsonschema.json": "file:///Users/michael/dev/ixo/ixo-blockchain/.golangci.yml"
-	}
+	},
+	"makefile.configureOnOpen": false
 }

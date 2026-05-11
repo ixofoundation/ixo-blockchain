@@ -245,7 +245,9 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 		// meaning if custom amounts defined it was within constraints, otherwise just the collection id or claim id was in constraints
 		matched = true
 
-		// subtract quota by one (if eval status is not invalidated) and if not 0 re-add to constraints
+		// subtract quota by one (if eval status is not invalidated) and if not 0 re-add to constraints.
+		// FLAGGED counts as a quota-consuming evaluation so a flag-then-finalise sequence by the same
+		// agent burns two quota slots, and an oracle that flags repeatedly cannot do so unboundedly.
 		if constraint.AgentQuota > 1 || mEval.Status == EvaluationStatus_invalidated {
 			// if evaluation status is invalidated then don't subtract quota
 			if mEval.Status != EvaluationStatus_invalidated {

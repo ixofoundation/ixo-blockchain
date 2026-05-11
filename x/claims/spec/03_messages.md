@@ -139,7 +139,29 @@ The field's descriptions is as follows:
 
 ## MsgEvaluateClaim
 
-A `MsgEvaluateClaim` updates the `Evaluation` for a claim. On evaluation payments will be made for both the evaluation of the claim (towards the agent or oracle) as well as if the claim was `APPROVED` then the claim submitter will also get a payment, which will the preset amount defined on th [Collection](02_state.md#collection) `Payments` field or the evaluator can also define a custom `Amount` that can be paid out on approval. Note: no payments will be made if agent evaluates claim with status `invalidated`
+A `MsgEvaluateClaim` updates the `Evaluation` for a claim. On evaluation payments will be made for both the evaluation of the claim (towards the agent or oracle) as well as if the claim was `APPROVED` then the claim submitter will also get a payment, which will the preset amount defined on th [Collection](02_state.md#collection) `Payments` field or the evaluator can also define a custom `Amount` that can be paid out on approval. Note: no payments will be made if agent evaluates claim with status `invalidated` or `flagged`.
+
+### Re-evaluation rules
+
+By default a claim's evaluation is set once and locks the claim. The exception is `flagged`:
+
+- A claim whose current evaluation status is `flagged` (5) **can** be re-evaluated by another authorized evaluator, or by the same evaluator that flagged it (e.g. once they have more information). The new evaluation may be another `flagged` (escalating to a third evaluator) or any terminal status.
+- The same agent cannot flag a claim they have already flagged. The keeper checks both the current `Evaluation` and every entry in `Claim.evaluationHistory` and rejects the message with `ErrSelfReFlag` if the agent address appears in either.
+- A claim with any *terminal* status (`approved`, `rejected`, `disputed`, `invalidated`) is locked. A second `MsgEvaluateClaim` against it returns `ErrClaimDuplicateEvaluation` regardless of the message status.
+- On a successful re-evaluation, the prior `Evaluation` is appended to `Claim.evaluationHistory` and the new `Evaluation` becomes `Claim.evaluation`. Claims that have only ever been evaluated once leave `evaluationHistory` empty.
+
+### `flagged` semantics
+
+When `status` is `flagged` the keeper:
+
+- skips the evaluator payment (the `Evaluation` payment for the collection does not fire),
+- skips the approval / rejection payment branch,
+- leaves any intent escrow funds in place (a subsequent terminal `approved` will pay the claim agent out of escrow; any other terminal status will refund the approval account),
+- increments `Collection.flagged` (cumulative event counter, never decremented),
+- increments `Collection.flaggedActive` only if the prior evaluation was not already `flagged` (re-flag chains do not double-count), and
+- emits `ClaimEvaluatedEvent` and `ClaimUpdatedEvent` carrying the new `Evaluation` and the updated `Claim` (now including the latest `evaluationHistory`).
+
+`AgentQuota` is decremented for `flagged` the same as for `approved` / `rejected` / `disputed`. Only `invalidated` skips the decrement.
 
 ```go
 type MsgEvaluateClaim struct {

@@ -48,6 +48,12 @@ enum EvaluationStatus {
   REJECTED = 2 [ (gogoproto.enumvalue_customname) = "rejected" ];
   DISPUTED = 3 [ (gogoproto.enumvalue_customname) = "disputed" ];
   INVALIDATED = 4 [ (gogoproto.enumvalue_customname) = "invalidated" ];
+  // Flagged: non-terminal "I am declining to make a final call" outcome.
+  // Payment does not fire. The flagger or any other authorized evaluator
+  // can subsequently re-evaluate the claim to a terminal status (APPROVED
+  // / REJECTED / INVALIDATED) when more information is available. FLAGGED
+  // counts against AgentQuota the same as a terminal evaluation.
+  FLAGGED = 5 [ (gogoproto.enumvalue_customname) = "flagged" ];
 }
 
 enum IntentStatus {
@@ -134,6 +140,14 @@ message Collection {
   // intents is the option for intents for this collection (allow, deny,
   // required)
   CollectionIntentOptions intents = 18;
+  // flagged is the cumulative number of times any claim in this collection
+  // has been flagged by an evaluator. Never decremented — it is an
+  // event-count metric, not a current-state count.
+  uint64 flagged = 19;
+  // flagged_active is the number of claims currently in FLAGGED state
+  // (incremented when a claim becomes FLAGGED, decremented when it
+  // transitions to a terminal evaluation status).
+  uint64 flagged_active = 20;
 }
 
 message Payments {
@@ -264,6 +278,13 @@ message Claim {
   // Copied from intent when use_intent is true. Used for budget restoration
   // on claim rejection/dispute/invalidation.
   string member_address = 13;
+  // evaluation_history holds prior evaluations for this claim in chronological
+  // order. The most recent evaluation always lives in `evaluation`; only
+  // superseded entries are appended here. Empty for claims that have been
+  // evaluated at most once. Populated when an evaluator FLAGS a claim and a
+  // subsequent evaluation (flag-then-flag chain or terminal finalisation)
+  // moves the prior evaluation into history.
+  repeated Evaluation evaluation_history = 14;
 }
 
 message ClaimPayments {

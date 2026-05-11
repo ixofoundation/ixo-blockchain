@@ -81,10 +81,11 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
    - Every claim has a unique `id`, which is typically the CID, doubling as its cryptographic proof.
    - Claims have a default `status` of `0`, indicating they've been `submitted`. Enum is [EvaluationStatus](02_state.md#evaluationstatus)
    - After evaluation, a claim's status can change to:
-     - `approved` (=1)
-     - `rejected` (=2)
-     - `disputed` (=3)
-     - `invalidated` (=4)
+     - `approved` (=1) — terminal, triggers approval payment
+     - `rejected` (=2) — terminal, triggers rejection payment if configured
+     - `disputed` (=3) — terminal, recorded by [MsgDisputeClaim](03_messages.md#msgdisputeclaim) rather than evaluator
+     - `invalidated` (=4) — terminal, no payments
+     - `flagged` (=5) — **non-terminal** escape hatch: no payments, no terminal counters, AgentQuota is still consumed. The flagger or any other authorized evaluator can subsequently re-evaluate the claim to one of the terminal statuses when more information is available. The same agent cannot re-flag a claim they have already flagged. Useful for AI / oracle workflows where the oracle wants to defer the call without committing.
 
 4. **Payment Authorization:**
 

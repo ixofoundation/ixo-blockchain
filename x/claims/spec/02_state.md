@@ -36,23 +36,25 @@ A MemberBudget is stored in the state under a composite key of collection id and
 
 ```go
 type Collection struct {
-	Id           string
-	Entity       string
-	Admin        string
-	Protocol     string
-	StartDate    *time.Time
-	EndDate      *time.Time
-	Quota        uint64
-	Count        uint64
-	Evaluated    uint64
-	Approved     uint64
-	Rejected     uint64
-	Disputed     uint64
-	Invalidated  uint64
-	State        CollectionState
-	Payments     *Payments
+	Id            string
+	Entity        string
+	Admin         string
+	Protocol      string
+	StartDate     *time.Time
+	EndDate       *time.Time
+	Quota         uint64
+	Count         uint64
+	Evaluated     uint64
+	Approved      uint64
+	Rejected      uint64
+	Disputed      uint64
+	Invalidated   uint64
+	State         CollectionState
+	Payments      *Payments
 	EscrowAccount string
-	Intents      CollectionIntentOptions
+	Intents       CollectionIntentOptions
+	Flagged       uint64
+	FlaggedActive uint64
 }
 ```
 
@@ -75,6 +77,8 @@ The field's descriptions is as follows:
 - `payments` - a [Payments](#payments)
 - `escrowAccount` - a string containing the escrow account address for this collection created at collection creation, used to transfer payments to escrow account for GUARANTEED payments through intents
 - `intents` - a [CollectionIntentOptions](#collectionintentoptions) option for intents for this collection (allow, deny, required)
+- `flagged` - a integer containing the cumulative number of times any claim in this collection has been flagged by an evaluator (internally calculated). This is an event-count metric — it increments on every flag, including re-flags by different agents on the same claim, and is **never decremented**.
+- `flaggedActive` - a integer containing the number of claims currently in `FLAGGED` state (internally calculated). Increments on the first transition to `FLAGGED` for a claim, decrements when that claim transitions to a terminal evaluation status. Re-flags (`FLAGGED → FLAGGED` by a different agent) leave it unchanged.
 
 ### Payments
 
@@ -238,7 +242,8 @@ type Claim struct {
 	CW20Payment    []CW20Payment
 	CW1155Payment  []CW1155Payment
 	CW1155IntentPayment []CW1155IntentPayment
-	MemberAddress  string
+	MemberAddress     string
+	EvaluationHistory []*Evaluation
 }
 ```
 
@@ -257,6 +262,7 @@ The field's descriptions is as follows:
 - `cw1155Payment` - an array of [CW1155Payment](#cw1155payment) containing the custom CW1155 payments specified by service agent for claim approval. If amount, CW20 and CW1155 payments are empty, then collection default is used (Note the Evaluation agent can still override this, this value is for whoever submits the claim to indicate cw1155Payment wanted if no intent used)
 - `cw1155IntentPayment` - an array of [CW1155IntentPayment](#cw1155intentpayment) containing the custom CW1155 payments if an intent was used to submit the claim.
 - `memberAddress` - a string containing the team member address this claim is on behalf of, if any. Copied from the intent (`Intent.MemberAddress`) when `useIntent` is true. Empty for individual subscriptions. Used to know which [MemberBudget](#memberbudget) to credit on rejection / dispute / invalidation.
+- `evaluationHistory` - an array of prior [Evaluation](#evaluation) entries in chronological order (oldest first). The most recent evaluation always lives in `evaluation`; only superseded entries are appended here. Empty for claims that have been evaluated at most once. Populated when an evaluator transitions a claim out of `FLAGGED` (either by another flag in a re-flag chain, or by a terminal finalisation) — at that point the prior evaluation is moved into history and the new one becomes `evaluation`.
 
 ### ClaimPayments
 
@@ -452,7 +458,7 @@ var CollectionIntentOptions_name = map[int32]string{
 
 ### EvaluationStatus
 
-Defines the `status` of a [Evaluation](#evaluation) indicating the status and result of the evaluation.
+Defines the `status` of a [Evaluation](#evaluation) indicating the status and result of the evaluation. `APPROVED`, `REJECTED`, `DISPUTED`, and `INVALIDATED` are terminal — once a claim's `Evaluation` carries one of those, the claim is locked and cannot be re-evaluated. `FLAGGED` is non-terminal and explicitly designed to be re-evaluated to one of the terminal statuses (or re-flagged by a different agent).
 
 ```go
 var EvaluationStatus_name = map[int32]string{
@@ -460,9 +466,21 @@ var EvaluationStatus_name = map[int32]string{
 	1: "APPROVED",
 	2: "REJECTED",
 	3: "DISPUTED",
-  4: "INVALIDATED"
+	4: "INVALIDATED",
+	5: "FLAGGED"
 }
 ```
+
+`FLAGGED` semantics:
+
+- **No payments fire.** Neither evaluator payment nor any approval / rejection payout is triggered.
+- **Funds remain in escrow** if the claim was intent-funded — the intent escrow stays locked until a subsequent terminal evaluation moves it to the agent (`APPROVED`) or refunds the approval account (any other terminal status).
+- **AgentQuota is consumed** the same as for any terminal evaluation — flagging counts against the evaluator's quota so an oracle cannot flag-bomb unboundedly. Only `INVALIDATED` skips quota decrement.
+- **Re-evaluation is allowed.** A claim with `FLAGGED` status can be re-evaluated by:
+  - the same agent that flagged (e.g. they later got more information and want to finalise), or
+  - any other authorized evaluator (escalation to a human reviewer or a stricter oracle).
+- **Re-flagging by the same agent is blocked.** An agent that flagged this claim — whether their flag is the current evaluation or sits in `evaluationHistory` after intervening flags from other agents — cannot flag the same claim again. The check covers both surfaces; flag-bombing across an intervening flag from another evaluator is rejected. Returns `ErrSelfReFlag`.
+- **Counters.** On flag, `Collection.flagged++`. On the *first* transition into `FLAGGED` for a claim, `Collection.flaggedActive++`. On terminal finalisation of a flagged claim, `Collection.flaggedActive--` (with appropriate `Approved++` / `Rejected++` / `Invalidated++` increment for the terminal status). `Disputed++` does not apply because `DISPUTED` is recorded by `MsgDisputeClaim`, not by `MsgEvaluateClaim`.
 
 ### IntentStatus
 
@@ -631,7 +649,7 @@ The field's descriptions is as follows:
 
 - `claimIds` - a list of strings containing all the id's of the claimsthe grantee is allowed to evaluate, can be an empty list to allow any claim
 - `collectionId` - a string containing the Collection `id` the constraints is for
-- `agentQuota` - a integer containing the quota for amount of time the grantee can execute the given authorization(authz), note: it won't subtract one on evaluation if agent evaluates claim with status `invalidated`
+- `agentQuota` - a integer containing the quota for amount of time the grantee can execute the given authorization(authz), note: it won't subtract one on evaluation if agent evaluates claim with status `invalidated`. All other statuses — `approved`, `rejected`, `disputed`, and `flagged` — consume one quota slot per call; an evaluator that flags a claim and later finalises it will burn two slots.
 - `beforeDate` - a timestamp of the date after which the grantee can't execute this authz anymore, a cut off date
 - `MaxCustomAmount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) object which denotes the coins and amount that indicates the maximum the evaluator is allowed to change the `APPROVED` payout to, since claims can be made for specific amount an evaluator is allowed to change the `APPROVED` payout amount.
 - `MaxCustomCW20Payment` - an array of [CW20Payment](#cw20payment) containing the maximum CW20 payments allowed to be specified by evaluator for claim approval. If empty then no custom amount is allowed, and default payments from Collection payments are used.

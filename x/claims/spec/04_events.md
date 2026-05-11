@@ -46,7 +46,7 @@ The field's descriptions is as follows:
 
 ### ClaimUpdatedEvent
 
-This event is emitted when a [Claim](./02_state.md#claim) is updated, typically when the payment status changes.
+This event is emitted when a [Claim](./02_state.md#claim) is updated, typically when the payment status changes or when the claim is evaluated (including a `flagged` evaluation or a re-evaluation that transitions a flagged claim out of `FLAGGED`). On a re-evaluation the carried `Claim` includes the updated `evaluationHistory` (the prior evaluation appended) and the new `evaluation`.
 
 ```go
 type ClaimUpdatedEvent struct {
@@ -60,7 +60,7 @@ The field's descriptions is as follows:
 
 ### ClaimEvaluatedEvent
 
-This event is emitted when a [Claim](./02_state.md#claim) is Evaluated using the [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim) message.
+This event is emitted when a [Claim](./02_state.md#claim) is Evaluated using the [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim) message. Fires for every successful call to that message — including evaluations with status `flagged` (non-terminal) and re-evaluations that transition a flagged claim to a terminal status. Indexers can distinguish flag events from terminal events by inspecting `evaluation.status`.
 
 ```go
 type ClaimEvaluatedEvent struct {
@@ -193,7 +193,7 @@ Triggered by:
 
 - An admin update to an existing member's limits via [MsgSetCollectionMembers](./03_messages.md#msgsetcollectionmembers) (preserving or resetting `periodSpent` per `resetPeriodSpent`).
 - A `periodSpent` deduction during [MsgClaimIntent](./03_messages.md#msgclaimintent) (covers both the lazy period reset and the deduction in one event).
-- A `periodSpent` restoration on claim rejection / dispute / invalidation via [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim).
+- A `periodSpent` restoration on claim rejection / dispute / invalidation via [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim). Note: a `flagged` evaluation does **not** restore the budget — the spend stays held until the claim reaches a terminal evaluation status (the budget is restored at that point if the terminal status is non-approved).
 - A `periodSpent` restoration on intent expiration in the EndBlocker.
 - A lazy period reset triggered during a restore operation when the period had elapsed (the restore early-returns after persisting the reset state).
 

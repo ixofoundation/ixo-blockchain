@@ -289,10 +289,37 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		return nil, errorsmod.Wrapf(types.ErrEvaluateWrongCollection, "claim collection %s vs message collection %s", claim.CollectionId, msg.CollectionId)
 	}
 
-	// check that claim was not evaluated already
-	if claim.Evaluation != nil {
-		return nil, errorsmod.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
+	// Re-evaluation gate. A claim with an existing evaluation can only be
+	// re-evaluated when its current status is FLAGGED (the non-terminal escape
+	// hatch). Any other prior status is terminal and locks the claim.
+	//
+	// The same agent that flagged a claim is allowed to finalise their own
+	// flag (e.g. they got more information later). They are not allowed to
+	// flag a claim more than once — re-flagging adds no new on-chain state
+	// (ErrSelfReFlag). The check looks at both the current evaluation and
+	// every entry in evaluation_history, so a flag-bomb across an
+	// intervening flag from another agent (tester flag → bob flag → tester
+	// flag again) is also blocked. Terminal priors are blocked by the
+	// duplicate-evaluation check above, so every entry we inspect for the
+	// self-reflag rule is itself a flag.
+	priorEvaluation := claim.Evaluation
+	isReEvaluation := priorEvaluation != nil
+	if isReEvaluation {
+		if priorEvaluation.Status != types.EvaluationStatus_flagged {
+			return nil, errorsmod.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
+		}
+		if msg.Status == types.EvaluationStatus_flagged {
+			if priorEvaluation.AgentAddress == msg.AgentAddress {
+				return nil, errorsmod.Wrapf(types.ErrSelfReFlag, "agent %s already flagged claim %s", msg.AgentAddress, claim.ClaimId)
+			}
+			for _, h := range claim.EvaluationHistory {
+				if h.AgentAddress == msg.AgentAddress {
+					return nil, errorsmod.Wrapf(types.ErrSelfReFlag, "agent %s already flagged claim %s", msg.AgentAddress, claim.ClaimId)
+				}
+			}
+		}
 	}
+	isFlagged := msg.Status == types.EvaluationStatus_flagged
 
 	// get Collection for claim
 	collection, err := s.Keeper.GetCollection(ctx, claim.CollectionId)
@@ -342,8 +369,11 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		evaluation.Cw1155IntentPayment = claim.Cw1155IntentPayment
 	}
 
-	// start payout process for evaluation submission, if evaluation has status invalidated, don't run evaluation payout process
-	if msg.Status != types.EvaluationStatus_invalidated {
+	// Evaluator payout. Skip for INVALIDATED and for FLAGGED
+	// (a flag is not a terminal output — no payment, no Evaluated++ on flag).
+	// On a finalising re-evaluation the finaliser receives the evaluator
+	// payment (msg.AgentAddress), which is what we want.
+	if msg.Status != types.EvaluationStatus_invalidated && !isFlagged {
 		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, &claim, collection, false, []*types.CW1155IntentPayment{}); err != nil {
 			return nil, err
 		}
@@ -352,8 +382,11 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		collection.Evaluated++
 	}
 
-	// if status is not approved and intent was used then transfer funds back out of escrow account to current APPROVAL payments account
-	if msg.Status != types.EvaluationStatus_approved && claim.UseIntent {
+	// Intent-funded escrow handling. On any non-approved terminal status with
+	// an intent, refund escrow → approval account, mark approval NO_PAYMENT
+	// and restore member budget. FLAGGED keeps funds in escrow (the claim is
+	// still in flight and a subsequent finaliser may still APPROVE).
+	if msg.Status != types.EvaluationStatus_approved && !isFlagged && claim.UseIntent {
 		// Get account used for APPROVAL payments on collection
 		approvalAddress, err := sdk.AccAddressFromBech32(collection.Payments.Approval.Account)
 		if err != nil {
@@ -428,13 +461,34 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	} else if msg.Status == types.EvaluationStatus_invalidated {
 		// no payment for invalidated
 		collection.Invalidated++
+	} else if isFlagged {
+		// Flagged is non-terminal: no payment, no terminal-state counters.
+		// `flagged` is a cumulative event counter (every flag, including
+		// flag-after-flag chains). `flagged_active` is the number of claims
+		// currently sitting in FLAGGED state — only increments on the
+		// transition into FLAGGED, not on a subsequent re-flag.
+		collection.Flagged++
+		if !isReEvaluation {
+			collection.FlaggedActive++
+		}
+	}
+
+	// Transitioning out of FLAGGED to a terminal status: decrement the
+	// active-flag count. Re-flag (FLAGGED → FLAGGED) leaves it untouched.
+	if isReEvaluation && !isFlagged && collection.FlaggedActive > 0 {
+		collection.FlaggedActive--
 	}
 
 	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
 		return nil, err
 	}
 
-	// persist and emit the events
+	// On re-evaluation, move the prior evaluation into history (chronological
+	// order, oldest first) before replacing the current evaluation. First-time
+	// evaluations leave evaluation_history empty.
+	if isReEvaluation {
+		claim.EvaluationHistory = append(claim.EvaluationHistory, priorEvaluation)
+	}
 	claim.Evaluation = &evaluation
 	s.Keeper.SetClaim(ctx, claim)
 	if err := ctx.EventManager().EmitTypedEvents(

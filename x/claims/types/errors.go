@@ -27,6 +27,8 @@ var (
 	ErrDisputeUnauthorized = errorsmod.Register(ModuleName, 1202, "unauthorized, not part of collection/entity/authz agent")
 
 	ErrEvaluateWrongCollection = errorsmod.Register(ModuleName, 1300, "evaluation claim and collection does not match")
+	ErrSelfReFlag              = errorsmod.Register(ModuleName, 1301, "the same agent cannot re-flag a claim they have already flagged")
+	ErrInvalidFlagTransition   = errorsmod.Register(ModuleName, 1303, "claim with terminal evaluation cannot be re-evaluated")
 
 	ErrPaymentPresetPercentagesOverflow = errorsmod.Register(ModuleName, 1400, "preset fee percentages for node and network overflows 100%")
 	ErrPaymentWithdrawFailed            = errorsmod.Register(ModuleName, 1401, "payment withdrawal failed")
