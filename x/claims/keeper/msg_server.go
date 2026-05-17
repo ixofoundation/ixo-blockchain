@@ -881,6 +881,39 @@ func (s msgServer) UpdateCollectionIntents(goCtx context.Context, msg *types.Msg
 	return &types.MsgUpdateCollectionIntentsResponse{}, nil
 }
 
+// UpdateCollectionQuota changes the maximum claim count for a collection.
+// Validation rule: the new quota must be either 0 (unlimited) or ≥ the
+// collection's current `count`. Setting a quota below already-submitted
+// claims would retroactively invalidate the gate on every prior submission,
+// so we reject it at handler time rather than silently lock the collection.
+func (s msgServer) UpdateCollectionQuota(goCtx context.Context, msg *types.MsgUpdateCollectionQuota) (*types.MsgUpdateCollectionQuotaResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	// Reject quota < count (unless 0, which means unlimited). Cannot
+	// retroactively cap below claims already in the collection.
+	if msg.Quota != 0 && msg.Quota < collection.Count {
+		return nil, errorsmod.Wrapf(types.ErrCollectionQuotaBelowCount,
+			"new quota %d is below current count %d", msg.Quota, collection.Count)
+	}
+
+	collection.Quota = msg.Quota
+
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateCollectionQuotaResponse{}, nil
+}
+
 // --------------------------
 // CLAIM INTENT
 // --------------------------

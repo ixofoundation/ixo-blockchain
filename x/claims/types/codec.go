@@ -21,6 +21,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateCollectionDates{}, "claims/UpdateCollectionDates", nil)
 	cdc.RegisterConcrete(&MsgUpdateCollectionPayments{}, "claims/UpdateCollectionPayments", nil)
 	cdc.RegisterConcrete(&MsgUpdateCollectionIntents{}, "claims/UpdateCollectionIntents", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollectionQuota{}, "claims/UpdateCollectionQuota", nil)
 	cdc.RegisterConcrete(&MsgClaimIntent{}, "claims/ClaimIntent", nil)
 	cdc.RegisterConcrete(&MsgCreateClaimAuthorization{}, "claims/CreateClaimAuthorization", nil)
 	cdc.RegisterConcrete(&MsgSetCollectionMembers{}, "claims/SetCollectionMembers", nil)
@@ -43,6 +44,7 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgUpdateCollectionDates{},
 		&MsgUpdateCollectionPayments{},
 		&MsgUpdateCollectionIntents{},
+		&MsgUpdateCollectionQuota{},
 		&MsgClaimIntent{},
 		&MsgCreateClaimAuthorization{},
 		&MsgSetCollectionMembers{},

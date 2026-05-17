@@ -34,6 +34,7 @@ func NewTxCmd() *cobra.Command {
 		NewCmdUpdateCollectionDates(),
 		NewCmdUpdateCollectionPayments(),
 		NewCmdUpdateCollectionIntents(),
+		NewCmdUpdateCollectionQuota(),
 		NewCmdClaimIntent(),
 		NewCmdCreateClaimAuthorization(),
 		NewCmdUpdateCollectionDisputeConfig(),
@@ -284,6 +285,12 @@ func NewCmdUpdateCollectionIntents() *cobra.Command {
 	return jsonCmd("update-collection-intents [json]",
 		"Update collection intent policy - raw json with struct of MsgUpdateCollectionIntents",
 		func() *types.MsgUpdateCollectionIntents { return &types.MsgUpdateCollectionIntents{} })
+}
+
+func NewCmdUpdateCollectionQuota() *cobra.Command {
+	return jsonCmd("update-collection-quota [json]",
+		"Update collection max-claim quota - raw json with struct of MsgUpdateCollectionQuota",
+		func() *types.MsgUpdateCollectionQuota { return &types.MsgUpdateCollectionQuota{} })
 }
 
 func NewCmdClaimIntent() *cobra.Command {

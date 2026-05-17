@@ -121,6 +121,24 @@ The field's descriptions is as follows:
 - `intents` - a [CollectionIntentOptions](02_state.md#collectionintentoptions) option for intents for this collection (allow, deny, required)
 - `adminAddress` - a string containing the account address of the private key signing the transaction, must be same as [Collection](02_state.md#collection) admin field
 
+## MsgUpdateCollectionQuota
+
+A `MsgUpdateCollectionQuota` updates a Collection's `quota` (the maximum number of claims that may be submitted). Use `0` for unlimited.
+
+```go
+type MsgUpdateCollectionQuota struct {
+	CollectionId string
+	Quota        uint64
+	AdminAddress string
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` to make the update to
+- `quota` - the new maximum claim count. `0` means unlimited. Must be `0` or `>= collection.count` (`ErrCollectionQuotaBelowCount`) — cannot retroactively cap below claims already submitted.
+- `adminAddress` - a string containing the account address of the private key signing the transaction, must be same as [Collection](02_state.md#collection) admin field
+
 ## MsgSubmitClaim
 
 A `MsgSubmitClaim` creates and stores a new Claim made towards a `Collection`. On Submission of claim `SUBMISSION` payments will be made if there is any defined in the [Collection](02_state.md#collection) `Payments`.

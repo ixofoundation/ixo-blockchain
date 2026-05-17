@@ -75,4 +75,5 @@ var (
 	ErrAdjudicationNotConfigured           = errorsmod.Register(ModuleName, 1919, "collection has no adjudicators configured; disputes cannot be adjudicated")
 	ErrDisputeConfigInvalid                = errorsmod.Register(ModuleName, 1920, "invalid dispute / performance-deposit configuration")
 	ErrEvaluationStatusDisputedDeprecated  = errorsmod.Register(ModuleName, 1921, "EvaluationStatus DISPUTED is deprecated; use MsgDisputeClaim instead")
+	ErrCollectionQuotaBelowCount           = errorsmod.Register(ModuleName, 1925, "new quota is below the collection's current claim count")
 )

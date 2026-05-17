@@ -299,6 +299,19 @@ func (msg MsgUpdateCollectionIntents) ValidateBasic() error {
 	return nil
 }
 
+func (msg MsgUpdateCollectionQuota) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.AdminAddress); err != nil {
+		return errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid admin address (%s)", err)
+	}
+	if iidtypes.IsEmpty(msg.CollectionId) {
+		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "collection_id cannot be empty")
+	}
+	// Quota is a uint64; ValidateBasic accepts any value. The
+	// quota-vs-current-count check is in the handler, since it needs the
+	// stored collection state to compare against.
+	return nil
+}
+
 // --------------------------
 // CLAIM INTENT
 // --------------------------

@@ -29,6 +29,8 @@ service Msg {
       returns (MsgUpdateCollectionPaymentsResponse);
   rpc UpdateCollectionIntents(MsgUpdateCollectionIntents)
       returns (MsgUpdateCollectionIntentsResponse);
+  rpc UpdateCollectionQuota(MsgUpdateCollectionQuota)
+      returns (MsgUpdateCollectionQuotaResponse);
   rpc ClaimIntent(MsgClaimIntent) returns (MsgClaimIntentResponse);
   rpc CreateClaimAuthorization(MsgCreateClaimAuthorization)
       returns (MsgCreateClaimAuthorizationResponse);
@@ -296,6 +298,23 @@ message MsgUpdateCollectionIntents {
   string admin_address = 3;
 }
 message MsgUpdateCollectionIntentsResponse {}
+
+// MsgUpdateCollectionQuota updates the maximum claim count for a collection.
+// The new quota must be either zero (unlimited) or ≥ the collection's current
+// `count` so already-submitted claims are not retroactively invalidated.
+message MsgUpdateCollectionQuota {
+  option (cosmos.msg.v1.signer) = "admin_address";
+
+  // collection_id indicates which Collection to update
+  string collection_id = 1;
+  // quota is the new maximum number of claims that may be submitted. 0 means
+  // unlimited. Must be 0 or ≥ collection.count (cannot retroactively cap
+  // below already-submitted claims).
+  uint64 quota = 2;
+  // admin address used to sign this message, validated against Collection Admin
+  string admin_address = 3;
+}
+message MsgUpdateCollectionQuotaResponse {}
 
 message MsgClaimIntent {
   option (cosmos.msg.v1.signer) = "agent_address";
