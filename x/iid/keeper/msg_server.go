@@ -27,6 +27,14 @@ func (k msgServer) CreateIidDocument(goCtx context.Context, msg *types.MsgCreate
 ) (*types.MsgCreateIidDocumentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	// Defense in depth: also reject module-reserved DID namespaces at the
+	// handler. ValidateBasic catches this in the antehandler, but anyone
+	// calling the msgServer directly (gov proposals, internal callsites)
+	// still goes through here.
+	if prefix, reserved := types.IsReservedDid(msg.Id); reserved {
+		return nil, errorsmod.Wrapf(types.ErrReservedDidNamespace, "did %s is in reserved namespace %s", msg.Id, prefix)
+	}
+
 	// check that the did is not already taken
 	_, found := k.Keeper.GetDidDocument(ctx, []byte(msg.Id))
 	if found {

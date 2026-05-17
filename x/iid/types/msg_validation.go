@@ -20,6 +20,15 @@ func (msg MsgCreateIidDocument) ValidateBasic() error {
 		return errorsmod.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
 
+	// Block module-reserved DID namespaces (e.g. did:ixo:entity:...). These
+	// prefixes are minted deterministically by their owning modules via
+	// IidKeeper.SetDidDocument; allowing user-submitted creates here would
+	// let an attacker squat a DID the owning module will later try to mint,
+	// deadlocking its sequence.
+	if prefix, reserved := IsReservedDid(msg.Id); reserved {
+		return errorsmod.Wrapf(ErrReservedDidNamespace, "did %s is in reserved namespace %s", msg.Id, prefix)
+	}
+
 	if msg.Verifications == nil || len(msg.Verifications) == 0 {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "verifications are required")
 	}

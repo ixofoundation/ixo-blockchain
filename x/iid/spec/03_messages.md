@@ -36,6 +36,14 @@ The field's descriptions is as follows:
 - `alsoKnownAs` - a string. The assertion that two or more DIDs (or other types of URI) refer to the same DID subject can be made using the alsoKnownAs property. https://www.w3.org/TR/did-core/#also-known-as
 - `signer` - a string containing the cosmos address of the private key signing the transaction
 
+### Reserved DID namespaces
+
+Certain DID prefixes are owned by other ixo modules that mint their DIDs deterministically via `IidKeeper.SetDidDocument` (not via this message). `MsgCreateIidDocument` rejects any `id` matching one of these prefixes with `ErrReservedDidNamespace` — otherwise a user could front-run the owning module's sequence and squat a DID it will later try to mint, deadlocking the module.
+
+Current reserved prefixes (see `types.ReservedDidPrefixes`):
+
+- `did:ixo:entity:` — minted by the entity module on `MsgCreateEntity`.
+
 ## MsgUpdateIidDocument
 
 The `MsgUpdateIidDocument` is used to update an iid document. It updates the iid document with all the fields, so if a field is empty it will be updated with default go type, aka never null. For this reason also provide the previous values for fields you do not wish to update.
