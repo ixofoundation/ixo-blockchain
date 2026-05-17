@@ -52,6 +52,8 @@ func (k Keeper) Marshal(value interface{}) (bytes []byte) {
 		bytes = k.cdc.MustMarshal(&value)
 	case types.MemberBudget:
 		bytes = k.cdc.MustMarshal(&value)
+	case types.AgentDepositBalance:
+		bytes = k.cdc.MustMarshal(&value)
 	}
 	return
 }

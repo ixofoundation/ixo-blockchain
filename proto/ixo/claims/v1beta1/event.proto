@@ -71,3 +71,27 @@ message MemberBudgetUpdatedEvent { MemberBudget budget = 1; }
 // removed from a collection. Includes the final budget state at the time of
 // removal for indexer audit.
 message MemberBudgetRemovedEvent { MemberBudget budget = 1; }
+
+// AgentDepositBalanceCreatedEvent is emitted when an agent's
+// performance-deposit balance is created for the first time (i.e. the first
+// MsgAddPerformanceDeposit for a given (collection, agent) pair).
+message AgentDepositBalanceCreatedEvent { AgentDepositBalance balance = 1; }
+
+// AgentDepositBalanceUpdatedEvent is emitted on any state change to an existing
+// agent performance-deposit balance: subsequent top-up, partial withdrawal, or
+// slashing on adjudicated dispute loss. Carries the post-state balance. The
+// indexer can derive the delta by diffing against the previous on-record value;
+// the reason can be inferred from the enclosing tx's Msg type
+// (MsgAddPerformanceDeposit / MsgWithdrawPerformanceDeposit /
+// MsgAdjudicateDispute).
+message AgentDepositBalanceUpdatedEvent { AgentDepositBalance balance = 1; }
+
+// AgentDepositBalanceRemovedEvent is emitted when the agent's balance is fully
+// drained (full withdrawal or full slash brings amount to zero) and the KV
+// entry is deleted. Carries the final balance state (with zero amount) so the
+// indexer can archive the entry. Mirrors MemberBudgetRemovedEvent.
+message AgentDepositBalanceRemovedEvent { AgentDepositBalance balance = 1; }
+
+// DisputeResolvedEvent is emitted when MsgAdjudicateDispute settles a
+// dispute (AWARDED or DISMISSED).
+message DisputeResolvedEvent { Dispute dispute = 1; }

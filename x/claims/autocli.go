@@ -67,6 +67,30 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "collectionId"}, {ProtoField: "memberAddress"}},
 				},
 				{
+					RpcMethod:      "DisputeBySubject",
+					Use:            "dispute-by-subject [subject-id] [target-role]",
+					Short:          "Query a dispute by (subject_id, target_role) via the v7 subject index",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "subjectId"}, {ProtoField: "targetRole"}},
+				},
+				{
+					RpcMethod:      "DisputeListForSubject",
+					Use:            "dispute-list-for-subject [subject-id]",
+					Short:          "List every dispute (any role) for a subject id",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "subjectId"}},
+				},
+				{
+					RpcMethod:      "AgentDepositBalance",
+					Use:            "agent-deposit-balance [collection-id] [agent-address]",
+					Short:          "Query a single agent's performance-deposit balance on a collection",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "collectionId"}, {ProtoField: "agentAddress"}},
+				},
+				{
+					RpcMethod:      "AgentDepositBalanceList",
+					Use:            "agent-deposit-balance-list [collection-id]",
+					Short:          "List every agent performance-deposit balance for a collection",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{{ProtoField: "collectionId"}},
+				},
+				{
 					RpcMethod: "Params",
 					Use:       "params",
 					Short:     "Query the current claims parameters",

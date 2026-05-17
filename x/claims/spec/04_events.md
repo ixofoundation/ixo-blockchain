@@ -74,7 +74,7 @@ The field's descriptions is as follows:
 
 ### ClaimDisputedEvent
 
-This event is emitted when a [Claim](./02_state.md#claim) is disputed using the [MsgDisputeClaim](./03_messages.md#msgdisputeclaim) message.
+This event is emitted when a [Claim](./02_state.md#claim) is disputed using the [MsgDisputeClaim](./03_messages.md#msgdisputeclaim) message. The carried `Dispute` has `status = OPEN` and all extended fields populated (`target_role`, `disputer_address/did`, `dispute_deposit`, `submitted_at`).
 
 ```go
 type ClaimDisputedEvent struct {
@@ -85,6 +85,20 @@ type ClaimDisputedEvent struct {
 The field's descriptions is as follows:
 
 - `dispute` - the full [Dispute](02_state.md#dispute)
+
+### DisputeResolvedEvent
+
+This event is emitted when a dispute is adjudicated (AWARDED or DISMISSED) via [MsgAdjudicateDispute](./03_messages.md#msgadjudicatedispute). The carried `Dispute` is the same record as the prior `ClaimDisputedEvent` but with `status` updated and `resolution` populated (intended vs actual penalty, winner/adjudicator addresses + amounts).
+
+```go
+type DisputeResolvedEvent struct {
+	Dispute *Dispute
+}
+```
+
+The field's descriptions is as follows:
+
+- `dispute` - the full resolved [Dispute](02_state.md#dispute)
 
 ### PaymentWithdrawnEvent
 
@@ -220,3 +234,51 @@ type MemberBudgetRemovedEvent struct {
 The field's descriptions is as follows:
 
 - `budget` - the full [MemberBudget](./02_state.md#memberbudget) state at time of removal
+
+## AgentDepositBalanceCreatedEvent
+
+This event is emitted on the **first** [MsgAddPerformanceDeposit](./03_messages.md#msgaddperformancedeposit) for a given `(collection_id, agent_address)` pair — i.e. when the agent's deposit balance is seeded. Mirrors `MemberBudgetCreatedEvent`. Carries the initial balance state for indexer insertion.
+
+```go
+type AgentDepositBalanceCreatedEvent struct {
+	Balance *AgentDepositBalance
+}
+```
+
+The field's descriptions is as follows:
+
+- `balance` - the full [AgentDepositBalance](02_state.md#agentdepositbalance)
+
+## AgentDepositBalanceUpdatedEvent
+
+This event is emitted on every state change to an existing [AgentDepositBalance](02_state.md#agentdepositbalance) that leaves a non-zero amount:
+
+- Subsequent [MsgAddPerformanceDeposit](./03_messages.md#msgaddperformancedeposit) top-ups.
+- Partial [MsgWithdrawPerformanceDeposit](./03_messages.md#msgwithdrawperformancedeposit) withdrawals.
+- Slashing on AWARDED [MsgAdjudicateDispute](./03_messages.md#msgadjudicatedispute) that does not fully drain the balance.
+
+Carries the post-state balance. Indexer derives the delta by diffing against its prior on-record value, and the reason can be inferred from the enclosing tx's Msg type.
+
+```go
+type AgentDepositBalanceUpdatedEvent struct {
+	Balance *AgentDepositBalance
+}
+```
+
+The field's descriptions is as follows:
+
+- `balance` - the post-update full [AgentDepositBalance](02_state.md#agentdepositbalance)
+
+## AgentDepositBalanceRemovedEvent
+
+This event is emitted when the [AgentDepositBalance](02_state.md#agentdepositbalance) is fully drained (the final withdrawal or slash brings the amount to zero) and the KV entry is deleted. Mirrors `MemberBudgetRemovedEvent`. Carries the final balance state (with zero amount) so the indexer can archive.
+
+```go
+type AgentDepositBalanceRemovedEvent struct {
+	Balance *AgentDepositBalance
+}
+```
+
+The field's descriptions is as follows:
+
+- `balance` - the final [AgentDepositBalance](02_state.md#agentdepositbalance) state at time of removal (amount will be zero coins)

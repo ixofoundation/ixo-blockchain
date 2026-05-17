@@ -25,6 +25,10 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateClaimAuthorization{}, "claims/CreateClaimAuthorization", nil)
 	cdc.RegisterConcrete(&MsgSetCollectionMembers{}, "claims/SetCollectionMembers", nil)
 	cdc.RegisterConcrete(&MsgRemoveCollectionMembers{}, "claims/RemoveCollectionMembers", nil)
+	cdc.RegisterConcrete(&MsgUpdateCollectionDisputeConfig{}, "claims/UpdateCollectionDisputeConfig", nil)
+	cdc.RegisterConcrete(&MsgAddPerformanceDeposit{}, "claims/AddPerformanceDeposit", nil)
+	cdc.RegisterConcrete(&MsgWithdrawPerformanceDeposit{}, "claims/WithdrawPerformanceDeposit", nil)
+	cdc.RegisterConcrete(&MsgAdjudicateDispute{}, "claims/AdjudicateDispute", nil)
 }
 
 // RegisterInterfaces registers interfaces and implementations of the x/claims module.
@@ -43,6 +47,10 @@ func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 		&MsgCreateClaimAuthorization{},
 		&MsgSetCollectionMembers{},
 		&MsgRemoveCollectionMembers{},
+		&MsgUpdateCollectionDisputeConfig{},
+		&MsgAddPerformanceDeposit{},
+		&MsgWithdrawPerformanceDeposit{},
+		&MsgAdjudicateDispute{},
 	)
 
 	registry.RegisterImplementations(

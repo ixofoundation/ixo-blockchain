@@ -5,6 +5,7 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	v2claims "github.com/ixofoundation/ixo-blockchain/v6/x/claims/migrations/v2"
 	v3claims "github.com/ixofoundation/ixo-blockchain/v6/x/claims/migrations/v3"
+	v4claims "github.com/ixofoundation/ixo-blockchain/v6/x/claims/migrations/v4"
 )
 
 // Migrator is a struct for handling in-place store migrations.
@@ -26,4 +27,12 @@ func (m Migrator) Migrate1to2(ctx sdk.Context) error {
 // Migrate2to3 migrates from version 2 to 3.
 func (m Migrator) Migrate2to3(ctx sdk.Context) error {
 	return v3claims.MigrateStore(ctx, m.keeper.storeKey, m.keeper.cdc, m.legacySubspace, m.keeper.AccountKeeper)
+}
+
+// Migrate3to4 migrates from version 3 to 4 (v7 chain upgrade).
+// Stamps legacy disputes as DISMISSED so they don't block v7 dispute
+// filings; new Collection / Dispute fields default to zero / empty on
+// existing records without rewriting them.
+func (m Migrator) Migrate3to4(ctx sdk.Context) error {
+	return v4claims.MigrateStore(ctx, m.keeper.storeKey, m.keeper.cdc)
 }

@@ -432,6 +432,8 @@ func updatePaymentStatus(paymentType types.PaymentType, claim *types.Claim, paym
 		claim.PaymentsStatus.Evaluation = paymentStatus
 	case types.PaymentType_submission:
 		claim.PaymentsStatus.Submission = paymentStatus
+	case types.PaymentType_rejection:
+		claim.PaymentsStatus.Rejection = paymentStatus
 	}
 
 	return nil

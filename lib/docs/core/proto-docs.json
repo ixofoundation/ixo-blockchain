@@ -4015,6 +4015,52 @@
           ]
         },
         {
+          "name": "DisputeStatus",
+          "longName": "DisputeStatus",
+          "fullName": "ixo.claims.v1beta1.DisputeStatus",
+          "description": "DisputeStatus is the lifecycle state of a dispute.",
+          "values": [
+            {
+              "name": "DISPUTE_STATUS_OPEN",
+              "number": "0",
+              "description": "Open: dispute has been filed and is awaiting adjudication. Targeted\nagent is blocked from submitting / withdrawing on this collection until\nresolved."
+            },
+            {
+              "name": "DISPUTE_STATUS_AWARDED",
+              "number": "1",
+              "description": "Awarded: dispute upheld; the targeted party was found in the wrong.\nNo further disputes against this (subject_id, target_role) are allowed."
+            },
+            {
+              "name": "DISPUTE_STATUS_DISMISSED",
+              "number": "2",
+              "description": "Dismissed: dispute rejected; targeted party was vindicated.\nOther parties may file new disputes against the same (subject_id,\ntarget_role) with new evidence."
+            }
+          ]
+        },
+        {
+          "name": "DisputeTargetRole",
+          "longName": "DisputeTargetRole",
+          "fullName": "ixo.claims.v1beta1.DisputeTargetRole",
+          "description": "DisputeTargetRole identifies which party of a claim a dispute is filed\nagainst. A dispute targets exactly one role; to dispute both the submitter\nand the evaluator of the same claim, file two separate disputes.",
+          "values": [
+            {
+              "name": "DISPUTE_TARGET_ROLE_UNSPECIFIED",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "DISPUTE_TARGET_ROLE_SUBMITTER",
+              "number": "1",
+              "description": "Submitter: the service agent that submitted the claim"
+            },
+            {
+              "name": "DISPUTE_TARGET_ROLE_EVALUATOR",
+              "number": "2",
+              "description": "Evaluator: the evaluation agent that evaluated the claim"
+            }
+          ]
+        },
+        {
           "name": "EvaluationStatus",
           "longName": "EvaluationStatus",
           "fullName": "ixo.claims.v1beta1.EvaluationStatus",
@@ -4044,6 +4090,11 @@
               "name": "INVALIDATED",
               "number": "4",
               "description": ""
+            },
+            {
+              "name": "FLAGGED",
+              "number": "5",
+              "description": "Flagged: non-terminal \"I am declining to make a final call\" outcome.\nPayment does not fire. The flagger or any other authorized evaluator\ncan subsequently re-evaluate the claim to a terminal status (APPROVED\n/ REJECTED / INVALIDATED) when more information is available. FLAGGED\ncounts against AgentQuota the same as a terminal evaluation."
             }
           ]
         },
@@ -4144,6 +4195,102 @@
       ],
       "extensions": [],
       "messages": [
+        {
+          "name": "AdjudicationDid",
+          "longName": "AdjudicationDid",
+          "fullName": "ixo.claims.v1beta1.AdjudicationDid",
+          "description": "AdjudicationDid represents a single adjudicator entry on a Collection's\ndispute whitelist. Each entry pairs a DID with its own reward percentage —\nadjudicators self-set their fee, turning adjudication into a competitive\nmarket (lower-fee adjudicators may attract more volume, higher-fee may\ntrade on reputation). The chain does not enforce who adjudicates a given\ndispute; whichever whitelisted DID submits MsgAdjudicateDispute first wins.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "did",
+              "description": "did is the adjudicator's DID. Must appear in this list to be allowed\nto settle disputes on the collection.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reward_percentage",
+              "description": "reward_percentage is the share (LegacyDec, range [0, 100]) of each\nactual penalty payout that goes to THIS adjudicator when they settle a\ndispute. The remainder goes to the dispute winner.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AgentDepositBalance",
+          "longName": "AgentDepositBalance",
+          "fullName": "ixo.claims.v1beta1.AgentDepositBalance",
+          "description": "AgentDepositBalance is an agent's rolling performance-deposit balance for\na single collection. Held inside the collection's existing escrow account\n(no separate escrow). Topped up via MsgAddPerformanceDeposit, drained on\nadjudicated dispute losses, withdrawable when no active dispute targets\nthis agent on this collection.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id this balance belongs to.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "agent_address is the account this balance is held for.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "amount is the current balance in escrow on this agent's behalf.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "withdrawable_at",
+              "description": "withdrawable_at is the earliest block time at which\nMsgWithdrawPerformanceDeposit may be issued against this balance. Rolled\nforward to max(current, now + collection.min_deposit_period) on each\ntop-up so an agent cannot deposit + submit + withdraw atomically and\nleave nothing at stake before a dispute can land. Zero on balances\ncreated under a collection with min_deposit_period == 0 (no lock).\nThe slash path is not gated by this lock; only voluntary withdrawal is.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "CW1155IntentPayment",
           "longName": "CW1155IntentPayment",
@@ -4513,6 +4660,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "evaluation_history",
+              "description": "evaluation_history holds prior evaluations for this claim in chronological\norder. The most recent evaluation always lives in `evaluation`; only\nsuperseded entries are appended here. Empty for claims that have been\nevaluated at most once. Populated when an evaluator FLAGS a claim and a\nsubsequent evaluation (flag-then-flag chain or terminal finalisation)\nmoves the prior evaluation into history.",
+              "label": "repeated",
+              "type": "Evaluation",
+              "longType": "Evaluation",
+              "fullType": "ixo.claims.v1beta1.Evaluation",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -4801,6 +4960,138 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "flagged",
+              "description": "flagged is the cumulative number of times any claim in this collection\nhas been flagged by an evaluator. Never decremented — it is an\nevent-count metric, not a current-state count.",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "flagged_active",
+              "description": "flagged_active is the number of claims currently in FLAGGED state\n(incremented when a claim becomes FLAGGED, decremented when it\ntransitions to a terminal evaluation status).",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "service_agent_deposit_required",
+              "description": "service_agent_deposit_required is the minimum performance deposit balance\na service agent must hold on this collection to submit claims. Empty /\nzero means no deposit gate for service agents.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evaluator_deposit_required",
+              "description": "evaluator_deposit_required is the minimum performance deposit balance an\nevaluator must hold on this collection to submit evaluations. Empty /\nzero means no deposit gate for evaluators.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dispute_deposit_amount",
+              "description": "dispute_deposit_amount is the stake a disputer attaches to MsgDisputeClaim.\nHeld with the dispute record; refunded on AWARDED; becomes the penalty\npot on DISMISSED. Empty / zero means no disputer stake required.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "penalty_amount_per_dispute",
+              "description": "penalty_amount_per_dispute is the fixed penalty applied on AWARDED. If\nempty / zero, the adjudicator sets the penalty per-resolution (bounded by\nthe loser's deposit-required amount). At collection-validation time, if\nset, must be ≤ each non-empty deposit-required field.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "disputes_open",
+              "description": "disputes_open is the number of currently-OPEN disputes against any\nclaim in this collection (internally calculated).",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "disputes_awarded",
+              "description": "disputes_awarded is the cumulative number of disputes ever resolved as\nAWARDED on this collection (internally calculated, never decremented).",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "disputes_dismissed",
+              "description": "disputes_dismissed is the cumulative number of disputes ever resolved as\nDISMISSED on this collection (internally calculated, never decremented).",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_deposit_period",
+              "description": "min_deposit_period is the minimum duration a performance deposit must\nremain locked after the most recent top-up before\nMsgWithdrawPerformanceDeposit can be issued. Closes the in-same-tx exploit\nwhere an agent could deposit, submit/evaluate, and withdraw atomically —\nleaving zero economic stake at dispute time. Set to zero duration to\ndisable the lock. Each MsgAddPerformanceDeposit rolls\nAgentDepositBalance.withdrawable_at forward to max(current, now +\nmin_deposit_period); the slash path is not gated by this lock.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicators",
+              "description": "adjudicators is the whitelist of approved adjudicator DIDs paired with\ntheir reward percentages. Each entry carries its own reward_percentage,\nletting adjudicators self-set their fees (a competitive market). The\nchain does not enforce who adjudicates a given dispute — whichever\nwhitelisted DID lands MsgAdjudicateDispute first wins; the percentage\napplied is that adjudicator's entry. Required to be non-empty if any\ndeposit-required / dispute_deposit / penalty field is set; clearing\nit is blocked while disputes_open \u003e 0.",
+              "label": "repeated",
+              "type": "AdjudicationDid",
+              "longType": "AdjudicationDid",
+              "fullType": "ixo.claims.v1beta1.AdjudicationDid",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -4897,6 +5188,90 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "target_role",
+              "description": "target_role is the party of the claim this dispute is filed against\n(submitter or evaluator). Exactly one role per dispute; to dispute both\nparties of the same claim, file two disputes. UNSPECIFIED only appears\non legacy disputes migrated from pre-v7 state.",
+              "label": "",
+              "type": "DisputeTargetRole",
+              "longType": "DisputeTargetRole",
+              "fullType": "ixo.claims.v1beta1.DisputeTargetRole",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "disputer_address",
+              "description": "disputer_address is the account that filed the dispute and locked the\ndispute_deposit. Receives the deposit back on AWARDED, or 80% of the\npenalty (loser balance) on AWARDED; loses the deposit (split 80/20\nwith adjudicator) on DISMISSED.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "disputer_did",
+              "description": "disputer_did is the DID of the disputer at filing time.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dispute_deposit",
+              "description": "dispute_deposit is the amount the disputer locked at filing, equal to\ncollection.dispute_deposit_amount at the time of filing. Held in the\ncollection escrow account.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "submitted_at",
+              "description": "submitted_at is the block time the dispute was filed.",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "status is the current lifecycle state.",
+              "label": "",
+              "type": "DisputeStatus",
+              "longType": "DisputeStatus",
+              "fullType": "ixo.claims.v1beta1.DisputeStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "resolution",
+              "description": "resolution is populated on adjudication (AWARDED or DISMISSED).",
+              "label": "",
+              "type": "DisputeResolution",
+              "longType": "DisputeResolution",
+              "fullType": "ixo.claims.v1beta1.DisputeResolution",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -4953,6 +5328,150 @@
               "type": "bool",
               "longType": "bool",
               "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DisputeResolution",
+          "longName": "DisputeResolution",
+          "fullName": "ixo.claims.v1beta1.DisputeResolution",
+          "description": "DisputeResolution captures the outcome of MsgAdjudicateDispute. Records\nthe intended penalty (what the adjudicator/collection prescribed) and the\nactual penalty paid (capped at the loser's available deposit balance —\nmay be less than intended if a prior dispute already drained the balance).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "adjudicator_did",
+              "description": "adjudicator_did is the DID that adjudicated; must be in the collection's\nadjudication_entity_dids whitelist.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicator_address",
+              "description": "adjudicator_address is the signer of MsgAdjudicateDispute. Either an\nentity account belonging to adjudicator_did, or a key registered on the\nadjudicator_did DID document.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicator_payout_address",
+              "description": "adjudicator_payout_address is where the 20% reward (or 100% if no\nwinner share) was actually paid out — either the AdjudicatorRevenue\nentity account (auto-created) when the DID is an entity DID with module\naccounts, or adjudicator_address otherwise.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "resolved_at",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "data is the structured payload the adjudicator attached to the\nresolution — same shape as the dispute filing's DisputeData. Lets the\nadjudicator pin an opinion document (IPFS/matrix uri + proof/cid), declare\nits MIME type, and flag encryption — mirroring how disputers attach\nevidence at filing time.",
+              "label": "",
+              "type": "DisputeData",
+              "longType": "DisputeData",
+              "fullType": "ixo.claims.v1beta1.DisputeData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "intended_penalty",
+              "description": "intended_penalty is the penalty the adjudicator selected (or the\ncollection's penalty_amount_per_dispute if fixed). May exceed what was\nactually paid if the loser's balance was insufficient.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "actual_penalty_paid",
+              "description": "actual_penalty_paid is what was actually slashed from the loser's\nbalance (or the dispute_deposit, on DISMISSED). Always ≤ intended.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "winner_amount",
+              "description": "winner_amount is the portion of actual_penalty_paid that went to the\ndispute winner (disputer on AWARDED, target agent on DISMISSED).",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicator_amount",
+              "description": "adjudicator_amount is the portion of actual_penalty_paid that went to\nthe adjudicator (governed by collection.adjudicator_reward_percentage).",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "winner_address",
+              "description": "winner_address is the address that received the winner_amount.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "loser_address",
+              "description": "loser_address is the address whose balance / deposit was slashed.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6315,6 +6834,78 @@
       "extensions": [],
       "messages": [
         {
+          "name": "AgentDepositBalanceCreatedEvent",
+          "longName": "AgentDepositBalanceCreatedEvent",
+          "fullName": "ixo.claims.v1beta1.AgentDepositBalanceCreatedEvent",
+          "description": "AgentDepositBalanceCreatedEvent is emitted when an agent's\nperformance-deposit balance is created for the first time (i.e. the first\nMsgAddPerformanceDeposit for a given (collection, agent) pair).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "balance",
+              "description": "",
+              "label": "",
+              "type": "AgentDepositBalance",
+              "longType": "AgentDepositBalance",
+              "fullType": "ixo.claims.v1beta1.AgentDepositBalance",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AgentDepositBalanceRemovedEvent",
+          "longName": "AgentDepositBalanceRemovedEvent",
+          "fullName": "ixo.claims.v1beta1.AgentDepositBalanceRemovedEvent",
+          "description": "AgentDepositBalanceRemovedEvent is emitted when the agent's balance is fully\ndrained (full withdrawal or full slash brings amount to zero) and the KV\nentry is deleted. Carries the final balance state (with zero amount) so the\nindexer can archive the entry. Mirrors MemberBudgetRemovedEvent.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "balance",
+              "description": "",
+              "label": "",
+              "type": "AgentDepositBalance",
+              "longType": "AgentDepositBalance",
+              "fullType": "ixo.claims.v1beta1.AgentDepositBalance",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "AgentDepositBalanceUpdatedEvent",
+          "longName": "AgentDepositBalanceUpdatedEvent",
+          "fullName": "ixo.claims.v1beta1.AgentDepositBalanceUpdatedEvent",
+          "description": "AgentDepositBalanceUpdatedEvent is emitted on any state change to an existing\nagent performance-deposit balance: subsequent top-up, partial withdrawal, or\nslashing on adjudicated dispute loss. Carries the post-state balance. The\nindexer can derive the delta by diffing against the previous on-record value;\nthe reason can be inferred from the enclosing tx's Msg type\n(MsgAddPerformanceDeposit / MsgWithdrawPerformanceDeposit /\nMsgAdjudicateDispute).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "balance",
+              "description": "",
+              "label": "",
+              "type": "AgentDepositBalance",
+              "longType": "AgentDepositBalance",
+              "fullType": "ixo.claims.v1beta1.AgentDepositBalance",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "ClaimAuthorizationCreatedEvent",
           "longName": "ClaimAuthorizationCreatedEvent",
           "fullName": "ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent",
@@ -6535,6 +7126,30 @@
               "type": "Collection",
               "longType": "Collection",
               "fullType": "ixo.claims.v1beta1.Collection",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "DisputeResolvedEvent",
+          "longName": "DisputeResolvedEvent",
+          "fullName": "ixo.claims.v1beta1.DisputeResolvedEvent",
+          "description": "DisputeResolvedEvent is emitted when MsgAdjudicateDispute settles a\ndispute (AWARDED or DISMISSED).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dispute",
+              "description": "",
+              "label": "",
+              "type": "Dispute",
+              "longType": "Dispute",
+              "fullType": "ixo.claims.v1beta1.Dispute",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -6829,6 +7444,18 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "agent_deposit_balances",
+              "description": "agent_deposit_balances are the rolling performance-deposit balances per\n(collection, agent). On InitGenesis, the active-dispute index and the\ndispute subject index are rebuilt from the disputes slice rather than\nexported separately.",
+              "label": "repeated",
+              "type": "AgentDepositBalance",
+              "longType": "AgentDepositBalance",
+              "fullType": "ixo.claims.v1beta1.AgentDepositBalance",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         }
@@ -6846,6 +7473,138 @@
       "enums": [],
       "extensions": [],
       "messages": [
+        {
+          "name": "QueryAgentDepositBalanceListRequest",
+          "longName": "QueryAgentDepositBalanceListRequest",
+          "fullName": "ixo.claims.v1beta1.QueryAgentDepositBalanceListRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collectionId",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryAgentDepositBalanceListResponse",
+          "longName": "QueryAgentDepositBalanceListResponse",
+          "fullName": "ixo.claims.v1beta1.QueryAgentDepositBalanceListResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "balances",
+              "description": "",
+              "label": "repeated",
+              "type": "AgentDepositBalance",
+              "longType": "AgentDepositBalance",
+              "fullType": "ixo.claims.v1beta1.AgentDepositBalance",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryAgentDepositBalanceRequest",
+          "longName": "QueryAgentDepositBalanceRequest",
+          "fullName": "ixo.claims.v1beta1.QueryAgentDepositBalanceRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collectionId",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agentAddress",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryAgentDepositBalanceResponse",
+          "longName": "QueryAgentDepositBalanceResponse",
+          "fullName": "ixo.claims.v1beta1.QueryAgentDepositBalanceResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "balance",
+              "description": "",
+              "label": "",
+              "type": "AgentDepositBalance",
+              "longType": "AgentDepositBalance",
+              "fullType": "ixo.claims.v1beta1.AgentDepositBalance",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
         {
           "name": "QueryClaimListRequest",
           "longName": "QueryClaimListRequest",
@@ -7187,6 +7946,114 @@
               "type": "Collection",
               "longType": "Collection",
               "fullType": "ixo.claims.v1beta1.Collection",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeBySubjectRequest",
+          "longName": "QueryDisputeBySubjectRequest",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeBySubjectRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "subjectId",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "targetRole",
+              "description": "",
+              "label": "",
+              "type": "DisputeTargetRole",
+              "longType": "DisputeTargetRole",
+              "fullType": "ixo.claims.v1beta1.DisputeTargetRole",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeBySubjectResponse",
+          "longName": "QueryDisputeBySubjectResponse",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeBySubjectResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "dispute",
+              "description": "",
+              "label": "",
+              "type": "Dispute",
+              "longType": "Dispute",
+              "fullType": "ixo.claims.v1beta1.Dispute",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeListForSubjectRequest",
+          "longName": "QueryDisputeListForSubjectRequest",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeListForSubjectRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "subjectId",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryDisputeListForSubjectResponse",
+          "longName": "QueryDisputeListForSubjectResponse",
+          "fullName": "ixo.claims.v1beta1.QueryDisputeListForSubjectResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "disputes",
+              "description": "",
+              "label": "repeated",
+              "type": "Dispute",
+              "longType": "Dispute",
+              "fullType": "ixo.claims.v1beta1.Dispute",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -7718,6 +8585,94 @@
                   ]
                 }
               }
+            },
+            {
+              "name": "DisputeBySubject",
+              "description": "DisputeBySubject returns the dispute (if any) for a given subject_id\nand target_role. Disputes targeting different roles of the same claim\nare separate records.",
+              "requestType": "QueryDisputeBySubjectRequest",
+              "requestLongType": "QueryDisputeBySubjectRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryDisputeBySubjectRequest",
+              "requestStreaming": false,
+              "responseType": "QueryDisputeBySubjectResponse",
+              "responseLongType": "QueryDisputeBySubjectResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryDisputeBySubjectResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claims/dispute-by-subject/{subjectId}/{targetRole}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "DisputeListForSubject",
+              "description": "DisputeListForSubject returns all disputes (across all target roles\nand over all time, regardless of status) for a given subject_id.",
+              "requestType": "QueryDisputeListForSubjectRequest",
+              "requestLongType": "QueryDisputeListForSubjectRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryDisputeListForSubjectRequest",
+              "requestStreaming": false,
+              "responseType": "QueryDisputeListForSubjectResponse",
+              "responseLongType": "QueryDisputeListForSubjectResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryDisputeListForSubjectResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claims/disputes-for-subject/{subjectId}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "AgentDepositBalance",
+              "description": "AgentDepositBalance returns a single agent's deposit balance on a\ncollection.",
+              "requestType": "QueryAgentDepositBalanceRequest",
+              "requestLongType": "QueryAgentDepositBalanceRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryAgentDepositBalanceRequest",
+              "requestStreaming": false,
+              "responseType": "QueryAgentDepositBalanceResponse",
+              "responseLongType": "QueryAgentDepositBalanceResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryAgentDepositBalanceResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claims/collection/{collectionId}/deposit/{agentAddress}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "AgentDepositBalanceList",
+              "description": "AgentDepositBalanceList returns all agent deposit balances for a\ncollection.",
+              "requestType": "QueryAgentDepositBalanceListRequest",
+              "requestLongType": "QueryAgentDepositBalanceListRequest",
+              "requestFullType": "ixo.claims.v1beta1.QueryAgentDepositBalanceListRequest",
+              "requestStreaming": false,
+              "responseType": "QueryAgentDepositBalanceListResponse",
+              "responseLongType": "QueryAgentDepositBalanceListResponse",
+              "responseFullType": "ixo.claims.v1beta1.QueryAgentDepositBalanceListResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/claims/collection/{collectionId}/deposits"
+                    }
+                  ]
+                }
+              }
             }
           ]
         }
@@ -7799,6 +8754,198 @@
               "type": "bool",
               "longType": "bool",
               "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgAddPerformanceDeposit",
+          "longName": "MsgAddPerformanceDeposit",
+          "fullName": "ixo.claims.v1beta1.MsgAddPerformanceDeposit",
+          "description": "MsgAddPerformanceDeposit tops up an agent's performance-deposit balance on\na collection. Funds move from agent_address → collection.escrow_account.\nPermitted regardless of whether the agent currently has active disputes —\nonly withdrawals and new submissions are gated.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "agent_address is the owner of the balance being topped up; also the\npayer. Anyone can fund their own balance on any collection (no authz\ngrant required from the collection admin).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgAddPerformanceDepositResponse",
+          "longName": "MsgAddPerformanceDepositResponse",
+          "fullName": "ixo.claims.v1beta1.MsgAddPerformanceDepositResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "new_balance",
+              "description": "new_balance is the agent's resulting balance after this top-up.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgAdjudicateDispute",
+          "longName": "MsgAdjudicateDispute",
+          "fullName": "ixo.claims.v1beta1.MsgAdjudicateDispute",
+          "description": "MsgAdjudicateDispute settles a dispute. Signed by adjudicator_address,\nwhich must be either an EntityAccount belonging to adjudicator_did, OR a\nkey registered on the adjudicator_did DID document (capability invocation\n/ authentication verification method). adjudicator_did must be in the\ncollection's adjudication_entity_dids whitelist.\n\nAWARDED: loser is the targeted agent of the dispute. Penalty is debited\nfrom their AgentDepositBalance (capped at available). 80% (by default)\ngoes to the disputer, 20% to the adjudicator payout address. The\ndisputer's dispute_deposit is returned to them in full.\n\nDISMISSED: loser is the disputer. The disputer's dispute_deposit is the\npot. 80% goes to the targeted agent (vindicated), 20% to the adjudicator\npayout address.\n\nThe penalty amount may be left empty by the caller if the collection has\npenalty_amount_per_dispute set, in which case the collection value is\nused. Otherwise the caller must supply a penalty bounded by the loser's\ndeposit-required (or dispute_deposit_amount for DISMISSED).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "subject_id",
+              "description": "subject_id of the dispute being adjudicated.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "target_role",
+              "description": "target_role of the dispute being adjudicated. Together with subject_id,\nidentifies the dispute uniquely (one OPEN dispute per pair).",
+              "label": "",
+              "type": "DisputeTargetRole",
+              "longType": "DisputeTargetRole",
+              "fullType": "ixo.claims.v1beta1.DisputeTargetRole",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicator_did",
+              "description": "adjudicator_did must be in collection.adjudication_entity_dids.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicator_address",
+              "description": "adjudicator_address is the signer. Must be authorized by adjudicator_did\n(entity account OR DID-registered key).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "outcome",
+              "description": "outcome must be AWARDED or DISMISSED; OPEN is rejected.",
+              "label": "",
+              "type": "DisputeStatus",
+              "longType": "DisputeStatus",
+              "fullType": "ixo.claims.v1beta1.DisputeStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "data",
+              "description": "data is the structured payload the adjudicator wants recorded on the\nresolution — symmetric with MsgDisputeClaim.data. The keeper stores\nthis verbatim on DisputeResolution.data, so adjudicators can pin a\nsigned opinion doc (IPFS/matrix uri + proof/cid), declare its MIME type,\nand flag encryption.",
+              "label": "",
+              "type": "DisputeData",
+              "longType": "DisputeData",
+              "fullType": "ixo.claims.v1beta1.DisputeData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "penalty_amount",
+              "description": "penalty_amount: if collection has a fixed penalty_amount_per_dispute,\nthis field is ignored. Otherwise must be set and ≤ loser's role\ndeposit-required (AWARDED) or ≤ dispute_deposit_amount (DISMISSED).",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgAdjudicateDisputeResponse",
+          "longName": "MsgAdjudicateDisputeResponse",
+          "fullName": "ixo.claims.v1beta1.MsgAdjudicateDisputeResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "actual_penalty_paid",
+              "description": "actual_penalty_paid is what was actually slashed; may be less than the\nintended penalty if the loser's balance was insufficient.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -8246,6 +9393,78 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "service_agent_deposit_required",
+              "description": "Optional dispute / performance-deposit config. All zero/empty means\nthe collection has no deposit gates and no disputes can be adjudicated.\nIf any deposit/penalty field is set, adjudicators must be non-empty.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evaluator_deposit_required",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dispute_deposit_amount",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "penalty_amount_per_dispute",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_deposit_period",
+              "description": "min_deposit_period locks performance-deposit withdrawals for this\nduration after each top-up (see Collection.min_deposit_period). Zero\ndisables the lock.",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicators",
+              "description": "adjudicators is the whitelist of approved adjudicators, each with their\nown reward_percentage (see Collection.adjudicators).",
+              "label": "repeated",
+              "type": "AdjudicationDid",
+              "longType": "AdjudicationDid",
+              "fullType": "ixo.claims.v1beta1.AdjudicationDid",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -8325,6 +9544,18 @@
               "type": "DisputeData",
               "longType": "DisputeData",
               "fullType": "ixo.claims.v1beta1.DisputeData",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "target_role",
+              "description": "target_role is the party being disputed (submitter or evaluator).\nExactly one role per dispute. To dispute both parties of the same claim\nfile two separate disputes. Must be SUBMITTER or EVALUATOR; UNSPECIFIED\nis rejected on new txs (only appears on legacy migrated disputes).",
+              "label": "",
+              "type": "DisputeTargetRole",
+              "longType": "DisputeTargetRole",
+              "fullType": "ixo.claims.v1beta1.DisputeTargetRole",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -8843,6 +10074,125 @@
           "fields": []
         },
         {
+          "name": "MsgUpdateCollectionDisputeConfig",
+          "longName": "MsgUpdateCollectionDisputeConfig",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfig",
+          "description": "MsgUpdateCollectionDisputeConfig updates the dispute / performance-deposit\nconfiguration on a collection. All fields are replacements, not merges —\nthe caller must send the full desired state. To \"clear\" a field, send it\nempty / zero. The handler enforces:\n  - if any deposit-required / penalty / disputer-stake field is non-empty,\n    adjudication_entity_dids must be non-empty;\n  - penalty_amount_per_dispute (if set) must be ≤ each non-empty\n    deposit-required field;\n  - adjudicator_reward_percentage in [0, 100].\nChanging config does NOT affect in-flight disputes (each dispute\nsnapshots config it cares about at filing / adjudication time).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "service_agent_deposit_required",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evaluator_deposit_required",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "dispute_deposit_amount",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "penalty_amount_per_dispute",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_deposit_period",
+              "description": "",
+              "label": "",
+              "type": "Duration",
+              "longType": "google.protobuf.Duration",
+              "fullType": "google.protobuf.Duration",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "adjudicators",
+              "description": "adjudicators is the whitelist of approved adjudicators (see\nCollection.adjudicators).",
+              "label": "repeated",
+              "type": "AdjudicationDid",
+              "longType": "AdjudicationDid",
+              "fullType": "ixo.claims.v1beta1.AdjudicationDid",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateCollectionDisputeConfigResponse",
+          "longName": "MsgUpdateCollectionDisputeConfigResponse",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfigResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
           "name": "MsgUpdateCollectionIntents",
           "longName": "MsgUpdateCollectionIntents",
           "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionIntents",
@@ -9176,6 +10526,90 @@
           "hasOneofs": false,
           "extensions": [],
           "fields": []
+        },
+        {
+          "name": "MsgWithdrawPerformanceDeposit",
+          "longName": "MsgWithdrawPerformanceDeposit",
+          "fullName": "ixo.claims.v1beta1.MsgWithdrawPerformanceDeposit",
+          "description": "MsgWithdrawPerformanceDeposit pulls some / all of an agent's\nperformance-deposit balance back to their wallet. Rejected if the agent\nhas any OPEN dispute targeting them on this collection. Partial\nwithdrawal supported.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "agent_address",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "amount",
+              "description": "amount to withdraw. Must be ≤ current balance. If empty, withdraws the\nfull current balance.",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgWithdrawPerformanceDepositResponse",
+          "longName": "MsgWithdrawPerformanceDepositResponse",
+          "fullName": "ixo.claims.v1beta1.MsgWithdrawPerformanceDepositResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "withdrawn",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "remaining_balance",
+              "description": "",
+              "label": "repeated",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
         }
       ],
       "services": [
@@ -9339,6 +10773,54 @@
               "responseType": "MsgRemoveCollectionMembersResponse",
               "responseLongType": "MsgRemoveCollectionMembersResponse",
               "responseFullType": "ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateCollectionDisputeConfig",
+              "description": "",
+              "requestType": "MsgUpdateCollectionDisputeConfig",
+              "requestLongType": "MsgUpdateCollectionDisputeConfig",
+              "requestFullType": "ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfig",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateCollectionDisputeConfigResponse",
+              "responseLongType": "MsgUpdateCollectionDisputeConfigResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfigResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "AddPerformanceDeposit",
+              "description": "",
+              "requestType": "MsgAddPerformanceDeposit",
+              "requestLongType": "MsgAddPerformanceDeposit",
+              "requestFullType": "ixo.claims.v1beta1.MsgAddPerformanceDeposit",
+              "requestStreaming": false,
+              "responseType": "MsgAddPerformanceDepositResponse",
+              "responseLongType": "MsgAddPerformanceDepositResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgAddPerformanceDepositResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "WithdrawPerformanceDeposit",
+              "description": "",
+              "requestType": "MsgWithdrawPerformanceDeposit",
+              "requestLongType": "MsgWithdrawPerformanceDeposit",
+              "requestFullType": "ixo.claims.v1beta1.MsgWithdrawPerformanceDeposit",
+              "requestStreaming": false,
+              "responseType": "MsgWithdrawPerformanceDepositResponse",
+              "responseLongType": "MsgWithdrawPerformanceDepositResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgWithdrawPerformanceDepositResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "AdjudicateDispute",
+              "description": "",
+              "requestType": "MsgAdjudicateDispute",
+              "requestLongType": "MsgAdjudicateDispute",
+              "requestFullType": "ixo.claims.v1beta1.MsgAdjudicateDispute",
+              "requestStreaming": false,
+              "responseType": "MsgAdjudicateDisputeResponse",
+              "responseLongType": "MsgAdjudicateDisputeResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgAdjudicateDisputeResponse",
               "responseStreaming": false
             }
           ]
@@ -15239,14 +16721,14 @@
           "name": "AddLiquidValidatorEvent",
           "longName": "AddLiquidValidatorEvent",
           "fullName": "ixo.liquidstake.v1beta1.AddLiquidValidatorEvent",
-          "description": "AddLiquidValidatorEvent is emitted when a newly whitelisted validator is\nactivated for a pool.",
+          "description": "AddLiquidValidatorEvent is emitted when a newly whitelisted validator is\nactivated for a pool.\n\nField tag preserved from v6 (validator=1); pool_id added at the end.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
             {
-              "name": "pool_id",
+              "name": "validator",
               "description": "",
               "label": "",
               "type": "string",
@@ -15258,7 +16740,7 @@
               "defaultValue": ""
             },
             {
-              "name": "validator",
+              "name": "pool_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -15275,24 +16757,12 @@
           "name": "AutocompoundStakingRewardsEvent",
           "longName": "AutocompoundStakingRewardsEvent",
           "fullName": "ixo.liquidstake.v1beta1.AutocompoundStakingRewardsEvent",
-          "description": "AutocompoundStakingRewardsEvent is emitted when a pool's autocompound\nepoch hook runs successfully.",
+          "description": "AutocompoundStakingRewardsEvent is emitted when a pool's autocompound\nepoch hook runs successfully.\n\nField tag numbers preserved from v6. Amount fields upgraded from\n\"\u003camount\u003e\u003cdenom\u003e\" strings to typed Coin.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
-            {
-              "name": "pool_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
             {
               "name": "delegator",
               "description": "",
@@ -15309,9 +16779,9 @@
               "name": "total_amount",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15321,9 +16791,9 @@
               "name": "fee_amount",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15333,9 +16803,9 @@
               "name": "redelegate_amount",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15343,6 +16813,18 @@
             },
             {
               "name": "weighted_rewards_amount",
+              "description": "",
+              "label": "",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -15359,24 +16841,12 @@
           "name": "LiquidStakeEvent",
           "longName": "LiquidStakeEvent",
           "fullName": "ixo.liquidstake.v1beta1.LiquidStakeEvent",
-          "description": "LiquidStakeEvent is emitted when a liquid stake is performed against a\nspecific pool.",
+          "description": "LiquidStakeEvent is emitted when a liquid stake is performed against a\nspecific pool.\n\nField tag numbers preserved from the pre-v7 single-pool layout\n(delegator=1, liquid_amount=2, stk_ixo_minted_amount=3) so wire-level\nproto compatibility is preserved for any consumer decoding historical\nv6 events with v7 codegen — pool_id simply shows as empty for those.\nThe liquid_amount and stk_ixo_minted_amount fields were upgraded from\nthe v6 string format (\"100000000uixo\") to typed Coin in v7 to remove\nregex parsing on the indexer side; the tag is unchanged but the wire\nencoding for that tag is now a length-delimited Coin sub-message.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
-            {
-              "name": "pool_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
             {
               "name": "delegator",
               "description": "",
@@ -15393,9 +16863,9 @@
               "name": "liquid_amount",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15403,6 +16873,18 @@
             },
             {
               "name": "stk_ixo_minted_amount",
+              "description": "",
+              "label": "",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -15419,24 +16901,12 @@
           "name": "LiquidUnstakeEvent",
           "longName": "LiquidUnstakeEvent",
           "fullName": "ixo.liquidstake.v1beta1.LiquidUnstakeEvent",
-          "description": "LiquidUnstakeEvent is emitted when a liquid unstake is performed against\na specific pool.",
+          "description": "LiquidUnstakeEvent is emitted when a liquid unstake is performed against\na specific pool.\n\nField tag numbers preserved from v6. completion_time upgraded from RFC3339\nstring to google.protobuf.Timestamp to match\nMsgLiquidUnstakeResponse.completion_time. Amount fields upgraded from\n\"\u003camount\u003e\u003cdenom\u003e\" strings to typed Coin.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
-            {
-              "name": "pool_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
             {
               "name": "delegator",
               "description": "",
@@ -15453,9 +16923,9 @@
               "name": "unstake_amount",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15465,9 +16935,9 @@
               "name": "unbonding_amount",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15477,9 +16947,9 @@
               "name": "unbonded_amount",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "Coin",
+              "longType": "cosmos.base.v1beta1.Coin",
+              "fullType": "cosmos.base.v1beta1.Coin",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15487,6 +16957,18 @@
             },
             {
               "name": "completion_time",
+              "description": "",
+              "label": "",
+              "type": "Timestamp",
+              "longType": "google.protobuf.Timestamp",
+              "fullType": "google.protobuf.Timestamp",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -15635,24 +17117,12 @@
           "name": "RebalancedLiquidStakeEvent",
           "longName": "RebalancedLiquidStakeEvent",
           "fullName": "ixo.liquidstake.v1beta1.RebalancedLiquidStakeEvent",
-          "description": "RebalancedLiquidStakeEvent is emitted after a pool's rebalancing pass.",
+          "description": "RebalancedLiquidStakeEvent is emitted after a pool's rebalancing pass.\n\nField tag numbers preserved from v6. Count fields upgraded from\nstrconv-formatted strings to typed uint32.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,
           "extensions": [],
           "fields": [
-            {
-              "name": "pool_id",
-              "description": "",
-              "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
-              "ismap": false,
-              "isoneof": false,
-              "oneofdecl": "",
-              "defaultValue": ""
-            },
             {
               "name": "delegator",
               "description": "",
@@ -15669,9 +17139,9 @@
               "name": "redelegation_count",
               "description": "",
               "label": "",
-              "type": "string",
-              "longType": "string",
-              "fullType": "string",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -15679,6 +17149,18 @@
             },
             {
               "name": "redelegation_fail_count",
+              "description": "",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pool_id",
               "description": "",
               "label": "",
               "type": "string",
@@ -17433,6 +18915,1875 @@
                   ]
                 }
               }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ixo/names/v1beta1/names.proto",
+      "description": "",
+      "package": "ixo.names.v1beta1",
+      "hasEnums": true,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [
+        {
+          "name": "NameStatus",
+          "longName": "NameStatus",
+          "fullName": "ixo.names.v1beta1.NameStatus",
+          "description": "NameStatus represents the lifecycle state of a NameRecord. Names are never\nhard-deleted; status transitions are used instead so audit history is\npreserved.",
+          "values": [
+            {
+              "name": "NAME_STATUS_UNSPECIFIED",
+              "number": "0",
+              "description": "NAME_STATUS_UNSPECIFIED is the zero value and must not be persisted."
+            },
+            {
+              "name": "NAME_STATUS_ACTIVE",
+              "number": "1",
+              "description": "NAME_STATUS_ACTIVE: the normal resolvable state."
+            },
+            {
+              "name": "NAME_STATUS_SUSPENDED",
+              "number": "2",
+              "description": "NAME_STATUS_SUSPENDED: hidden from resolution, can be restored by\nregistrar."
+            },
+            {
+              "name": "NAME_STATUS_REVOKED",
+              "number": "3",
+              "description": "NAME_STATUS_REVOKED: terminally taken down, cannot be re-used by the same\nowner."
+            },
+            {
+              "name": "NAME_STATUS_TOMBSTONED",
+              "number": "4",
+              "description": "NAME_STATUS_TOMBSTONED: registrar-level take-down for policy/legal reasons;\nthe (namespace, normalized_name) tuple is permanently burned."
+            }
+          ]
+        }
+      ],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "NameRecord",
+          "longName": "NameRecord",
+          "fullName": "ixo.names.v1beta1.NameRecord",
+          "description": "NameRecord is a registered name bound to a DID. The uniqueness key for a\nNameRecord is (namespace, normalized_name).",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "namespace is the Namespace.name this record belongs to.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_name",
+              "description": "normalized_name is the canonical form used for uniqueness (trimmed,\nlowercased ASCII).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "display_name",
+              "description": "display_name is the original name as supplied by the registrant, preserving\ncase for presentation.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner_did",
+              "description": "owner_did is the DID that controls this name. Resolution returns this DID.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "verified",
+              "description": "verified is true if this name was attested to by a registrar/oracle (e.g.\nproof of an off-chain identity such as Twitter or KYC).",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "valid_until",
+              "description": "valid_until is a unix timestamp; 0 means no expiry. Reserved for future\nrenewal flow.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "status is the lifecycle state of the record. Resolution should treat\nanything other than NAME_STATUS_ACTIVE as not-found.",
+              "label": "",
+              "type": "NameStatus",
+              "longType": "NameStatus",
+              "fullType": "ixo.names.v1beta1.NameStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "verified_by",
+              "description": "verified_by is the DID or address of the registrar/oracle that attested\nthis record, if any.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evidence_hash",
+              "description": "evidence_hash is an optional content hash of off-chain attestation\nevidence (e.g. a signed JWT or VC).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "source",
+              "description": "source is a free-form tag describing where the verification came from\n(e.g. \"workos\", \"ussd\", \"import\", \"manual\").",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "created_at",
+              "description": "created_at is the unix timestamp the record was first written.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_at",
+              "description": "updated_at is the unix timestamp of the last write.",
+              "label": "",
+              "type": "int64",
+              "longType": "int64",
+              "fullType": "int64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "Namespace",
+          "longName": "Namespace",
+          "fullName": "ixo.names.v1beta1.Namespace",
+          "description": "Namespace defines a governed bucket of names (e.g. \"yoid\", \"twitter\").\nCreated and updated only via governance.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "name is the namespace identifier and the uniqueness scope for names\nregistered under it. Lowercase ASCII recommended.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "description",
+              "description": "description is a human-readable summary of the namespace.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "registrar_accounts",
+              "description": "registrar_accounts is the list of bech32 account addresses authorised to\nregister or moderate names in this namespace on behalf of users.",
+              "label": "repeated",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "allow_self_register",
+              "description": "allow_self_register: when true, users can register their own names by\nsigning MsgRegisterName. When false, only registrars can register.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "allow_registrar_override",
+              "description": "allow_registrar_override: when true, registrars can update or transfer\nnames regardless of the current owner (used for moderation or assisted\nflows). When false, only the owning DID can transfer/update.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "min_length",
+              "description": "min_length is the minimum allowed length of the normalized name.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "max_length",
+              "description": "max_length is the maximum allowed length of the normalized name. Must be\ngreater than zero.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "regex",
+              "description": "regex is an additional ASCII-only character pattern that the normalized\nname must match. Empty string means no extra check on top of the default.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "allow_expiry",
+              "description": "allow_expiry: when true, NameRecords in this namespace may have a non-zero\nvalid_until. Reserved for a future renewal flow.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/names/v1beta1/event.proto",
+      "description": "",
+      "package": "ixo.names.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "NameRegisteredEvent",
+          "longName": "NameRegisteredEvent",
+          "fullName": "ixo.names.v1beta1.NameRegisteredEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "record",
+              "description": "",
+              "label": "",
+              "type": "NameRecord",
+              "longType": "NameRecord",
+              "fullType": "ixo.names.v1beta1.NameRecord",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "registered_by",
+              "description": "registered_by is the address that submitted the tx (owner DID controller\nfor self-register, registrar account otherwise).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NameStatusChangedEvent",
+          "longName": "NameStatusChangedEvent",
+          "fullName": "ixo.names.v1beta1.NameStatusChangedEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "old_status",
+              "description": "",
+              "label": "",
+              "type": "NameStatus",
+              "longType": "NameStatus",
+              "fullType": "ixo.names.v1beta1.NameStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "new_status",
+              "description": "",
+              "label": "",
+              "type": "NameStatus",
+              "longType": "NameStatus",
+              "fullType": "ixo.names.v1beta1.NameStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "changed_by",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NameTransferredEvent",
+          "longName": "NameTransferredEvent",
+          "fullName": "ixo.names.v1beta1.NameTransferredEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "from_owner_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "to_owner_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "transferred_by",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NameUpdatedEvent",
+          "longName": "NameUpdatedEvent",
+          "fullName": "ixo.names.v1beta1.NameUpdatedEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "record",
+              "description": "",
+              "label": "",
+              "type": "NameRecord",
+              "longType": "NameRecord",
+              "fullType": "ixo.names.v1beta1.NameRecord",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "updated_by",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NamespaceCreatedEvent",
+          "longName": "NamespaceCreatedEvent",
+          "fullName": "ixo.names.v1beta1.NamespaceCreatedEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "Namespace",
+              "longType": "Namespace",
+              "fullType": "ixo.names.v1beta1.Namespace",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authority",
+              "description": "authority is the gov module address that created the namespace; lets\nindexers attribute namespace changes to a governance proposal.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "NamespaceUpdatedEvent",
+          "longName": "NamespaceUpdatedEvent",
+          "fullName": "ixo.names.v1beta1.NamespaceUpdatedEvent",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "Namespace",
+              "longType": "Namespace",
+              "fullType": "ixo.names.v1beta1.Namespace",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "authority",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/names/v1beta1/genesis.proto",
+      "description": "",
+      "package": "ixo.names.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": false,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "GenesisState",
+          "longName": "GenesisState",
+          "fullName": "ixo.names.v1beta1.GenesisState",
+          "description": "GenesisState defines the names module's genesis state.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespaces",
+              "description": "",
+              "label": "repeated",
+              "type": "Namespace",
+              "longType": "Namespace",
+              "fullType": "ixo.names.v1beta1.Namespace",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "names",
+              "description": "",
+              "label": "repeated",
+              "type": "NameRecord",
+              "longType": "NameRecord",
+              "fullType": "ixo.names.v1beta1.NameRecord",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": []
+    },
+    {
+      "name": "ixo/names/v1beta1/query.proto",
+      "description": "",
+      "package": "ixo.names.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "QueryGetNameRequest",
+          "longName": "QueryGetNameRequest",
+          "fullName": "ixo.names.v1beta1.QueryGetNameRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryGetNameResponse",
+          "longName": "QueryGetNameResponse",
+          "fullName": "ixo.names.v1beta1.QueryGetNameResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "record",
+              "description": "",
+              "label": "",
+              "type": "NameRecord",
+              "longType": "NameRecord",
+              "fullType": "ixo.names.v1beta1.NameRecord",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamesByNamespaceRequest",
+          "longName": "QueryNamesByNamespaceRequest",
+          "fullName": "ixo.names.v1beta1.QueryNamesByNamespaceRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamesByNamespaceResponse",
+          "longName": "QueryNamesByNamespaceResponse",
+          "fullName": "ixo.names.v1beta1.QueryNamesByNamespaceResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "records",
+              "description": "",
+              "label": "repeated",
+              "type": "NameRecord",
+              "longType": "NameRecord",
+              "fullType": "ixo.names.v1beta1.NameRecord",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamesByOwnerRequest",
+          "longName": "QueryNamesByOwnerRequest",
+          "fullName": "ixo.names.v1beta1.QueryNamesByOwnerRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "owner_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamesByOwnerResponse",
+          "longName": "QueryNamesByOwnerResponse",
+          "fullName": "ixo.names.v1beta1.QueryNamesByOwnerResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "records",
+              "description": "",
+              "label": "repeated",
+              "type": "NameRecord",
+              "longType": "NameRecord",
+              "fullType": "ixo.names.v1beta1.NameRecord",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamespaceRequest",
+          "longName": "QueryNamespaceRequest",
+          "fullName": "ixo.names.v1beta1.QueryNamespaceRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamespaceResponse",
+          "longName": "QueryNamespaceResponse",
+          "fullName": "ixo.names.v1beta1.QueryNamespaceResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "Namespace",
+              "longType": "Namespace",
+              "fullType": "ixo.names.v1beta1.Namespace",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamespacesRequest",
+          "longName": "QueryNamespacesRequest",
+          "fullName": "ixo.names.v1beta1.QueryNamespacesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageRequest",
+              "longType": "cosmos.base.query.v1beta1.PageRequest",
+              "fullType": "cosmos.base.query.v1beta1.PageRequest",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryNamespacesResponse",
+          "longName": "QueryNamespacesResponse",
+          "fullName": "ixo.names.v1beta1.QueryNamespacesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespaces",
+              "description": "",
+              "label": "repeated",
+              "type": "Namespace",
+              "longType": "Namespace",
+              "fullType": "ixo.names.v1beta1.Namespace",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "pagination",
+              "description": "",
+              "label": "",
+              "type": "PageResponse",
+              "longType": "cosmos.base.query.v1beta1.PageResponse",
+              "fullType": "cosmos.base.query.v1beta1.PageResponse",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryResolveNameRequest",
+          "longName": "QueryResolveNameRequest",
+          "fullName": "ixo.names.v1beta1.QueryResolveNameRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "name is normalized server-side; callers may pass the display form.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "QueryResolveNameResponse",
+          "longName": "QueryResolveNameResponse",
+          "fullName": "ixo.names.v1beta1.QueryResolveNameResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "record",
+              "description": "",
+              "label": "",
+              "type": "NameRecord",
+              "longType": "NameRecord",
+              "fullType": "ixo.names.v1beta1.NameRecord",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "Query",
+          "longName": "Query",
+          "fullName": "ixo.names.v1beta1.Query",
+          "description": "Query defines the names module gRPC query service.",
+          "methods": [
+            {
+              "name": "Namespace",
+              "description": "Namespace returns a single namespace by its name.",
+              "requestType": "QueryNamespaceRequest",
+              "requestLongType": "QueryNamespaceRequest",
+              "requestFullType": "ixo.names.v1beta1.QueryNamespaceRequest",
+              "requestStreaming": false,
+              "responseType": "QueryNamespaceResponse",
+              "responseLongType": "QueryNamespaceResponse",
+              "responseFullType": "ixo.names.v1beta1.QueryNamespaceResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/names/v1beta1/namespaces/{name}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Namespaces",
+              "description": "Namespaces returns all namespaces.",
+              "requestType": "QueryNamespacesRequest",
+              "requestLongType": "QueryNamespacesRequest",
+              "requestFullType": "ixo.names.v1beta1.QueryNamespacesRequest",
+              "requestStreaming": false,
+              "responseType": "QueryNamespacesResponse",
+              "responseLongType": "QueryNamespacesResponse",
+              "responseFullType": "ixo.names.v1beta1.QueryNamespacesResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/names/v1beta1/namespaces"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "ResolveName",
+              "description": "ResolveName returns the active NameRecord for (namespace, name). The name\nis normalized server-side before lookup. Returns not-found if the record\nis missing or its status is not ACTIVE.",
+              "requestType": "QueryResolveNameRequest",
+              "requestLongType": "QueryResolveNameRequest",
+              "requestFullType": "ixo.names.v1beta1.QueryResolveNameRequest",
+              "requestStreaming": false,
+              "responseType": "QueryResolveNameResponse",
+              "responseLongType": "QueryResolveNameResponse",
+              "responseFullType": "ixo.names.v1beta1.QueryResolveNameResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/names/v1beta1/resolve/{namespace}/{name}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "GetName",
+              "description": "GetName returns a NameRecord regardless of status. Useful for moderation\nand audit tools.",
+              "requestType": "QueryGetNameRequest",
+              "requestLongType": "QueryGetNameRequest",
+              "requestFullType": "ixo.names.v1beta1.QueryGetNameRequest",
+              "requestStreaming": false,
+              "responseType": "QueryGetNameResponse",
+              "responseLongType": "QueryGetNameResponse",
+              "responseFullType": "ixo.names.v1beta1.QueryGetNameResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/names/v1beta1/names/{namespace}/{normalized_name}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "NamesByNamespace",
+              "description": "NamesByNamespace lists records under a namespace (paginated).",
+              "requestType": "QueryNamesByNamespaceRequest",
+              "requestLongType": "QueryNamesByNamespaceRequest",
+              "requestFullType": "ixo.names.v1beta1.QueryNamesByNamespaceRequest",
+              "requestStreaming": false,
+              "responseType": "QueryNamesByNamespaceResponse",
+              "responseLongType": "QueryNamesByNamespaceResponse",
+              "responseFullType": "ixo.names.v1beta1.QueryNamesByNamespaceResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/names/v1beta1/names/{namespace}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "NamesByOwner",
+              "description": "NamesByOwner lists every name owned by a DID across all namespaces.",
+              "requestType": "QueryNamesByOwnerRequest",
+              "requestLongType": "QueryNamesByOwnerRequest",
+              "requestFullType": "ixo.names.v1beta1.QueryNamesByOwnerRequest",
+              "requestStreaming": false,
+              "responseType": "QueryNamesByOwnerResponse",
+              "responseLongType": "QueryNamesByOwnerResponse",
+              "responseFullType": "ixo.names.v1beta1.QueryNamesByOwnerResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ixo/names/v1beta1/owner/{owner_did}"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ixo/names/v1beta1/tx.proto",
+      "description": "",
+      "package": "ixo.names.v1beta1",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "MsgCreateNamespace",
+          "longName": "MsgCreateNamespace",
+          "fullName": "ixo.names.v1beta1.MsgCreateNamespace",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "authority is the address allowed to create namespaces (the gov module\naddress).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "namespace",
+              "description": "namespace is the full configuration of the new namespace.",
+              "label": "",
+              "type": "Namespace",
+              "longType": "Namespace",
+              "fullType": "ixo.names.v1beta1.Namespace",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgCreateNamespaceResponse",
+          "longName": "MsgCreateNamespaceResponse",
+          "fullName": "ixo.names.v1beta1.MsgCreateNamespaceResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgRegisterName",
+          "longName": "MsgRegisterName",
+          "fullName": "ixo.names.v1beta1.MsgRegisterName",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "signer",
+              "description": "signer is the bech32 address signing the tx; must control owner_did via\nan authentication verification method on the IID document.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "namespace",
+              "description": "namespace is the namespace under which the name is being registered.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "name is the display name (preserves case); will be normalized for\nuniqueness.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner_did",
+              "description": "owner_did is the DID this name will resolve to.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgRegisterNameByRegistrar",
+          "longName": "MsgRegisterNameByRegistrar",
+          "fullName": "ixo.names.v1beta1.MsgRegisterNameByRegistrar",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "registrar",
+              "description": "registrar is the bech32 address signing the tx; must be in the\nnamespace's registrar_accounts.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "owner_did",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "verified",
+              "description": "verified marks the record as attested. Registrars typically set this true\nafter off-chain verification; user-driven self-register sets it false.",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evidence_hash",
+              "description": "evidence_hash is an optional hash of the off-chain attestation evidence.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "source",
+              "description": "source is a free-form tag describing the verification source.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgRegisterNameByRegistrarResponse",
+          "longName": "MsgRegisterNameByRegistrarResponse",
+          "fullName": "ixo.names.v1beta1.MsgRegisterNameByRegistrarResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "normalized_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgRegisterNameResponse",
+          "longName": "MsgRegisterNameResponse",
+          "fullName": "ixo.names.v1beta1.MsgRegisterNameResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "normalized_name",
+              "description": "normalized_name is the canonical form stored.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgSetNameStatus",
+          "longName": "MsgSetNameStatus",
+          "fullName": "ixo.names.v1beta1.MsgSetNameStatus",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "signer",
+              "description": "signer is either a namespace registrar or the governance authority.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "status",
+              "description": "",
+              "label": "",
+              "type": "NameStatus",
+              "longType": "NameStatus",
+              "fullType": "ixo.names.v1beta1.NameStatus",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "reason",
+              "description": "reason is a free-form string surfaced in the audit event.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgSetNameStatusResponse",
+          "longName": "MsgSetNameStatusResponse",
+          "fullName": "ixo.names.v1beta1.MsgSetNameStatusResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgTransferName",
+          "longName": "MsgTransferName",
+          "fullName": "ixo.names.v1beta1.MsgTransferName",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "signer",
+              "description": "signer is the bech32 address submitting the transfer; must control the\ncurrent owner_did, OR be a registrar when allow_registrar_override is\nenabled.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_name",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "new_owner_did",
+              "description": "new_owner_did is the DID that will own the name after the transfer.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgTransferNameResponse",
+          "longName": "MsgTransferNameResponse",
+          "fullName": "ixo.names.v1beta1.MsgTransferNameResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateNameByRegistrar",
+          "longName": "MsgUpdateNameByRegistrar",
+          "fullName": "ixo.names.v1beta1.MsgUpdateNameByRegistrar",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "registrar",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "namespace",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "normalized_name",
+              "description": "normalized_name is the canonical name to update.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "verified",
+              "description": "",
+              "label": "",
+              "type": "bool",
+              "longType": "bool",
+              "fullType": "bool",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "evidence_hash",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "source",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateNameByRegistrarResponse",
+          "longName": "MsgUpdateNameByRegistrarResponse",
+          "fullName": "ixo.names.v1beta1.MsgUpdateNameByRegistrarResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateNamespace",
+          "longName": "MsgUpdateNamespace",
+          "fullName": "ixo.names.v1beta1.MsgUpdateNamespace",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "authority is the address allowed to update namespaces (the gov module\naddress).",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "namespace",
+              "description": "namespace replaces the existing namespace configuration; the\nnamespace.name selects the target.",
+              "label": "",
+              "type": "Namespace",
+              "longType": "Namespace",
+              "fullType": "ixo.names.v1beta1.Namespace",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateNamespaceResponse",
+          "longName": "MsgUpdateNamespaceResponse",
+          "fullName": "ixo.names.v1beta1.MsgUpdateNamespaceResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        }
+      ],
+      "services": [
+        {
+          "name": "Msg",
+          "longName": "Msg",
+          "fullName": "ixo.names.v1beta1.Msg",
+          "description": "Msg defines the names module Msg service.",
+          "methods": [
+            {
+              "name": "CreateNamespace",
+              "description": "CreateNamespace creates a new namespace. Authority-only (gov).",
+              "requestType": "MsgCreateNamespace",
+              "requestLongType": "MsgCreateNamespace",
+              "requestFullType": "ixo.names.v1beta1.MsgCreateNamespace",
+              "requestStreaming": false,
+              "responseType": "MsgCreateNamespaceResponse",
+              "responseLongType": "MsgCreateNamespaceResponse",
+              "responseFullType": "ixo.names.v1beta1.MsgCreateNamespaceResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateNamespace",
+              "description": "UpdateNamespace replaces an existing namespace's configuration.\nAuthority-only (gov). All Namespace fields supplied in the message become\nthe new state.",
+              "requestType": "MsgUpdateNamespace",
+              "requestLongType": "MsgUpdateNamespace",
+              "requestFullType": "ixo.names.v1beta1.MsgUpdateNamespace",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateNamespaceResponse",
+              "responseLongType": "MsgUpdateNamespaceResponse",
+              "responseFullType": "ixo.names.v1beta1.MsgUpdateNamespaceResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "RegisterName",
+              "description": "RegisterName lets a user register a name in a namespace that allows\nself-registration. The signer must control owner_did.",
+              "requestType": "MsgRegisterName",
+              "requestLongType": "MsgRegisterName",
+              "requestFullType": "ixo.names.v1beta1.MsgRegisterName",
+              "requestStreaming": false,
+              "responseType": "MsgRegisterNameResponse",
+              "responseLongType": "MsgRegisterNameResponse",
+              "responseFullType": "ixo.names.v1beta1.MsgRegisterNameResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "RegisterNameByRegistrar",
+              "description": "RegisterNameByRegistrar lets a registrar register a name on behalf of\nowner_did. The signer must be a registrar of the namespace.",
+              "requestType": "MsgRegisterNameByRegistrar",
+              "requestLongType": "MsgRegisterNameByRegistrar",
+              "requestFullType": "ixo.names.v1beta1.MsgRegisterNameByRegistrar",
+              "requestStreaming": false,
+              "responseType": "MsgRegisterNameByRegistrarResponse",
+              "responseLongType": "MsgRegisterNameByRegistrarResponse",
+              "responseFullType": "ixo.names.v1beta1.MsgRegisterNameByRegistrarResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateNameByRegistrar",
+              "description": "UpdateNameByRegistrar lets a registrar update the verification metadata\n(verified flag, verified_by, evidence_hash, source) of an existing record.\nThe signer must be a registrar of the namespace. Owner DID is not\nchanged by this message; use TransferName for that.",
+              "requestType": "MsgUpdateNameByRegistrar",
+              "requestLongType": "MsgUpdateNameByRegistrar",
+              "requestFullType": "ixo.names.v1beta1.MsgUpdateNameByRegistrar",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateNameByRegistrarResponse",
+              "responseLongType": "MsgUpdateNameByRegistrarResponse",
+              "responseFullType": "ixo.names.v1beta1.MsgUpdateNameByRegistrarResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "TransferName",
+              "description": "TransferName transfers ownership of a name to another DID. Permitted for\nthe current owner; permitted for a registrar when the namespace has\nallow_registrar_override = true.",
+              "requestType": "MsgTransferName",
+              "requestLongType": "MsgTransferName",
+              "requestFullType": "ixo.names.v1beta1.MsgTransferName",
+              "requestStreaming": false,
+              "responseType": "MsgTransferNameResponse",
+              "responseLongType": "MsgTransferNameResponse",
+              "responseFullType": "ixo.names.v1beta1.MsgTransferNameResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "SetNameStatus",
+              "description": "SetNameStatus changes the lifecycle status of a name (suspend, revoke,\ntombstone, or restore to active). Permitted for registrars and the\ngovernance authority.",
+              "requestType": "MsgSetNameStatus",
+              "requestLongType": "MsgSetNameStatus",
+              "requestFullType": "ixo.names.v1beta1.MsgSetNameStatus",
+              "requestStreaming": false,
+              "responseType": "MsgSetNameStatusResponse",
+              "responseLongType": "MsgSetNameStatusResponse",
+              "responseFullType": "ixo.names.v1beta1.MsgSetNameStatusResponse",
+              "responseStreaming": false
             }
           ]
         }

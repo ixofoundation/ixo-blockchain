@@ -6,6 +6,14 @@ const (
 	DefaultIxoAccount         = "ixo1kqmtxkggcqa9u34lnr6shy0euvclgatw4f9zz5"
 	DefaultCollectionSequence = uint64(1)
 	DefaultIntentSequence     = uint64(1)
+
+	// EntityAdjudicatorRevenueAccountName is the entity-account name created
+	// on an adjudicator entity when it first receives an adjudication payout.
+	// Mirrors EntityOracleRevenueAccountName from the oracle-payment flow.
+	// Only used when the adjudicator DID resolves to an entity with module
+	// accounts; non-entity DIDs (e.g. did:ixo:wasm:...) are paid out to the
+	// adjudicator_address directly instead.
+	EntityAdjudicatorRevenueAccountName = "adjudicatorRevenue"
 )
 
 // MinMemberBudgetPeriod is the minimum allowed period for a member budget.

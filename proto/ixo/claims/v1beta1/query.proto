@@ -50,6 +50,35 @@ service Query {
     option (google.api.http).get =
         "/ixo/claims/collection/{collectionId}/members";
   }
+  // DisputeBySubject returns the dispute (if any) for a given subject_id
+  // and target_role. Disputes targeting different roles of the same claim
+  // are separate records.
+  rpc DisputeBySubject(QueryDisputeBySubjectRequest)
+      returns (QueryDisputeBySubjectResponse) {
+    option (google.api.http).get =
+        "/ixo/claims/dispute-by-subject/{subjectId}/{targetRole}";
+  }
+  // DisputeListForSubject returns all disputes (across all target roles
+  // and over all time, regardless of status) for a given subject_id.
+  rpc DisputeListForSubject(QueryDisputeListForSubjectRequest)
+      returns (QueryDisputeListForSubjectResponse) {
+    option (google.api.http).get =
+        "/ixo/claims/disputes-for-subject/{subjectId}";
+  }
+  // AgentDepositBalance returns a single agent's deposit balance on a
+  // collection.
+  rpc AgentDepositBalance(QueryAgentDepositBalanceRequest)
+      returns (QueryAgentDepositBalanceResponse) {
+    option (google.api.http).get =
+        "/ixo/claims/collection/{collectionId}/deposit/{agentAddress}";
+  }
+  // AgentDepositBalanceList returns all agent deposit balances for a
+  // collection.
+  rpc AgentDepositBalanceList(QueryAgentDepositBalanceListRequest)
+      returns (QueryAgentDepositBalanceListResponse) {
+    option (google.api.http).get =
+        "/ixo/claims/collection/{collectionId}/deposits";
+  }
 }
 
 message QueryParamsRequest {}
@@ -137,5 +166,35 @@ message QueryCollectionMemberListRequest {
 
 message QueryCollectionMemberListResponse {
   repeated MemberBudget member_budgets = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryDisputeBySubjectRequest {
+  string subjectId = 1;
+  DisputeTargetRole targetRole = 2;
+}
+message QueryDisputeBySubjectResponse {
+  Dispute dispute = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryDisputeListForSubjectRequest { string subjectId = 1; }
+message QueryDisputeListForSubjectResponse {
+  repeated Dispute disputes = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryAgentDepositBalanceRequest {
+  string collectionId = 1;
+  string agentAddress = 2;
+}
+message QueryAgentDepositBalanceResponse {
+  AgentDepositBalance balance = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryAgentDepositBalanceListRequest {
+  string collectionId = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+message QueryAgentDepositBalanceListResponse {
+  repeated AgentDepositBalance balances = 1 [ (gogoproto.nullable) = false ];
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

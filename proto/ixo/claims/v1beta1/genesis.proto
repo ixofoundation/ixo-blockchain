@@ -14,4 +14,10 @@ message GenesisState {
   repeated Dispute disputes = 4 [ (gogoproto.nullable) = false ];
   repeated Intent intents = 5 [ (gogoproto.nullable) = false ];
   repeated MemberBudget member_budgets = 6 [ (gogoproto.nullable) = false ];
+  // agent_deposit_balances are the rolling performance-deposit balances per
+  // (collection, agent). On InitGenesis, the active-dispute index and the
+  // dispute subject index are rebuilt from the disputes slice rather than
+  // exported separately.
+  repeated AgentDepositBalance agent_deposit_balances = 7
+      [ (gogoproto.nullable) = false ];
 }

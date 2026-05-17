@@ -49,5 +49,27 @@ func (gs GenesisState) Validate() error {
 			return fmt.Errorf("invalid period_spent for collection %s member %s: %w", mb.CollectionId, mb.MemberAddress, err)
 		}
 	}
+
+	// Validate agent deposit balances
+	seenBalance := make(map[string]bool, len(gs.AgentDepositBalances))
+	for _, b := range gs.AgentDepositBalances {
+		if b.CollectionId == "" {
+			return fmt.Errorf("agent deposit balance has empty collection_id")
+		}
+		if _, err := sdk.AccAddressFromBech32(b.AgentAddress); err != nil {
+			return fmt.Errorf("agent deposit balance has invalid agent_address %s: %w", b.AgentAddress, err)
+		}
+		key := b.CollectionId + "/" + b.AgentAddress
+		if seenBalance[key] {
+			return fmt.Errorf("duplicate agent deposit balance for collection %s agent %s", b.CollectionId, b.AgentAddress)
+		}
+		seenBalance[key] = true
+		if err := b.Amount.Validate(); err != nil {
+			return fmt.Errorf("invalid amount for collection %s agent %s: %w", b.CollectionId, b.AgentAddress, err)
+		}
+		if b.Amount.IsZero() {
+			return fmt.Errorf("agent deposit balance for collection %s agent %s is zero (entry should be omitted)", b.CollectionId, b.AgentAddress)
+		}
+	}
 	return nil
 }

@@ -14,9 +14,9 @@ A Claim is stored in the state and is accessed by the identity of the ClaimId(us
 
 ## Disputes
 
-A Dispute is stored in the state and is accessed by the SubjectId of the dispute(user provided).
+A Dispute is stored in the state under its own `Data.Proof` CID. This preserves backward compatibility with legacy disputes that didn't carry a target role. A secondary index ([Dispute Subject Index](#dispute-subject-index)) is used to look up disputes by `(subject_id, target_role)` — the lookup path used by dispute filing and adjudication.
 
-- Disputes: `0x03 | disputeSubjectId(DID) -> ProtocolBuffer(Dispute)`
+- Disputes: `0x03 | disputeProof(CID) -> ProtocolBuffer(Dispute)`
 
 ## Intents
 
@@ -29,6 +29,26 @@ An Intent is stored in the state under a composite key of agent address, collect
 A MemberBudget is stored in the state under a composite key of collection id and member address. Storing each member budget under its own KV entry keeps reads and writes O(1) per member regardless of total team size — operations on one member do not require loading or rewriting other members' budgets, so per-operation gas is constant in team size.
 
 - Member Budgets: `0x05 | collectionId + "/" + memberAddress -> ProtocolBuffer(MemberBudget)`
+
+## Agent Deposit Balances
+
+An AgentDepositBalance is the rolling performance-deposit balance held by a single agent on a single collection. Stored under a composite key of `(collectionId, agentAddress)` so reads / writes are O(1). The actual funds live inside the collection's existing `escrow_account`; this entry is the per-agent accounting record.
+
+- Agent Deposit Balances: `0x06 | collectionId + "/" + agentAddress -> ProtocolBuffer(AgentDepositBalance)`
+
+## Active Dispute Index
+
+A presence-only secondary index used to answer "does this agent have any OPEN dispute targeting them on this collection?" in O(1) gas. The check is a prefix scan with limit 1 — used by `MsgSubmitClaim` / `MsgEvaluateClaim` / `MsgWithdrawPerformanceDeposit` to gate the actor while at least one OPEN dispute exists.
+
+- Active Dispute Index: `0x07 | collectionId + "/" + agentAddress + "/" + subjectId -> []byte{1}` (presence-only)
+
+Entries are written on `MsgDisputeClaim` (one per targeted role's agent) and deleted on `MsgAdjudicateDispute` when the dispute is resolved.
+
+## Dispute Subject Index
+
+A secondary index from `(subject_id, target_role)` to the most-recent dispute's proof CID. Walks back to the primary [Dispute](#dispute) record to read its status. Governs the "one OPEN dispute per (subject, role); AWARDED permanently blocks; DISMISSED allows new filings" rule.
+
+- Dispute Subject Index: `0x08 | subjectId + "/" + targetRole(int) -> disputeProof`
 
 # Types
 
@@ -55,6 +75,17 @@ type Collection struct {
 	Intents       CollectionIntentOptions
 	Flagged       uint64
 	FlaggedActive uint64
+	// Dispute / performance-deposit config (all optional; opt-in).
+	ServiceAgentDepositRequired  sdk.Coins
+	EvaluatorDepositRequired     sdk.Coins
+	DisputeDepositAmount         sdk.Coins
+	Adjudicators                 []*AdjudicationDid
+	PenaltyAmountPerDispute      sdk.Coins
+	MinDepositPeriod             time.Duration
+	// Dispute counters (internally calculated).
+	DisputesOpen      uint64
+	DisputesAwarded   uint64
+	DisputesDismissed uint64
 }
 ```
 
@@ -79,6 +110,31 @@ The field's descriptions is as follows:
 - `intents` - a [CollectionIntentOptions](#collectionintentoptions) option for intents for this collection (allow, deny, required)
 - `flagged` - a integer containing the cumulative number of times any claim in this collection has been flagged by an evaluator (internally calculated). This is an event-count metric — it increments on every flag, including re-flags by different agents on the same claim, and is **never decremented**.
 - `flaggedActive` - a integer containing the number of claims currently in `FLAGGED` state (internally calculated). Increments on the first transition to `FLAGGED` for a claim, decrements when that claim transitions to a terminal evaluation status. Re-flags (`FLAGGED → FLAGGED` by a different agent) leave it unchanged.
+- `serviceAgentDepositRequired` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) minimum performance-deposit balance a service agent must hold on this collection in order to `MsgSubmitClaim`. Empty / zero means no SA deposit gate.
+- `evaluatorDepositRequired` - same as `serviceAgentDepositRequired` but for evaluators, gating `MsgEvaluateClaim`. Empty / zero means no EA deposit gate.
+- `disputeDepositAmount` - the stake a disputer must attach to each `MsgDisputeClaim` (locked inline, refunded on `AWARDED`, forfeited as the penalty pot on `DISMISSED`). Empty / zero means no disputer stake required (legacy behavior).
+- `adjudicators` - the whitelist of approved adjudicators, each entry an [AdjudicationDid](#adjudicationdid) pairing a DID with that adjudicator's own `reward_percentage`. Adjudicators self-set their fee, turning the whitelist into a competitive market (low-fee adjudicators may win on volume, high-fee adjudicators may trade on reputation). The chain doesn't enforce who adjudicates a given dispute — whichever whitelisted DID lands `MsgAdjudicateDispute` first wins, and that entry's `reward_percentage` is applied. Required to be non-empty if any of the deposit / penalty fields above is set; clearing it is blocked while `disputesOpen > 0`.
+- `penaltyAmountPerDispute` - the fixed penalty applied on `AWARDED` adjudications. If empty, the adjudicator picks the penalty per-resolution (bounded by the loser's role deposit-required). At collection-validation time the fixed penalty must be ≤ each non-empty role deposit-required.
+- `minDepositPeriod` - the minimum duration a performance deposit must remain locked after the most recent `MsgAddPerformanceDeposit` before `MsgWithdrawPerformanceDeposit` can succeed. Closes the in-same-tx exploit where an agent could deposit + submit + withdraw atomically and leave zero stake at dispute time. Zero disables the lock. Each top-up rolls `AgentDepositBalance.withdrawableAt` forward to `max(current, now + minDepositPeriod)`; the slash path is not gated by this lock.
+- `disputesOpen` - the number of currently-OPEN disputes against any claim in this collection (internally calculated). Drives the "can the admin clear the adjudicator whitelist?" guard.
+- `disputesAwarded` - cumulative number of `AWARDED` adjudications on this collection (internally calculated, never decremented).
+- `disputesDismissed` - cumulative number of `DISMISSED` adjudications on this collection (internally calculated, never decremented).
+
+### AdjudicationDid
+
+An AdjudicationDid is a single entry on a collection's `adjudicators` whitelist — pairs an adjudicator DID with that adjudicator's own reward percentage. Lets adjudicators self-set fees so the whitelist functions as a competitive market.
+
+```go
+type AdjudicationDid struct {
+	Did              string
+	RewardPercentage math.LegacyDec // 0–100
+}
+```
+
+The field's descriptions is as follows:
+
+- `did` - the adjudicator's DID. Must appear on the `adjudicators` list to be allowed to settle disputes on the collection.
+- `rewardPercentage` - the share (`LegacyDec`, range `[0, 100]`) of each actual penalty payout that goes to **this** adjudicator when they settle a dispute. The remainder goes to the dispute winner. `0` means the adjudicator works for free; `100` means they take the full pot.
 
 ### Payments
 
@@ -324,21 +380,36 @@ The field's descriptions is as follows:
 
 ### Dispute
 
-A Dispute stores information concerning the dispute made towards a [Claim](#claim)
+A Dispute stores information concerning the dispute made towards a [Claim](#claim). v7 extended the record with target-role + economic-stake fields, plus a `status` lifecycle that culminates in a populated `resolution`.
 
 ```go
 type Dispute struct {
-	SubjectId  string
-	Type       int32
-	Data       *DisputeData
+	SubjectId       string
+	Type            int32
+	Data            *DisputeData
+	// Extended fields
+	TargetRole      DisputeTargetRole
+	DisputerAddress string
+	DisputerDid     string
+	DisputeDeposit  sdk.Coins
+	SubmittedAt     *time.Time
+	Status          DisputeStatus
+	Resolution      *DisputeResolution
 }
 ```
 
 The field's descriptions is as follows:
 
-- `subjectId` - a string containing the `id` of the claim the dispute is for. A unique field
+- `subjectId` - a string containing the `id` of the claim the dispute is for.
 - `type` - a integer interpreted by the client
 - `data` - a [DisputeData](#disputedata)
+- `targetRole` - a [DisputeTargetRole](#disputetargetrole) identifying which party of the claim is being disputed. `UNSPECIFIED` only appears on disputes migrated from pre-v7 state. The disputed agent's address is not stored on the record — it is derived at read time as `claim.agentAddress` for `SUBMITTER` or `claim.evaluation.agentAddress` for `EVALUATOR` (safe to re-derive because EVALUATOR disputes can only exist against terminal evaluations, which are immutable).
+- `disputerAddress` - the account that filed the dispute and locked the dispute deposit.
+- `disputerDid` - the DID of the disputer.
+- `disputeDeposit` - the amount locked by the disputer at filing, equal to `collection.disputeDepositAmount` at that moment. Refunded on `AWARDED`; forfeited as the penalty pot on `DISMISSED`.
+- `submittedAt` - the block time the dispute was filed.
+- `status` - the current [DisputeStatus](#disputestatus).
+- `resolution` - a [DisputeResolution](#disputeresolution), populated when the dispute is adjudicated.
 
 ### DisputeData
 
@@ -357,8 +428,42 @@ The field's descriptions is as follows:
 
 - `uri` - a string representing the endpoint of the data linked resource
 - `type ` - a string representing the [MIME](https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types) type of the data linked resource
-- `proof ` - a string representing the proof to verify the data linked resource
+- `proof ` - a string representing the proof to verify the data linked resource. This is the **primary key** of the Dispute record in state.
 - `encrypted ` - a boolean value for whether this data linked resource is encrypted or not
+
+### DisputeResolution
+
+A DisputeResolution stores the outcome of `MsgAdjudicateDispute`. Tracks both the intended penalty (what the adjudicator / collection prescribed) and the actual penalty paid (capped at the loser's available deposit balance — may be less than intended if a prior dispute already drained the balance).
+
+```go
+type DisputeResolution struct {
+	AdjudicatorDid           string
+	AdjudicatorAddress       string
+	AdjudicatorPayoutAddress string
+	ResolvedAt               *time.Time
+	Reason                   string
+	IntendedPenalty          sdk.Coins
+	ActualPenaltyPaid        sdk.Coins
+	WinnerAmount             sdk.Coins
+	AdjudicatorAmount        sdk.Coins
+	WinnerAddress            string
+	LoserAddress             string
+}
+```
+
+The field's descriptions is as follows:
+
+- `adjudicatorDid` - the DID that adjudicated; must be in `collection.adjudicators`.
+- `adjudicatorAddress` - the signer of `MsgAdjudicateDispute`. Either an `EntityAccount` of the adjudicator DID, or a key registered on the DID document.
+- `adjudicatorPayoutAddress` - where the adjudicator share was actually paid: the entity's `EntityAdjudicatorRevenueAccountName` account when `adjudicatorDid` resolves to an entity (auto-created on first adjudication), otherwise the signer address itself.
+- `resolvedAt` - block time of adjudication.
+- `reason` - free-form reason text from the adjudicator.
+- `intendedPenalty` - the penalty the adjudicator selected (or the collection's fixed `penaltyAmountPerDispute` if set). May exceed what was actually paid if the loser's balance was insufficient.
+- `actualPenaltyPaid` - what was actually slashed from the loser's balance (or paid out from the dispute deposit on `DISMISSED`). Always ≤ `intendedPenalty`.
+- `winnerAmount` - the share of `actualPenaltyPaid` that went to the dispute winner (disputer on `AWARDED`, target agent on `DISMISSED`).
+- `adjudicatorAmount` - the share of `actualPenaltyPaid` that went to the adjudicator.
+- `winnerAddress` - the address that received `winnerAmount`.
+- `loserAddress` - the address whose balance / deposit was slashed.
 
 ### Intent
 
@@ -430,6 +535,34 @@ Lifecycle:
 - **Updated (restore)** — when a claim is rejected / disputed / invalidated, or an intent expires before being used, the corresponding amounts are subtracted back from `periodSpent`. If the period has reset between the original deduction and the restore, the restore is skipped (the old period's spend doesn't carry over into the new period).
 - **Removed** — when removed via `MsgRemoveCollectionMembers`. Pending intents from a removed member still expire and refund escrow normally; budget restore is silently skipped.
 
+### AgentDepositBalance
+
+An AgentDepositBalance is the rolling performance-deposit balance held by an agent (service agent, evaluator, or third-party disputer using the same accounting bucket) on a single collection. The funds live in the collection's existing `escrow_account`; this record is the per-agent accounting.
+
+```go
+type AgentDepositBalance struct {
+	CollectionId    string
+	AgentAddress    string
+	Amount          sdk.Coins
+	WithdrawableAt  *time.Time
+}
+```
+
+The field's descriptions is as follows:
+
+- `collectionId` - a string containing the Collection `id` this balance is held on.
+- `agentAddress` - a string containing the account address the balance is held for.
+- `amount` - a [Coins](https://github.com/cosmos/cosmos-sdk/blob/main/types/coin.go#L180) value of the current balance.
+- `withdrawableAt` - the earliest block time at which `MsgWithdrawPerformanceDeposit` may be issued against this balance. Set on each `MsgAddPerformanceDeposit` to `max(current, now + collection.minDepositPeriod)`. Nil / zero on balances created under a collection with `minDepositPeriod == 0` (no lock). The slash path is not gated by this lock.
+
+Lifecycle:
+
+- **Created** — first `MsgAddPerformanceDeposit` for an `(collection, agent)` pair. Funds move from agent's wallet → collection escrow. Emits `AgentDepositBalanceCreatedEvent`.
+- **Updated** — subsequent top-ups, partial withdrawals, or partial slashes on adjudicated dispute loss that leave a non-zero balance. Emits `AgentDepositBalanceUpdatedEvent`.
+- **Removed** — full withdrawal or a slash that drains the balance to zero. The KV entry is deleted. Emits `AgentDepositBalanceRemovedEvent` with the final zero-amount balance.
+
+`amount.Sort()` is always non-empty when the entry exists (no zero-amount denoms persist).
+
 ## Enums
 
 ### CollectionState
@@ -482,6 +615,8 @@ var EvaluationStatus_name = map[int32]string{
 - **Re-flagging by the same agent is blocked.** An agent that flagged this claim — whether their flag is the current evaluation or sits in `evaluationHistory` after intervening flags from other agents — cannot flag the same claim again. The check covers both surfaces; flag-bombing across an intervening flag from another evaluator is rejected. Returns `ErrSelfReFlag`.
 - **Counters.** On flag, `Collection.flagged++`. On the *first* transition into `FLAGGED` for a claim, `Collection.flaggedActive++`. On terminal finalisation of a flagged claim, `Collection.flaggedActive--` (with appropriate `Approved++` / `Rejected++` / `Invalidated++` increment for the terminal status). `Disputed++` does not apply because `DISPUTED` is recorded by `MsgDisputeClaim`, not by `MsgEvaluateClaim`.
 
+**`DISPUTED` is deprecated for new transactions**. `MsgEvaluateClaim` rejects status `DISPUTED` with `ErrEvaluationStatusDisputedDeprecated`. The dispute lifecycle lives on the [Dispute](#dispute) record, not on the evaluation — existing on-chain evaluations with status `DISPUTED` from before v7 remain valid history.
+
 ### IntentStatus
 
 Defines the status of an [Intent](#intent) indicating its current state.
@@ -520,6 +655,30 @@ var PaymentStatus_name = map[int32]string{
 	4: "PAID",
 	5: "FAILED",
 	6: "DISPUTED",
+}
+```
+
+### DisputeTargetRole
+
+Defines which party of a claim a [Dispute](#dispute) is filed against. A dispute targets **exactly one** role; to dispute both the submitter and the evaluator of the same claim, file two separate disputes.
+
+```go
+var DisputeTargetRole_name = map[int32]string{
+	0: "UNSPECIFIED", // Only appears on pre-v7 migrated disputes; rejected on new txs.
+	1: "SUBMITTER",   // The service agent that submitted the claim.
+	2: "EVALUATOR",   // The evaluation agent that evaluated the claim.
+}
+```
+
+### DisputeStatus
+
+The lifecycle state of a [Dispute](#dispute).
+
+```go
+var DisputeStatus_name = map[int32]string{
+	0: "OPEN",      // Filed and awaiting adjudication. Targeted agent is blocked from new submissions / evaluations / withdrawal.
+	1: "AWARDED",   // Disputer won. Loser's balance slashed (80% disputer / 20% adjudicator). Further disputes on the same (subject, role) are permanently blocked.
+	2: "DISMISSED", // Disputer lost. Their dispute deposit becomes the pot (same 80/20 split, target agent is the winner). New disputes against the same (subject, role) may be filed with new evidence.
 }
 ```
 

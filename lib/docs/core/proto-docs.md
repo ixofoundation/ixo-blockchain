@@ -91,6 +91,8 @@
     - [Msg](#ixo.bonds.v1beta1.Msg)
   
 - [ixo/claims/v1beta1/claims.proto](#ixo/claims/v1beta1/claims.proto)
+    - [AdjudicationDid](#ixo.claims.v1beta1.AdjudicationDid)
+    - [AgentDepositBalance](#ixo.claims.v1beta1.AgentDepositBalance)
     - [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment)
     - [CW1155IntentPaymentToken](#ixo.claims.v1beta1.CW1155IntentPaymentToken)
     - [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment)
@@ -102,6 +104,7 @@
     - [Contract1155Payment](#ixo.claims.v1beta1.Contract1155Payment)
     - [Dispute](#ixo.claims.v1beta1.Dispute)
     - [DisputeData](#ixo.claims.v1beta1.DisputeData)
+    - [DisputeResolution](#ixo.claims.v1beta1.DisputeResolution)
     - [Evaluation](#ixo.claims.v1beta1.Evaluation)
     - [Intent](#ixo.claims.v1beta1.Intent)
     - [MemberBudget](#ixo.claims.v1beta1.MemberBudget)
@@ -111,6 +114,8 @@
   
     - [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions)
     - [CollectionState](#ixo.claims.v1beta1.CollectionState)
+    - [DisputeStatus](#ixo.claims.v1beta1.DisputeStatus)
+    - [DisputeTargetRole](#ixo.claims.v1beta1.DisputeTargetRole)
     - [EvaluationStatus](#ixo.claims.v1beta1.EvaluationStatus)
     - [IntentStatus](#ixo.claims.v1beta1.IntentStatus)
     - [PaymentStatus](#ixo.claims.v1beta1.PaymentStatus)
@@ -129,6 +134,9 @@
     - [CreateClaimAuthorizationType](#ixo.claims.v1beta1.CreateClaimAuthorizationType)
   
 - [ixo/claims/v1beta1/event.proto](#ixo/claims/v1beta1/event.proto)
+    - [AgentDepositBalanceCreatedEvent](#ixo.claims.v1beta1.AgentDepositBalanceCreatedEvent)
+    - [AgentDepositBalanceRemovedEvent](#ixo.claims.v1beta1.AgentDepositBalanceRemovedEvent)
+    - [AgentDepositBalanceUpdatedEvent](#ixo.claims.v1beta1.AgentDepositBalanceUpdatedEvent)
     - [ClaimAuthorizationCreatedEvent](#ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent)
     - [ClaimDisputedEvent](#ixo.claims.v1beta1.ClaimDisputedEvent)
     - [ClaimEvaluatedEvent](#ixo.claims.v1beta1.ClaimEvaluatedEvent)
@@ -136,6 +144,7 @@
     - [ClaimUpdatedEvent](#ixo.claims.v1beta1.ClaimUpdatedEvent)
     - [CollectionCreatedEvent](#ixo.claims.v1beta1.CollectionCreatedEvent)
     - [CollectionUpdatedEvent](#ixo.claims.v1beta1.CollectionUpdatedEvent)
+    - [DisputeResolvedEvent](#ixo.claims.v1beta1.DisputeResolvedEvent)
     - [IntentSubmittedEvent](#ixo.claims.v1beta1.IntentSubmittedEvent)
     - [IntentUpdatedEvent](#ixo.claims.v1beta1.IntentUpdatedEvent)
     - [MemberBudgetCreatedEvent](#ixo.claims.v1beta1.MemberBudgetCreatedEvent)
@@ -148,6 +157,10 @@
     - [GenesisState](#ixo.claims.v1beta1.GenesisState)
   
 - [ixo/claims/v1beta1/query.proto](#ixo/claims/v1beta1/query.proto)
+    - [QueryAgentDepositBalanceListRequest](#ixo.claims.v1beta1.QueryAgentDepositBalanceListRequest)
+    - [QueryAgentDepositBalanceListResponse](#ixo.claims.v1beta1.QueryAgentDepositBalanceListResponse)
+    - [QueryAgentDepositBalanceRequest](#ixo.claims.v1beta1.QueryAgentDepositBalanceRequest)
+    - [QueryAgentDepositBalanceResponse](#ixo.claims.v1beta1.QueryAgentDepositBalanceResponse)
     - [QueryClaimListRequest](#ixo.claims.v1beta1.QueryClaimListRequest)
     - [QueryClaimListResponse](#ixo.claims.v1beta1.QueryClaimListResponse)
     - [QueryClaimRequest](#ixo.claims.v1beta1.QueryClaimRequest)
@@ -160,6 +173,10 @@
     - [QueryCollectionMemberResponse](#ixo.claims.v1beta1.QueryCollectionMemberResponse)
     - [QueryCollectionRequest](#ixo.claims.v1beta1.QueryCollectionRequest)
     - [QueryCollectionResponse](#ixo.claims.v1beta1.QueryCollectionResponse)
+    - [QueryDisputeBySubjectRequest](#ixo.claims.v1beta1.QueryDisputeBySubjectRequest)
+    - [QueryDisputeBySubjectResponse](#ixo.claims.v1beta1.QueryDisputeBySubjectResponse)
+    - [QueryDisputeListForSubjectRequest](#ixo.claims.v1beta1.QueryDisputeListForSubjectRequest)
+    - [QueryDisputeListForSubjectResponse](#ixo.claims.v1beta1.QueryDisputeListForSubjectResponse)
     - [QueryDisputeListRequest](#ixo.claims.v1beta1.QueryDisputeListRequest)
     - [QueryDisputeListResponse](#ixo.claims.v1beta1.QueryDisputeListResponse)
     - [QueryDisputeRequest](#ixo.claims.v1beta1.QueryDisputeRequest)
@@ -175,6 +192,10 @@
   
 - [ixo/claims/v1beta1/tx.proto](#ixo/claims/v1beta1/tx.proto)
     - [CollectionMemberInput](#ixo.claims.v1beta1.CollectionMemberInput)
+    - [MsgAddPerformanceDeposit](#ixo.claims.v1beta1.MsgAddPerformanceDeposit)
+    - [MsgAddPerformanceDepositResponse](#ixo.claims.v1beta1.MsgAddPerformanceDepositResponse)
+    - [MsgAdjudicateDispute](#ixo.claims.v1beta1.MsgAdjudicateDispute)
+    - [MsgAdjudicateDisputeResponse](#ixo.claims.v1beta1.MsgAdjudicateDisputeResponse)
     - [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent)
     - [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse)
     - [MsgCreateClaimAuthorization](#ixo.claims.v1beta1.MsgCreateClaimAuthorization)
@@ -193,6 +214,8 @@
     - [MsgSubmitClaimResponse](#ixo.claims.v1beta1.MsgSubmitClaimResponse)
     - [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates)
     - [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse)
+    - [MsgUpdateCollectionDisputeConfig](#ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfig)
+    - [MsgUpdateCollectionDisputeConfigResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfigResponse)
     - [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents)
     - [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse)
     - [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments)
@@ -201,6 +224,8 @@
     - [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse)
     - [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment)
     - [MsgWithdrawPaymentResponse](#ixo.claims.v1beta1.MsgWithdrawPaymentResponse)
+    - [MsgWithdrawPerformanceDeposit](#ixo.claims.v1beta1.MsgWithdrawPerformanceDeposit)
+    - [MsgWithdrawPerformanceDepositResponse](#ixo.claims.v1beta1.MsgWithdrawPerformanceDepositResponse)
   
     - [Msg](#ixo.claims.v1beta1.Msg)
   
@@ -433,6 +458,57 @@
     - [QueryParamsResponse](#ixo.mint.v1beta1.QueryParamsResponse)
   
     - [Query](#ixo.mint.v1beta1.Query)
+  
+- [ixo/names/v1beta1/names.proto](#ixo/names/v1beta1/names.proto)
+    - [NameRecord](#ixo.names.v1beta1.NameRecord)
+    - [Namespace](#ixo.names.v1beta1.Namespace)
+  
+    - [NameStatus](#ixo.names.v1beta1.NameStatus)
+  
+- [ixo/names/v1beta1/event.proto](#ixo/names/v1beta1/event.proto)
+    - [NameRegisteredEvent](#ixo.names.v1beta1.NameRegisteredEvent)
+    - [NameStatusChangedEvent](#ixo.names.v1beta1.NameStatusChangedEvent)
+    - [NameTransferredEvent](#ixo.names.v1beta1.NameTransferredEvent)
+    - [NameUpdatedEvent](#ixo.names.v1beta1.NameUpdatedEvent)
+    - [NamespaceCreatedEvent](#ixo.names.v1beta1.NamespaceCreatedEvent)
+    - [NamespaceUpdatedEvent](#ixo.names.v1beta1.NamespaceUpdatedEvent)
+  
+- [ixo/names/v1beta1/genesis.proto](#ixo/names/v1beta1/genesis.proto)
+    - [GenesisState](#ixo.names.v1beta1.GenesisState)
+  
+- [ixo/names/v1beta1/query.proto](#ixo/names/v1beta1/query.proto)
+    - [QueryGetNameRequest](#ixo.names.v1beta1.QueryGetNameRequest)
+    - [QueryGetNameResponse](#ixo.names.v1beta1.QueryGetNameResponse)
+    - [QueryNamesByNamespaceRequest](#ixo.names.v1beta1.QueryNamesByNamespaceRequest)
+    - [QueryNamesByNamespaceResponse](#ixo.names.v1beta1.QueryNamesByNamespaceResponse)
+    - [QueryNamesByOwnerRequest](#ixo.names.v1beta1.QueryNamesByOwnerRequest)
+    - [QueryNamesByOwnerResponse](#ixo.names.v1beta1.QueryNamesByOwnerResponse)
+    - [QueryNamespaceRequest](#ixo.names.v1beta1.QueryNamespaceRequest)
+    - [QueryNamespaceResponse](#ixo.names.v1beta1.QueryNamespaceResponse)
+    - [QueryNamespacesRequest](#ixo.names.v1beta1.QueryNamespacesRequest)
+    - [QueryNamespacesResponse](#ixo.names.v1beta1.QueryNamespacesResponse)
+    - [QueryResolveNameRequest](#ixo.names.v1beta1.QueryResolveNameRequest)
+    - [QueryResolveNameResponse](#ixo.names.v1beta1.QueryResolveNameResponse)
+  
+    - [Query](#ixo.names.v1beta1.Query)
+  
+- [ixo/names/v1beta1/tx.proto](#ixo/names/v1beta1/tx.proto)
+    - [MsgCreateNamespace](#ixo.names.v1beta1.MsgCreateNamespace)
+    - [MsgCreateNamespaceResponse](#ixo.names.v1beta1.MsgCreateNamespaceResponse)
+    - [MsgRegisterName](#ixo.names.v1beta1.MsgRegisterName)
+    - [MsgRegisterNameByRegistrar](#ixo.names.v1beta1.MsgRegisterNameByRegistrar)
+    - [MsgRegisterNameByRegistrarResponse](#ixo.names.v1beta1.MsgRegisterNameByRegistrarResponse)
+    - [MsgRegisterNameResponse](#ixo.names.v1beta1.MsgRegisterNameResponse)
+    - [MsgSetNameStatus](#ixo.names.v1beta1.MsgSetNameStatus)
+    - [MsgSetNameStatusResponse](#ixo.names.v1beta1.MsgSetNameStatusResponse)
+    - [MsgTransferName](#ixo.names.v1beta1.MsgTransferName)
+    - [MsgTransferNameResponse](#ixo.names.v1beta1.MsgTransferNameResponse)
+    - [MsgUpdateNameByRegistrar](#ixo.names.v1beta1.MsgUpdateNameByRegistrar)
+    - [MsgUpdateNameByRegistrarResponse](#ixo.names.v1beta1.MsgUpdateNameByRegistrarResponse)
+    - [MsgUpdateNamespace](#ixo.names.v1beta1.MsgUpdateNamespace)
+    - [MsgUpdateNamespaceResponse](#ixo.names.v1beta1.MsgUpdateNamespaceResponse)
+  
+    - [Msg](#ixo.names.v1beta1.Msg)
   
 - [ixo/smartaccount/crypto/crypto.proto](#ixo/smartaccount/crypto/crypto.proto)
     - [AuthnPubKey](#ixo.smartaccount.crypto.AuthnPubKey)
@@ -1891,6 +1967,49 @@ Msg defines the bonds Msg service.
 
 
 
+<a name="ixo.claims.v1beta1.AdjudicationDid"></a>
+
+### AdjudicationDid
+AdjudicationDid represents a single adjudicator entry on a Collection&#39;s
+dispute whitelist. Each entry pairs a DID with its own reward percentage —
+adjudicators self-set their fee, turning adjudication into a competitive
+market (lower-fee adjudicators may attract more volume, higher-fee may
+trade on reputation). The chain does not enforce who adjudicates a given
+dispute; whichever whitelisted DID submits MsgAdjudicateDispute first wins.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| did | [string](#string) |  | did is the adjudicator&#39;s DID. Must appear in this list to be allowed to settle disputes on the collection. |
+| reward_percentage | [string](#string) |  | reward_percentage is the share (LegacyDec, range [0, 100]) of each actual penalty payout that goes to THIS adjudicator when they settle a dispute. The remainder goes to the dispute winner. |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.AgentDepositBalance"></a>
+
+### AgentDepositBalance
+AgentDepositBalance is an agent&#39;s rolling performance-deposit balance for
+a single collection. Held inside the collection&#39;s existing escrow account
+(no separate escrow). Topped up via MsgAddPerformanceDeposit, drained on
+adjudicated dispute losses, withdrawable when no active dispute targets
+this agent on this collection.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id this balance belongs to. |
+| agent_address | [string](#string) |  | agent_address is the account this balance is held for. |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | amount is the current balance in escrow on this agent&#39;s behalf. |
+| withdrawable_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | withdrawable_at is the earliest block time at which MsgWithdrawPerformanceDeposit may be issued against this balance. Rolled forward to max(current, now &#43; collection.min_deposit_period) on each top-up so an agent cannot deposit &#43; submit &#43; withdraw atomically and leave nothing at stake before a dispute can land. Zero on balances created under a collection with min_deposit_period == 0 (no lock). The slash path is not gated by this lock; only voluntary withdrawal is. |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.CW1155IntentPayment"></a>
 
 ### CW1155IntentPayment
@@ -1994,6 +2113,7 @@ CW20Output represents a CW20 token output for split payments
 | cw1155_payment | [CW1155Payment](#ixo.claims.v1beta1.CW1155Payment) | repeated | custom cw1155 payments specified by service agent for claim approval NOTE: if all amounts are empty then collection default is used |
 | cw1155_intent_payment | [CW1155IntentPayment](#ixo.claims.v1beta1.CW1155IntentPayment) | repeated | If intent was used, this is the cw20_payment equivalent but with amounts per token_id to transfer the same tokens to and from the escrow account |
 | member_address | [string](#string) |  | member_address is the team member this claim is on behalf of, if any. Copied from intent when use_intent is true. Used for budget restoration on claim rejection/dispute/invalidation. |
+| evaluation_history | [Evaluation](#ixo.claims.v1beta1.Evaluation) | repeated | evaluation_history holds prior evaluations for this claim in chronological order. The most recent evaluation always lives in `evaluation`; only superseded entries are appended here. Empty for claims that have been evaluated at most once. Populated when an evaluator FLAGS a claim and a subsequent evaluation (flag-then-flag chain or terminal finalisation) moves the prior evaluation into history. |
 
 
 
@@ -2044,6 +2164,17 @@ CW20Output represents a CW20 token output for split payments
 | invalidated | [uint64](#uint64) |  | invalidated is the number of claims that have been evaluated as invalid (internally calculated) |
 | escrow_account | [string](#string) |  | escrow_account is the escrow account address for this collection created at collection creation, current purpose is to transfer payments to escrow account for GUARANTEED payments through intents |
 | intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
+| flagged | [uint64](#uint64) |  | flagged is the cumulative number of times any claim in this collection has been flagged by an evaluator. Never decremented — it is an event-count metric, not a current-state count. |
+| flagged_active | [uint64](#uint64) |  | flagged_active is the number of claims currently in FLAGGED state (incremented when a claim becomes FLAGGED, decremented when it transitions to a terminal evaluation status). |
+| service_agent_deposit_required | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | service_agent_deposit_required is the minimum performance deposit balance a service agent must hold on this collection to submit claims. Empty / zero means no deposit gate for service agents. |
+| evaluator_deposit_required | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | evaluator_deposit_required is the minimum performance deposit balance an evaluator must hold on this collection to submit evaluations. Empty / zero means no deposit gate for evaluators. |
+| dispute_deposit_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | dispute_deposit_amount is the stake a disputer attaches to MsgDisputeClaim. Held with the dispute record; refunded on AWARDED; becomes the penalty pot on DISMISSED. Empty / zero means no disputer stake required. |
+| penalty_amount_per_dispute | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | penalty_amount_per_dispute is the fixed penalty applied on AWARDED. If empty / zero, the adjudicator sets the penalty per-resolution (bounded by the loser&#39;s deposit-required amount). At collection-validation time, if set, must be ≤ each non-empty deposit-required field. |
+| disputes_open | [uint64](#uint64) |  | disputes_open is the number of currently-OPEN disputes against any claim in this collection (internally calculated). |
+| disputes_awarded | [uint64](#uint64) |  | disputes_awarded is the cumulative number of disputes ever resolved as AWARDED on this collection (internally calculated, never decremented). |
+| disputes_dismissed | [uint64](#uint64) |  | disputes_dismissed is the cumulative number of disputes ever resolved as DISMISSED on this collection (internally calculated, never decremented). |
+| min_deposit_period | [google.protobuf.Duration](#google.protobuf.Duration) |  | min_deposit_period is the minimum duration a performance deposit must remain locked after the most recent top-up before MsgWithdrawPerformanceDeposit can be issued. Closes the in-same-tx exploit where an agent could deposit, submit/evaluate, and withdraw atomically — leaving zero economic stake at dispute time. Set to zero duration to disable the lock. Each MsgAddPerformanceDeposit rolls AgentDepositBalance.withdrawable_at forward to max(current, now &#43; min_deposit_period); the slash path is not gated by this lock. |
+| adjudicators | [AdjudicationDid](#ixo.claims.v1beta1.AdjudicationDid) | repeated | adjudicators is the whitelist of approved adjudicator DIDs paired with their reward percentages. Each entry carries its own reward_percentage, letting adjudicators self-set their fees (a competitive market). The chain does not enforce who adjudicates a given dispute — whichever whitelisted DID lands MsgAdjudicateDispute first wins; the percentage applied is that adjudicator&#39;s entry. Required to be non-empty if any deposit-required / dispute_deposit / penalty field is set; clearing it is blocked while disputes_open &gt; 0. |
 
 
 
@@ -2078,6 +2209,13 @@ CW20Output represents a CW20 token output for split payments
 | subject_id | [string](#string) |  |  |
 | type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
 | data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
+| target_role | [DisputeTargetRole](#ixo.claims.v1beta1.DisputeTargetRole) |  | target_role is the party of the claim this dispute is filed against (submitter or evaluator). Exactly one role per dispute; to dispute both parties of the same claim, file two disputes. UNSPECIFIED only appears on legacy disputes migrated from pre-v7 state. |
+| disputer_address | [string](#string) |  | disputer_address is the account that filed the dispute and locked the dispute_deposit. Receives the deposit back on AWARDED, or 80% of the penalty (loser balance) on AWARDED; loses the deposit (split 80/20 with adjudicator) on DISMISSED. |
+| disputer_did | [string](#string) |  | disputer_did is the DID of the disputer at filing time. |
+| dispute_deposit | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | dispute_deposit is the amount the disputer locked at filing, equal to collection.dispute_deposit_amount at the time of filing. Held in the collection escrow account. |
+| submitted_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | submitted_at is the block time the dispute was filed. |
+| status | [DisputeStatus](#ixo.claims.v1beta1.DisputeStatus) |  | status is the current lifecycle state. |
+| resolution | [DisputeResolution](#ixo.claims.v1beta1.DisputeResolution) |  | resolution is populated on adjudication (AWARDED or DISMISSED). |
 
 
 
@@ -2096,6 +2234,34 @@ CW20Output represents a CW20 token output for split payments
 | type | [string](#string) |  |  |
 | proof | [string](#string) |  |  |
 | encrypted | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.DisputeResolution"></a>
+
+### DisputeResolution
+DisputeResolution captures the outcome of MsgAdjudicateDispute. Records
+the intended penalty (what the adjudicator/collection prescribed) and the
+actual penalty paid (capped at the loser&#39;s available deposit balance —
+may be less than intended if a prior dispute already drained the balance).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| adjudicator_did | [string](#string) |  | adjudicator_did is the DID that adjudicated; must be in the collection&#39;s adjudication_entity_dids whitelist. |
+| adjudicator_address | [string](#string) |  | adjudicator_address is the signer of MsgAdjudicateDispute. Either an entity account belonging to adjudicator_did, or a key registered on the adjudicator_did DID document. |
+| adjudicator_payout_address | [string](#string) |  | adjudicator_payout_address is where the 20% reward (or 100% if no winner share) was actually paid out — either the AdjudicatorRevenue entity account (auto-created) when the DID is an entity DID with module accounts, or adjudicator_address otherwise. |
+| resolved_at | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  | data is the structured payload the adjudicator attached to the resolution — same shape as the dispute filing&#39;s DisputeData. Lets the adjudicator pin an opinion document (IPFS/matrix uri &#43; proof/cid), declare its MIME type, and flag encryption — mirroring how disputers attach evidence at filing time. |
+| intended_penalty | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | intended_penalty is the penalty the adjudicator selected (or the collection&#39;s penalty_amount_per_dispute if fixed). May exceed what was actually paid if the loser&#39;s balance was insufficient. |
+| actual_penalty_paid | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | actual_penalty_paid is what was actually slashed from the loser&#39;s balance (or the dispute_deposit, on DISMISSED). Always ≤ intended. |
+| winner_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | winner_amount is the portion of actual_penalty_paid that went to the dispute winner (disputer on AWARDED, target agent on DISMISSED). |
+| adjudicator_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | adjudicator_amount is the portion of actual_penalty_paid that went to the adjudicator (governed by collection.adjudicator_reward_percentage). |
+| winner_address | [string](#string) |  | winner_address is the address that received the winner_amount. |
+| loser_address | [string](#string) |  | loser_address is the address whose balance / deposit was slashed. |
 
 
 
@@ -2268,6 +2434,34 @@ for gas-efficient O(1) reads and writes independent of team size.
 
 
 
+<a name="ixo.claims.v1beta1.DisputeStatus"></a>
+
+### DisputeStatus
+DisputeStatus is the lifecycle state of a dispute.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DISPUTE_STATUS_OPEN | 0 | Open: dispute has been filed and is awaiting adjudication. Targeted agent is blocked from submitting / withdrawing on this collection until resolved. |
+| DISPUTE_STATUS_AWARDED | 1 | Awarded: dispute upheld; the targeted party was found in the wrong. No further disputes against this (subject_id, target_role) are allowed. |
+| DISPUTE_STATUS_DISMISSED | 2 | Dismissed: dispute rejected; targeted party was vindicated. Other parties may file new disputes against the same (subject_id, target_role) with new evidence. |
+
+
+
+<a name="ixo.claims.v1beta1.DisputeTargetRole"></a>
+
+### DisputeTargetRole
+DisputeTargetRole identifies which party of a claim a dispute is filed
+against. A dispute targets exactly one role; to dispute both the submitter
+and the evaluator of the same claim, file two separate disputes.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DISPUTE_TARGET_ROLE_UNSPECIFIED | 0 |  |
+| DISPUTE_TARGET_ROLE_SUBMITTER | 1 | Submitter: the service agent that submitted the claim |
+| DISPUTE_TARGET_ROLE_EVALUATOR | 2 | Evaluator: the evaluation agent that evaluated the claim |
+
+
+
 <a name="ixo.claims.v1beta1.EvaluationStatus"></a>
 
 ### EvaluationStatus
@@ -2280,6 +2474,7 @@ for gas-efficient O(1) reads and writes independent of team size.
 | REJECTED | 2 |  |
 | DISPUTED | 3 |  |
 | INVALIDATED | 4 |  |
+| FLAGGED | 5 | Flagged: non-terminal &#34;I am declining to make a final call&#34; outcome. Payment does not fire. The flagger or any other authorized evaluator can subsequently re-evaluate the claim to a terminal status (APPROVED / REJECTED / INVALIDATED) when more information is available. FLAGGED counts against AgentQuota the same as a terminal evaluation. |
 
 
 
@@ -2528,6 +2723,62 @@ created
 
 
 
+<a name="ixo.claims.v1beta1.AgentDepositBalanceCreatedEvent"></a>
+
+### AgentDepositBalanceCreatedEvent
+AgentDepositBalanceCreatedEvent is emitted when an agent&#39;s
+performance-deposit balance is created for the first time (i.e. the first
+MsgAddPerformanceDeposit for a given (collection, agent) pair).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| balance | [AgentDepositBalance](#ixo.claims.v1beta1.AgentDepositBalance) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.AgentDepositBalanceRemovedEvent"></a>
+
+### AgentDepositBalanceRemovedEvent
+AgentDepositBalanceRemovedEvent is emitted when the agent&#39;s balance is fully
+drained (full withdrawal or full slash brings amount to zero) and the KV
+entry is deleted. Carries the final balance state (with zero amount) so the
+indexer can archive the entry. Mirrors MemberBudgetRemovedEvent.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| balance | [AgentDepositBalance](#ixo.claims.v1beta1.AgentDepositBalance) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.AgentDepositBalanceUpdatedEvent"></a>
+
+### AgentDepositBalanceUpdatedEvent
+AgentDepositBalanceUpdatedEvent is emitted on any state change to an existing
+agent performance-deposit balance: subsequent top-up, partial withdrawal, or
+slashing on adjudicated dispute loss. Carries the post-state balance. The
+indexer can derive the delta by diffing against the previous on-record value;
+the reason can be inferred from the enclosing tx&#39;s Msg type
+(MsgAddPerformanceDeposit / MsgWithdrawPerformanceDeposit /
+MsgAdjudicateDispute).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| balance | [AgentDepositBalance](#ixo.claims.v1beta1.AgentDepositBalance) |  |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent"></a>
 
 ### ClaimAuthorizationCreatedEvent
@@ -2633,6 +2884,22 @@ CollectionUpdatedEvent is an event triggered on a Collection update
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | collection | [Collection](#ixo.claims.v1beta1.Collection) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.DisputeResolvedEvent"></a>
+
+### DisputeResolvedEvent
+DisputeResolvedEvent is emitted when MsgAdjudicateDispute settles a
+dispute (AWARDED or DISMISSED).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| dispute | [Dispute](#ixo.claims.v1beta1.Dispute) |  |  |
 
 
 
@@ -2783,6 +3050,7 @@ GenesisState defines the claims module&#39;s genesis state.
 | disputes | [Dispute](#ixo.claims.v1beta1.Dispute) | repeated |  |
 | intents | [Intent](#ixo.claims.v1beta1.Intent) | repeated |  |
 | member_budgets | [MemberBudget](#ixo.claims.v1beta1.MemberBudget) | repeated |  |
+| agent_deposit_balances | [AgentDepositBalance](#ixo.claims.v1beta1.AgentDepositBalance) | repeated | agent_deposit_balances are the rolling performance-deposit balances per (collection, agent). On InitGenesis, the active-dispute index and the dispute subject index are rebuilt from the disputes slice rather than exported separately. |
 
 
 
@@ -2802,6 +3070,69 @@ GenesisState defines the claims module&#39;s genesis state.
 <p align="right"><a href="#top">Top</a></p>
 
 ## ixo/claims/v1beta1/query.proto
+
+
+
+<a name="ixo.claims.v1beta1.QueryAgentDepositBalanceListRequest"></a>
+
+### QueryAgentDepositBalanceListRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collectionId | [string](#string) |  |  |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryAgentDepositBalanceListResponse"></a>
+
+### QueryAgentDepositBalanceListResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| balances | [AgentDepositBalance](#ixo.claims.v1beta1.AgentDepositBalance) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryAgentDepositBalanceRequest"></a>
+
+### QueryAgentDepositBalanceRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collectionId | [string](#string) |  |  |
+| agentAddress | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryAgentDepositBalanceResponse"></a>
+
+### QueryAgentDepositBalanceResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| balance | [AgentDepositBalance](#ixo.claims.v1beta1.AgentDepositBalance) |  |  |
+
+
+
 
 
 
@@ -2990,6 +3321,67 @@ GenesisState defines the claims module&#39;s genesis state.
 
 
 
+<a name="ixo.claims.v1beta1.QueryDisputeBySubjectRequest"></a>
+
+### QueryDisputeBySubjectRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subjectId | [string](#string) |  |  |
+| targetRole | [DisputeTargetRole](#ixo.claims.v1beta1.DisputeTargetRole) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryDisputeBySubjectResponse"></a>
+
+### QueryDisputeBySubjectResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| dispute | [Dispute](#ixo.claims.v1beta1.Dispute) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryDisputeListForSubjectRequest"></a>
+
+### QueryDisputeListForSubjectRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subjectId | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.QueryDisputeListForSubjectResponse"></a>
+
+### QueryDisputeListForSubjectResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| disputes | [Dispute](#ixo.claims.v1beta1.Dispute) | repeated |  |
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.QueryDisputeListRequest"></a>
 
 ### QueryDisputeListRequest
@@ -3163,6 +3555,10 @@ Query defines the gRPC querier service.
 | IntentList | [QueryIntentListRequest](#ixo.claims.v1beta1.QueryIntentListRequest) | [QueryIntentListResponse](#ixo.claims.v1beta1.QueryIntentListResponse) |  |
 | CollectionMember | [QueryCollectionMemberRequest](#ixo.claims.v1beta1.QueryCollectionMemberRequest) | [QueryCollectionMemberResponse](#ixo.claims.v1beta1.QueryCollectionMemberResponse) |  |
 | CollectionMemberList | [QueryCollectionMemberListRequest](#ixo.claims.v1beta1.QueryCollectionMemberListRequest) | [QueryCollectionMemberListResponse](#ixo.claims.v1beta1.QueryCollectionMemberListResponse) |  |
+| DisputeBySubject | [QueryDisputeBySubjectRequest](#ixo.claims.v1beta1.QueryDisputeBySubjectRequest) | [QueryDisputeBySubjectResponse](#ixo.claims.v1beta1.QueryDisputeBySubjectResponse) | DisputeBySubject returns the dispute (if any) for a given subject_id and target_role. Disputes targeting different roles of the same claim are separate records. |
+| DisputeListForSubject | [QueryDisputeListForSubjectRequest](#ixo.claims.v1beta1.QueryDisputeListForSubjectRequest) | [QueryDisputeListForSubjectResponse](#ixo.claims.v1beta1.QueryDisputeListForSubjectResponse) | DisputeListForSubject returns all disputes (across all target roles and over all time, regardless of status) for a given subject_id. |
+| AgentDepositBalance | [QueryAgentDepositBalanceRequest](#ixo.claims.v1beta1.QueryAgentDepositBalanceRequest) | [QueryAgentDepositBalanceResponse](#ixo.claims.v1beta1.QueryAgentDepositBalanceResponse) | AgentDepositBalance returns a single agent&#39;s deposit balance on a collection. |
+| AgentDepositBalanceList | [QueryAgentDepositBalanceListRequest](#ixo.claims.v1beta1.QueryAgentDepositBalanceListRequest) | [QueryAgentDepositBalanceListResponse](#ixo.claims.v1beta1.QueryAgentDepositBalanceListResponse) | AgentDepositBalanceList returns all agent deposit balances for a collection. |
 
  
 
@@ -3189,6 +3585,95 @@ MsgSetCollectionMembers
 | period_spend_limit | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | maximum native coin spend allowed per period |
 | period_cw20_spend_limit | [CW20Payment](#ixo.claims.v1beta1.CW20Payment) | repeated | maximum CW20 spend allowed per period |
 | reset_period_spent | [bool](#bool) |  | if true, resets period_spent to zero (useful for manual admin reset) |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgAddPerformanceDeposit"></a>
+
+### MsgAddPerformanceDeposit
+MsgAddPerformanceDeposit tops up an agent&#39;s performance-deposit balance on
+a collection. Funds move from agent_address → collection.escrow_account.
+Permitted regardless of whether the agent currently has active disputes —
+only withdrawals and new submissions are gated.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  |  |
+| agent_address | [string](#string) |  | agent_address is the owner of the balance being topped up; also the payer. Anyone can fund their own balance on any collection (no authz grant required from the collection admin). |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgAddPerformanceDepositResponse"></a>
+
+### MsgAddPerformanceDepositResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| new_balance | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | new_balance is the agent&#39;s resulting balance after this top-up. |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgAdjudicateDispute"></a>
+
+### MsgAdjudicateDispute
+MsgAdjudicateDispute settles a dispute. Signed by adjudicator_address,
+which must be either an EntityAccount belonging to adjudicator_did, OR a
+key registered on the adjudicator_did DID document (capability invocation
+/ authentication verification method). adjudicator_did must be in the
+collection&#39;s adjudication_entity_dids whitelist.
+
+AWARDED: loser is the targeted agent of the dispute. Penalty is debited
+from their AgentDepositBalance (capped at available). 80% (by default)
+goes to the disputer, 20% to the adjudicator payout address. The
+disputer&#39;s dispute_deposit is returned to them in full.
+
+DISMISSED: loser is the disputer. The disputer&#39;s dispute_deposit is the
+pot. 80% goes to the targeted agent (vindicated), 20% to the adjudicator
+payout address.
+
+The penalty amount may be left empty by the caller if the collection has
+penalty_amount_per_dispute set, in which case the collection value is
+used. Otherwise the caller must supply a penalty bounded by the loser&#39;s
+deposit-required (or dispute_deposit_amount for DISMISSED).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| subject_id | [string](#string) |  | subject_id of the dispute being adjudicated. |
+| target_role | [DisputeTargetRole](#ixo.claims.v1beta1.DisputeTargetRole) |  | target_role of the dispute being adjudicated. Together with subject_id, identifies the dispute uniquely (one OPEN dispute per pair). |
+| adjudicator_did | [string](#string) |  | adjudicator_did must be in collection.adjudication_entity_dids. |
+| adjudicator_address | [string](#string) |  | adjudicator_address is the signer. Must be authorized by adjudicator_did (entity account OR DID-registered key). |
+| outcome | [DisputeStatus](#ixo.claims.v1beta1.DisputeStatus) |  | outcome must be AWARDED or DISMISSED; OPEN is rejected. |
+| data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  | data is the structured payload the adjudicator wants recorded on the resolution — symmetric with MsgDisputeClaim.data. The keeper stores this verbatim on DisputeResolution.data, so adjudicators can pin a signed opinion doc (IPFS/matrix uri &#43; proof/cid), declare its MIME type, and flag encryption. |
+| penalty_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | penalty_amount: if collection has a fixed penalty_amount_per_dispute, this field is ignored. Otherwise must be set and ≤ loser&#39;s role deposit-required (AWARDED) or ≤ dispute_deposit_amount (DISMISSED). |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgAdjudicateDisputeResponse"></a>
+
+### MsgAdjudicateDisputeResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| actual_penalty_paid | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | actual_penalty_paid is what was actually slashed; may be less than the intended penalty if the loser&#39;s balance was insufficient. |
 
 
 
@@ -3290,6 +3775,12 @@ authorization
 | state | [CollectionState](#ixo.claims.v1beta1.CollectionState) |  | state is the current state of this Collection (open, paused, closed) |
 | payments | [Payments](#ixo.claims.v1beta1.Payments) |  | payments is the amount paid for claim submission, evaluation, approval, or rejection |
 | intents | [CollectionIntentOptions](#ixo.claims.v1beta1.CollectionIntentOptions) |  | intents is the option for intents for this collection (allow, deny, required) |
+| service_agent_deposit_required | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Optional dispute / performance-deposit config. All zero/empty means the collection has no deposit gates and no disputes can be adjudicated. If any deposit/penalty field is set, adjudicators must be non-empty. |
+| evaluator_deposit_required | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| dispute_deposit_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| penalty_amount_per_dispute | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| min_deposit_period | [google.protobuf.Duration](#google.protobuf.Duration) |  | min_deposit_period locks performance-deposit withdrawals for this duration after each top-up (see Collection.min_deposit_period). Zero disables the lock. |
+| adjudicators | [AdjudicationDid](#ixo.claims.v1beta1.AdjudicationDid) | repeated | adjudicators is the whitelist of approved adjudicators, each with their own reward_percentage (see Collection.adjudicators). |
 
 
 
@@ -3320,6 +3811,7 @@ Collection entity, or have authz cap, aka is agent
 | agent_address | [string](#string) |  |  |
 | dispute_type | [int32](#int32) |  | type is expressed as an integer, interpreted by the client |
 | data | [DisputeData](#ixo.claims.v1beta1.DisputeData) |  |  |
+| target_role | [DisputeTargetRole](#ixo.claims.v1beta1.DisputeTargetRole) |  | target_role is the party being disputed (submitter or evaluator). Exactly one role per dispute. To dispute both parties of the same claim file two separate disputes. Must be SUBMITTER or EVALUATOR; UNSPECIFIED is rejected on new txs (only appears on legacy migrated disputes). |
 
 
 
@@ -3504,6 +3996,48 @@ a single message are rejected.
 
 
 
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfig"></a>
+
+### MsgUpdateCollectionDisputeConfig
+MsgUpdateCollectionDisputeConfig updates the dispute / performance-deposit
+configuration on a collection. All fields are replacements, not merges —
+the caller must send the full desired state. To &#34;clear&#34; a field, send it
+empty / zero. The handler enforces:
+  - if any deposit-required / penalty / disputer-stake field is non-empty,
+    adjudication_entity_dids must be non-empty;
+  - penalty_amount_per_dispute (if set) must be ≤ each non-empty
+    deposit-required field;
+  - adjudicator_reward_percentage in [0, 100].
+Changing config does NOT affect in-flight disputes (each dispute
+snapshots config it cares about at filing / adjudication time).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  |  |
+| admin_address | [string](#string) |  |  |
+| service_agent_deposit_required | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| evaluator_deposit_required | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| dispute_deposit_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| penalty_amount_per_dispute | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| min_deposit_period | [google.protobuf.Duration](#google.protobuf.Duration) |  |  |
+| adjudicators | [AdjudicationDid](#ixo.claims.v1beta1.AdjudicationDid) | repeated | adjudicators is the whitelist of approved adjudicators (see Collection.adjudicators). |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfigResponse"></a>
+
+### MsgUpdateCollectionDisputeConfigResponse
+
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.MsgUpdateCollectionIntents"></a>
 
 ### MsgUpdateCollectionIntents
@@ -3619,6 +4153,42 @@ a single message are rejected.
 
 
 
+
+<a name="ixo.claims.v1beta1.MsgWithdrawPerformanceDeposit"></a>
+
+### MsgWithdrawPerformanceDeposit
+MsgWithdrawPerformanceDeposit pulls some / all of an agent&#39;s
+performance-deposit balance back to their wallet. Rejected if the agent
+has any OPEN dispute targeting them on this collection. Partial
+withdrawal supported.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  |  |
+| agent_address | [string](#string) |  |  |
+| amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | amount to withdraw. Must be ≤ current balance. If empty, withdraws the full current balance. |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgWithdrawPerformanceDepositResponse"></a>
+
+### MsgWithdrawPerformanceDepositResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| withdrawn | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+| remaining_balance | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
  
 
  
@@ -3646,6 +4216,10 @@ Msg defines the Msg service.
 | CreateClaimAuthorization | [MsgCreateClaimAuthorization](#ixo.claims.v1beta1.MsgCreateClaimAuthorization) | [MsgCreateClaimAuthorizationResponse](#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse) |  |
 | SetCollectionMembers | [MsgSetCollectionMembers](#ixo.claims.v1beta1.MsgSetCollectionMembers) | [MsgSetCollectionMembersResponse](#ixo.claims.v1beta1.MsgSetCollectionMembersResponse) |  |
 | RemoveCollectionMembers | [MsgRemoveCollectionMembers](#ixo.claims.v1beta1.MsgRemoveCollectionMembers) | [MsgRemoveCollectionMembersResponse](#ixo.claims.v1beta1.MsgRemoveCollectionMembersResponse) |  |
+| UpdateCollectionDisputeConfig | [MsgUpdateCollectionDisputeConfig](#ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfig) | [MsgUpdateCollectionDisputeConfigResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDisputeConfigResponse) |  |
+| AddPerformanceDeposit | [MsgAddPerformanceDeposit](#ixo.claims.v1beta1.MsgAddPerformanceDeposit) | [MsgAddPerformanceDepositResponse](#ixo.claims.v1beta1.MsgAddPerformanceDepositResponse) |  |
+| WithdrawPerformanceDeposit | [MsgWithdrawPerformanceDeposit](#ixo.claims.v1beta1.MsgWithdrawPerformanceDeposit) | [MsgWithdrawPerformanceDepositResponse](#ixo.claims.v1beta1.MsgWithdrawPerformanceDepositResponse) |  |
+| AdjudicateDispute | [MsgAdjudicateDispute](#ixo.claims.v1beta1.MsgAdjudicateDispute) | [MsgAdjudicateDisputeResponse](#ixo.claims.v1beta1.MsgAdjudicateDisputeResponse) |  |
 
  
 
@@ -5831,11 +6405,13 @@ ValidatorStatus enumerates the status of a liquid validator.
 AddLiquidValidatorEvent is emitted when a newly whitelisted validator is
 activated for a pool.
 
+Field tag preserved from v6 (validator=1); pool_id added at the end.
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pool_id | [string](#string) |  |  |
 | validator | [string](#string) |  |  |
+| pool_id | [string](#string) |  |  |
 
 
 
@@ -5848,15 +6424,18 @@ activated for a pool.
 AutocompoundStakingRewardsEvent is emitted when a pool&#39;s autocompound
 epoch hook runs successfully.
 
+Field tag numbers preserved from v6. Amount fields upgraded from
+&#34;&lt;amount&gt;&lt;denom&gt;&#34; strings to typed Coin.
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
-| total_amount | [string](#string) |  |  |
-| fee_amount | [string](#string) |  |  |
-| redelegate_amount | [string](#string) |  |  |
-| weighted_rewards_amount | [string](#string) |  |  |
+| total_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| fee_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| redelegate_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| weighted_rewards_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| pool_id | [string](#string) |  |  |
 
 
 
@@ -5869,13 +6448,22 @@ epoch hook runs successfully.
 LiquidStakeEvent is emitted when a liquid stake is performed against a
 specific pool.
 
+Field tag numbers preserved from the pre-v7 single-pool layout
+(delegator=1, liquid_amount=2, stk_ixo_minted_amount=3) so wire-level
+proto compatibility is preserved for any consumer decoding historical
+v6 events with v7 codegen — pool_id simply shows as empty for those.
+The liquid_amount and stk_ixo_minted_amount fields were upgraded from
+the v6 string format (&#34;100000000uixo&#34;) to typed Coin in v7 to remove
+regex parsing on the indexer side; the tag is unchanged but the wire
+encoding for that tag is now a length-delimited Coin sub-message.
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
-| liquid_amount | [string](#string) |  |  |
-| stk_ixo_minted_amount | [string](#string) |  |  |
+| liquid_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| stk_ixo_minted_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| pool_id | [string](#string) |  |  |
 
 
 
@@ -5888,15 +6476,20 @@ specific pool.
 LiquidUnstakeEvent is emitted when a liquid unstake is performed against
 a specific pool.
 
+Field tag numbers preserved from v6. completion_time upgraded from RFC3339
+string to google.protobuf.Timestamp to match
+MsgLiquidUnstakeResponse.completion_time. Amount fields upgraded from
+&#34;&lt;amount&gt;&lt;denom&gt;&#34; strings to typed Coin.
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
-| unstake_amount | [string](#string) |  |  |
-| unbonding_amount | [string](#string) |  |  |
-| unbonded_amount | [string](#string) |  |  |
-| completion_time | [string](#string) |  |  |
+| unstake_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| unbonding_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| unbonded_amount | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| completion_time | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+| pool_id | [string](#string) |  |  |
 
 
 
@@ -5962,13 +6555,16 @@ MsgUpdateWeightedRewardsReceivers, MsgSetPoolPaused.
 ### RebalancedLiquidStakeEvent
 RebalancedLiquidStakeEvent is emitted after a pool&#39;s rebalancing pass.
 
+Field tag numbers preserved from v6. Count fields upgraded from
+strconv-formatted strings to typed uint32.
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pool_id | [string](#string) |  |  |
 | delegator | [string](#string) |  |  |
-| redelegation_count | [string](#string) |  |  |
-| redelegation_fail_count | [string](#string) |  |  |
+| redelegation_count | [uint32](#uint32) |  |  |
+| redelegation_fail_count | [uint32](#uint32) |  |  |
+| pool_id | [string](#string) |  |  |
 
 
 
@@ -6777,6 +7373,699 @@ Query provides defines the gRPC querier service.
 | ----------- | ------------ | ------------- | ------------|
 | Params | [QueryParamsRequest](#ixo.mint.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#ixo.mint.v1beta1.QueryParamsResponse) | Params returns the total set of minting parameters. |
 | EpochProvisions | [QueryEpochProvisionsRequest](#ixo.mint.v1beta1.QueryEpochProvisionsRequest) | [QueryEpochProvisionsResponse](#ixo.mint.v1beta1.QueryEpochProvisionsResponse) | EpochProvisions returns the current minting epoch provisions value. |
+
+ 
+
+
+
+<a name="ixo/names/v1beta1/names.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/names/v1beta1/names.proto
+
+
+
+<a name="ixo.names.v1beta1.NameRecord"></a>
+
+### NameRecord
+NameRecord is a registered name bound to a DID. The uniqueness key for a
+NameRecord is (namespace, normalized_name).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [string](#string) |  | namespace is the Namespace.name this record belongs to. |
+| normalized_name | [string](#string) |  | normalized_name is the canonical form used for uniqueness (trimmed, lowercased ASCII). |
+| display_name | [string](#string) |  | display_name is the original name as supplied by the registrant, preserving case for presentation. |
+| owner_did | [string](#string) |  | owner_did is the DID that controls this name. Resolution returns this DID. |
+| verified | [bool](#bool) |  | verified is true if this name was attested to by a registrar/oracle (e.g. proof of an off-chain identity such as Twitter or KYC). |
+| valid_until | [int64](#int64) |  | valid_until is a unix timestamp; 0 means no expiry. Reserved for future renewal flow. |
+| status | [NameStatus](#ixo.names.v1beta1.NameStatus) |  | status is the lifecycle state of the record. Resolution should treat anything other than NAME_STATUS_ACTIVE as not-found. |
+| verified_by | [string](#string) |  | verified_by is the DID or address of the registrar/oracle that attested this record, if any. |
+| evidence_hash | [string](#string) |  | evidence_hash is an optional content hash of off-chain attestation evidence (e.g. a signed JWT or VC). |
+| source | [string](#string) |  | source is a free-form tag describing where the verification came from (e.g. &#34;workos&#34;, &#34;ussd&#34;, &#34;import&#34;, &#34;manual&#34;). |
+| created_at | [int64](#int64) |  | created_at is the unix timestamp the record was first written. |
+| updated_at | [int64](#int64) |  | updated_at is the unix timestamp of the last write. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.Namespace"></a>
+
+### Namespace
+Namespace defines a governed bucket of names (e.g. &#34;yoid&#34;, &#34;twitter&#34;).
+Created and updated only via governance.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  | name is the namespace identifier and the uniqueness scope for names registered under it. Lowercase ASCII recommended. |
+| description | [string](#string) |  | description is a human-readable summary of the namespace. |
+| registrar_accounts | [string](#string) | repeated | registrar_accounts is the list of bech32 account addresses authorised to register or moderate names in this namespace on behalf of users. |
+| allow_self_register | [bool](#bool) |  | allow_self_register: when true, users can register their own names by signing MsgRegisterName. When false, only registrars can register. |
+| allow_registrar_override | [bool](#bool) |  | allow_registrar_override: when true, registrars can update or transfer names regardless of the current owner (used for moderation or assisted flows). When false, only the owning DID can transfer/update. |
+| min_length | [uint32](#uint32) |  | min_length is the minimum allowed length of the normalized name. |
+| max_length | [uint32](#uint32) |  | max_length is the maximum allowed length of the normalized name. Must be greater than zero. |
+| regex | [string](#string) |  | regex is an additional ASCII-only character pattern that the normalized name must match. Empty string means no extra check on top of the default. |
+| allow_expiry | [bool](#bool) |  | allow_expiry: when true, NameRecords in this namespace may have a non-zero valid_until. Reserved for a future renewal flow. |
+
+
+
+
+
+ 
+
+
+<a name="ixo.names.v1beta1.NameStatus"></a>
+
+### NameStatus
+NameStatus represents the lifecycle state of a NameRecord. Names are never
+hard-deleted; status transitions are used instead so audit history is
+preserved.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| NAME_STATUS_UNSPECIFIED | 0 | NAME_STATUS_UNSPECIFIED is the zero value and must not be persisted. |
+| NAME_STATUS_ACTIVE | 1 | NAME_STATUS_ACTIVE: the normal resolvable state. |
+| NAME_STATUS_SUSPENDED | 2 | NAME_STATUS_SUSPENDED: hidden from resolution, can be restored by registrar. |
+| NAME_STATUS_REVOKED | 3 | NAME_STATUS_REVOKED: terminally taken down, cannot be re-used by the same owner. |
+| NAME_STATUS_TOMBSTONED | 4 | NAME_STATUS_TOMBSTONED: registrar-level take-down for policy/legal reasons; the (namespace, normalized_name) tuple is permanently burned. |
+
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/names/v1beta1/event.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/names/v1beta1/event.proto
+
+
+
+<a name="ixo.names.v1beta1.NameRegisteredEvent"></a>
+
+### NameRegisteredEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| record | [NameRecord](#ixo.names.v1beta1.NameRecord) |  |  |
+| registered_by | [string](#string) |  | registered_by is the address that submitted the tx (owner DID controller for self-register, registrar account otherwise). |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.NameStatusChangedEvent"></a>
+
+### NameStatusChangedEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [string](#string) |  |  |
+| normalized_name | [string](#string) |  |  |
+| old_status | [NameStatus](#ixo.names.v1beta1.NameStatus) |  |  |
+| new_status | [NameStatus](#ixo.names.v1beta1.NameStatus) |  |  |
+| changed_by | [string](#string) |  |  |
+| reason | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.NameTransferredEvent"></a>
+
+### NameTransferredEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [string](#string) |  |  |
+| normalized_name | [string](#string) |  |  |
+| from_owner_did | [string](#string) |  |  |
+| to_owner_did | [string](#string) |  |  |
+| transferred_by | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.NameUpdatedEvent"></a>
+
+### NameUpdatedEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| record | [NameRecord](#ixo.names.v1beta1.NameRecord) |  |  |
+| updated_by | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.NamespaceCreatedEvent"></a>
+
+### NamespaceCreatedEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [Namespace](#ixo.names.v1beta1.Namespace) |  |  |
+| authority | [string](#string) |  | authority is the gov module address that created the namespace; lets indexers attribute namespace changes to a governance proposal. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.NamespaceUpdatedEvent"></a>
+
+### NamespaceUpdatedEvent
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [Namespace](#ixo.names.v1beta1.Namespace) |  |  |
+| authority | [string](#string) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/names/v1beta1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/names/v1beta1/genesis.proto
+
+
+
+<a name="ixo.names.v1beta1.GenesisState"></a>
+
+### GenesisState
+GenesisState defines the names module&#39;s genesis state.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespaces | [Namespace](#ixo.names.v1beta1.Namespace) | repeated |  |
+| names | [NameRecord](#ixo.names.v1beta1.NameRecord) | repeated |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+<a name="ixo/names/v1beta1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/names/v1beta1/query.proto
+
+
+
+<a name="ixo.names.v1beta1.QueryGetNameRequest"></a>
+
+### QueryGetNameRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [string](#string) |  |  |
+| normalized_name | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryGetNameResponse"></a>
+
+### QueryGetNameResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| record | [NameRecord](#ixo.names.v1beta1.NameRecord) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamesByNamespaceRequest"></a>
+
+### QueryNamesByNamespaceRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [string](#string) |  |  |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamesByNamespaceResponse"></a>
+
+### QueryNamesByNamespaceResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| records | [NameRecord](#ixo.names.v1beta1.NameRecord) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamesByOwnerRequest"></a>
+
+### QueryNamesByOwnerRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| owner_did | [string](#string) |  |  |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamesByOwnerResponse"></a>
+
+### QueryNamesByOwnerResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| records | [NameRecord](#ixo.names.v1beta1.NameRecord) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamespaceRequest"></a>
+
+### QueryNamespaceRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamespaceResponse"></a>
+
+### QueryNamespaceResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [Namespace](#ixo.names.v1beta1.Namespace) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamespacesRequest"></a>
+
+### QueryNamespacesRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pagination | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryNamespacesResponse"></a>
+
+### QueryNamespacesResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespaces | [Namespace](#ixo.names.v1beta1.Namespace) | repeated |  |
+| pagination | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryResolveNameRequest"></a>
+
+### QueryResolveNameRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| namespace | [string](#string) |  |  |
+| name | [string](#string) |  | name is normalized server-side; callers may pass the display form. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.QueryResolveNameResponse"></a>
+
+### QueryResolveNameResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| record | [NameRecord](#ixo.names.v1beta1.NameRecord) |  |  |
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.names.v1beta1.Query"></a>
+
+### Query
+Query defines the names module gRPC query service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| Namespace | [QueryNamespaceRequest](#ixo.names.v1beta1.QueryNamespaceRequest) | [QueryNamespaceResponse](#ixo.names.v1beta1.QueryNamespaceResponse) | Namespace returns a single namespace by its name. |
+| Namespaces | [QueryNamespacesRequest](#ixo.names.v1beta1.QueryNamespacesRequest) | [QueryNamespacesResponse](#ixo.names.v1beta1.QueryNamespacesResponse) | Namespaces returns all namespaces. |
+| ResolveName | [QueryResolveNameRequest](#ixo.names.v1beta1.QueryResolveNameRequest) | [QueryResolveNameResponse](#ixo.names.v1beta1.QueryResolveNameResponse) | ResolveName returns the active NameRecord for (namespace, name). The name is normalized server-side before lookup. Returns not-found if the record is missing or its status is not ACTIVE. |
+| GetName | [QueryGetNameRequest](#ixo.names.v1beta1.QueryGetNameRequest) | [QueryGetNameResponse](#ixo.names.v1beta1.QueryGetNameResponse) | GetName returns a NameRecord regardless of status. Useful for moderation and audit tools. |
+| NamesByNamespace | [QueryNamesByNamespaceRequest](#ixo.names.v1beta1.QueryNamesByNamespaceRequest) | [QueryNamesByNamespaceResponse](#ixo.names.v1beta1.QueryNamesByNamespaceResponse) | NamesByNamespace lists records under a namespace (paginated). |
+| NamesByOwner | [QueryNamesByOwnerRequest](#ixo.names.v1beta1.QueryNamesByOwnerRequest) | [QueryNamesByOwnerResponse](#ixo.names.v1beta1.QueryNamesByOwnerResponse) | NamesByOwner lists every name owned by a DID across all namespaces. |
+
+ 
+
+
+
+<a name="ixo/names/v1beta1/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## ixo/names/v1beta1/tx.proto
+
+
+
+<a name="ixo.names.v1beta1.MsgCreateNamespace"></a>
+
+### MsgCreateNamespace
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | authority is the address allowed to create namespaces (the gov module address). |
+| namespace | [Namespace](#ixo.names.v1beta1.Namespace) |  | namespace is the full configuration of the new namespace. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgCreateNamespaceResponse"></a>
+
+### MsgCreateNamespaceResponse
+
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgRegisterName"></a>
+
+### MsgRegisterName
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| signer | [string](#string) |  | signer is the bech32 address signing the tx; must control owner_did via an authentication verification method on the IID document. |
+| namespace | [string](#string) |  | namespace is the namespace under which the name is being registered. |
+| name | [string](#string) |  | name is the display name (preserves case); will be normalized for uniqueness. |
+| owner_did | [string](#string) |  | owner_did is the DID this name will resolve to. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgRegisterNameByRegistrar"></a>
+
+### MsgRegisterNameByRegistrar
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| registrar | [string](#string) |  | registrar is the bech32 address signing the tx; must be in the namespace&#39;s registrar_accounts. |
+| namespace | [string](#string) |  |  |
+| name | [string](#string) |  |  |
+| owner_did | [string](#string) |  |  |
+| verified | [bool](#bool) |  | verified marks the record as attested. Registrars typically set this true after off-chain verification; user-driven self-register sets it false. |
+| evidence_hash | [string](#string) |  | evidence_hash is an optional hash of the off-chain attestation evidence. |
+| source | [string](#string) |  | source is a free-form tag describing the verification source. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgRegisterNameByRegistrarResponse"></a>
+
+### MsgRegisterNameByRegistrarResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| normalized_name | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgRegisterNameResponse"></a>
+
+### MsgRegisterNameResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| normalized_name | [string](#string) |  | normalized_name is the canonical form stored. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgSetNameStatus"></a>
+
+### MsgSetNameStatus
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| signer | [string](#string) |  | signer is either a namespace registrar or the governance authority. |
+| namespace | [string](#string) |  |  |
+| normalized_name | [string](#string) |  |  |
+| status | [NameStatus](#ixo.names.v1beta1.NameStatus) |  |  |
+| reason | [string](#string) |  | reason is a free-form string surfaced in the audit event. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgSetNameStatusResponse"></a>
+
+### MsgSetNameStatusResponse
+
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgTransferName"></a>
+
+### MsgTransferName
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| signer | [string](#string) |  | signer is the bech32 address submitting the transfer; must control the current owner_did, OR be a registrar when allow_registrar_override is enabled. |
+| namespace | [string](#string) |  |  |
+| normalized_name | [string](#string) |  |  |
+| new_owner_did | [string](#string) |  | new_owner_did is the DID that will own the name after the transfer. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgTransferNameResponse"></a>
+
+### MsgTransferNameResponse
+
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgUpdateNameByRegistrar"></a>
+
+### MsgUpdateNameByRegistrar
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| registrar | [string](#string) |  |  |
+| namespace | [string](#string) |  |  |
+| normalized_name | [string](#string) |  | normalized_name is the canonical name to update. |
+| verified | [bool](#bool) |  |  |
+| evidence_hash | [string](#string) |  |  |
+| source | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgUpdateNameByRegistrarResponse"></a>
+
+### MsgUpdateNameByRegistrarResponse
+
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgUpdateNamespace"></a>
+
+### MsgUpdateNamespace
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  | authority is the address allowed to update namespaces (the gov module address). |
+| namespace | [Namespace](#ixo.names.v1beta1.Namespace) |  | namespace replaces the existing namespace configuration; the namespace.name selects the target. |
+
+
+
+
+
+
+<a name="ixo.names.v1beta1.MsgUpdateNamespaceResponse"></a>
+
+### MsgUpdateNamespaceResponse
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+<a name="ixo.names.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the names module Msg service.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| CreateNamespace | [MsgCreateNamespace](#ixo.names.v1beta1.MsgCreateNamespace) | [MsgCreateNamespaceResponse](#ixo.names.v1beta1.MsgCreateNamespaceResponse) | CreateNamespace creates a new namespace. Authority-only (gov). |
+| UpdateNamespace | [MsgUpdateNamespace](#ixo.names.v1beta1.MsgUpdateNamespace) | [MsgUpdateNamespaceResponse](#ixo.names.v1beta1.MsgUpdateNamespaceResponse) | UpdateNamespace replaces an existing namespace&#39;s configuration. Authority-only (gov). All Namespace fields supplied in the message become the new state. |
+| RegisterName | [MsgRegisterName](#ixo.names.v1beta1.MsgRegisterName) | [MsgRegisterNameResponse](#ixo.names.v1beta1.MsgRegisterNameResponse) | RegisterName lets a user register a name in a namespace that allows self-registration. The signer must control owner_did. |
+| RegisterNameByRegistrar | [MsgRegisterNameByRegistrar](#ixo.names.v1beta1.MsgRegisterNameByRegistrar) | [MsgRegisterNameByRegistrarResponse](#ixo.names.v1beta1.MsgRegisterNameByRegistrarResponse) | RegisterNameByRegistrar lets a registrar register a name on behalf of owner_did. The signer must be a registrar of the namespace. |
+| UpdateNameByRegistrar | [MsgUpdateNameByRegistrar](#ixo.names.v1beta1.MsgUpdateNameByRegistrar) | [MsgUpdateNameByRegistrarResponse](#ixo.names.v1beta1.MsgUpdateNameByRegistrarResponse) | UpdateNameByRegistrar lets a registrar update the verification metadata (verified flag, verified_by, evidence_hash, source) of an existing record. The signer must be a registrar of the namespace. Owner DID is not changed by this message; use TransferName for that. |
+| TransferName | [MsgTransferName](#ixo.names.v1beta1.MsgTransferName) | [MsgTransferNameResponse](#ixo.names.v1beta1.MsgTransferNameResponse) | TransferName transfers ownership of a name to another DID. Permitted for the current owner; permitted for a registrar when the namespace has allow_registrar_override = true. |
+| SetNameStatus | [MsgSetNameStatus](#ixo.names.v1beta1.MsgSetNameStatus) | [MsgSetNameStatusResponse](#ixo.names.v1beta1.MsgSetNameStatusResponse) | SetNameStatus changes the lifecycle status of a name (suspend, revoke, tombstone, or restore to active). Permitted for registrars and the governance authority. |
 
  
 
