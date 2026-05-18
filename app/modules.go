@@ -140,15 +140,15 @@ func appModules(
 		ibchooks.NewAppModule(app.AccountKeeper),
 
 		// Custom ixo AppModules
-		iidmodule.NewAppModule(app.IidKeeper),
+		iidmodule.NewAppModule(app.IidKeeper, app.AccountKeeper, app.BankKeeper),
 		bonds.NewAppModule(app.BondsKeeper),
 		entitymodule.NewAppModule(app.EntityKeeper),
 		tokenmodule.NewAppModule(app.TokenKeeper),
 		claimsmodule.NewAppModule(app.ClaimsKeeper, app.GetSubspace(claimsmoduletypes.ModuleName)),
-		smartaccount.NewAppModule(*app.SmartAccountKeeper),
+		smartaccount.NewAppModule(*app.SmartAccountKeeper, app.AccountKeeper, app.BankKeeper),
 		epochs.NewAppModule(*app.EpochsKeeper),
 		liquidstake.NewAppModule(app.LiquidStakeKeeper),
-		namesmodule.NewAppModule(app.NamesKeeper),
+		namesmodule.NewAppModule(app.NamesKeeper, app.AccountKeeper, app.BankKeeper),
 	}
 }
 
@@ -198,6 +198,18 @@ func simulationModules(
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
+		// Custom ixo modules — each implements AppModuleSimulation
+		// (RegisterStoreDecoder + empty WeightedOperations / ProposalContents
+		// / ProposalMsgs). See Phase 3 in tests.md for the design rationale.
+		iidmodule.NewAppModule(app.IidKeeper, app.AccountKeeper, app.BankKeeper),
+		bonds.NewAppModule(app.BondsKeeper),
+		entitymodule.NewAppModule(app.EntityKeeper),
+		tokenmodule.NewAppModule(app.TokenKeeper),
+		claimsmodule.NewAppModule(app.ClaimsKeeper, app.GetSubspace(claimsmoduletypes.ModuleName)),
+		smartaccount.NewAppModule(*app.SmartAccountKeeper, app.AccountKeeper, app.BankKeeper),
+		epochs.NewAppModule(*app.EpochsKeeper),
+		liquidstake.NewAppModule(app.LiquidStakeKeeper),
+		namesmodule.NewAppModule(app.NamesKeeper, app.AccountKeeper, app.BankKeeper),
 	}
 }
 

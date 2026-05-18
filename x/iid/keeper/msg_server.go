@@ -91,8 +91,12 @@ func (k msgServer) UpdateIidDocument(goCtx context.Context, msg *types.MsgUpdate
 			if err != nil {
 				return err
 			}
-			// Keep old iid doc metadata
+			// Keep old iid doc metadata; assign the freshly built doc back
+			// through the pointer so ExecuteOnDidWithRelationships persists
+			// the new fields. Without this assignment the message payload
+			// would be silently dropped (see tests.md bug log).
 			did.Metadata = didDoc.Metadata
+			*didDoc = did
 			return nil
 		}); err != nil {
 		return nil, err
@@ -383,7 +387,7 @@ func (k msgServer) DeactivateIID(goCtx context.Context, msg *types.MsgDeactivate
 		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer, func(didDoc *types.IidDocument) error {
-			return didDoc.Deactivate()
+			return didDoc.Deactivate(msg.State)
 		}); err != nil {
 		return nil, err
 	}

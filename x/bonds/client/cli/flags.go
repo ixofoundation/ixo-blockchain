@@ -60,6 +60,7 @@ func init() {
 	fsBondCreate.String(FlagBondDid, "", "Bond's DID")
 	fsBondCreate.String(FlagCreatorDid, "", "Bond creator's DID")
 	fsBondCreate.String(FlagControllerDid, "", "Bond controller's DID")
+	fsBondCreate.String(FlagOracleDid, "", "Bond oracle's DID")
 
 	fsBondEdit.String(FlagName, types.DoNotModifyField, "The bond's name")
 	fsBondEdit.String(FlagDescription, types.DoNotModifyField, "The bond's description")

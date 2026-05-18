@@ -1,0 +1,3 @@
+*.wasm binary
+*.wasm -diff
+*.wasm linguist-vendored

@@ -8,4 +8,14 @@ commit-msg:
 
 pre-push:
   parallel: true
-  commands: {}
+  commands:
+    # Run unit tests for any module touched by the push. Bails out on the
+    # first failure so a broken commit can never reach origin. Skip with
+    # LEFTHOOK=0 git push when you really need to push WIP.
+    test-unit-changed:
+      glob: "x/*/**/*.go,app/**/*.go"
+      run: |
+        modules="$(echo {staged_files} {push_files} 2>/dev/null | tr ' ' '\n' | grep -E '^(x/[^/]+|app)' | awk -F/ '{print $1"/"$2}' | sort -u)"
+        if [ -z "$modules" ]; then exit 0; fi
+        echo "Running tests for: $modules"
+        go test -mod=readonly -tags='ledger test_ledger_mock norace' $(echo "$modules" | sed 's|^|./|;s|$|/...|')

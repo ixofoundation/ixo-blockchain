@@ -11,10 +11,12 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
 	"github.com/ixofoundation/ixo-blockchain/v6/x/names/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/names/simulation"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
 )
 
@@ -68,11 +70,13 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command { return nil }
 // AppModule wires the names module into the app.
 type AppModule struct {
 	AppModuleBasic
-	keeper keeper.Keeper
+	keeper        keeper.Keeper
+	accountKeeper simulation.AccountKeeper
+	bankKeeper    simulation.BankKeeper
 }
 
-func NewAppModule(k keeper.Keeper) AppModule {
-	return AppModule{keeper: k}
+func NewAppModule(k keeper.Keeper, ak simulation.AccountKeeper, bk simulation.BankKeeper) AppModule {
+	return AppModule{keeper: k, accountKeeper: ak, bankKeeper: bk}
 }
 
 func (AppModule) IsAppModule() {}
@@ -99,3 +103,35 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 func (AppModule) ConsensusVersion() uint64 { return 1 }
+
+// AppModuleSimulation: registers the store decoder and exposes empty
+// proposal/message simulation hooks. The names module is governance-driven
+// (CreateNamespace / UpdateNamespace are authority-only) so per-Msg
+// WeightedOperations are intentionally empty here; self-register flows are
+// covered by keeper-level tests.
+
+// ProposalContents returns no governance proposal content for x/names.
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
+	return nil
+}
+
+// ProposalMsgs returns no governance proposal messages for x/names.
+func (AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+	return nil
+}
+
+// RegisterStoreDecoder wires the store-determinism decoder into the simulator.
+func (AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(nil)
+}
+
+// WeightedOperations returns the per-Msg simulation operations for x/names.
+func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
+	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, simState.TxConfig, am.accountKeeper, am.bankKeeper, am.keeper)
+}
+
+// GenerateGenesisState seeds the SimulationState with the module's default
+// genesis. Property tests can later replace this with randomized state.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(types.DefaultGenesisState())
+}

@@ -11,10 +11,13 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
+	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/client/cli"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/simulation"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
 )
 
@@ -76,9 +79,12 @@ func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx sdkclient.Context, mux
 }
 
 // GetTxCmd returns the root tx command for the liquidstake module.
-// Modifying parameters of a liquidstake can be done through governance process, not through transaction level.
+// Manual registration is required because cosmos-sdk's autocli +
+// dynamicpb path panics on gogoproto-generated Coin messages with
+// `cosmos.base.v1beta1.Coin.denom: field descriptor does not belong
+// to this message`. See client/cli/tx.go for details.
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	return nil
+	return cli.GetTxCmd()
 }
 
 // GetQueryCmd returns the root query command for the liquidstake module.
@@ -147,3 +153,29 @@ func (am AppModule) BeginBlock(context context.Context) error {
 // the single-pool layout introduced in chain v4. v2 is the v7 multi-pool
 // layout (ModuleParams + per-pool Pool / LiquidValidator records).
 func (AppModule) ConsensusVersion() uint64 { return 2 }
+
+// AppModuleSimulation: empty proposal/op hooks + a store decoder for the
+// state-determinism diff. Per-Msg WeightedOperations are deferred to the
+// interchaintest E2E suite where real state evolves under live consensus.
+
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
+	return nil
+}
+
+func (AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+	return nil
+}
+
+func (AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(nil)
+}
+
+func (AppModule) WeightedOperations(_ module.SimulationState) []simtypes.WeightedOperation {
+	return nil
+}
+
+// GenerateGenesisState seeds the SimulationState with the module's default
+// genesis. Property tests can later replace this with randomized state.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(types.DefaultGenesisState())
+}

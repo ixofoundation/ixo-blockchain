@@ -26,8 +26,10 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/simulation"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
 )
 
@@ -157,3 +159,29 @@ func (am AppModule) BeginBlock(context context.Context) error {
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
 func (AppModule) ConsensusVersion() uint64 { return 1 }
+
+// AppModuleSimulation hooks. Epochs has no Msg* server (it's a pure
+// scheduling primitive driven by BeginBlocker), so WeightedOperations and
+// the proposal hooks are intentionally empty.
+
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
+	return nil
+}
+
+func (AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+	return nil
+}
+
+func (AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(nil)
+}
+
+func (AppModule) WeightedOperations(_ module.SimulationState) []simtypes.WeightedOperation {
+	return nil
+}
+
+// GenerateGenesisState seeds the SimulationState with the module's default
+// genesis.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(types.DefaultGenesis())
+}

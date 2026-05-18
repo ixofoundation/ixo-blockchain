@@ -11,11 +11,13 @@ import ( // this line is used by starport scaffolding # 1
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
 	"github.com/ixofoundation/ixo-blockchain/v6/x/iid/client/cli"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/iid/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/iid/simulation"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
 )
 
@@ -79,9 +81,13 @@ func (a AppModuleBasic) GetTxCmd() *cobra.Command {
 	return cli.GetTxCmd()
 }
 
-// GetQueryCmd returns the capability module's root query command.
+// GetQueryCmd returns the iid module's root query command. We register
+// queries manually (instead of relying on the AutoCLIOptions.Query path)
+// because autocli's `aminojson` + `dynamicpb` rendering returns empty
+// objects for gogoproto-generated nested message types like Service,
+// VerificationMethod, and IidMetadata. See cli/query.go for details.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return nil
+	return cli.GetQueryCmd()
 }
 
 // ----------------------------------------------------------------------------
@@ -91,13 +97,17 @@ func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule implements the AppModule interface for the module.
 type AppModule struct {
 	AppModuleBasic
-	keeper keeper.Keeper
+	keeper        keeper.Keeper
+	accountKeeper simulation.AccountKeeper
+	bankKeeper    simulation.BankKeeper
 }
 
-func NewAppModule(keeper keeper.Keeper) AppModule {
+func NewAppModule(k keeper.Keeper, ak simulation.AccountKeeper, bk simulation.BankKeeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
-		keeper:         keeper,
+		keeper:         k,
+		accountKeeper:  ak,
+		bankKeeper:     bk,
 	}
 }
 
@@ -138,3 +148,29 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (AppModule) ConsensusVersion() uint64 { return 1 }
+
+// AppModuleSimulation: empty proposal/op hooks + a store decoder for the
+// state-determinism diff. Per-Msg WeightedOperations are deferred to the
+// interchaintest E2E suite where real state evolves under live consensus.
+
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
+	return nil
+}
+
+func (AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+	return nil
+}
+
+func (AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(nil)
+}
+
+func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
+	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, simState.TxConfig, am.accountKeeper, am.bankKeeper, am.keeper)
+}
+
+// GenerateGenesisState seeds the SimulationState with the module's default
+// genesis. Property tests can later replace this with randomized state.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(types.DefaultGenesisState())
+}

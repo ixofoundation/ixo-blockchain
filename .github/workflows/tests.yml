@@ -1,0 +1,101 @@
+name: Tests
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+# Cancel earlier runs of the same workflow on the same ref.
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.22.11"
+
+jobs:
+  unit:
+    name: Unit (L1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - run: make test-unit
+      - run: make test-race
+
+  cover:
+    name: Coverage (L1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - run: make test-cover
+      - uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage.txt
+
+  simulator:
+    name: Simulator (L2)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [test-sim-app-fast, test-sim-determinism, test-sim-import-export]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - run: make ${{ matrix.target }}
+
+  interchaintest-build:
+    # Compile-only check — runs on every PR so build breakage in the L3 sub-module
+    # is caught without needing docker.
+    name: Interchaintest (build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - working-directory: tests/interchaintest
+        run: go test -tags interchaintest -short ./...
+
+  interchaintest:
+    # Full Docker run — gates the PR → main merge, plus manual trigger.
+    # Skipped on develop pushes / dev-only PRs to keep the inner loop fast
+    # (this job is ~35–45 min on ubuntu-latest).
+    name: Interchaintest (E2E, Docker)
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.base_ref == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+      - name: Build ixod docker image
+        run: docker build -t ixofoundation/ixo-blockchain:local .
+      - name: Run interchaintest E2E
+        env:
+          IXO_IMAGE: ixofoundation/ixo-blockchain:local
+        working-directory: tests/interchaintest
+        run: go test -tags interchaintest -timeout 90m ./...

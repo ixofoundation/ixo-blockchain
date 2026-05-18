@@ -49,6 +49,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 		Description:              description,
 		CreatorDid:               creatorDid,
 		ControllerDid:            controllerDid,
+		OracleDid:                oracleDid,
 		FunctionType:             functionType,
 		FunctionParameters:       functionParameters,
 		ReserveTokens:            reserveTokens,

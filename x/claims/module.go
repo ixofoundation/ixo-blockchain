@@ -11,10 +11,12 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/client/cli"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/simulation"
 	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
 	"github.com/spf13/cobra"
 )
@@ -160,4 +162,30 @@ func (am AppModule) EndBlock(context context.Context) error {
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
 	return 4
+}
+
+// AppModuleSimulation: empty proposal/op hooks + a store decoder for the
+// state-determinism diff. Per-Msg WeightedOperations are deferred to the
+// interchaintest E2E suite where real state evolves under live consensus.
+
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
+	return nil
+}
+
+func (AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+	return nil
+}
+
+func (AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(nil)
+}
+
+func (AppModule) WeightedOperations(_ module.SimulationState) []simtypes.WeightedOperation {
+	return nil
+}
+
+// GenerateGenesisState seeds the SimulationState with the module's default
+// genesis. Property tests can later replace this with randomized state.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(types.DefaultGenesisState())
 }

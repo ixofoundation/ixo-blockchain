@@ -154,8 +154,13 @@ func NewAddVerificationCmd() *cobra.Command {
 				return err
 			}
 
+			// args[0] is the DID id; args[1] is the verification JSON.
+			// Earlier versions read JSON from args[0] which always
+			// failed because args[0] is a `did:ixo:...` string. Bug
+			// fix: read verification JSON from args[1] and pass
+			// args[0] (the id) to NewMsgAddVerification.
 			var verJson types.VerificationsJSON
-			if err := json.Unmarshal([]byte(args[0]), &verJson); err != nil {
+			if err := json.Unmarshal([]byte(args[1]), &verJson); err != nil {
 				return err
 			}
 
