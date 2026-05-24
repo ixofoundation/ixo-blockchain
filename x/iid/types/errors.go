@@ -20,4 +20,6 @@ var (
 	ErrKeyFormatNotSupported      = errorsmod.Register(ModuleName, 1111, "key format not supported")
 	ErrDidPubKeyMismatch          = errorsmod.Register(ModuleName, 1112, "did does not match public key in signature")
 	ErrReservedDidNamespace 			= errorsmod.Register(ModuleName, 1113, "did namespace is reserved for an internal module; cannot be created via MsgCreateIidDocument")
+	ErrDIDAccountSignerMismatch         = errorsmod.Register(ModuleName, 1114, "did:ixo:<account> account must equal the signer address")
+	ErrDIDFormNotAllowed                = errorsmod.Register(ModuleName, 1115, "did form is not permitted for MsgCreateIidDocument (allowed: did:ixo:<account>, did:ixo:wasm:<contract>)")
 )

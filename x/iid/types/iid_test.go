@@ -102,3 +102,60 @@ func TestMsgCreateIidDocument_ValidateBasic_ReservedNamespace(t *testing.T) {
 			"ValidateBasic must reject prefix %q (got %v)", prefix, err)
 	}
 }
+
+// IXO-2045: ValidateMsgCreateDIDForm is the policy the iid module enforces
+// on every MsgCreateIidDocument — both in ValidateBasic and (defense in
+// depth) inside the msg-server handler so Cosmwasm contracts cannot bypass
+// it. This table-driven test pins each allow/deny path with the matching
+// sentinel error so a future refactor that drops a branch fails loudly.
+func TestValidateMsgCreateDIDForm(t *testing.T) {
+	signer := sdk.AccAddress("signer-bytes-20-chars").String()
+	other := sdk.AccAddress("another-acct-20-chars").String()
+	contract := sdk.AccAddress("contract-addr-20-byte").String()
+
+	cases := []struct {
+		name    string
+		id      string
+		signer  string
+		errLike error // nil => expected to pass
+	}{
+		{"did:ixo:<signer> ok", "did:ixo:" + signer, signer, nil},
+		{"did:ixo:wasm:<contract> ok (signer != contract is fine)",
+			"did:ixo:wasm:" + contract, signer, nil},
+
+		{"did:ixo:<other> rejected (account != signer)",
+			"did:ixo:" + other, signer, types.ErrDIDAccountSignerMismatch},
+		{"did:ixo:wasm:<not-bech32> rejected",
+			"did:ixo:wasm:not-a-bech32", signer, types.ErrDIDFormNotAllowed},
+		{"did:ixo:wasm:<empty> rejected",
+			"did:ixo:wasm:", signer, types.ErrDIDFormNotAllowed},
+		{"did:ixo:wasm:<addr>:more rejected (nested sub-method)",
+			"did:ixo:wasm:" + contract + ":more", signer, types.ErrDIDFormNotAllowed},
+		{"did:ixo:haha:haha rejected (unknown sub-method)",
+			"did:ixo:haha:haha", signer, types.ErrDIDFormNotAllowed},
+		{"did:ixo:<not-bech32> rejected (account not bech32)",
+			"did:ixo:not-a-bech32", signer, types.ErrDIDFormNotAllowed},
+		{"did:ixo: (empty suffix) rejected",
+			"did:ixo:", signer, types.ErrDIDFormNotAllowed},
+		{"did:cosmos:foo rejected (wrong method)",
+			"did:cosmos:foo", signer, types.ErrDIDFormNotAllowed},
+		{"did:x:ixo:abc rejected (DidChainPrefix not a user namespace)",
+			"did:x:ixo:abc", signer, types.ErrDIDFormNotAllowed},
+
+		// Reserved namespace continues to be flagged distinctly.
+		{"did:ixo:entity:* rejected (reserved)",
+			"did:ixo:entity:abc", signer, types.ErrReservedDidNamespace},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			err := types.ValidateMsgCreateDIDForm(tc.id, tc.signer)
+			if tc.errLike == nil {
+				require.NoError(t, err, "id=%q signer=%q", tc.id, tc.signer)
+				return
+			}
+			require.ErrorIs(t, err, tc.errLike,
+				"id=%q signer=%q (got %v, expected %v)", tc.id, tc.signer, err, tc.errLike)
+		})
+	}
+}

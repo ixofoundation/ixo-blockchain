@@ -62,6 +62,78 @@ func (s *KeeperTestSuite) TestMsgCreateIidDocument_ReservedNamespace() {
 	}
 }
 
+// IXO-2045: MsgCreateIidDocument must enforce the DID-form policy at the
+// handler — not just in ValidateBasic — so Cosmwasm contracts (which
+// bypass ValidateBasic by routing through Stargate / the MsgServiceRouter
+// from their wasm-vm) cannot create DIDs they should not own. The same
+// policy lives in types.ValidateMsgCreateDIDForm; this suite asserts the
+// keeper actually invokes it. Each subcase pins the matching error so a
+// future refactor that drops one of the checks fails loudly.
+func (s *KeeperTestSuite) TestMsgCreateIidDocument_DIDFormPolicy() {
+	s.SetupTest()
+	signer := apptesting.RandomAccountAddress()
+	other := apptesting.RandomAccountAddress()
+	contract := apptesting.RandomAccountAddress()
+
+	// --- happy paths ---
+	cases := []struct {
+		name string
+		id   string
+	}{
+		// did:ixo:<signer> — the signer registers their own account DID.
+		{"signer-owned account DID", "did:ixo:" + signer.String()},
+		// did:ixo:wasm:<contract> — any signer may create a wasm-form DID
+		// (for now) as long as the suffix is a valid bech32 address.
+		{"wasm contract DID created by arbitrary signer",
+			"did:ixo:wasm:" + contract.String()},
+	}
+	for _, tc := range cases {
+		_, err := s.msgServer.CreateIidDocument(s.goCtx(), &types.MsgCreateIidDocument{
+			Id:     tc.id,
+			Signer: signer.String(),
+		})
+		s.Require().NoErrorf(err, "%s: %v", tc.name, err)
+		_, found := s.App.IidKeeper.GetDidDocument(s.Ctx, []byte(tc.id))
+		s.Require().True(found, "%s: did was not persisted", tc.name)
+	}
+
+	// --- rejections, each pinned to the matching sentinel error ---
+	rejections := []struct {
+		name    string
+		id      string
+		errLike error
+	}{
+		// did:ixo:<other-account> — caller cannot claim someone else's address.
+		{"did:ixo:<other-account> rejected (account != signer)",
+			"did:ixo:" + other.String(), types.ErrDIDAccountSignerMismatch},
+		// did:ixo:wasm:<junk> — wasm suffix must be a valid bech32 address.
+		{"did:ixo:wasm:<invalid> rejected (not bech32)",
+			"did:ixo:wasm:not-a-bech32", types.ErrDIDFormNotAllowed},
+		// did:ixo:wasm:<addr>:more — wasm suffix must be a single segment.
+		{"did:ixo:wasm:<addr>:extra rejected (nested sub-method)",
+			"did:ixo:wasm:" + contract.String() + ":extra", types.ErrDIDFormNotAllowed},
+		// did:ixo:haha:haha — unknown sub-method.
+		{"did:ixo:<unknown-submethod>:* rejected",
+			"did:ixo:haha:haha", types.ErrDIDFormNotAllowed},
+		// did:cosmos:foo — wrong DID method entirely.
+		{"did:cosmos:* rejected (only did:ixo: allowed)",
+			"did:cosmos:foo", types.ErrDIDFormNotAllowed},
+		// did:x:ixo:foo — DidChainPrefix is not an allowed user namespace.
+		{"did:x:* rejected (only did:ixo: allowed)",
+			"did:x:ixo:abc123", types.ErrDIDFormNotAllowed},
+	}
+	for _, tc := range rejections {
+		_, err := s.msgServer.CreateIidDocument(s.goCtx(), &types.MsgCreateIidDocument{
+			Id:     tc.id,
+			Signer: signer.String(),
+		})
+		s.Require().ErrorIsf(err, tc.errLike,
+			"%s: expected %v, got %v", tc.name, tc.errLike, err)
+		_, found := s.App.IidKeeper.GetDidDocument(s.Ctx, []byte(tc.id))
+		s.Require().False(found, "%s: rejected DID must not be persisted", tc.name)
+	}
+}
+
 // ----------------------------------------------------------------------------
 // UpdateIidDocument
 // ----------------------------------------------------------------------------

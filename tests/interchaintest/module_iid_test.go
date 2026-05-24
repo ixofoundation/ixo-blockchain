@@ -192,6 +192,80 @@ func TestIxoIID_FullScenario(t *testing.T) {
 			"create-iid", IidDoc(squatted, owner.FormattedAddress()))
 	})
 
+	// ----- 6c. DID-form policy (IXO-2045) -----
+	//
+	// MsgCreateIidDocument must restrict the allowed DID forms to
+	// did:ixo:<signer-account> and did:ixo:wasm:<bech32-contract>. This
+	// runs against the live chain so the ValidateBasic + keeper handler
+	// pair are both exercised; both must reject the bad forms.
+	//
+	// The positive `did:ixo:<owner-addr>` case is already covered by
+	// step 1 above — we don't re-create it here.
+
+	// did:ixo:<other-account>: caller cannot claim someone else's address.
+	// The attacker tries to register the OWNER's account-DID — the
+	// classic squatting attack this rule prevents. The OWNER's DID was
+	// already created in step 1, so to keep this test focused on the
+	// policy (and not on the duplicate-DID branch), we point the attack
+	// at a fresh address — `attacker` claiming OWNER's prefix. Because
+	// account != signer, the policy fires before the duplicate check.
+	t.Run("create-iid claiming someone-else's account-DID is rejected", func(t *testing.T) {
+		ownerDID := "did:ixo:" + owner.FormattedAddress()
+		// `attacker` signs but `Id` is the owner's account-DID.
+		IidExecExpectFail(t, ctx, chain, attacker,
+			[]string{"must equal", "signer", "mismatch"},
+			"create-iid", IidDoc(ownerDID, attacker.FormattedAddress()))
+	})
+
+	// did:ixo:wasm:<contract-address>: positive — any signer may create
+	// one of these as long as the suffix is a valid bech32 address. We
+	// piggy-back on the attacker's address as a "contract-like" bech32
+	// since the policy only validates bech32-shape, not contract
+	// existence.
+	t.Run("create-iid in did:ixo:wasm:<addr> form is accepted", func(t *testing.T) {
+		wasmDID := "did:ixo:wasm:" + attacker.FormattedAddress()
+		out, err := chain.GetNode().ExecTx(ctx, owner.KeyName(),
+			"iid", "create-iid", IidDoc(wasmDID, owner.FormattedAddress()),
+			"--gas", "auto", "--gas-adjustment", "1.5",
+		)
+		require.NoError(t, err, "create-iid did:ixo:wasm:<bech32>: %s", out)
+		doc := QueryIidDocument(t, ctx, chain, wasmDID)
+		require.Equal(t, wasmDID, doc.Id,
+			"did:ixo:wasm:<bech32-contract> must be createable by any signer")
+	})
+
+	// did:ixo:wasm:<junk>: suffix must be a valid bech32 address.
+	t.Run("create-iid did:ixo:wasm:<not-bech32> is rejected", func(t *testing.T) {
+		bad := "did:ixo:wasm:not-a-bech32-address"
+		IidExecExpectFail(t, ctx, chain, owner,
+			[]string{"bech32", "form", "permitted"},
+			"create-iid", IidDoc(bad, owner.FormattedAddress()))
+	})
+
+	// did:ixo:haha:haha: unknown sub-method.
+	t.Run("create-iid did:ixo:<unknown-sub>:* is rejected", func(t *testing.T) {
+		bad := "did:ixo:haha:haha"
+		IidExecExpectFail(t, ctx, chain, owner,
+			[]string{"form", "permitted", "sub-method"},
+			"create-iid", IidDoc(bad, owner.FormattedAddress()))
+	})
+
+	// did:cosmos:foo: only the did:ixo: method is allowed.
+	t.Run("create-iid did:cosmos:* is rejected", func(t *testing.T) {
+		bad := "did:cosmos:foo"
+		IidExecExpectFail(t, ctx, chain, owner,
+			[]string{"did:ixo:", "form", "permitted", "namespace"},
+			"create-iid", IidDoc(bad, owner.FormattedAddress()))
+	})
+
+	// did:x:ixo:abc: DidChainPrefix is not a user-facing namespace.
+	t.Run("create-iid did:x:* is rejected", func(t *testing.T) {
+		bad := "did:x:ixo:abc123"
+		IidExecExpectFail(t, ctx, chain, owner,
+			[]string{"did:ixo:", "form", "permitted", "namespace"},
+			"create-iid", IidDoc(bad, owner.FormattedAddress()))
+	})
+
 	// ----- 7. Negative: update non-existent DID -----
 	//
 	// Note on the rejection text: the chain's MsgUpdateIidDocument
