@@ -301,3 +301,40 @@ message MsgBurn {
 }
 
 message MsgBurnResponse {}
+
+// =====================================================================
+// LEGACY message types — kept for backward-compat tx decoding only.
+//
+// These messages existed pre-v7 and the v7 chain migration removed their
+// handlers. They are NOT in the Msg service (no rpc entry) so no new txs
+// of these types can be submitted on v7.
+//
+// HOWEVER: pre-v7 txs containing these message types are still in the
+// chain's block history. When any client (blocksync-core, an explorer,
+// or even `ixod query tx ...`) asks the v7 RPC for a historical block
+// containing one of these txs, the v7 node must be able to *decode* the
+// proto Any-wrapped message body to render the tx. Without the Go type
+// registered in the InterfaceRegistry, decode fails with
+//   "unable to resolve type URL /ixo.liquidstake.v1beta1.MsgUpdateParams"
+// and the entire tx-events query for that height errors out.
+//
+// We re-add the proto definitions here so the generated Go structs exist;
+// codec.go registers them with the InterfaceRegistry (no Msg server
+// handler is attached, since gov execution of these messages already
+// happened pre-v7).
+// =====================================================================
+
+// MsgUpdateParams (pre-v7) updated the single-pool global Params record.
+// In v7 this is replaced by MsgUpdateModuleParams + MsgCreatePool /
+// MsgUpdatePool, but historical pre-upgrade txs still contain this type.
+message MsgUpdateParams {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (amino.name) = "liquidstake/MsgUpdateParams";
+  option (cosmos.msg.v1.signer) = "authority";
+
+  string authority = 1 [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+  Params params = 2 [ (gogoproto.nullable) = false ];
+}
+
+message MsgUpdateParamsResponse {}
