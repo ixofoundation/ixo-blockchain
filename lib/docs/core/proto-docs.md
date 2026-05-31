@@ -220,6 +220,8 @@
     - [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse)
     - [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments)
     - [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse)
+    - [MsgUpdateCollectionQuota](#ixo.claims.v1beta1.MsgUpdateCollectionQuota)
+    - [MsgUpdateCollectionQuotaResponse](#ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse)
     - [MsgUpdateCollectionState](#ixo.claims.v1beta1.MsgUpdateCollectionState)
     - [MsgUpdateCollectionStateResponse](#ixo.claims.v1beta1.MsgUpdateCollectionStateResponse)
     - [MsgWithdrawPayment](#ixo.claims.v1beta1.MsgWithdrawPayment)
@@ -430,6 +432,8 @@
     - [MsgSetPoolPausedResponse](#ixo.liquidstake.v1beta1.MsgSetPoolPausedResponse)
     - [MsgUpdateModuleParams](#ixo.liquidstake.v1beta1.MsgUpdateModuleParams)
     - [MsgUpdateModuleParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse)
+    - [MsgUpdateParams](#ixo.liquidstake.v1beta1.MsgUpdateParams)
+    - [MsgUpdateParamsResponse](#ixo.liquidstake.v1beta1.MsgUpdateParamsResponse)
     - [MsgUpdatePool](#ixo.liquidstake.v1beta1.MsgUpdatePool)
     - [MsgUpdatePoolResponse](#ixo.liquidstake.v1beta1.MsgUpdatePoolResponse)
     - [MsgUpdateWeightedRewardsReceivers](#ixo.liquidstake.v1beta1.MsgUpdateWeightedRewardsReceivers)
@@ -4092,6 +4096,35 @@ snapshots config it cares about at filing / adjudication time).
 
 
 
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionQuota"></a>
+
+### MsgUpdateCollectionQuota
+MsgUpdateCollectionQuota updates the maximum claim count for a collection.
+The new quota must be either zero (unlimited) or ≥ the collection&#39;s current
+`count` so already-submitted claims are not retroactively invalidated.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| collection_id | [string](#string) |  | collection_id indicates which Collection to update |
+| quota | [uint64](#uint64) |  | quota is the new maximum number of claims that may be submitted. 0 means unlimited. Must be 0 or ≥ collection.count (cannot retroactively cap below already-submitted claims). |
+| admin_address | [string](#string) |  | admin address used to sign this message, validated against Collection Admin |
+
+
+
+
+
+
+<a name="ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse"></a>
+
+### MsgUpdateCollectionQuotaResponse
+
+
+
+
+
+
+
 <a name="ixo.claims.v1beta1.MsgUpdateCollectionState"></a>
 
 ### MsgUpdateCollectionState
@@ -4212,6 +4245,7 @@ Msg defines the Msg service.
 | UpdateCollectionDates | [MsgUpdateCollectionDates](#ixo.claims.v1beta1.MsgUpdateCollectionDates) | [MsgUpdateCollectionDatesResponse](#ixo.claims.v1beta1.MsgUpdateCollectionDatesResponse) |  |
 | UpdateCollectionPayments | [MsgUpdateCollectionPayments](#ixo.claims.v1beta1.MsgUpdateCollectionPayments) | [MsgUpdateCollectionPaymentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionPaymentsResponse) |  |
 | UpdateCollectionIntents | [MsgUpdateCollectionIntents](#ixo.claims.v1beta1.MsgUpdateCollectionIntents) | [MsgUpdateCollectionIntentsResponse](#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse) |  |
+| UpdateCollectionQuota | [MsgUpdateCollectionQuota](#ixo.claims.v1beta1.MsgUpdateCollectionQuota) | [MsgUpdateCollectionQuotaResponse](#ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse) |  |
 | ClaimIntent | [MsgClaimIntent](#ixo.claims.v1beta1.MsgClaimIntent) | [MsgClaimIntentResponse](#ixo.claims.v1beta1.MsgClaimIntentResponse) |  |
 | CreateClaimAuthorization | [MsgCreateClaimAuthorization](#ixo.claims.v1beta1.MsgCreateClaimAuthorization) | [MsgCreateClaimAuthorizationResponse](#ixo.claims.v1beta1.MsgCreateClaimAuthorizationResponse) |  |
 | SetCollectionMembers | [MsgSetCollectionMembers](#ixo.claims.v1beta1.MsgSetCollectionMembers) | [MsgSetCollectionMembersResponse](#ixo.claims.v1beta1.MsgSetCollectionMembersResponse) |  |
@@ -7014,6 +7048,34 @@ MsgUpdateModuleParams updates the global ModuleParams. Governance only.
 <a name="ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse"></a>
 
 ### MsgUpdateModuleParamsResponse
+
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateParams"></a>
+
+### MsgUpdateParams
+MsgUpdateParams (pre-v7) updated the single-pool global Params record.
+In v7 this is replaced by MsgUpdateModuleParams &#43; MsgCreatePool /
+MsgUpdatePool, but historical pre-upgrade txs still contain this type.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| authority | [string](#string) |  |  |
+| params | [Params](#ixo.liquidstake.v1beta1.Params) |  |  |
+
+
+
+
+
+
+<a name="ixo.liquidstake.v1beta1.MsgUpdateParamsResponse"></a>
+
+### MsgUpdateParamsResponse
 
 
 

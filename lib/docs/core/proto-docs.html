@@ -1053,6 +1053,14 @@
                 </li>
               
                 <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionQuota"><span class="badge">M</span>MsgUpdateCollectionQuota</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse"><span class="badge">M</span>MsgUpdateCollectionQuotaResponse</a>
+                </li>
+              
+                <li>
                   <a href="#ixo.claims.v1beta1.MsgUpdateCollectionState"><span class="badge">M</span>MsgUpdateCollectionState</a>
                 </li>
               
@@ -1921,6 +1929,14 @@
               
                 <li>
                   <a href="#ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse"><span class="badge">M</span>MsgUpdateModuleParamsResponse</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.liquidstake.v1beta1.MsgUpdateParams"><span class="badge">M</span>MsgUpdateParams</a>
+                </li>
+              
+                <li>
+                  <a href="#ixo.liquidstake.v1beta1.MsgUpdateParamsResponse"><span class="badge">M</span>MsgUpdateParamsResponse</a>
                 </li>
               
                 <li>
@@ -10956,6 +10972,53 @@ rejection </p></td>
 
         
       
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionQuota">MsgUpdateCollectionQuota</h3>
+        <p>MsgUpdateCollectionQuota updates the maximum claim count for a collection.</p><p>The new quota must be either zero (unlimited) or ≥ the collection's current</p><p>`count` so already-submitted claims are not retroactively invalidated.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>collection_id</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>collection_id indicates which Collection to update </p></td>
+                </tr>
+              
+                <tr>
+                  <td>quota</td>
+                  <td><a href="#uint64">uint64</a></td>
+                  <td></td>
+                  <td><p>quota is the new maximum number of claims that may be submitted. 0 means
+unlimited. Must be 0 or ≥ collection.count (cannot retroactively cap
+below already-submitted claims). </p></td>
+                </tr>
+              
+                <tr>
+                  <td>admin_address</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p>admin address used to sign this message, validated against Collection Admin </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse">MsgUpdateCollectionQuotaResponse</h3>
+        <p></p>
+
+        
+
+        
+      
         <h3 id="ixo.claims.v1beta1.MsgUpdateCollectionState">MsgUpdateCollectionState</h3>
         <p></p>
 
@@ -11270,6 +11333,13 @@ full current balance. </p></td>
                 <td>UpdateCollectionIntents</td>
                 <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionIntents">MsgUpdateCollectionIntents</a></td>
                 <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse">MsgUpdateCollectionIntentsResponse</a></td>
+                <td><p></p></td>
+              </tr>
+            
+              <tr>
+                <td>UpdateCollectionQuota</td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionQuota">MsgUpdateCollectionQuota</a></td>
+                <td><a href="#ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse">MsgUpdateCollectionQuotaResponse</a></td>
                 <td><p></p></td>
               </tr>
             
@@ -17131,6 +17201,44 @@ Pool(pool_id).liquid_bond_denom. </p></td>
         
       
         <h3 id="ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse">MsgUpdateModuleParamsResponse</h3>
+        <p></p>
+
+        
+
+        
+      
+        <h3 id="ixo.liquidstake.v1beta1.MsgUpdateParams">MsgUpdateParams</h3>
+        <p>MsgUpdateParams (pre-v7) updated the single-pool global Params record.</p><p>In v7 this is replaced by MsgUpdateModuleParams + MsgCreatePool /</p><p>MsgUpdatePool, but historical pre-upgrade txs still contain this type.</p>
+
+        
+          <table class="field-table">
+            <thead>
+              <tr><td>Field</td><td>Type</td><td>Label</td><td>Description</td></tr>
+            </thead>
+            <tbody>
+              
+                <tr>
+                  <td>authority</td>
+                  <td><a href="#string">string</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+                <tr>
+                  <td>params</td>
+                  <td><a href="#ixo.liquidstake.v1beta1.Params">Params</a></td>
+                  <td></td>
+                  <td><p> </p></td>
+                </tr>
+              
+            </tbody>
+          </table>
+
+          
+
+        
+      
+        <h3 id="ixo.liquidstake.v1beta1.MsgUpdateParamsResponse">MsgUpdateParamsResponse</h3>
         <p></p>
 
         

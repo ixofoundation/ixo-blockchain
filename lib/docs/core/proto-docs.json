@@ -10311,6 +10311,65 @@
           "fields": []
         },
         {
+          "name": "MsgUpdateCollectionQuota",
+          "longName": "MsgUpdateCollectionQuota",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionQuota",
+          "description": "MsgUpdateCollectionQuota updates the maximum claim count for a collection.\nThe new quota must be either zero (unlimited) or ≥ the collection's current\n`count` so already-submitted claims are not retroactively invalidated.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "collection_id",
+              "description": "collection_id indicates which Collection to update",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "quota",
+              "description": "quota is the new maximum number of claims that may be submitted. 0 means\nunlimited. Must be 0 or ≥ collection.count (cannot retroactively cap\nbelow already-submitted claims).",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "admin_address",
+              "description": "admin address used to sign this message, validated against Collection Admin",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateCollectionQuotaResponse",
+          "longName": "MsgUpdateCollectionQuotaResponse",
+          "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
           "name": "MsgUpdateCollectionState",
           "longName": "MsgUpdateCollectionState",
           "fullName": "ixo.claims.v1beta1.MsgUpdateCollectionState",
@@ -10725,6 +10784,18 @@
               "responseType": "MsgUpdateCollectionIntentsResponse",
               "responseLongType": "MsgUpdateCollectionIntentsResponse",
               "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionIntentsResponse",
+              "responseStreaming": false
+            },
+            {
+              "name": "UpdateCollectionQuota",
+              "description": "",
+              "requestType": "MsgUpdateCollectionQuota",
+              "requestLongType": "MsgUpdateCollectionQuota",
+              "requestFullType": "ixo.claims.v1beta1.MsgUpdateCollectionQuota",
+              "requestStreaming": false,
+              "responseType": "MsgUpdateCollectionQuotaResponse",
+              "responseLongType": "MsgUpdateCollectionQuotaResponse",
+              "responseFullType": "ixo.claims.v1beta1.MsgUpdateCollectionQuotaResponse",
               "responseStreaming": false
             },
             {
@@ -18077,6 +18148,53 @@
           "name": "MsgUpdateModuleParamsResponse",
           "longName": "MsgUpdateModuleParamsResponse",
           "fullName": "ixo.liquidstake.v1beta1.MsgUpdateModuleParamsResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "MsgUpdateParams",
+          "longName": "MsgUpdateParams",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateParams",
+          "description": "MsgUpdateParams (pre-v7) updated the single-pool global Params record.\nIn v7 this is replaced by MsgUpdateModuleParams + MsgCreatePool /\nMsgUpdatePool, but historical pre-upgrade txs still contain this type.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "authority",
+              "description": "",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "params",
+              "description": "",
+              "label": "",
+              "type": "Params",
+              "longType": "Params",
+              "fullType": "ixo.liquidstake.v1beta1.Params",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MsgUpdateParamsResponse",
+          "longName": "MsgUpdateParamsResponse",
+          "fullName": "ixo.liquidstake.v1beta1.MsgUpdateParamsResponse",
           "description": "",
           "hasExtensions": false,
           "hasFields": false,
