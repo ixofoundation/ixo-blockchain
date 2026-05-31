@@ -7,10 +7,11 @@ import (
 	namestypes "github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
 )
 
-// UpgradeName is the on-chain identifier for the v7 multi-pool liquidstake
-// upgrade. The chain governance proposal must use exactly this string.
+// UpgradeName is the on-chain identifier for the v7 ("Opus") multi-pool
+// liquidstake upgrade. The chain governance software-upgrade proposal must
+// use exactly this string.
 const (
-	UpgradeName = "v7"
+	UpgradeName = "Opus"
 
 	// LegacyPoolID is the pool_id assigned to the pre-v7 single-pool state
 	// during migration. Holders of the existing "uzero" LST denom continue
