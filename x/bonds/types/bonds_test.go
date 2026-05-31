@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
 )
 
 func TestBondState_IsValidProgressionFrom(t *testing.T) {

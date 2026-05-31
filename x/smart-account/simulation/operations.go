@@ -11,8 +11,8 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/authenticator"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/authenticator"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
 )
 
 const (

@@ -9,10 +9,10 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/names/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/names/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
 )
 
 // KeeperTestSuite covers x/names keeper, msg_server, query server, and genesis

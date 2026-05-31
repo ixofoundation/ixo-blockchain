@@ -4,8 +4,8 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
 )
 
 // verifyDidController ensures `signer` controls `did`. Control is established

@@ -12,10 +12,10 @@ import (
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v6/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 // IIDAnteTestSuite covers VerifyIidControllersAgainstSignature: every

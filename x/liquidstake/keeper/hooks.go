@@ -3,8 +3,8 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
 // AfterEpochEnd is intentionally a no-op for the liquidstake module; all

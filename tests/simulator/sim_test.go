@@ -33,7 +33,7 @@ import (
 	simcli "github.com/cosmos/cosmos-sdk/x/simulation/client/cli"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app"
+	"github.com/ixofoundation/ixo-blockchain/v7/app"
 )
 
 // SimAppChainID is the chain id used for simulations. Distinct from the

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v7/ixomath"
 )
 
 var (

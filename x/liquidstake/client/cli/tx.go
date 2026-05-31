@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
 // GetTxCmd returns the cli tx commands for x/liquidstake.

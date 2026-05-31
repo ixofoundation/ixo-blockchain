@@ -8,11 +8,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"go.uber.org/mock/gomock"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v6/x/entity/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/entity/testutil"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v7/x/entity/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/testutil"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 // withMockedWasm builds an entity Keeper with mocked WasmKeeper +

@@ -8,11 +8,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"go.uber.org/mock/gomock"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
-	tokenkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/token/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/token/testutil"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	tokenkeeper "github.com/ixofoundation/ixo-blockchain/v7/x/token/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/token/testutil"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
 )
 
 // withMockedWasm builds a fresh token keeper that delegates Instantiate /

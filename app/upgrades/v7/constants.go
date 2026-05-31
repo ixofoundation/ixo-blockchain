@@ -3,8 +3,8 @@ package v7
 import (
 	store "cosmossdk.io/store/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/upgrades"
-	namestypes "github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/upgrades"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
 )
 
 // UpgradeName is the on-chain identifier for the v7 ("Opus") multi-pool

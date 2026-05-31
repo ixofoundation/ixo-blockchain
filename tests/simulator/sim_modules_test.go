@@ -21,7 +21,7 @@ import (
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app"
+	"github.com/ixofoundation/ixo-blockchain/v7/app"
 )
 
 // expectedCustomModules is the set of custom ixo modules that MUST be

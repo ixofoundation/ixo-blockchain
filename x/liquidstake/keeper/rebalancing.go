@@ -9,8 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
 // TryRedelegation attempts a single redelegation, atomically through a cached

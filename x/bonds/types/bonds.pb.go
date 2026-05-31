@@ -11,7 +11,7 @@ import (
 	types "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
-	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"
@@ -149,8 +149,8 @@ type Bond struct {
 	Token                        string                                                             `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
 	Name                         string                                                             `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	Description                  string                                                             `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	CreatorDid                   github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=creator_did,json=creatorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"creator_did,omitempty"`
-	ControllerDid                github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,5,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
+	CreatorDid                   github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=creator_did,json=creatorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"creator_did,omitempty"`
+	ControllerDid                github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,5,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
 	FunctionType                 string                                                             `protobuf:"bytes,6,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
 	FunctionParameters           FunctionParams                                                     `protobuf:"bytes,7,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=FunctionParams" json:"function_parameters"`
 	ReserveTokens                []string                                                           `protobuf:"bytes,8,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
@@ -173,7 +173,7 @@ type Bond struct {
 	OutcomePayment               cosmossdk_io_math.Int                                              `protobuf:"bytes,25,opt,name=outcome_payment,json=outcomePayment,proto3,customtype=cosmossdk.io/math.Int" json:"outcome_payment"`
 	State                        string                                                             `protobuf:"bytes,26,opt,name=state,proto3" json:"state,omitempty"`
 	BondDid                      string                                                             `protobuf:"bytes,27,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
-	OracleDid                    github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,28,opt,name=oracle_did,json=oracleDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"oracle_did,omitempty"`
+	OracleDid                    github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,28,opt,name=oracle_did,json=oracleDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"oracle_did,omitempty"`
 }
 
 func (m *Bond) Reset()         { *m = Bond{} }
@@ -366,7 +366,7 @@ func (m *Bond) GetOracleDid() github_com_ixofoundation_ixo_blockchain_v6_x_iid_t
 // BaseOrder defines a base order type. It contains all the necessary fields for
 // specifying the general details about a buy, sell, or swap order.
 type BaseOrder struct {
-	AccountDid   github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=account_did,json=accountDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"account_did,omitempty"`
+	AccountDid   github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=account_did,json=accountDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"account_did,omitempty"`
 	Amount       types.Coin                                                         `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
 	Cancelled    bool                                                               `protobuf:"varint,3,opt,name=cancelled,proto3" json:"cancelled,omitempty"`
 	CancelReason string                                                             `protobuf:"bytes,4,opt,name=cancel_reason,json=cancelReason,proto3" json:"cancel_reason,omitempty"`

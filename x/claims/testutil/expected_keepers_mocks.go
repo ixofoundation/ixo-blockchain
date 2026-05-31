@@ -17,8 +17,8 @@ import (
 	types "github.com/cosmos/cosmos-sdk/types"
 	authz "github.com/cosmos/cosmos-sdk/x/authz"
 	types0 "github.com/cosmos/cosmos-sdk/x/bank/types"
-	types1 "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	types2 "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	types1 "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	types2 "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	gomock "go.uber.org/mock/gomock"
 )
 

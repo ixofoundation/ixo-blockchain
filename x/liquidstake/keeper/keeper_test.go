@@ -7,8 +7,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
 // KeeperTestSuite covers x/liquidstake at the keeper layer: pool CRUD,

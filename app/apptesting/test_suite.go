@@ -26,7 +26,7 @@ import (
 
 	"cosmossdk.io/log"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app"
+	"github.com/ixofoundation/ixo-blockchain/v7/app"
 )
 
 // KeeperTestHelper is meant to be embedded into per-module test suites.

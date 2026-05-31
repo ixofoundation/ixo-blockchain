@@ -28,9 +28,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
 )
 
 var (

@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
 )
 
 // TestIxoAnteHandler_Wiring confirms the IxoAnteHandler constructor accepts

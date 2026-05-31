@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
 )
 
 func TestNormalizeName(t *testing.T) {

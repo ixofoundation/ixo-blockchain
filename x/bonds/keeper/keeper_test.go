@@ -8,10 +8,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 // KeeperTestSuite covers x/bonds keeper-level operations: CRUD, reserve

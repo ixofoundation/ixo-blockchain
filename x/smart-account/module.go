@@ -13,9 +13,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
 	"github.com/spf13/cobra"
 )
 

@@ -8,9 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/require"
 
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
 )
 
 // validBech32 returns a deterministic, well-formed bech32 ixo address

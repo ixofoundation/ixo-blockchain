@@ -15,7 +15,7 @@ import (
 
 	types "github.com/cosmos/cosmos-sdk/types"
 	types0 "github.com/cosmos/cosmos-sdk/x/staking/types"
-	types1 "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	types1 "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	gomock "go.uber.org/mock/gomock"
 )
 

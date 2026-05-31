@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/authenticator"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/authenticator"
 )
 
 // TestAddAuthenticator_Then_Get exercises the full add → list → remove

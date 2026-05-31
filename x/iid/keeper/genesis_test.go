@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 // TestGenesis_RoundTrip seeds two DID documents through SetDidDocument,

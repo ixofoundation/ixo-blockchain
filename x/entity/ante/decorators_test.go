@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	entityante "github.com/ixofoundation/ixo-blockchain/v6/x/entity/ante"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	entityante "github.com/ixofoundation/ixo-blockchain/v7/x/entity/ante"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
 )
 
 // EntityAnteTestSuite covers BlockNftContractTransferForEntityDecorator: it

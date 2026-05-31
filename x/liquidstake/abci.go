@@ -6,8 +6,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
 // BeginBlock refreshes every pool's LiquidValidator set so newly whitelisted

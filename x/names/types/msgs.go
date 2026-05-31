@@ -3,7 +3,7 @@ package types
 import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 // validateAddr returns an error if addr is not a valid bech32 address.

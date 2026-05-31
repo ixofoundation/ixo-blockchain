@@ -8,11 +8,11 @@ import (
 	crisistypes "github.com/cosmos/cosmos-sdk/x/crisis/types"
 	cosmosminttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	ibchooks "github.com/cosmos/ibc-apps/modules/ibc-hooks/v8/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/app/upgrades"
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
-	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
-	minttypes "github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/upgrades"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v7/x/mint/types"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
 )
 
 const (

@@ -14,7 +14,7 @@ import (
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
-	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -42,9 +42,9 @@ type MsgCreateBond struct {
 	Description              string                                                             `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 	FunctionType             string                                                             `protobuf:"bytes,5,opt,name=function_type,json=functionType,proto3" json:"function_type,omitempty"`
 	FunctionParameters       FunctionParams                                                     `protobuf:"bytes,6,rep,name=function_parameters,json=functionParameters,proto3,castrepeated=FunctionParams" json:"function_parameters"`
-	CreatorDid               github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,7,opt,name=creator_did,json=creatorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"creator_did,omitempty"`
-	ControllerDid            github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,8,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
-	OracleDid                github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,9,opt,name=oracle_did,json=oracleDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"oracle_did,omitempty"`
+	CreatorDid               github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,7,opt,name=creator_did,json=creatorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"creator_did,omitempty"`
+	ControllerDid            github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,8,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
+	OracleDid                github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,9,opt,name=oracle_did,json=oracleDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"oracle_did,omitempty"`
 	ReserveTokens            []string                                                           `protobuf:"bytes,10,rep,name=reserve_tokens,json=reserveTokens,proto3" json:"reserve_tokens,omitempty"`
 	TxFeePercentage          cosmossdk_io_math.LegacyDec                                        `protobuf:"bytes,11,opt,name=tx_fee_percentage,json=txFeePercentage,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"tx_fee_percentage"`
 	ExitFeePercentage        cosmossdk_io_math.LegacyDec                                        `protobuf:"bytes,12,opt,name=exit_fee_percentage,json=exitFeePercentage,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"exit_fee_percentage"`
@@ -266,7 +266,7 @@ type MsgEditBond struct {
 	OrderQuantityLimits    string                                                             `protobuf:"bytes,4,opt,name=order_quantity_limits,json=orderQuantityLimits,proto3" json:"order_quantity_limits,omitempty"`
 	SanityRate             string                                                             `protobuf:"bytes,5,opt,name=sanity_rate,json=sanityRate,proto3" json:"sanity_rate,omitempty"`
 	SanityMarginPercentage string                                                             `protobuf:"bytes,6,opt,name=sanity_margin_percentage,json=sanityMarginPercentage,proto3" json:"sanity_margin_percentage,omitempty"`
-	EditorDid              github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,7,opt,name=editor_did,json=editorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"editor_did,omitempty"`
+	EditorDid              github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,7,opt,name=editor_did,json=editorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"editor_did,omitempty"`
 	EditorAddress          string                                                             `protobuf:"bytes,8,opt,name=editor_address,json=editorAddress,proto3" json:"editor_address,omitempty"`
 }
 
@@ -401,7 +401,7 @@ type MsgSetNextAlpha struct {
 	BondDid       string                                                             `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 	Alpha         cosmossdk_io_math.LegacyDec                                        `protobuf:"bytes,2,opt,name=alpha,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"alpha"`
 	Delta         *cosmossdk_io_math.LegacyDec                                       `protobuf:"bytes,3,opt,name=delta,proto3,customtype=cosmossdk.io/math.LegacyDec" json:"delta,omitempty"`
-	OracleDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=oracle_did,json=oracleDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"oracle_did,omitempty"`
+	OracleDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=oracle_did,json=oracleDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"oracle_did,omitempty"`
 	OracleAddress string                                                             `protobuf:"bytes,5,opt,name=oracle_address,json=oracleAddress,proto3" json:"oracle_address,omitempty"`
 }
 
@@ -499,7 +499,7 @@ var xxx_messageInfo_MsgSetNextAlphaResponse proto.InternalMessageInfo
 type MsgUpdateBondState struct {
 	BondDid       string                                                             `protobuf:"bytes,1,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 	State         string                                                             `protobuf:"bytes,2,opt,name=state,proto3" json:"state,omitempty"`
-	EditorDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"editor_did,omitempty"`
+	EditorDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=editor_did,json=editorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"editor_did,omitempty"`
 	EditorAddress string                                                             `protobuf:"bytes,4,opt,name=editor_address,json=editorAddress,proto3" json:"editor_address,omitempty"`
 }
 
@@ -603,7 +603,7 @@ var xxx_messageInfo_MsgUpdateBondStateResponse proto.InternalMessageInfo
 
 // MsgBuy defines a message for buying from a bond.
 type MsgBuy struct {
-	BuyerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=buyer_did,json=buyerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"buyer_did,omitempty"`
+	BuyerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=buyer_did,json=buyerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"buyer_did,omitempty"`
 	Amount       types.Coin                                                         `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
 	MaxPrices    github_com_cosmos_cosmos_sdk_types.Coins                           `protobuf:"bytes,3,rep,name=max_prices,json=maxPrices,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"max_prices"`
 	BondDid      string                                                             `protobuf:"bytes,4,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
@@ -717,7 +717,7 @@ var xxx_messageInfo_MsgBuyResponse proto.InternalMessageInfo
 
 // MsgSell defines a message for selling from a bond.
 type MsgSell struct {
-	SellerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=seller_did,json=sellerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"seller_did,omitempty"`
+	SellerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=seller_did,json=sellerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"seller_did,omitempty"`
 	Amount        types.Coin                                                         `protobuf:"bytes,2,opt,name=amount,proto3" json:"amount"`
 	BondDid       string                                                             `protobuf:"bytes,3,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 	SellerAddress string                                                             `protobuf:"bytes,4,opt,name=seller_address,json=sellerAddress,proto3" json:"seller_address,omitempty"`
@@ -824,7 +824,7 @@ var xxx_messageInfo_MsgSellResponse proto.InternalMessageInfo
 // MsgSwap defines a message for swapping from one reserve bond token to
 // another.
 type MsgSwap struct {
-	SwapperDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=swapper_did,json=swapperDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"swapper_did,omitempty"`
+	SwapperDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=swapper_did,json=swapperDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"swapper_did,omitempty"`
 	BondDid        string                                                             `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 	From           types.Coin                                                         `protobuf:"bytes,3,opt,name=from,proto3" json:"from"`
 	ToToken        string                                                             `protobuf:"bytes,4,opt,name=to_token,json=toToken,proto3" json:"to_token,omitempty"`
@@ -939,7 +939,7 @@ var xxx_messageInfo_MsgSwapResponse proto.InternalMessageInfo
 // MsgMakeOutcomePayment defines a message for making an outcome payment to a
 // bond.
 type MsgMakeOutcomePayment struct {
-	SenderDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"sender_did,omitempty"`
+	SenderDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=sender_did,json=senderDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"sender_did,omitempty"`
 	Amount        cosmossdk_io_math.Int                                              `protobuf:"bytes,2,opt,name=amount,proto3,customtype=cosmossdk.io/math.Int" json:"amount"`
 	BondDid       string                                                             `protobuf:"bytes,3,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 	SenderAddress string                                                             `protobuf:"bytes,4,opt,name=sender_address,json=senderAddress,proto3" json:"sender_address,omitempty"`
@@ -1040,7 +1040,7 @@ var xxx_messageInfo_MsgMakeOutcomePaymentResponse proto.InternalMessageInfo
 // MsgWithdrawShare defines a message for withdrawing a share from a bond that
 // is in the SETTLE stage.
 type MsgWithdrawShare struct {
-	RecipientDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"recipient_did,omitempty"`
+	RecipientDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"recipient_did,omitempty"`
 	BondDid          string                                                             `protobuf:"bytes,2,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 	RecipientAddress string                                                             `protobuf:"bytes,3,opt,name=recipient_address,json=recipientAddress,proto3" json:"recipient_address,omitempty"`
 }
@@ -1138,7 +1138,7 @@ var xxx_messageInfo_MsgWithdrawShareResponse proto.InternalMessageInfo
 
 // MsgWithdrawReserve defines a message for withdrawing reserve from a bond.
 type MsgWithdrawReserve struct {
-	WithdrawerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=withdrawer_did,json=withdrawerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"withdrawer_did,omitempty"`
+	WithdrawerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=withdrawer_did,json=withdrawerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"withdrawer_did,omitempty"`
 	Amount            github_com_cosmos_cosmos_sdk_types.Coins                           `protobuf:"bytes,2,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
 	BondDid           string                                                             `protobuf:"bytes,3,opt,name=bond_did,json=bondDid,proto3" json:"bond_did,omitempty"`
 	WithdrawerAddress string                                                             `protobuf:"bytes,4,opt,name=withdrawer_address,json=withdrawerAddress,proto3" json:"withdrawer_address,omitempty"`

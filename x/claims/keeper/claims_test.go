@@ -1,8 +1,8 @@
 package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
 )
 
 func (s *KeeperTestSuite) TestCollection_RoundTrip() {

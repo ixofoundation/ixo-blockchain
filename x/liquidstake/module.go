@@ -15,10 +15,10 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
 var (

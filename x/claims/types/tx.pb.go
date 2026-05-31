@@ -15,7 +15,7 @@ import (
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
 	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
-	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -257,7 +257,7 @@ type MsgSubmitClaim struct {
 	// claimID is the unique identifier of the claim in the cid hash format
 	ClaimId string `protobuf:"bytes,2,opt,name=claim_id,json=claimId,proto3" json:"claim_id,omitempty"`
 	// agent is the DID of the agent submitting the claim
-	AgentDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	AgentDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
 	AgentAddress string                                                             `protobuf:"bytes,4,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// admin address used to sign this message, validated against Collection Admin
 	AdminAddress string `protobuf:"bytes,5,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
@@ -428,7 +428,7 @@ type MsgEvaluateClaim struct {
 	// oracle is the DID of the Oracle entity that evaluates the claim
 	Oracle string `protobuf:"bytes,3,opt,name=oracle,proto3" json:"oracle,omitempty"`
 	// agent is the DID of the agent that submits the evaluation
-	AgentDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	AgentDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
 	AgentAddress string                                                             `protobuf:"bytes,5,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// admin address used to sign this message, validated against Collection Admin
 	AdminAddress string `protobuf:"bytes,6,opt,name=admin_address,json=adminAddress,proto3" json:"admin_address,omitempty"`
@@ -618,7 +618,7 @@ type MsgDisputeClaim struct {
 	SubjectId string `protobuf:"bytes,1,opt,name=subject_id,json=subjectId,proto3" json:"subject_id,omitempty"`
 	// agent is the DID of the agent disputing the claim, agent details won't be
 	// saved in kvStore
-	AgentDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	AgentDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
 	AgentAddress string                                                             `protobuf:"bytes,3,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// type is expressed as an integer, interpreted by the client
 	DisputeType int32        `protobuf:"varint,4,opt,name=dispute_type,json=disputeType,proto3" json:"dispute_type,omitempty"`
@@ -1430,7 +1430,7 @@ var xxx_messageInfo_MsgUpdateCollectionQuotaResponse proto.InternalMessageInfo
 
 type MsgClaimIntent struct {
 	// The service agent's DID (Decentralized Identifier).
-	AgentDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
+	AgentDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,1,opt,name=agent_did,json=agentDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"agent_did,omitempty"`
 	// The service agent's address (who submits this message).
 	AgentAddress string `protobuf:"bytes,2,opt,name=agent_address,json=agentAddress,proto3" json:"agent_address,omitempty"`
 	// The id of the collection this intent is linked to.
@@ -1599,7 +1599,7 @@ type MsgCreateClaimAuthorization struct {
 	// Address of the creator (user with meta-authorization)
 	CreatorAddress string `protobuf:"bytes,1,opt,name=creator_address,json=creatorAddress,proto3" json:"creator_address,omitempty"`
 	// agent is the DID of the agent submitting the claim
-	CreatorDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"creator_did,omitempty"`
+	CreatorDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=creator_did,json=creatorDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"creator_did,omitempty"`
 	// Address of the grantee (who will receive the authorization)
 	GranteeAddress string `protobuf:"bytes,3,opt,name=grantee_address,json=granteeAddress,proto3" json:"grantee_address,omitempty"`
 	// admin address used to sign this message, validated against Collection Admin

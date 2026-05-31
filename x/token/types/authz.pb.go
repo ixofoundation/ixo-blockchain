@@ -9,7 +9,7 @@ import (
 	_ "github.com/cosmos/cosmos-proto"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
-	_ "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	_ "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	io "io"
 	math "math"
 	math_bits "math/bits"

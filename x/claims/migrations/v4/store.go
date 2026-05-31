@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
 )
 
 // MigrateStore performs the in-place store migrations from claims module

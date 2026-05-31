@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
 )
 
 func (s *KeeperTestSuite) TestSetGetToken_RoundTrip() {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
 )
 
 func TestValidateEpochIdentifierString(t *testing.T) {

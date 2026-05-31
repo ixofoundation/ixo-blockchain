@@ -13,10 +13,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/entity/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/entity/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/entity/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
 	"github.com/spf13/cobra"
 )
 

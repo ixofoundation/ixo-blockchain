@@ -17,7 +17,7 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app"
+	"github.com/ixofoundation/ixo-blockchain/v7/app"
 )
 
 // TestIxoSim_AllInvariantsCleanAtGenesis runs every registered

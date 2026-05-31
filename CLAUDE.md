@@ -8,7 +8,7 @@ The ixo Blockchain is a Cosmos SDK Layer 1 blockchain (v6) for coordinating, fin
 
 **Binary:** `ixod`
 **Go Version:** 1.22.11
-**Module:** `github.com/ixofoundation/ixo-blockchain/v6`
+**Module:** `github.com/ixofoundation/ixo-blockchain/v7`
 
 ## Common Commands
 

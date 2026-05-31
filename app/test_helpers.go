@@ -30,7 +30,7 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
 )
 
 const TestChainID = "ixo-test-1"

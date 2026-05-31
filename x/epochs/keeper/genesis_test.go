@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"time"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
 )
 
 // TestGenesis_RoundTrip: import a known set of epochs, export, ensure both

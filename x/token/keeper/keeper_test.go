@@ -8,9 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/token/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/token/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
 )
 
 // KeeperTestSuite covers the non-wasm surface of x/token: keeper CRUD,

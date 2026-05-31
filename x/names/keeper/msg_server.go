@@ -6,7 +6,7 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
 )
 
 type msgServer struct {
