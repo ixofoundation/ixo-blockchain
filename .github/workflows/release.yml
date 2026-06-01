@@ -26,11 +26,18 @@ jobs:
       - name: Free disk space
         # goreleaser-cross is a large image and we build 4 CGO targets; the
         # default ubuntu-latest disk is tight, so reclaim space first.
+        # NOTE: do NOT remove $AGENT_TOOLSDIRECTORY (/opt/hostedtoolcache) —
+        # it holds Go, which `make release` needs to resolve COSMWASM_VERSION.
         run: |
-          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android \
-            /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /usr/local/share/boost
           sudo docker image prune -af || true
           df -h /
+      - name: Set up Go
+        # Ensures `go list -m github.com/CosmWasm/wasmvm` works so the Makefile
+        # can pass a non-empty COSMWASM_VERSION into goreleaser's wget pre-hooks.
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
       - name: Make release
         run: |
           make release
