@@ -81,10 +81,11 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
    - Every claim has a unique `id`, which is typically the CID, doubling as its cryptographic proof.
    - Claims have a default `status` of `0`, indicating they've been `submitted`. Enum is [EvaluationStatus](02_state.md#evaluationstatus)
    - After evaluation, a claim's status can change to:
-     - `approved` (=1)
-     - `rejected` (=2)
-     - `disputed` (=3)
-     - `invalidated` (=4)
+     - `approved` (=1) — terminal, triggers approval payment
+     - `rejected` (=2) — terminal, triggers rejection payment if configured
+     - `disputed` (=3) — terminal, recorded by [MsgDisputeClaim](03_messages.md#msgdisputeclaim) rather than evaluator
+     - `invalidated` (=4) — terminal, no payments
+     - `flagged` (=5) — **non-terminal** escape hatch: no payments, no terminal counters, AgentQuota is still consumed. The flagger or any other authorized evaluator can subsequently re-evaluate the claim to one of the terminal statuses when more information is available. The same agent cannot re-flag a claim they have already flagged. Useful for AI / oracle workflows where the oracle wants to defer the call without committing.
 
 4. **Payment Authorization:**
 
@@ -115,9 +116,29 @@ An ixo entity can have one or more claim protocols represented as a `linkedClaim
      - 80% to the Oracle service provider
    - CW20 payments are supported for Oracle payments when using intents or when configured without timeouts.
 
-7. **Recording Counter-Claims Evidence:**
-   - In case of disputes, evidence for counter-claims can be recorded, facilitating transparency and conflict resolution.
+7. **Disputes, Performance Deposits & Adjudication:**
+
+   - Service agents and evaluators may be required to hold a **rolling performance-deposit balance** on a collection (per `serviceAgentDepositRequired` / `evaluatorDepositRequired`). The balance gates `MsgSubmitClaim` / `MsgEvaluateClaim` and is at risk on adjudicated dispute loss.
+   - **Anyone with a registered IID** can file `MsgDisputeClaim` against either the **SUBMITTER** or **EVALUATOR** role of a claim. The disputer must stake the collection's `disputeDepositAmount` inline — that, not authz, is the spam gate. The targeted agent is blocked from new submissions/evaluations and from withdrawing their deposit while any OPEN dispute targets them.
+   - Disputes are adjudicated **AWARDED** or **DISMISSED** via `MsgAdjudicateDispute`. The signer must be a registered key on one of the collection's whitelisted `adjudicators` DIDs (verified by the IID ante, same model as every other DID-gated message). Payouts to entity-resolved DIDs go to the entity's adjudicator revenue account.
+   - Penalty payout follows a winner / adjudicator split governed by **each adjudicator's own `reward_percentage`** (per-entry on the `adjudicators` whitelist) — adjudicators self-set their fees, making the whitelist a competitive market. On AWARDED the loser-agent's balance is slashed and the winner share goes to the disputer, the adjudicator share to the adjudicator; on DISMISSED the disputer's staked deposit becomes the pot, split the same way (the targeted agent is the vindicated winner). Actual payouts are bounded by available balances and recorded on the resolution record (`intended_penalty` vs `actual_penalty_paid`).
+   - At most one OPEN dispute per `(subject_id, target_role)`. An **AWARDED** outcome permanently blocks further disputes against that pair; a **DISMISSED** outcome allows new filings. FLAGGED evaluations cannot be disputed (re-evaluate them to a terminal status first).
+   - The collection's existing `escrow_account` holds three logical buckets in v7: intent funds, agent deposit balances, and locked dispute deposits — no new escrow account is created. Module accounting tracks each bucket in state; the bank balance equals their sum.
+
+8. **Team Member Budgets (Team / Enterprise Subscriptions):**
+
+   - A collection can be configured for team / enterprise use by adding one or more **member budgets**, where each member is identified by their account address and assigned a periodic spend cap.
+   - When a collection has member budgets, all intents and claims against it must be attributed to a specific member, and the member's periodic budget is enforced at intent creation time (the actual spend gate, where funds move to escrow).
+   - Each member budget tracks:
+     - A `period` duration (e.g., 30 days, minimum 24 hours)
+     - A `period_spend_limit` for native coins and a `period_cw20_spend_limit` for CW20 tokens
+     - A `period_spent` counter for actual consumption in the current period
+     - A `period_reset_at` timestamp for the next reset boundary
+   - Periods reset **lazily** — when an intent or restore operation runs, the period is rolled forward and `period_spent` zeroed if the reset boundary has passed (no scheduled job needed).
+   - Per-member attribution is enforced through strict equality on the `member_address` field across `MsgCreateClaimAuthorization`, `MsgClaimIntent`, `MsgSubmitClaim`, and the corresponding constraints on `SubmitClaimAuthorization` and `CreateClaimAuthorizationAuthorization`. This prevents one member's budget being consumed by activity attributed to another.
+   - Budget is deducted on intent creation and restored if the resulting claim is rejected, disputed, invalidated, or if the intent expires before being used.
+   - Collections with no member budgets continue to work exactly as before — member budgets are an opt-in feature configured by the collection admin.
 
 ## Conclusion
 
-The Claims module is instrumental in the ixo system, providing a robust infrastructure for the creation, management, evaluation, and verification of claims. With the integration of the W3C standard for VCs, it ensures that all claims are both trustworthy and verifiable. Recent upgrades have expanded payment options and introduced intent-based guarantees, enhancing the flexibility and utility of the claims system for real-world applications.
+The Claims module is instrumental in the ixo system, providing a robust infrastructure for the creation, management, evaluation, and verification of claims. With the integration of the W3C standard for VCs, it ensures that all claims are both trustworthy and verifiable. Recent upgrades have expanded payment options, introduced intent-based payment guarantees, team-budget enterprise subscriptions, and a full performance-deposit + dispute-resolution lifecycle, enhancing both the flexibility of the claims system and the economic security of agents acting under it. The dispute / deposit state shapes and indexes live in [02_state.md](02_state.md); each dispute message and its economics are documented under the corresponding entry in [03_messages.md](03_messages.md) (`MsgDisputeClaim`, `MsgAdjudicateDispute`, `MsgUpdateCollectionDisputeConfig`, `MsgAddPerformanceDeposit`, `MsgWithdrawPerformanceDeposit`).

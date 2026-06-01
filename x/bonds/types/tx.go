@@ -3,8 +3,8 @@ package types
 import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v6/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 const (
@@ -49,6 +49,7 @@ func NewMsgCreateBond(token, name, description string, creatorDid, controllerDid
 		Description:              description,
 		CreatorDid:               creatorDid,
 		ControllerDid:            controllerDid,
+		OracleDid:                oracleDid,
 		FunctionType:             functionType,
 		FunctionParameters:       functionParameters,
 		ReserveTokens:            reserveTokens,

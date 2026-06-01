@@ -4,7 +4,7 @@ package ixo.claims.v1beta1;
 import "gogoproto/gogo.proto";
 import "ixo/claims/v1beta1/claims.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/claims/types";
 
 // GenesisState defines the claims module's genesis state.
 message GenesisState {
@@ -13,4 +13,11 @@ message GenesisState {
   repeated Claim claims = 3 [ (gogoproto.nullable) = false ];
   repeated Dispute disputes = 4 [ (gogoproto.nullable) = false ];
   repeated Intent intents = 5 [ (gogoproto.nullable) = false ];
+  repeated MemberBudget member_budgets = 6 [ (gogoproto.nullable) = false ];
+  // agent_deposit_balances are the rolling performance-deposit balances per
+  // (collection, agent). On InitGenesis, the active-dispute index and the
+  // dispute subject index are rebuilt from the disputes slice rather than
+  // exported separately.
+  repeated AgentDepositBalance agent_deposit_balances = 7
+      [ (gogoproto.nullable) = false ];
 }

@@ -9,10 +9,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 type msgServer struct {
@@ -79,22 +78,28 @@ func (s msgServer) CreateCollection(goCtx context.Context, msg *types.MsgCreateC
 
 	// create and persist the Collection
 	collection := types.Collection{
-		Id:          fmt.Sprint(collectionSequence),
-		Entity:      msg.Entity,
-		Admin:       admin,
-		Protocol:    msg.Protocol,
-		StartDate:   msg.StartDate,
-		EndDate:     msg.EndDate,
-		Quota:       msg.Quota,
-		Count:       0,
-		Evaluated:   0,
-		Approved:    0,
-		Rejected:    0,
-		Disputed:    0,
-		Invalidated: 0,
-		State:       msg.State,
-		Payments:    msg.Payments,
-		Intents:     msg.Intents,
+		Id:                          fmt.Sprint(collectionSequence),
+		Entity:                      msg.Entity,
+		Admin:                       admin,
+		Protocol:                    msg.Protocol,
+		StartDate:                   msg.StartDate,
+		EndDate:                     msg.EndDate,
+		Quota:                       msg.Quota,
+		Count:                       0,
+		Evaluated:                   0,
+		Approved:                    0,
+		Rejected:                    0,
+		Disputed:                    0,
+		Invalidated:                 0,
+		State:                       msg.State,
+		Payments:                    msg.Payments,
+		Intents:                     msg.Intents,
+		ServiceAgentDepositRequired: msg.ServiceAgentDepositRequired,
+		EvaluatorDepositRequired:    msg.EvaluatorDepositRequired,
+		DisputeDepositAmount:        msg.DisputeDepositAmount,
+		Adjudicators:                msg.Adjudicators,
+		PenaltyAmountPerDispute:     msg.PenaltyAmountPerDispute,
+		MinDepositPeriod:            msg.MinDepositPeriod,
 	}
 
 	// create escrow account for the collection
@@ -174,6 +179,28 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidRequest, "collection %s does not allow intent", msg.CollectionId)
 	}
 
+	// Dispute-gate (v7): SA can't submit new claims while they have any
+	// OPEN dispute against them on this collection. Allows the SA to top
+	// up their deposit but not perform new work until the dispute is
+	// adjudicated.
+	if s.Keeper.HasActiveDisputeAgainstAgent(ctx, msg.CollectionId, msg.AgentAddress) {
+		return nil, errorsmod.Wrapf(types.ErrAgentHasActiveDispute,
+			"submitter %s has open disputes on collection %s",
+			msg.AgentAddress, msg.CollectionId)
+	}
+	// Performance-deposit gate (v7): if the collection requires a
+	// service-agent deposit, the SA's running balance must already meet it.
+	// Top-up happens via MsgAddPerformanceDeposit; this is a check, not a
+	// debit. The deposit balance only moves on adjudicated dispute losses
+	// or explicit withdrawal.
+	if !collection.ServiceAgentDepositRequired.IsZero() {
+		if !s.Keeper.HasAgentMetDepositRequirement(ctx, msg.CollectionId, msg.AgentAddress, collection.ServiceAgentDepositRequired) {
+			return nil, errorsmod.Wrapf(types.ErrAgentDepositInsufficient,
+				"submitter %s on collection %s needs balance ≥ %s",
+				msg.AgentAddress, msg.CollectionId, collection.ServiceAgentDepositRequired)
+		}
+	}
+
 	// get intent if used, if used agent must have an active intent for this collection
 	var intent types.Intent
 	var intentFound bool
@@ -210,10 +237,19 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 
 	// if intent then override payments, add intent id and update APPROVAL payment to GUARANTEED
 	if msg.UseIntent {
+		// validate member_address consistency between msg and intent (strict equality,
+		// including both being empty). Prevents a user from spuriously attributing a
+		// claim to a member when the intent has no member context, which would later
+		// cause an incorrect budget restore on rejection.
+		if msg.MemberAddress != intent.MemberAddress {
+			return nil, errorsmod.Wrapf(types.ErrMemberAddressMismatch, "msg member_address %s does not match intent member_address %s", msg.MemberAddress, intent.MemberAddress)
+		}
+
 		claim.Amount = intent.Amount
 		claim.Cw20Payment = intent.Cw20Payment
 		claim.Cw1155Payment = intent.Cw1155Payment
 		claim.Cw1155IntentPayment = intent.Cw1155IntentPayment
+		claim.MemberAddress = intent.MemberAddress
 
 		// if any payment is not empty then APPROVAL payment become GUARANTEED as funds is in escrow account
 		// if all payments is empty or all amounts is 0 then APPROVAL payment stays NO_PAYMENT since no funds are in escrow account
@@ -229,6 +265,10 @@ func (s msgServer) SubmitClaim(goCtx context.Context, msg *types.MsgSubmitClaim)
 			return nil, err
 		}
 	} else {
+		// without intent there is no member context — reject any provided member_address
+		if msg.MemberAddress != "" {
+			return nil, errorsmod.Wrapf(types.ErrMemberAddressMismatch, "member_address provided without use_intent")
+		}
 		// if no intent used, check if collection approval payment is oracle payment then only native coins allowed
 		if collection.Payments.Approval.IsOraclePayment && (!types.IsZeroCW20Payments(claim.Cw20Payment) || !types.IsZeroCW1155Payments(claim.Cw1155Payment)) {
 			return nil, types.ErrOraclePaymentOnlyNative
@@ -276,10 +316,37 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		return nil, errorsmod.Wrapf(types.ErrEvaluateWrongCollection, "claim collection %s vs message collection %s", claim.CollectionId, msg.CollectionId)
 	}
 
-	// check that claim was not evaluated already
-	if claim.Evaluation != nil {
-		return nil, errorsmod.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
+	// Re-evaluation gate. A claim with an existing evaluation can only be
+	// re-evaluated when its current status is FLAGGED (the non-terminal escape
+	// hatch). Any other prior status is terminal and locks the claim.
+	//
+	// The same agent that flagged a claim is allowed to finalise their own
+	// flag (e.g. they got more information later). They are not allowed to
+	// flag a claim more than once — re-flagging adds no new on-chain state
+	// (ErrSelfReFlag). The check looks at both the current evaluation and
+	// every entry in evaluation_history, so a flag-bomb across an
+	// intervening flag from another agent (tester flag → bob flag → tester
+	// flag again) is also blocked. Terminal priors are blocked by the
+	// duplicate-evaluation check above, so every entry we inspect for the
+	// self-reflag rule is itself a flag.
+	priorEvaluation := claim.Evaluation
+	isReEvaluation := priorEvaluation != nil
+	if isReEvaluation {
+		if priorEvaluation.Status != types.EvaluationStatus_flagged {
+			return nil, errorsmod.Wrapf(types.ErrClaimDuplicateEvaluation, "id %s", claim.ClaimId)
+		}
+		if msg.Status == types.EvaluationStatus_flagged {
+			if priorEvaluation.AgentAddress == msg.AgentAddress {
+				return nil, errorsmod.Wrapf(types.ErrSelfReFlag, "agent %s already flagged claim %s", msg.AgentAddress, claim.ClaimId)
+			}
+			for _, h := range claim.EvaluationHistory {
+				if h.AgentAddress == msg.AgentAddress {
+					return nil, errorsmod.Wrapf(types.ErrSelfReFlag, "agent %s already flagged claim %s", msg.AgentAddress, claim.ClaimId)
+				}
+			}
+		}
 	}
+	isFlagged := msg.Status == types.EvaluationStatus_flagged
 
 	// get Collection for claim
 	collection, err := s.Keeper.GetCollection(ctx, claim.CollectionId)
@@ -296,6 +363,24 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	evalAgent, err := sdk.AccAddressFromBech32(msg.AgentAddress)
 	if err != nil {
 		return nil, err
+	}
+
+	// Dispute-gate (v7): evaluator can't submit new evaluations while any
+	// OPEN dispute targets one of their prior evaluations on this collection.
+	if s.Keeper.HasActiveDisputeAgainstAgent(ctx, claim.CollectionId, msg.AgentAddress) {
+		return nil, errorsmod.Wrapf(types.ErrAgentHasActiveDispute,
+			"evaluator %s has open disputes on collection %s",
+			msg.AgentAddress, claim.CollectionId)
+	}
+	// Performance-deposit gate (v7): if the collection requires an
+	// evaluator deposit, balance must meet it. INVALIDATED still gates —
+	// any work on the claim counts.
+	if !collection.EvaluatorDepositRequired.IsZero() {
+		if !s.Keeper.HasAgentMetDepositRequirement(ctx, claim.CollectionId, msg.AgentAddress, collection.EvaluatorDepositRequired) {
+			return nil, errorsmod.Wrapf(types.ErrAgentDepositInsufficient,
+				"evaluator %s on collection %s needs balance ≥ %s",
+				msg.AgentAddress, claim.CollectionId, collection.EvaluatorDepositRequired)
+		}
 	}
 
 	// Get claim agent address
@@ -329,8 +414,11 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		evaluation.Cw1155IntentPayment = claim.Cw1155IntentPayment
 	}
 
-	// start payout process for evaluation submission, if evaluation has status invalidated, don't run evaluation payout process
-	if msg.Status != types.EvaluationStatus_invalidated {
+	// Evaluator payout. Skip for INVALIDATED and for FLAGGED
+	// (a flag is not a terminal output — no payment, no Evaluated++ on flag).
+	// On a finalising re-evaluation the finaliser receives the evaluator
+	// payment (msg.AgentAddress), which is what we want.
+	if msg.Status != types.EvaluationStatus_invalidated && !isFlagged {
 		if err = processPayment(ctx, *s.Keeper, evalAgent, collection.Payments.Evaluation, types.PaymentType_evaluation, &claim, collection, false, []*types.CW1155IntentPayment{}); err != nil {
 			return nil, err
 		}
@@ -339,8 +427,11 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		collection.Evaluated++
 	}
 
-	// if status is not approved and intent was used then transfer funds back out of escrow account to current APPROVAL payments account
-	if msg.Status != types.EvaluationStatus_approved && claim.UseIntent {
+	// Intent-funded escrow handling. On any non-approved terminal status with
+	// an intent, refund escrow → approval account, mark approval NO_PAYMENT
+	// and restore member budget. FLAGGED keeps funds in escrow (the claim is
+	// still in flight and a subsequent finaliser may still APPROVE).
+	if msg.Status != types.EvaluationStatus_approved && !isFlagged && claim.UseIntent {
 		// Get account used for APPROVAL payments on collection
 		approvalAddress, err := sdk.AccAddressFromBech32(collection.Payments.Approval.Account)
 		if err != nil {
@@ -359,6 +450,13 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 		err = updatePaymentStatus(types.PaymentType_approval, &claim, types.PaymentStatus_no_payment)
 		if err != nil {
 			return nil, err
+		}
+
+		// Restore member budget if this claim was on behalf of a team member
+		if claim.MemberAddress != "" {
+			if err := s.Keeper.RestoreMemberBudget(ctx, claim.CollectionId, claim.MemberAddress, claim.Amount, claim.Cw20Payment); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -408,13 +506,34 @@ func (s msgServer) EvaluateClaim(goCtx context.Context, msg *types.MsgEvaluateCl
 	} else if msg.Status == types.EvaluationStatus_invalidated {
 		// no payment for invalidated
 		collection.Invalidated++
+	} else if isFlagged {
+		// Flagged is non-terminal: no payment, no terminal-state counters.
+		// `flagged` is a cumulative event counter (every flag, including
+		// flag-after-flag chains). `flagged_active` is the number of claims
+		// currently sitting in FLAGGED state — only increments on the
+		// transition into FLAGGED, not on a subsequent re-flag.
+		collection.Flagged++
+		if !isReEvaluation {
+			collection.FlaggedActive++
+		}
+	}
+
+	// Transitioning out of FLAGGED to a terminal status: decrement the
+	// active-flag count. Re-flag (FLAGGED → FLAGGED) leaves it untouched.
+	if isReEvaluation && !isFlagged && collection.FlaggedActive > 0 {
+		collection.FlaggedActive--
 	}
 
 	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
 		return nil, err
 	}
 
-	// persist and emit the events
+	// On re-evaluation, move the prior evaluation into history (chronological
+	// order, oldest first) before replacing the current evaluation. First-time
+	// evaluations leave evaluation_history empty.
+	if isReEvaluation {
+		claim.EvaluationHistory = append(claim.EvaluationHistory, priorEvaluation)
+	}
 	claim.Evaluation = &evaluation
 	s.Keeper.SetClaim(ctx, claim)
 	if err := ctx.EventManager().EmitTypedEvents(
@@ -454,67 +573,105 @@ func (s msgServer) DisputeClaim(goCtx context.Context, msg *types.MsgDisputeClai
 		return nil, err
 	}
 
-	entity, found := s.Keeper.IidKeeper.GetDidDocument(ctx, []byte(collection.Entity))
-	if !found {
-		return nil, errorsmod.Wrapf(iidtypes.ErrDidDocumentNotFound, "for entity %s", collection.Entity)
+	// Dispute filing is open to anyone with a valid registered IID (the IID
+	// ante still validates that msg.AgentAddress is a key on msg.AgentDid).
+	// The economic gate is the `dispute_deposit_amount` the disputer stakes
+	// inline — that, rather than authz/controller permissions, prevents
+	// frivolous filings. Prior versions required the disputer to be the
+	// collection admin, an entity controller, or hold submit/evaluate authz
+	// on the collection; that gate is removed in v7 now that disputers
+	// have skin in the game.
+
+	// v7 dispute lifecycle. Determine the targeted agent so we can write
+	// the active-dispute index and (on AWARDED later) slash their balance.
+	var targetAgent string
+	switch msg.TargetRole {
+	case types.DisputeTargetRole_target_submitter:
+		targetAgent = claim.AgentAddress
+	case types.DisputeTargetRole_target_evaluator:
+		if claim.Evaluation == nil {
+			return nil, errorsmod.Wrapf(types.ErrDisputeTargetEvaluatorNoEvaluation,
+				"claim %s has no evaluation; cannot dispute evaluator", claim.ClaimId)
+		}
+		// FLAGGED is a non-terminal escape-hatch — the evaluator explicitly
+		// declined to finalise. Disputing a flag would punish honest
+		// uncertainty and discourage flagging, which is the opposite of the
+		// intent. The path to resolve a FLAGGED claim is another evaluator
+		// re-evaluating to a terminal status; that terminal evaluation can
+		// then itself be disputed.
+		if claim.Evaluation.Status == types.EvaluationStatus_flagged {
+			return nil, errorsmod.Wrapf(types.ErrDisputeTargetEvaluatorFlagged,
+				"claim %s evaluation is FLAGGED", claim.ClaimId)
+		}
+		targetAgent = claim.Evaluation.AgentAddress
+	default:
+		// ValidateBasic already rejects UNSPECIFIED; defensive only.
+		return nil, types.ErrDisputeTargetRoleInvalid
 	}
 
-	// check if user authorized to lay claim,
-	// check if user is admin on Collection or if user is a controller on Collections entity
-	if msg.AgentAddress != collection.Admin && !entity.HasController(iidtypes.DID(msg.AgentDid.Did())) {
-		// check if user has authz cap, aka is agent
-		isAuthorized := false
-		grantee, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+	// (subject_id, target_role) gating: no OPEN duplicate; AWARDED permanently
+	// blocks. DISMISSED allows a new filing.
+	if err := s.Keeper.CanFileNewDisputeForSubject(ctx, msg.SubjectId, msg.TargetRole); err != nil {
+		return nil, err
+	}
+
+	// Lock the disputer's stake into the collection escrow (v7). The
+	// dispute is recorded with the exact amount snapshot, so subsequent
+	// admin updates to dispute_deposit_amount don't retroactively change
+	// what's at stake on this dispute.
+	//
+	// Guard: refuse to lock funds when the collection has no adjudicator
+	// whitelist configured — otherwise the deposit could not be released
+	// through adjudication (MsgAdjudicateDispute requires the adjudicator
+	// DID to be in the whitelist). Without this check an admin who never
+	// set up the whitelist could end up with disputer funds permanently
+	// stuck in escrow.
+	disputeDeposit := collection.DisputeDepositAmount
+	if !disputeDeposit.IsZero() {
+		if len(collection.Adjudicators) == 0 {
+			return nil, errorsmod.Wrap(types.ErrAdjudicationNotConfigured,
+				"refusing to lock dispute deposit on a collection with no adjudicators")
+		}
+		disputerAddr, err := sdk.AccAddressFromBech32(msg.AgentAddress)
 		if err != nil {
 			return nil, err
 		}
-		granter, err := sdk.AccAddressFromBech32(collection.Admin)
+		escrowAddr, err := sdk.AccAddressFromBech32(collection.EscrowAccount)
 		if err != nil {
+			return nil, errorsmod.Wrapf(types.ErrInternalError, "invalid escrow address: %s", err)
+		}
+		if err := s.Keeper.BankKeeper.SendCoins(ctx, disputerAddr, escrowAddr, disputeDeposit); err != nil {
 			return nil, err
-		}
-
-		// get users current authorization to see if user is agent for claim/collection
-		authorizations, err := s.Keeper.AuthzKeeper.GetAuthorizations(ctx, grantee, granter)
-		if err != nil {
-			return nil, types.ErrDisputeUnauthorized
-		}
-
-		for _, auth := range authorizations {
-			if isAuthorized {
-				break
-			}
-			switch k := auth.(type) {
-			case *types.SubmitClaimAuthorization:
-				// check if there a constraint that has collectionId of disputed subjectId(claim)
-				for _, con := range k.Constraints {
-					if con.CollectionId == collection.Id {
-						isAuthorized = true
-					}
-				}
-			case *types.EvaluateClaimAuthorization:
-				// check if there a constraint that has collectionId or claimId of disputed subjectId(claim)
-				for _, con := range k.Constraints {
-					if con.CollectionId == collection.Id || ixo.Contains(con.ClaimIds, claim.ClaimId) {
-						isAuthorized = true
-					}
-				}
-			}
-		}
-
-		if !isAuthorized {
-			return nil, types.ErrDisputeUnauthorized
 		}
 	}
 
-	// create and persist the dispute
+	submittedAt := ctx.BlockTime()
 	dispute := types.Dispute{
-		SubjectId: msg.SubjectId,
-		Type:      msg.DisputeType,
-		Data:      msg.Data,
+		SubjectId:       msg.SubjectId,
+		Type:            msg.DisputeType,
+		Data:            msg.Data,
+		TargetRole:      msg.TargetRole,
+		DisputerAddress: msg.AgentAddress,
+		DisputerDid:     msg.AgentDid.Did(),
+		DisputeDeposit:  disputeDeposit,
+		SubmittedAt:     &submittedAt,
+		Status:          types.DisputeStatus_dispute_open,
 	}
 	s.Keeper.SetDispute(ctx, dispute)
+	// Subject index points the (subject_id, role) tuple at this dispute's
+	// proof so the canonical-status lookup is one-hop. Overwrites a prior
+	// DISMISSED pointer if present.
+	s.Keeper.SetDisputeSubjectIndex(ctx, msg.SubjectId, msg.TargetRole, msg.Data.Proof)
+	// Active-dispute presence index for the target agent, used by submit /
+	// evaluate / withdraw gates.
+	s.Keeper.SetActiveDispute(ctx, claim.CollectionId, targetAgent, msg.SubjectId)
 
-	// emit the events
+	// Collection-level counter.
+	collection.DisputesOpen++
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
+
 	if err := ctx.EventManager().EmitTypedEvents(
 		&types.ClaimDisputedEvent{
 			Dispute: &dispute,
@@ -724,6 +881,39 @@ func (s msgServer) UpdateCollectionIntents(goCtx context.Context, msg *types.Msg
 	return &types.MsgUpdateCollectionIntentsResponse{}, nil
 }
 
+// UpdateCollectionQuota changes the maximum claim count for a collection.
+// Validation rule: the new quota must be either 0 (unlimited) or ≥ the
+// collection's current `count`. Setting a quota below already-submitted
+// claims would retroactively invalidate the gate on every prior submission,
+// so we reject it at handler time rather than silently lock the collection.
+func (s msgServer) UpdateCollectionQuota(goCtx context.Context, msg *types.MsgUpdateCollectionQuota) (*types.MsgUpdateCollectionQuotaResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	// Reject quota < count (unless 0, which means unlimited). Cannot
+	// retroactively cap below claims already in the collection.
+	if msg.Quota != 0 && msg.Quota < collection.Count {
+		return nil, errorsmod.Wrapf(types.ErrCollectionQuotaBelowCount,
+			"new quota %d is below current count %d", msg.Quota, collection.Count)
+	}
+
+	collection.Quota = msg.Quota
+
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateCollectionQuotaResponse{}, nil
+}
+
 // --------------------------
 // CLAIM INTENT
 // --------------------------
@@ -745,6 +935,17 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 	// check that intents is allowed for the collection
 	if collection.Intents == types.CollectionIntentOptions_deny {
 		return nil, errorsmod.Wrapf(types.ErrIntentUnauthorized, "intents is not allowed for collection %s", msg.CollectionId)
+	}
+
+	// member_address presence must match collection setup:
+	//   - team collection (has member budgets): member_address required
+	//   - individual collection (no member budgets): member_address must be empty
+	hasMemberBudgets := s.Keeper.HasMemberBudgets(ctx, msg.CollectionId)
+	if hasMemberBudgets && msg.MemberAddress == "" {
+		return nil, types.ErrMemberAddressRequired
+	}
+	if !hasMemberBudgets && msg.MemberAddress != "" {
+		return nil, types.ErrMemberAddressNotAllowed
 	}
 
 	agentAddress, err := sdk.AccAddressFromBech32(msg.AgentAddress)
@@ -771,13 +972,22 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 	default:
 		return nil, fmt.Errorf("existing Authorizations for route %s is not of type SubmitClaimAuthorization", authzMsgType)
 	}
-	// get constraint for collection id
+	// get constraint matching collection_id AND member_address (strict equality,
+	// including both being empty for individual subscriptions)
 	var constraint *types.SubmitClaimConstraints
 	for _, con := range constraints {
-		if con.CollectionId == msg.CollectionId {
-			constraint = con
-			break
+		if con.CollectionId != msg.CollectionId {
+			continue
 		}
+		// member_address must match exactly: both empty for individual subscriptions,
+		// or both equal to the specific member for team subscriptions. This prevents
+		// silently picking a member-tagged constraint when the oracle didn't attribute
+		// the intent to a member, or vice versa.
+		if con.MemberAddress != msg.MemberAddress {
+			continue
+		}
+		constraint = con
+		break
 	}
 	// if no authz constraint for collection id then return error
 	if constraint == nil {
@@ -800,6 +1010,79 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 		msg.Amount = collection.Payments.Approval.Amount
 		msg.Cw20Payment = collection.Payments.Approval.Cw20Payment
 		msg.Cw1155Payment = collection.Payments.Approval.Cw1155Payment
+	}
+
+	// Member budget check and deduction. Constraint matching above already enforced
+	// that constraint.MemberAddress == msg.MemberAddress, and the early guard ensured
+	// msg.MemberAddress is non-empty when collection has member budgets.
+	if hasMemberBudgets {
+		budget, err := s.Keeper.GetMemberBudget(ctx, msg.CollectionId, msg.MemberAddress)
+		if err != nil {
+			return nil, errorsmod.Wrapf(types.ErrMemberBudgetNotFound, "member %s not found on collection %s", msg.MemberAddress, msg.CollectionId)
+		}
+
+		// Lazy period reset
+		s.Keeper.TryResetMemberBudgetPeriod(ctx, &budget)
+
+		// Check native coin budget
+		if len(msg.Amount) > 0 && !msg.Amount.IsZero() {
+			remaining, hasNeg := budget.PeriodSpendLimit.SafeSub(budget.PeriodSpent...)
+			if hasNeg {
+				return nil, errorsmod.Wrapf(types.ErrMemberBudgetExceeded, "member %s has no remaining budget", msg.MemberAddress)
+			}
+			if !msg.Amount.IsAllLTE(remaining) {
+				return nil, errorsmod.Wrapf(types.ErrMemberBudgetExceeded, "member %s intent amount exceeds remaining budget", msg.MemberAddress)
+			}
+			budget.PeriodSpent = budget.PeriodSpent.Add(msg.Amount...)
+		}
+
+		// Check CW20 budget
+		if len(msg.Cw20Payment) > 0 {
+			for _, payment := range msg.Cw20Payment {
+				if payment.Amount == 0 {
+					continue
+				}
+				var limitAmount uint64
+				for _, limit := range budget.PeriodCw20SpendLimit {
+					if limit.Address == payment.Address {
+						limitAmount = limit.Amount
+						break
+					}
+				}
+				var spentAmount uint64
+				for _, spent := range budget.PeriodCw20Spent {
+					if spent.Address == payment.Address {
+						spentAmount = spent.Amount
+						break
+					}
+				}
+				// Guard against uint64 underflow: if spent already meets or exceeds
+				// limit, there is no remaining budget. Without this check, the
+				// subtraction wraps around to a huge number and the comparison passes.
+				if spentAmount >= limitAmount || payment.Amount > limitAmount-spentAmount {
+					return nil, errorsmod.Wrapf(types.ErrMemberBudgetExceeded, "member %s cw20 intent amount exceeds remaining budget for %s", msg.MemberAddress, payment.Address)
+				}
+				// Deduct CW20 spent
+				found := false
+				for i, spent := range budget.PeriodCw20Spent {
+					if spent.Address == payment.Address {
+						budget.PeriodCw20Spent[i].Amount += payment.Amount
+						found = true
+						break
+					}
+				}
+				if !found {
+					budget.PeriodCw20Spent = append(budget.PeriodCw20Spent, &types.CW20Payment{
+						Address: payment.Address,
+						Amount:  payment.Amount,
+					})
+				}
+			}
+		}
+
+		if err := s.Keeper.SetMemberBudgetAndEmitUpdatedEvent(ctx, budget); err != nil {
+			return nil, err
+		}
 	}
 
 	// Get account used for APPROVAL payments on collection
@@ -842,6 +1125,7 @@ func (s msgServer) ClaimIntent(goCtx context.Context, msg *types.MsgClaimIntent)
 		EscrowAddress:       escrow.String(),
 		Cw1155Payment:       msg.Cw1155Payment,
 		Cw1155IntentPayment: cw1155IntentPayments,
+		MemberAddress:       msg.MemberAddress,
 	}
 
 	// Save the intent and emit the events
@@ -916,6 +1200,7 @@ func (s msgServer) CreateClaimAuthorization(goCtx context.Context, msg *types.Ms
 			MaxCw20Payment:   msg.MaxCw20Payment,
 			MaxCw1155Payment: msg.MaxCw1155Payment,
 			IntentDurationNs: msg.IntentDurationNs,
+			MemberAddress:    msg.MemberAddress,
 		}
 
 		// Check for existing SubmitClaimAuthorization
@@ -1053,4 +1338,427 @@ func (s msgServer) CreateClaimAuthorization(goCtx context.Context, msg *types.Ms
 	}
 
 	return &types.MsgCreateClaimAuthorizationResponse{}, nil
+}
+
+// --------------------------
+// SET COLLECTION MEMBERS
+// --------------------------
+func (s msgServer) SetCollectionMembers(goCtx context.Context, msg *types.MsgSetCollectionMembers) (*types.MsgSetCollectionMembersResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	now := ctx.BlockTime()
+
+	for _, member := range msg.Members {
+		// Check if member budget already exists
+		existingBudget, getErr := s.Keeper.GetMemberBudget(ctx, msg.CollectionId, member.MemberAddress)
+		isNew := getErr != nil
+
+		budget := types.MemberBudget{
+			CollectionId:         msg.CollectionId,
+			MemberAddress:        member.MemberAddress,
+			Period:               member.Period,
+			PeriodSpendLimit:     member.PeriodSpendLimit,
+			PeriodCw20SpendLimit: member.PeriodCw20SpendLimit,
+		}
+
+		if !isNew {
+			// Existing member - preserve period_spent and period_reset_at unless reset requested
+			if member.ResetPeriodSpent {
+				budget.PeriodSpent = sdk.Coins{}
+				budget.PeriodCw20Spent = nil
+				resetAt := now.Add(member.Period)
+				budget.PeriodResetAt = &resetAt
+			} else {
+				budget.PeriodSpent = existingBudget.PeriodSpent
+				budget.PeriodCw20Spent = existingBudget.PeriodCw20Spent
+				budget.PeriodResetAt = existingBudget.PeriodResetAt
+			}
+		} else {
+			// New member - start fresh
+			budget.PeriodSpent = sdk.Coins{}
+			budget.PeriodCw20Spent = nil
+			resetAt := now.Add(member.Period)
+			budget.PeriodResetAt = &resetAt
+		}
+
+		// New members get MemberBudgetCreatedEvent (one-time emission, indexer
+		// uses INSERT). Existing member updates go through the helper which
+		// emits MemberBudgetUpdatedEvent (indexer uses UPDATE).
+		if isNew {
+			s.Keeper.SetMemberBudget(ctx, budget)
+			if err := ctx.EventManager().EmitTypedEvent(
+				&types.MemberBudgetCreatedEvent{Budget: &budget},
+			); err != nil {
+				return nil, err
+			}
+		} else {
+			if err := s.Keeper.SetMemberBudgetAndEmitUpdatedEvent(ctx, budget); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	return &types.MsgSetCollectionMembersResponse{}, nil
+}
+
+// --------------------------
+// REMOVE COLLECTION MEMBERS
+// --------------------------
+// Removes one or more member budgets from a collection. Does NOT revoke any
+// existing claim authorizations the members granted to oracles — admin should
+// do that separately if needed. New intents from the removed members will fail
+// at the GetMemberBudget lookup.
+//
+// Edge case: if a member is removed while they have unresolved intents/claims,
+// budget restoration on rejection or expiration is silently skipped (member
+// budget no longer exists). If the member is later re-added with a fresh budget
+// before those intents resolve, the restore would target the new budget — this
+// could effectively reduce the new period's spent amount by amounts that belong
+// to the old period. This is an accepted trade-off for v1; admins should avoid
+// removing members with active intents in flight.
+func (s msgServer) RemoveCollectionMembers(goCtx context.Context, msg *types.MsgRemoveCollectionMembers) (*types.MsgRemoveCollectionMembersResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Get Collection
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// check that signer is collection admin
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	for _, memberAddress := range msg.MemberAddresses {
+		// Verify the member budget exists before removing — also gives us the
+		// final state to include on the event for the indexer.
+		budget, err := s.Keeper.GetMemberBudget(ctx, msg.CollectionId, memberAddress)
+		if err != nil {
+			return nil, errorsmod.Wrapf(types.ErrMemberBudgetNotFound, "member %s not found on collection %s", memberAddress, msg.CollectionId)
+		}
+		if err := s.Keeper.RemoveMemberBudgetAndEmitEvent(ctx, budget); err != nil {
+			return nil, err
+		}
+	}
+
+	return &types.MsgRemoveCollectionMembersResponse{}, nil
+}
+
+// --------------------------
+// UPDATE COLLECTION DISPUTE CONFIG
+// --------------------------
+// Replaces the full dispute/performance-deposit config on a collection.
+// Does NOT affect in-flight disputes — each dispute snapshots the values
+// it cares about at filing / adjudication time (DisputeDeposit on the
+// Dispute record, slash destinations resolved per adjudication).
+//
+// Validation is delegated to types.ValidateCollectionDisputeConfig via
+// MsgUpdateCollectionDisputeConfig.ValidateBasic; the handler only enforces
+// authz (admin signer matches collection.admin) and persists.
+func (s msgServer) UpdateCollectionDisputeConfig(goCtx context.Context, msg *types.MsgUpdateCollectionDisputeConfig) (*types.MsgUpdateCollectionDisputeConfigResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	collection, err := s.Keeper.GetCollection(ctx, msg.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+	if collection.Admin != msg.AdminAddress {
+		return nil, errorsmod.Wrapf(types.ErrClaimUnauthorized, "collection admin %s, msg admin address %s", collection.Admin, msg.AdminAddress)
+	}
+
+	// Guard: refuse to clear the adjudicator whitelist while there are
+	// open disputes on the collection. Otherwise those disputes — which
+	// may hold locked disputer deposits — can never be adjudicated, and
+	// the deposits are stranded in escrow forever. Reducing the whitelist
+	// (but not emptying it) is fine; new adjudicators can still resolve
+	// existing open disputes.
+	if len(msg.Adjudicators) == 0 && collection.DisputesOpen > 0 {
+		return nil, errorsmod.Wrapf(types.ErrAdjudicationNotConfigured,
+			"cannot clear adjudicators while %d open dispute(s) exist on collection %s",
+			collection.DisputesOpen, collection.Id)
+	}
+
+	collection.ServiceAgentDepositRequired = msg.ServiceAgentDepositRequired
+	collection.EvaluatorDepositRequired = msg.EvaluatorDepositRequired
+	collection.DisputeDepositAmount = msg.DisputeDepositAmount
+	collection.Adjudicators = msg.Adjudicators
+	collection.PenaltyAmountPerDispute = msg.PenaltyAmountPerDispute
+	collection.MinDepositPeriod = msg.MinDepositPeriod
+
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgUpdateCollectionDisputeConfigResponse{}, nil
+}
+
+// --------------------------
+// ADD PERFORMANCE DEPOSIT
+// --------------------------
+// Agent-funded top-up of their performance-deposit balance for a collection.
+// Funds move agent → collection.escrow_account. Permitted regardless of
+// active disputes — top-up is needed to clear arrears caused by a slash.
+func (s msgServer) AddPerformanceDeposit(goCtx context.Context, msg *types.MsgAddPerformanceDeposit) (*types.MsgAddPerformanceDepositResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	agentAddr, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+	if err != nil {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
+	}
+
+	balance, err := s.Keeper.AddPerformanceDeposit(ctx, msg.CollectionId, agentAddr, msg.Amount)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgAddPerformanceDepositResponse{NewBalance: balance.Amount}, nil
+}
+
+// --------------------------
+// WITHDRAW PERFORMANCE DEPOSIT
+// --------------------------
+// Pulls some or all of an agent's deposit balance back to their wallet.
+// Blocked while the agent has any OPEN dispute targeting them on this
+// collection (gate enforced in keeper.WithdrawPerformanceDeposit).
+func (s msgServer) WithdrawPerformanceDeposit(goCtx context.Context, msg *types.MsgWithdrawPerformanceDeposit) (*types.MsgWithdrawPerformanceDepositResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	agentAddr, err := sdk.AccAddressFromBech32(msg.AgentAddress)
+	if err != nil {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid agent address (%s)", err)
+	}
+
+	withdrawn, remaining, err := s.Keeper.WithdrawPerformanceDeposit(ctx, msg.CollectionId, agentAddr, msg.Amount)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgWithdrawPerformanceDepositResponse{
+		Withdrawn:        withdrawn,
+		RemainingBalance: remaining,
+	}, nil
+}
+
+// --------------------------
+// ADJUDICATE DISPUTE
+// --------------------------
+// Settles an OPEN dispute by AWARDED or DISMISSED, applying the penalty
+// math (80/20 winner / adjudicator split, configurable), tracking actual
+// vs intended payouts (since loser balance may be short), and clearing
+// the active-dispute index entry so the targeted agent is unblocked.
+//
+// Authorization: adjudicator_did must be on the collection's whitelist, and
+// adjudicator_address must be authorized for that DID via either path
+// (entity account OR DID-registered key — see AuthorizeAdjudicator).
+func (s msgServer) AdjudicateDispute(goCtx context.Context, msg *types.MsgAdjudicateDispute) (*types.MsgAdjudicateDisputeResponse, error) {
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// 1. Fetch dispute & claim & collection.
+	dispute, err := s.Keeper.GetDisputeBySubject(ctx, msg.SubjectId, msg.TargetRole)
+	if err != nil {
+		return nil, err
+	}
+	if dispute.Status != types.DisputeStatus_dispute_open {
+		return nil, errorsmod.Wrapf(types.ErrDisputeNotOpen, "current status %s", dispute.Status)
+	}
+	claim, err := s.Keeper.GetClaim(ctx, msg.SubjectId)
+	if err != nil {
+		return nil, err
+	}
+	collection, err := s.Keeper.GetCollection(ctx, claim.CollectionId)
+	if err != nil {
+		return nil, err
+	}
+
+	// 2. Verify adjudicator authorization. DID must be on the collection
+	//    whitelist, and the signer must be a registered key on that DID
+	//    document (same DID-key rule used by every other DID-gated message).
+	//    The IID ante has already enforced the DID-key check at tx time;
+	//    AuthorizeAdjudicator re-runs it as defense-in-depth and resolves
+	//    the payout routing flag.
+	adjudicatorEntry, ok := LookupAdjudicator(collection, msg.AdjudicatorDid)
+	if !ok {
+		return nil, errorsmod.Wrapf(types.ErrAdjudicatorDidNotApproved,
+			"did %s not in collection.adjudicators", msg.AdjudicatorDid)
+	}
+	signer, err := sdk.AccAddressFromBech32(msg.AdjudicatorAddress)
+	if err != nil {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid adjudicator address (%s)", err)
+	}
+	auth, err := s.Keeper.AuthorizeAdjudicator(ctx, msg.AdjudicatorDid, signer)
+	if err != nil {
+		return nil, err
+	}
+	adjudicatorPayout, err := s.Keeper.AdjudicatorPayoutAddress(ctx, auth)
+	if err != nil {
+		return nil, err
+	}
+
+	// 3. Resolve the target agent (loser on AWARDED) from current claim
+	//    state. Safe to re-derive because:
+	//      - SUBMITTER: claim.AgentAddress is immutable.
+	//      - EVALUATOR: MsgDisputeClaim rejects filing against a FLAGGED
+	//        evaluation, so by the time a dispute exists the evaluation is
+	//        terminal — and terminal evaluations cannot be re-evaluated
+	//        (ErrClaimDuplicateEvaluation). So claim.Evaluation.AgentAddress
+	//        is stable for the lifetime of any EVALUATOR-targeted dispute.
+	var targetAgent string
+	switch dispute.TargetRole {
+	case types.DisputeTargetRole_target_submitter:
+		targetAgent = claim.AgentAddress
+	case types.DisputeTargetRole_target_evaluator:
+		if claim.Evaluation == nil {
+			return nil, types.ErrDisputeTargetEvaluatorNoEvaluation
+		}
+		targetAgent = claim.Evaluation.AgentAddress
+	default:
+		return nil, types.ErrDisputeTargetRoleInvalid
+	}
+	targetAgentAddr, err := sdk.AccAddressFromBech32(targetAgent)
+	if err != nil {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid target agent address (%s)", err)
+	}
+	disputerAddr, err := sdk.AccAddressFromBech32(dispute.DisputerAddress)
+	if err != nil {
+		return nil, errorsmod.Wrapf(sdkerrors.ErrInvalidAddress, "invalid disputer address (%s)", err)
+	}
+	escrowAddr, err := sdk.AccAddressFromBech32(collection.EscrowAccount)
+	if err != nil {
+		return nil, errorsmod.Wrapf(types.ErrInternalError, "invalid escrow address: %s", err)
+	}
+
+	// 4. Determine the intended penalty.
+	//
+	// The penalty is only economically applied on AWARDED — it sets the
+	// upper bound on what gets slashed from the loser agent's deposit
+	// balance. On DISMISSED, the pot is always the disputer's locked
+	// dispute_deposit and the penalty field is ignored.
+	//
+	// For AWARDED:
+	//   - if collection has fixed penalty_amount_per_dispute, use that
+	//   - else require msg.PenaltyAmount, capped at the loser's role-
+	//     deposit-required (current collection config — admin can adjust
+	//     in-flight; actual slash is always min(intended, balance), so
+	//     no overdraft is possible regardless of how the config moves).
+	var intendedPenalty sdk.Coins
+	if msg.Outcome == types.DisputeStatus_dispute_awarded {
+		if !collection.PenaltyAmountPerDispute.IsZero() {
+			intendedPenalty = collection.PenaltyAmountPerDispute
+		} else {
+			if msg.PenaltyAmount.IsZero() {
+				return nil, types.ErrPenaltyAmountRequired
+			}
+			intendedPenalty = msg.PenaltyAmount.Sort()
+			roleCap := DepositRequiredForRole(collection, dispute.TargetRole)
+			if !roleCap.IsZero() && !intendedPenalty.IsAllLTE(roleCap.Sort()) {
+				return nil, errorsmod.Wrapf(types.ErrPenaltyAmountExceedsCap,
+					"penalty %s exceeds role deposit cap %s", intendedPenalty, roleCap)
+			}
+		}
+	}
+
+	// 5. Apply outcome.
+	resolution := &types.DisputeResolution{
+		AdjudicatorDid:           msg.AdjudicatorDid,
+		AdjudicatorAddress:       msg.AdjudicatorAddress,
+		AdjudicatorPayoutAddress: adjudicatorPayout.String(),
+		Data:                     msg.Data,
+		IntendedPenalty:          intendedPenalty,
+	}
+	resolvedAt := ctx.BlockTime()
+	resolution.ResolvedAt = &resolvedAt
+
+	var actualPenalty sdk.Coins
+
+	if msg.Outcome == types.DisputeStatus_dispute_awarded {
+		// AWARDED: loser is the target agent; pot is min(intended, target balance).
+		actualPenalty = s.Keeper.PenaltyPotForAwarded(ctx, claim.CollectionId, targetAgent, intendedPenalty)
+		// Compute the 80/20 split BEFORE moving funds so we know the exact
+		// amounts to send. SplitPenalty rounds adjudicator share down so
+		// winner+adjudicator == pot.
+		winnerAmt, adjudicatorAmt := SplitPenalty(actualPenalty, adjudicatorEntry.RewardPercentage)
+		// Slash from target's balance: send winner share to disputer, adjudicator
+		// share to adjudicator payout. SlashAgentDepositBalance handles the
+		// debit + bank transfer + event for each.
+		if !winnerAmt.IsZero() {
+			if _, err := s.Keeper.SlashAgentDepositBalance(ctx, claim.CollectionId, targetAgentAddr, winnerAmt, disputerAddr); err != nil {
+				return nil, err
+			}
+		}
+		if !adjudicatorAmt.IsZero() {
+			if _, err := s.Keeper.SlashAgentDepositBalance(ctx, claim.CollectionId, targetAgentAddr, adjudicatorAmt, adjudicatorPayout); err != nil {
+				return nil, err
+			}
+		}
+		// Disputer wins: dispute deposit is refunded in full (not slashed).
+		if !dispute.DisputeDeposit.IsZero() {
+			if err := s.Keeper.BankKeeper.SendCoins(ctx, escrowAddr, disputerAddr, dispute.DisputeDeposit); err != nil {
+				return nil, err
+			}
+		}
+		resolution.WinnerAddress = dispute.DisputerAddress
+		resolution.LoserAddress = targetAgent
+		resolution.WinnerAmount = winnerAmt
+		resolution.AdjudicatorAmount = adjudicatorAmt
+		dispute.Status = types.DisputeStatus_dispute_awarded
+		collection.DisputesAwarded++
+	} else {
+		// DISMISSED: loser is the disputer; pot is the dispute deposit itself.
+		// SplitPenalty applies the same 80/20 ratio to the dispute deposit.
+		actualPenalty = dispute.DisputeDeposit
+		// If actualPenalty == zero (collection had no dispute_deposit at
+		// filing time), pay-outs are zero.
+		winnerAmt, adjudicatorAmt := SplitPenalty(actualPenalty, adjudicatorEntry.RewardPercentage)
+		if !winnerAmt.IsZero() {
+			if err := s.Keeper.BankKeeper.SendCoins(ctx, escrowAddr, targetAgentAddr, winnerAmt); err != nil {
+				return nil, err
+			}
+		}
+		if !adjudicatorAmt.IsZero() {
+			if err := s.Keeper.BankKeeper.SendCoins(ctx, escrowAddr, adjudicatorPayout, adjudicatorAmt); err != nil {
+				return nil, err
+			}
+		}
+		resolution.WinnerAddress = targetAgent
+		resolution.LoserAddress = dispute.DisputerAddress
+		resolution.WinnerAmount = winnerAmt
+		resolution.AdjudicatorAmount = adjudicatorAmt
+		dispute.Status = types.DisputeStatus_dispute_dismissed
+		collection.DisputesDismissed++
+	}
+
+	resolution.ActualPenaltyPaid = actualPenalty
+
+	// 6. Persist resolution back onto dispute record and clear indices.
+	dispute.Resolution = resolution
+	s.Keeper.SetDispute(ctx, dispute)
+	// Subject index continues to point at this dispute's proof so future
+	// CanFileNewDisputeForSubject reads the new status (AWARDED/DISMISSED).
+	s.Keeper.SetDisputeSubjectIndex(ctx, dispute.SubjectId, dispute.TargetRole, dispute.Data.Proof)
+	s.Keeper.RemoveActiveDispute(ctx, claim.CollectionId, targetAgent, dispute.SubjectId)
+
+	if collection.DisputesOpen > 0 {
+		collection.DisputesOpen--
+	}
+	if err := s.Keeper.CollectionPersistAndEmitEvents(ctx, collection); err != nil {
+		return nil, err
+	}
+
+	if err := ctx.EventManager().EmitTypedEvents(&types.DisputeResolvedEvent{Dispute: &dispute}); err != nil {
+		return nil, err
+	}
+
+	return &types.MsgAdjudicateDisputeResponse{ActualPenaltyPaid: actualPenalty}, nil
 }

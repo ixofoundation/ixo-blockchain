@@ -9,9 +9,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/ixomath"
-	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
-	epochtypes "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/ixomath"
+	"github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
+	epochtypes "github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
 )
 
 var _ paramtypes.ParamSet = &Params{}
@@ -44,11 +44,17 @@ func DefaultParams() Params {
 	return Params{
 		MintDenom:              ixo.IxoNativeToken,
 		GenesisEpochProvisions: ixomath.NewDec(43_500_000_000), // 43_500 IXO
-		// TODO: comment out 2min, used for local testing
-		// EpochIdentifier:         "2min",  // 2 min
-		// ReductionPeriodInEpochs: 1000000, // 14 min
+		// For local liquidstake testing, swap to the "2min" / 1_000_000
+		// values below so mint inflation accrues fast enough for the
+		// autocompound test to observe a real net_amount delta within
+		// the test window. Also uncomment the matching "2min" epoch in
+		// x/epochs/types/genesis.go and switch the AutocompoundEpoch /
+		// RebalanceEpoch in x/liquidstake/types/keys.go to "2min".
+		// DO NOT enable for mainnet.
 		EpochIdentifier:         "day",                                          // 1 day
-		ReductionPeriodInEpochs: 365,                                            // 1 years
+		ReductionPeriodInEpochs: 365,                                            // 1 year
+		// EpochIdentifier:         "2min",     // TEST-ONLY
+		// ReductionPeriodInEpochs: 1_000_000,  // TEST-ONLY (effectively no reduction)
 		ReductionFactor:         ixomath.NewDecWithPrec(666666666666666666, 18), // 0.666666666666666666
 		DistributionProportions: DistributionProportions{
 			Staking:       ixomath.NewDecWithPrec(1, 0), // 1.0

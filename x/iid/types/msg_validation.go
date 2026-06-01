@@ -20,6 +20,10 @@ func (msg MsgCreateIidDocument) ValidateBasic() error {
 		return errorsmod.Wrap(ErrInvalidDIDFormat, msg.Id)
 	}
 
+	if err := ValidateMsgCreateDIDForm(msg.Id, msg.Signer); err != nil {
+		return err
+	}
+
 	if msg.Verifications == nil || len(msg.Verifications) == 0 {
 		return errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "verifications are required")
 	}

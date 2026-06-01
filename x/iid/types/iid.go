@@ -449,9 +449,12 @@ func (didDoc *IidDocument) DeleteControllers(controllers ...string) error {
 	return nil
 }
 
-// Deactivate sets the deactivated field in IidMetadata to true
-func (didDoc *IidDocument) Deactivate() error {
-	didDoc.Metadata.Deactivated = true
+// Deactivate sets the deactivated field in IidMetadata to `state`.
+// `state=true` deactivates the document; `state=false` re-activates it.
+// Earlier versions hard-coded `true`, which silently dropped the
+// MsgDeactivateIID.State field — see tests.md::Bug Log.
+func (didDoc *IidDocument) Deactivate(state bool) error {
+	didDoc.Metadata.Deactivated = state
 	return nil
 }
 

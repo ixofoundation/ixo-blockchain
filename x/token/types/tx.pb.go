@@ -12,8 +12,8 @@ import (
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
-	_ "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
-	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	_ "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -38,7 +38,7 @@ type MsgCreateToken struct {
 	// address of minter
 	Minter string `protobuf:"bytes,1,opt,name=minter,proto3" json:"minter,omitempty"`
 	// class is the token protocol entity DID (validated)
-	Class github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=class,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v6/x/iid/types.DIDFragment" json:"class,omitempty"`
+	Class github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=class,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"class,omitempty"`
 	// name is the token name, which must be unique (namespace)
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// description is any arbitrary description

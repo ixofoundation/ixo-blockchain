@@ -1,0 +1,48 @@
+syntax = "proto3";
+package ixo.names.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "ixo/names/v1beta1/names.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/names/types";
+
+message NamespaceCreatedEvent {
+  Namespace namespace = 1;
+  // authority is the gov module address that created the namespace; lets
+  // indexers attribute namespace changes to a governance proposal.
+  string authority = 2;
+}
+
+message NamespaceUpdatedEvent {
+  Namespace namespace = 1;
+  string authority = 2;
+}
+
+message NameRegisteredEvent {
+  NameRecord record = 1;
+  // registered_by is the address that submitted the tx (owner DID controller
+  // for self-register, registrar account otherwise).
+  string registered_by = 2;
+}
+
+message NameUpdatedEvent {
+  NameRecord record = 1;
+  string updated_by = 2;
+}
+
+message NameTransferredEvent {
+  string namespace = 1;
+  string normalized_name = 2;
+  string from_owner_did = 3;
+  string to_owner_did = 4;
+  string transferred_by = 5;
+}
+
+message NameStatusChangedEvent {
+  string namespace = 1;
+  string normalized_name = 2;
+  NameStatus old_status = 3;
+  NameStatus new_status = 4;
+  string changed_by = 5;
+  string reason = 6;
+}

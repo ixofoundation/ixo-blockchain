@@ -1,6 +1,7 @@
 package keepers
 
 import (
+	"context"
 
 	// Wasmd
 	"github.com/CosmWasm/wasmd/x/wasm"
@@ -8,6 +9,7 @@ import (
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	// Cosmos SDK
+	errorsmod "cosmossdk.io/errors"
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
 	evidencekeeper "cosmossdk.io/x/evidence/keeper"
@@ -80,26 +82,28 @@ import (
 
 	// Local
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	wasmbinding "github.com/ixofoundation/ixo-blockchain/v6/wasmbinding"
-	bondskeeper "github.com/ixofoundation/ixo-blockchain/v6/x/bonds/keeper"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
-	claimsmodulekeeper "github.com/ixofoundation/ixo-blockchain/v6/x/claims/keeper"
-	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v6/x/entity/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	epochskeeper "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/keeper"
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
-	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/v6/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
-	liquidstakekeeper "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/keeper"
-	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
-	mintkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/mint/keeper"
-	minttypes "github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/authenticator"
-	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/keeper"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
-	tokenkeeper "github.com/ixofoundation/ixo-blockchain/v6/x/token/keeper"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
+	wasmbinding "github.com/ixofoundation/ixo-blockchain/v7/wasmbinding"
+	bondskeeper "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/keeper"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	claimsmodulekeeper "github.com/ixofoundation/ixo-blockchain/v7/x/claims/keeper"
+	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v7/x/entity/keeper"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	epochskeeper "github.com/ixofoundation/ixo-blockchain/v7/x/epochs/keeper"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
+	iidmodulekeeper "github.com/ixofoundation/ixo-blockchain/v7/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	liquidstakekeeper "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/keeper"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	mintkeeper "github.com/ixofoundation/ixo-blockchain/v7/x/mint/keeper"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v7/x/mint/types"
+	nameskeeper "github.com/ixofoundation/ixo-blockchain/v7/x/names/keeper"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/authenticator"
+	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/keeper"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
+	tokenkeeper "github.com/ixofoundation/ixo-blockchain/v7/x/token/keeper"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
 )
 
 type AppKeepers struct {
@@ -150,6 +154,7 @@ type AppKeepers struct {
 	EpochsKeeper         *epochskeeper.Keeper
 	MintKeeper           *mintkeeper.Keeper
 	LiquidStakeKeeper    liquidstakekeeper.Keeper
+	NamesKeeper          nameskeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
@@ -259,6 +264,48 @@ func NewAppKeepers(
 		blockedAddress,
 		govModAddress,
 		bApp.Logger(),
+	)
+
+	// MintCoinsRestriction: enduring bank-level lock that prevents any module
+	// from minting a denom registered as a liquidstake pool's LST denom unless
+	// the call originated from liquidstake itself. liquidstake stamps an
+	// authorisation sentinel onto its sdk.Context immediately before calling
+	// bank.MintCoins (see types.AuthorizeLSTMintContext); this closure honours
+	// that sentinel and rejects every other caller.
+	//
+	// The closure captures appKeepers by pointer so it can resolve
+	// LiquidStakeKeeper lazily at mint time. LiquidStakeKeeper is zero-valued
+	// at the point of installation but is populated later in this same
+	// constructor before NewAppKeepers returns; taking the address here
+	// forces heap allocation of appKeepers so subsequent population is
+	// visible through the captured pointer.
+	//
+	// Installed RIGHT AFTER bank construction so every subsequently-built
+	// module receives the restricted bank. Modules constructed earlier in
+	// this function (AccountKeeper, CrisisKeeper) hold an unrestricted copy,
+	// which is fine because none of them mint denoms that could clash with
+	// liquidstake pools (account never mints; crisis only refunds invariant
+	// breaks against existing supply).
+	appKeepersPtr := &appKeepers
+	appKeepers.BankKeeper = appKeepers.BankKeeper.WithMintCoinsRestriction(
+		func(ctx context.Context, coins sdk.Coins) error {
+			// Pre-restriction calls (e.g. from genesis init before liquidstake
+			// is wired) bypass the rule. By the time real chain traffic runs,
+			// the keeper is fully populated.
+			lsKeeper := appKeepersPtr.LiquidStakeKeeper
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			authorized := liquidstaketypes.IsLSTMintAuthorized(ctx)
+			for _, c := range coins {
+				if lsKeeper.HasPoolWithDenom(sdkCtx, c.Denom) && !authorized {
+					return errorsmod.Wrapf(
+						liquidstaketypes.ErrDenomAlreadyInUse,
+						"denom %s is registered as a liquidstake pool's LST denom and may only be minted by the liquidstake module",
+						c.Denom,
+					)
+				}
+			}
+			return nil
+		},
 	)
 
 	appKeepers.AuthzKeeper = authzkeeper.NewKeeper(
@@ -490,6 +537,13 @@ func NewAppKeepers(
 	appKeepers.IidKeeper = iidmodulekeeper.NewKeeper(
 		appCodec,
 		appKeepers.keys[iidtypes.StoreKey],
+	)
+
+	appKeepers.NamesKeeper = nameskeeper.NewKeeper(
+		appCodec,
+		appKeepers.keys[namestypes.StoreKey],
+		appKeepers.IidKeeper,
+		govModAddress,
 	)
 
 	appKeepers.BondsKeeper = bondskeeper.NewKeeper(
@@ -765,5 +819,6 @@ func KVStoreKeys() []string {
 		smartaccounttypes.StoreKey,
 		epochstypes.StoreKey,
 		liquidstaketypes.StoreKey,
+		namestypes.StoreKey,
 	}
 }

@@ -7,8 +7,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	ixo "github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	ixo "github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 var (
@@ -92,6 +92,13 @@ func (a SubmitClaimAuthorization) Accept(_ context.Context, msg sdk.Msg) (authz.
 		// if we already found a match, don't check further, only above check to maybe remove constraint
 		// or if the collection id doesn't match, don't check further
 		if matched || constraint.CollectionId != mSubmit.CollectionId {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
+		}
+
+		// member_address must match exactly between msg and constraint (both empty for
+		// individual subscriptions, or both equal for team member attribution)
+		if constraint.MemberAddress != mSubmit.MemberAddress {
 			unhandledConstraints = append(unhandledConstraints, constraint)
 			continue
 		}
@@ -238,7 +245,9 @@ func (a EvaluateClaimAuthorization) Accept(ctx context.Context, msg sdk.Msg) (au
 		// meaning if custom amounts defined it was within constraints, otherwise just the collection id or claim id was in constraints
 		matched = true
 
-		// subtract quota by one (if eval status is not invalidated) and if not 0 re-add to constraints
+		// subtract quota by one (if eval status is not invalidated) and if not 0 re-add to constraints.
+		// FLAGGED counts as a quota-consuming evaluation so a flag-then-finalise sequence by the same
+		// agent burns two quota slots, and an oracle that flags repeatedly cannot do so unboundedly.
 		if constraint.AgentQuota > 1 || mEval.Status == EvaluationStatus_invalidated {
 			// if evaluation status is invalidated then don't subtract quota
 			if mEval.Status != EvaluationStatus_invalidated {
@@ -607,6 +616,15 @@ func (a CreateClaimAuthorizationAuthorization) Accept(ctx context.Context, msg s
 				unhandledConstraints = append(unhandledConstraints, constraint)
 				continue
 			}
+		}
+
+		// member_address must match exactly between msg and constraint (anti-spoofing).
+		// Both empty for individual subscriptions, or both equal for team members.
+		// Prevents a grantee from creating a member-tagged authorization when the
+		// admin's CCAA constraint has no member context (or vice versa).
+		if constraint.MemberAddress != mCreate.MemberAddress {
+			unhandledConstraints = append(unhandledConstraints, constraint)
+			continue
 		}
 
 		// Mark as matched since we've found a valid constraint

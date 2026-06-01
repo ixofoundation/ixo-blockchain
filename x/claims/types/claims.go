@@ -2,14 +2,15 @@ package types
 
 import (
 	"fmt"
+	"time"
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 // IsValidCollection tells if a Claim Collection is valid,
@@ -305,4 +306,148 @@ func CreateNewCollectionEscrow(ctx sdk.Context, accKeeper AccountKeeper, collect
 	accKeeper.SetAccount(ctx, account)
 
 	return account.GetAddress(), nil
+}
+
+// IsValidAgentDepositBalance tells if an AgentDepositBalance is well-formed
+// (has the keys to live in state and a sortable Coins amount).
+func IsValidAgentDepositBalance(b *AgentDepositBalance) bool {
+	if b == nil {
+		return false
+	}
+	if iidtypes.IsEmpty(b.CollectionId) {
+		return false
+	}
+	if _, err := sdk.AccAddressFromBech32(b.AgentAddress); err != nil {
+		return false
+	}
+	if err := ValidateCoinsAllowZero(b.Amount.Sort()); err != nil {
+		return false
+	}
+	return true
+}
+
+// CollectionDisputeConfig is the subset of Collection fields that govern
+// dispute resolution + performance deposits. Pulled out into a separate
+// helper so the same validation runs for both MsgCreateCollection (which
+// inlines these fields) and MsgUpdateCollectionDisputeConfig.
+type CollectionDisputeConfig struct {
+	ServiceAgentDepositRequired sdk.Coins
+	EvaluatorDepositRequired    sdk.Coins
+	DisputeDepositAmount        sdk.Coins
+	Adjudicators                []*AdjudicationDid
+	PenaltyAmountPerDispute     sdk.Coins
+	MinDepositPeriod            time.Duration
+}
+
+// ValidateCollectionDisputeConfig enforces the cross-field invariants for
+// dispute/performance-deposit config:
+//   - any non-empty deposit amount must validate as Coins
+//   - if any deposit-required, disputer stake, or penalty is set, the
+//     collection MUST have at least one adjudication_entity_did
+//   - adjudicators entries must each have a valid DID and a reward_percentage
+//     in [0, 100]; DIDs must be unique within the list
+//   - penalty_amount_per_dispute (if set) must be ≤ each non-empty
+//     deposit-required field
+//   - min_deposit_period must be non-negative
+//
+// Callers should populate cfg with the values they intend to persist; this
+// runs no IO and never touches state.
+func ValidateCollectionDisputeConfig(cfg CollectionDisputeConfig) error {
+	// 1. amounts well-formed
+	if err := ValidateCoinsAllowZero(cfg.ServiceAgentDepositRequired.Sort()); err != nil {
+		return errorsmod.Wrapf(ErrDisputeConfigInvalid, "service_agent_deposit_required: %s", err)
+	}
+	if err := ValidateCoinsAllowZero(cfg.EvaluatorDepositRequired.Sort()); err != nil {
+		return errorsmod.Wrapf(ErrDisputeConfigInvalid, "evaluator_deposit_required: %s", err)
+	}
+	if err := ValidateCoinsAllowZero(cfg.DisputeDepositAmount.Sort()); err != nil {
+		return errorsmod.Wrapf(ErrDisputeConfigInvalid, "dispute_deposit_amount: %s", err)
+	}
+	if err := ValidateCoinsAllowZero(cfg.PenaltyAmountPerDispute.Sort()); err != nil {
+		return errorsmod.Wrapf(ErrDisputeConfigInvalid, "penalty_amount_per_dispute: %s", err)
+	}
+
+	// 2. if any dispute / deposit feature is configured, adjudicators must be set.
+	anyConfigured := !cfg.ServiceAgentDepositRequired.IsZero() ||
+		!cfg.EvaluatorDepositRequired.IsZero() ||
+		!cfg.DisputeDepositAmount.IsZero() ||
+		!cfg.PenaltyAmountPerDispute.IsZero() ||
+		len(cfg.Adjudicators) > 0
+	if anyConfigured && len(cfg.Adjudicators) == 0 {
+		return errorsmod.Wrap(ErrDisputeConfigInvalid,
+			"adjudicators is required when any deposit or penalty amount is set")
+	}
+
+	// 3. adjudicator entries must each have a valid DID, a reward_percentage
+	//    in [0, 100], and DIDs must be unique within the list.
+	seen := make(map[string]bool, len(cfg.Adjudicators))
+	for _, a := range cfg.Adjudicators {
+		if a == nil {
+			return errorsmod.Wrap(ErrDisputeConfigInvalid,
+				"adjudicators contains a nil entry")
+		}
+		if !iidtypes.IsValidDID(a.Did) {
+			return errorsmod.Wrapf(ErrDisputeConfigInvalid,
+				"adjudicators contains invalid DID: %s", a.Did)
+		}
+		if seen[a.Did] {
+			return errorsmod.Wrapf(ErrDisputeConfigInvalid,
+				"adjudicators contains duplicate DID: %s", a.Did)
+		}
+		seen[a.Did] = true
+		if !a.RewardPercentage.IsNil() {
+			if a.RewardPercentage.IsNegative() || a.RewardPercentage.GT(OneHundred) {
+				return errorsmod.Wrapf(ErrDisputeConfigInvalid,
+					"adjudicators[%s].reward_percentage must be in [0, 100]", a.Did)
+			}
+		}
+	}
+
+	// 4. penalty cap: if set, must be ≤ each non-empty *role* deposit-required
+	//    field. The penalty represents what gets slashed from the LOSER's
+	//    agent-deposit balance on AWARDED, so it is bounded by what is
+	//    economically available there. On DISMISSED the disputer's stake
+	//    (dispute_deposit_amount) IS the pot — the penalty isn't applied to
+	//    it — so there's no penalty-vs-dispute_deposit relationship to
+	//    enforce here.
+	if !cfg.PenaltyAmountPerDispute.IsZero() {
+		penalty := cfg.PenaltyAmountPerDispute.Sort()
+		if !cfg.ServiceAgentDepositRequired.IsZero() {
+			if !penalty.IsAllLTE(cfg.ServiceAgentDepositRequired.Sort()) {
+				return errorsmod.Wrap(ErrDisputeConfigInvalid,
+					"penalty_amount_per_dispute exceeds service_agent_deposit_required")
+			}
+		}
+		if !cfg.EvaluatorDepositRequired.IsZero() {
+			if !penalty.IsAllLTE(cfg.EvaluatorDepositRequired.Sort()) {
+				return errorsmod.Wrap(ErrDisputeConfigInvalid,
+					"penalty_amount_per_dispute exceeds evaluator_deposit_required")
+			}
+		}
+	}
+
+	// 6. min deposit period must be non-negative. Zero is allowed (no lock,
+	//    legacy behavior). No upper bound enforced — the admin is trusted to
+	//    pick a sensible value; a too-long period is a foot-gun, not a
+	//    safety hazard.
+	if cfg.MinDepositPeriod < 0 {
+		return errorsmod.Wrap(ErrDisputeConfigInvalid,
+			"min_deposit_period must be non-negative")
+	}
+
+	return nil
+}
+
+// SnapshotDisputeConfigFromCollection projects a Collection's persisted
+// dispute-config fields into a CollectionDisputeConfig for validation /
+// runtime use.
+func SnapshotDisputeConfigFromCollection(c Collection) CollectionDisputeConfig {
+	return CollectionDisputeConfig{
+		ServiceAgentDepositRequired: c.ServiceAgentDepositRequired,
+		EvaluatorDepositRequired:    c.EvaluatorDepositRequired,
+		DisputeDepositAmount:        c.DisputeDepositAmount,
+		Adjudicators:                c.Adjudicators,
+		PenaltyAmountPerDispute:     c.PenaltyAmountPerDispute,
+		MinDepositPeriod:            c.MinDepositPeriod,
+	}
 }

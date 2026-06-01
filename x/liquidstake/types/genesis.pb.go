@@ -25,8 +25,13 @@ const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // GenesisState defines the liquidstake module's genesis state.
 type GenesisState struct {
-	Params           Params            `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
-	LiquidValidators []LiquidValidator `protobuf:"bytes,2,rep,name=liquid_validators,json=liquidValidators,proto3" json:"liquid_validators"`
+	// module_params holds the global module-wide parameters.
+	ModuleParams ModuleParams `protobuf:"bytes,1,opt,name=module_params,json=moduleParams,proto3" json:"module_params"`
+	// pools is the list of every registered liquid staking pool.
+	Pools []Pool `protobuf:"bytes,2,rep,name=pools,proto3" json:"pools"`
+	// pool_liquid_validators groups each pool's liquid validators by pool_id.
+	// The pool_id of every entry must match a Pool in pools.
+	PoolLiquidValidators []PoolLiquidValidators `protobuf:"bytes,3,rep,name=pool_liquid_validators,json=poolLiquidValidators,proto3" json:"pool_liquid_validators"`
 }
 
 func (m *GenesisState) Reset()         { *m = GenesisState{} }
@@ -62,8 +67,51 @@ func (m *GenesisState) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_GenesisState proto.InternalMessageInfo
 
+// PoolLiquidValidators groups a pool's liquid-validator state for genesis
+// import/export, since validators are scoped per pool in v7+.
+type PoolLiquidValidators struct {
+	// pool_id selects the owning pool.
+	PoolId string `protobuf:"bytes,1,opt,name=pool_id,json=poolId,proto3" json:"pool_id,omitempty"`
+	// liquid_validators is the set of liquid validators known to the pool.
+	LiquidValidators []LiquidValidator `protobuf:"bytes,2,rep,name=liquid_validators,json=liquidValidators,proto3" json:"liquid_validators"`
+}
+
+func (m *PoolLiquidValidators) Reset()         { *m = PoolLiquidValidators{} }
+func (m *PoolLiquidValidators) String() string { return proto.CompactTextString(m) }
+func (*PoolLiquidValidators) ProtoMessage()    {}
+func (*PoolLiquidValidators) Descriptor() ([]byte, []int) {
+	return fileDescriptor_dbf8ee1bfb5daf8e, []int{1}
+}
+func (m *PoolLiquidValidators) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PoolLiquidValidators) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PoolLiquidValidators.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PoolLiquidValidators) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PoolLiquidValidators.Merge(m, src)
+}
+func (m *PoolLiquidValidators) XXX_Size() int {
+	return m.Size()
+}
+func (m *PoolLiquidValidators) XXX_DiscardUnknown() {
+	xxx_messageInfo_PoolLiquidValidators.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PoolLiquidValidators proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*GenesisState)(nil), "ixo.liquidstake.v1beta1.GenesisState")
+	proto.RegisterType((*PoolLiquidValidators)(nil), "ixo.liquidstake.v1beta1.PoolLiquidValidators")
 }
 
 func init() {
@@ -71,25 +119,30 @@ func init() {
 }
 
 var fileDescriptor_dbf8ee1bfb5daf8e = []byte{
-	// 278 bytes of a gzipped FileDescriptorProto
+	// 363 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x52, 0xcd, 0xac, 0xc8, 0xd7,
 	0xcf, 0xc9, 0x2c, 0x2c, 0xcd, 0x4c, 0x29, 0x2e, 0x49, 0xcc, 0x4e, 0xd5, 0x2f, 0x33, 0x4c, 0x4a,
 	0x2d, 0x49, 0x34, 0xd4, 0x4f, 0x4f, 0xcd, 0x4b, 0x2d, 0xce, 0x2c, 0xd6, 0x2b, 0x28, 0xca, 0x2f,
 	0xc9, 0x17, 0x12, 0xcf, 0xac, 0xc8, 0xd7, 0x43, 0x52, 0xa6, 0x07, 0x55, 0x26, 0x25, 0x92, 0x9e,
 	0x9f, 0x9e, 0x0f, 0x56, 0xa3, 0x0f, 0x62, 0x41, 0x94, 0x4b, 0x69, 0xe2, 0x32, 0x15, 0xd9, 0x08,
-	0xb0, 0x52, 0xa5, 0x2d, 0x8c, 0x5c, 0x3c, 0xee, 0x10, 0xbb, 0x82, 0x4b, 0x12, 0x4b, 0x52, 0x85,
-	0x6c, 0xb9, 0xd8, 0x0a, 0x12, 0x8b, 0x12, 0x73, 0x8b, 0x25, 0x18, 0x15, 0x18, 0x35, 0xb8, 0x8d,
-	0xe4, 0xf5, 0x70, 0xd8, 0xad, 0x17, 0x00, 0x56, 0xe6, 0xc4, 0x72, 0xe2, 0x9e, 0x3c, 0x43, 0x10,
-	0x54, 0x93, 0x50, 0x34, 0x97, 0x20, 0x44, 0x6d, 0x7c, 0x59, 0x62, 0x4e, 0x66, 0x4a, 0x62, 0x49,
-	0x7e, 0x51, 0xb1, 0x04, 0x93, 0x02, 0xb3, 0x06, 0xb7, 0x91, 0x06, 0x4e, 0x93, 0x7c, 0xc0, 0x62,
-	0x61, 0x30, 0x0d, 0x50, 0x23, 0x05, 0x72, 0x50, 0x85, 0x8b, 0xad, 0x38, 0x3a, 0x16, 0xc8, 0x33,
-	0xbc, 0x58, 0x20, 0xcf, 0xe0, 0x14, 0x71, 0xe2, 0x91, 0x1c, 0xe3, 0x85, 0x47, 0x72, 0x8c, 0x0f,
-	0x1e, 0xc9, 0x31, 0x4e, 0x78, 0x2c, 0xc7, 0x70, 0xe1, 0xb1, 0x1c, 0xc3, 0x8d, 0xc7, 0x72, 0x0c,
-	0x51, 0x76, 0xe9, 0x99, 0x25, 0x19, 0xa5, 0x49, 0x7a, 0xc9, 0xf9, 0xb9, 0xfa, 0x99, 0x15, 0xf9,
-	0x69, 0xf9, 0xa5, 0x79, 0x29, 0x89, 0x25, 0x99, 0xf9, 0x79, 0x20, 0x9e, 0x6e, 0x52, 0x4e, 0x7e,
-	0x72, 0x76, 0x72, 0x46, 0x62, 0x66, 0x9e, 0x7e, 0x99, 0x99, 0x7e, 0x05, 0x4a, 0x20, 0x95, 0x54,
-	0x16, 0xa4, 0x16, 0x27, 0xb1, 0x81, 0xc3, 0xc5, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0xc0, 0x82,
-	0x83, 0x78, 0x9a, 0x01, 0x00, 0x00,
+	0xb0, 0x52, 0xa5, 0x09, 0x4c, 0x5c, 0x3c, 0xee, 0x10, 0xbb, 0x82, 0x4b, 0x12, 0x4b, 0x52, 0x85,
+	0x02, 0xb8, 0x78, 0x73, 0xf3, 0x53, 0x4a, 0x73, 0x52, 0xe3, 0x0b, 0x12, 0x8b, 0x12, 0x73, 0x8b,
+	0x25, 0x18, 0x15, 0x18, 0x35, 0xb8, 0x8d, 0x54, 0xf5, 0x70, 0x38, 0x41, 0xcf, 0x17, 0xac, 0x3a,
+	0x00, 0xac, 0xd8, 0x89, 0xe5, 0xc4, 0x3d, 0x79, 0x86, 0x20, 0x9e, 0x5c, 0x24, 0x31, 0x21, 0x4b,
+	0x2e, 0xd6, 0x82, 0xfc, 0xfc, 0x9c, 0x62, 0x09, 0x26, 0x05, 0x66, 0x0d, 0x6e, 0x23, 0x59, 0x9c,
+	0x26, 0x05, 0xe4, 0xe7, 0xe7, 0x40, 0x4d, 0x80, 0xe8, 0x10, 0xca, 0xe4, 0x12, 0x03, 0x31, 0xe2,
+	0x21, 0xaa, 0xe3, 0xcb, 0x12, 0x73, 0x32, 0x53, 0x12, 0x4b, 0xf2, 0x8b, 0x8a, 0x25, 0x98, 0xc1,
+	0x66, 0xe9, 0xe2, 0x35, 0xcb, 0x07, 0x2c, 0x1e, 0x06, 0xd7, 0x04, 0x35, 0x5b, 0xa4, 0x00, 0x8b,
+	0x9c, 0x15, 0x47, 0xc7, 0x02, 0x79, 0x86, 0x17, 0x0b, 0xe4, 0x19, 0x94, 0xa6, 0x31, 0x72, 0x89,
+	0x60, 0xd3, 0x2e, 0x24, 0xce, 0xc5, 0x0e, 0x76, 0x4d, 0x66, 0x0a, 0x38, 0x50, 0x38, 0x83, 0xd8,
+	0x40, 0x5c, 0xcf, 0x14, 0xa1, 0x68, 0x2e, 0x41, 0x4c, 0x17, 0x42, 0x7c, 0xab, 0x81, 0xd3, 0x85,
+	0x68, 0xc6, 0x43, 0x1d, 0x27, 0x90, 0x83, 0xd3, 0x61, 0x4e, 0x11, 0x27, 0x1e, 0xc9, 0x31, 0x5e,
+	0x78, 0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x17, 0x1e, 0xcb, 0x31,
+	0xdc, 0x78, 0x2c, 0xc7, 0x10, 0x65, 0x97, 0x9e, 0x59, 0x92, 0x51, 0x9a, 0xa4, 0x97, 0x9c, 0x9f,
+	0xab, 0x9f, 0x59, 0x91, 0x9f, 0x96, 0x5f, 0x9a, 0x97, 0x92, 0x58, 0x92, 0x99, 0x9f, 0x07, 0xe2,
+	0xe9, 0x26, 0xe5, 0xe4, 0x27, 0x67, 0x27, 0x67, 0x24, 0x66, 0xe6, 0xe9, 0x97, 0x99, 0xe9, 0x57,
+	0xa0, 0xa4, 0x8c, 0x92, 0xca, 0x82, 0xd4, 0xe2, 0x24, 0x36, 0x70, 0x62, 0x30, 0x06, 0x04, 0x00,
+	0x00, 0xff, 0xff, 0xde, 0x63, 0x9c, 0x85, 0x8f, 0x02, 0x00, 0x00,
 }
 
 func (m *GenesisState) Marshal() (dAtA []byte, err error) {
@@ -112,6 +165,67 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if len(m.PoolLiquidValidators) > 0 {
+		for iNdEx := len(m.PoolLiquidValidators) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PoolLiquidValidators[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.Pools) > 0 {
+		for iNdEx := len(m.Pools) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Pools[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintGenesis(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x12
+		}
+	}
+	{
+		size, err := m.ModuleParams.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintGenesis(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0xa
+	return len(dAtA) - i, nil
+}
+
+func (m *PoolLiquidValidators) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PoolLiquidValidators) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PoolLiquidValidators) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
 	if len(m.LiquidValidators) > 0 {
 		for iNdEx := len(m.LiquidValidators) - 1; iNdEx >= 0; iNdEx-- {
 			{
@@ -126,16 +240,13 @@ func (m *GenesisState) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 			dAtA[i] = 0x12
 		}
 	}
-	{
-		size, err := m.Params.MarshalToSizedBuffer(dAtA[:i])
-		if err != nil {
-			return 0, err
-		}
-		i -= size
-		i = encodeVarintGenesis(dAtA, i, uint64(size))
+	if len(m.PoolId) > 0 {
+		i -= len(m.PoolId)
+		copy(dAtA[i:], m.PoolId)
+		i = encodeVarintGenesis(dAtA, i, uint64(len(m.PoolId)))
+		i--
+		dAtA[i] = 0xa
 	}
-	i--
-	dAtA[i] = 0xa
 	return len(dAtA) - i, nil
 }
 
@@ -156,8 +267,33 @@ func (m *GenesisState) Size() (n int) {
 	}
 	var l int
 	_ = l
-	l = m.Params.Size()
+	l = m.ModuleParams.Size()
 	n += 1 + l + sovGenesis(uint64(l))
+	if len(m.Pools) > 0 {
+		for _, e := range m.Pools {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
+	if len(m.PoolLiquidValidators) > 0 {
+		for _, e := range m.PoolLiquidValidators {
+			l = e.Size()
+			n += 1 + l + sovGenesis(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *PoolLiquidValidators) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.PoolId)
+	if l > 0 {
+		n += 1 + l + sovGenesis(uint64(l))
+	}
 	if len(m.LiquidValidators) > 0 {
 		for _, e := range m.LiquidValidators {
 			l = e.Size()
@@ -204,7 +340,7 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Params", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field ModuleParams", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -231,9 +367,159 @@ func (m *GenesisState) Unmarshal(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if err := m.Params.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.ModuleParams.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Pools", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Pools = append(m.Pools, Pool{})
+			if err := m.Pools[len(m.Pools)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolLiquidValidators", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolLiquidValidators = append(m.PoolLiquidValidators, PoolLiquidValidators{})
+			if err := m.PoolLiquidValidators[len(m.PoolLiquidValidators)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipGenesis(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PoolLiquidValidators) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowGenesis
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PoolLiquidValidators: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PoolLiquidValidators: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PoolId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowGenesis
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthGenesis
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PoolId = string(dAtA[iNdEx:postIndex])
 			iNdEx = postIndex
 		case 2:
 			if wireType != 2 {

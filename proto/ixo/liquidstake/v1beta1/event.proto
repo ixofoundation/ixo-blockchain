@@ -1,68 +1,130 @@
 syntax = "proto3";
 package ixo.liquidstake.v1beta1;
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types";
 
 import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+import "google/protobuf/timestamp.proto";
 import "ixo/liquidstake/v1beta1/liquidstake.proto";
 
-// LiquidStakeParamsUpdatedEvent is triggered when a the Params is updated.
-message LiquidStakeParamsUpdatedEvent {
+// ModuleParamsUpdatedEvent is emitted when the global ModuleParams change
+// (either via MsgUpdateModuleParams or MsgSetModulePaused).
+message ModuleParamsUpdatedEvent {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
-  Params params = 1;
+  ModuleParams module_params = 1;
   string authority = 2;
 }
 
-// LiquidStakeEvent is triggered when a liquid stake is performed.
+// PoolCreatedEvent is emitted when a new pool is registered via
+// MsgCreatePool.
+message PoolCreatedEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string pool_id = 1;
+  Pool pool = 2;
+  string authority = 3;
+}
+
+// PoolUpdatedEvent is emitted when a pool's configuration changes via any
+// of: MsgUpdatePool, MsgUpdateWhitelistedValidators,
+// MsgUpdateWeightedRewardsReceivers, MsgSetPoolPaused.
+message PoolUpdatedEvent {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string pool_id = 1;
+  Pool pool = 2;
+  string authority = 3;
+}
+
+// LiquidStakeEvent is emitted when a liquid stake is performed against a
+// specific pool.
+//
+// Field tag numbers preserved from the pre-v7 single-pool layout
+// (delegator=1, liquid_amount=2, stk_ixo_minted_amount=3) so wire-level
+// proto compatibility is preserved for any consumer decoding historical
+// v6 events with v7 codegen — pool_id simply shows as empty for those.
+// The liquid_amount and stk_ixo_minted_amount fields were upgraded from
+// the v6 string format ("100000000uixo") to typed Coin in v7 to remove
+// regex parsing on the indexer side; the tag is unchanged but the wire
+// encoding for that tag is now a length-delimited Coin sub-message.
 message LiquidStakeEvent {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
   string delegator = 1;
-  string liquid_amount = 2;
-  string stk_ixo_minted_amount = 3;
+  cosmos.base.v1beta1.Coin liquid_amount = 2 [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin stk_ixo_minted_amount = 3
+      [ (gogoproto.nullable) = false ];
+  string pool_id = 4;
 }
 
-// LiquidUnstakeEvent is triggered when a liquid unstake is performed.
+// LiquidUnstakeEvent is emitted when a liquid unstake is performed against
+// a specific pool.
+//
+// Field tag numbers preserved from v6. completion_time upgraded from RFC3339
+// string to google.protobuf.Timestamp to match
+// MsgLiquidUnstakeResponse.completion_time. Amount fields upgraded from
+// "<amount><denom>" strings to typed Coin.
 message LiquidUnstakeEvent {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
   string delegator = 1;
-  string unstake_amount = 2;
-  string unbonding_amount = 3;
-  string unbonded_amount = 4;
-  string completion_time = 5;
+  cosmos.base.v1beta1.Coin unstake_amount = 2 [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin unbonding_amount = 3
+      [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin unbonded_amount = 4 [ (gogoproto.nullable) = false ];
+  google.protobuf.Timestamp completion_time = 5
+      [ (gogoproto.nullable) = false, (gogoproto.stdtime) = true ];
+  string pool_id = 6;
 }
 
-// LiquidRedelegateEvent is triggered when a liquid validator is added.
+// AddLiquidValidatorEvent is emitted when a newly whitelisted validator is
+// activated for a pool.
+//
+// Field tag preserved from v6 (validator=1); pool_id added at the end.
 message AddLiquidValidatorEvent {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
   string validator = 1;
+  string pool_id = 2;
 }
 
-// RebalancedEvent is triggered after a rebalance is performed.
+// RebalancedLiquidStakeEvent is emitted after a pool's rebalancing pass.
+//
+// Field tag numbers preserved from v6. Count fields upgraded from
+// strconv-formatted strings to typed uint32.
 message RebalancedLiquidStakeEvent {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
   string delegator = 1;
-  string redelegation_count = 2;
-  string redelegation_fail_count = 3;
+  uint32 redelegation_count = 2;
+  uint32 redelegation_fail_count = 3;
+  string pool_id = 4;
 }
 
-// AutocompoundEvent is triggered after a epoch is triggered for autocompound.
+// AutocompoundStakingRewardsEvent is emitted when a pool's autocompound
+// epoch hook runs successfully.
+//
+// Field tag numbers preserved from v6. Amount fields upgraded from
+// "<amount><denom>" strings to typed Coin.
 message AutocompoundStakingRewardsEvent {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
   string delegator = 1;
-  string total_amount = 2;
-  string fee_amount = 3;
-  string redelegate_amount = 4;
-  string weighted_rewards_amount = 5;
+  cosmos.base.v1beta1.Coin total_amount = 2 [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin fee_amount = 3 [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin redelegate_amount = 4
+      [ (gogoproto.nullable) = false ];
+  cosmos.base.v1beta1.Coin weighted_rewards_amount = 5
+      [ (gogoproto.nullable) = false ];
+  string pool_id = 6;
 }

@@ -36,6 +36,36 @@ The field's descriptions is as follows:
 - `alsoKnownAs` - a string. The assertion that two or more DIDs (or other types of URI) refer to the same DID subject can be made using the alsoKnownAs property. https://www.w3.org/TR/did-core/#also-known-as
 - `signer` - a string containing the cosmos address of the private key signing the transaction
 
+### Allowed DID forms
+
+`MsgCreateIidDocument` only accepts a small, explicit set of DID forms under
+the `did:ixo:` namespace. The policy is enforced both in `ValidateBasic`
+(antehandler) and inside the keeper's `CreateIidDocument` handler — the
+keeper-side check is defense in depth for Cosmwasm contracts and other
+direct-msg-server callers that bypass `ValidateBasic`
+
+- `did:ixo:<bech32-account>` — the suffix MUST equal the signer's bech32
+  address. A user can only register their OWN account DID; they cannot
+  claim another address's DID. Rejected with `ErrDIDAccountSignerMismatch`.
+- `did:ixo:wasm:<bech32-contract>` — anyone may create one of these for
+  now (they identify a contract, not a user account), but the suffix
+  after `wasm:` must be a valid bech32 address. Rejected with
+  `ErrDIDFormNotAllowed` otherwise.
+
+Any other DID form is rejected with `ErrDIDFormNotAllowed`, including:
+
+- `did:cosmos:...` / `did:x:...` — wrong DID method.
+- `did:ixo:foo:bar` — unknown sub-method (only `wasm:` is recognised).
+- `did:ixo:wasm:` / `did:ixo:wasm:not-a-bech32` — malformed wasm form.
+
+### Reserved DID namespaces
+
+Certain DID prefixes are owned by other ixo modules that mint their DIDs deterministically via `IidKeeper.SetDidDocument` (not via this message). `MsgCreateIidDocument` rejects any `id` matching one of these prefixes with `ErrReservedDidNamespace` — otherwise a user could front-run the owning module's sequence and squat a DID it will later try to mint, deadlocking the module.
+
+Current reserved prefixes (see `types.ReservedDidPrefixes`):
+
+- `did:ixo:entity:` — minted by the entity module on `MsgCreateEntity`.
+
 ## MsgUpdateIidDocument
 
 The `MsgUpdateIidDocument` is used to update an iid document. It updates the iid document with all the fields, so if a field is empty it will be updated with default go type, aka never null. For this reason also provide the previous values for fields you do not wish to update.

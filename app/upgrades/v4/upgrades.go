@@ -21,14 +21,14 @@ import (
 	ibcexported "github.com/cosmos/ibc-go/v8/modules/core/exported"
 
 	// Local
-	"github.com/ixofoundation/ixo-blockchain/v6/app/keepers"
-	"github.com/ixofoundation/ixo-blockchain/v6/lib/ixo"
-	"github.com/ixofoundation/ixo-blockchain/v6/wasmbinding"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
-	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/keepers"
+	"github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v7/wasmbinding"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
 
 	// SDK v47 modules
 	"cosmossdk.io/math"
@@ -214,14 +214,21 @@ func CreateUpgradeHandler(
 		// Set the liquid stake params in the store
 		// -------------------------------------------------
 		ctx.Logger().Info("Set liquid stake params")
-		liquidStakeParams := keepers.LiquidStakeKeeper.GetParams(ctx)
+		// Historic upgrade: this code originally set the pre-v7 single-pool
+		// Params record. Rerouted through {Get,Set}LegacyParams so it
+		// continues to compile and behaves identically when replayed on a
+		// chain syncing from genesis. The v7 upgrade migrates the resulting
+		// legacy state into the multi-pool layout.
+		liquidStakeParams := keepers.LiquidStakeKeeper.GetLegacyParams(ctx)
 		liquidStakeParams.WhitelistedValidators = WhitelistedValidators
 		liquidStakeParams.UnstakeFeeRate = LSMUnstakeFeeRate
 		liquidStakeParams.AutocompoundFeeRate = LSMAutocompoundFeeRate
 		liquidStakeParams.WhitelistAdminAddress = LSMWhitelistAdminAddress
 		liquidStakeParams.WeightedRewardsReceivers = LSMWeightedRewardsReceivers
 		liquidStakeParams.FeeAccountAddress = LSMFeeAccountAddress
-		keepers.LiquidStakeKeeper.SetParams(ctx, liquidStakeParams)
+		if err := keepers.LiquidStakeKeeper.SetLegacyParams(ctx, liquidStakeParams); err != nil {
+			return nil, err
+		}
 
 		// -------------------------------------------------
 		// Set the ICA Host params in the store

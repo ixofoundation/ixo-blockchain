@@ -11,11 +11,13 @@ import (
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
 	"github.com/spf13/cobra"
 )
 
@@ -127,6 +129,9 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	if err := cfg.RegisterMigration(types.ModuleName, 2, m.Migrate2to3); err != nil {
 		panic(fmt.Sprintf("failed to migrate x/%s from version 2 to 3: %v", types.ModuleName, err))
 	}
+	if err := cfg.RegisterMigration(types.ModuleName, 3, m.Migrate3to4); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/%s from version 3 to 4: %v", types.ModuleName, err))
+	}
 }
 
 // RegisterInvariants registers module invariants.
@@ -156,5 +161,31 @@ func (am AppModule) EndBlock(context context.Context) error {
 // introduced by the module. To avoid wrong/empty versions, the initial version
 // should be set to 1.
 func (am AppModule) ConsensusVersion() uint64 {
-	return 3
+	return 4
+}
+
+// AppModuleSimulation: empty proposal/op hooks + a store decoder for the
+// state-determinism diff. Per-Msg WeightedOperations are deferred to the
+// interchaintest E2E suite where real state evolves under live consensus.
+
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
+	return nil
+}
+
+func (AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+	return nil
+}
+
+func (AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(nil)
+}
+
+func (AppModule) WeightedOperations(_ module.SimulationState) []simtypes.WeightedOperation {
+	return nil
+}
+
+// GenerateGenesisState seeds the SimulationState with the module's default
+// genesis. Property tests can later replace this with randomized state.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(types.DefaultGenesisState())
 }

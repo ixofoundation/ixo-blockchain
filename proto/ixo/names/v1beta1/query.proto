@@ -1,0 +1,102 @@
+syntax = "proto3";
+package ixo.names.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "ixo/names/v1beta1/names.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/names/types";
+
+// Query defines the names module gRPC query service.
+service Query {
+  // Namespace returns a single namespace by its name.
+  rpc Namespace(QueryNamespaceRequest) returns (QueryNamespaceResponse) {
+    option (google.api.http).get = "/ixo/names/v1beta1/namespaces/{name}";
+  }
+  // Namespaces returns all namespaces.
+  rpc Namespaces(QueryNamespacesRequest) returns (QueryNamespacesResponse) {
+    option (google.api.http).get = "/ixo/names/v1beta1/namespaces";
+  }
+
+  // ResolveName returns the active NameRecord for (namespace, name). The name
+  // is normalized server-side before lookup. Returns not-found if the record
+  // is missing or its status is not ACTIVE.
+  rpc ResolveName(QueryResolveNameRequest) returns (QueryResolveNameResponse) {
+    option (google.api.http).get =
+        "/ixo/names/v1beta1/resolve/{namespace}/{name}";
+  }
+
+  // GetName returns a NameRecord regardless of status. Useful for moderation
+  // and audit tools.
+  rpc GetName(QueryGetNameRequest) returns (QueryGetNameResponse) {
+    option (google.api.http).get =
+        "/ixo/names/v1beta1/names/{namespace}/{normalized_name}";
+  }
+
+  // NamesByNamespace lists records under a namespace (paginated).
+  rpc NamesByNamespace(QueryNamesByNamespaceRequest)
+      returns (QueryNamesByNamespaceResponse) {
+    option (google.api.http).get = "/ixo/names/v1beta1/names/{namespace}";
+  }
+
+  // NamesByOwner lists every name owned by a DID across all namespaces.
+  rpc NamesByOwner(QueryNamesByOwnerRequest)
+      returns (QueryNamesByOwnerResponse) {
+    option (google.api.http).get = "/ixo/names/v1beta1/owner/{owner_did}";
+  }
+}
+
+message QueryNamespaceRequest { string name = 1; }
+
+message QueryNamespaceResponse {
+  Namespace namespace = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryNamespacesRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryNamespacesResponse {
+  repeated Namespace namespaces = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryResolveNameRequest {
+  string namespace = 1;
+  // name is normalized server-side; callers may pass the display form.
+  string name = 2;
+}
+
+message QueryResolveNameResponse {
+  NameRecord record = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryGetNameRequest {
+  string namespace = 1;
+  string normalized_name = 2;
+}
+
+message QueryGetNameResponse {
+  NameRecord record = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryNamesByNamespaceRequest {
+  string namespace = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryNamesByNamespaceResponse {
+  repeated NameRecord records = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+message QueryNamesByOwnerRequest {
+  string owner_did = 1;
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+message QueryNamesByOwnerResponse {
+  repeated NameRecord records = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}

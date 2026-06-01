@@ -2,14 +2,15 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v6/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 var (
 	_ iidante.IidTxMsg = &MsgSubmitClaim{}
 	_ iidante.IidTxMsg = &MsgEvaluateClaim{}
 	_ iidante.IidTxMsg = &MsgDisputeClaim{}
+	_ iidante.IidTxMsg = &MsgAdjudicateDispute{}
 )
 
 // --------------------------
@@ -142,3 +143,53 @@ func (msg MsgCreateClaimAuthorization) Type() string { return TypeMsgCreateClaim
 func (msg MsgCreateClaimAuthorization) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
 
 func (msg MsgCreateClaimAuthorization) Route() string { return RouterKey }
+
+// --------------------------
+// UPDATE COLLECTION DISPUTE CONFIG
+// --------------------------
+const TypeMsgUpdateCollectionDisputeConfig = "update_collection_dispute_config"
+
+var _ sdk.Msg = &MsgUpdateCollectionDisputeConfig{}
+
+func (msg MsgUpdateCollectionDisputeConfig) Type() string {
+	return TypeMsgUpdateCollectionDisputeConfig
+}
+
+func (msg MsgUpdateCollectionDisputeConfig) Route() string { return RouterKey }
+
+// --------------------------
+// ADD PERFORMANCE DEPOSIT
+// --------------------------
+const TypeMsgAddPerformanceDeposit = "add_performance_deposit"
+
+var _ sdk.Msg = &MsgAddPerformanceDeposit{}
+
+func (msg MsgAddPerformanceDeposit) Type() string { return TypeMsgAddPerformanceDeposit }
+
+func (msg MsgAddPerformanceDeposit) Route() string { return RouterKey }
+
+// --------------------------
+// WITHDRAW PERFORMANCE DEPOSIT
+// --------------------------
+const TypeMsgWithdrawPerformanceDeposit = "withdraw_performance_deposit"
+
+var _ sdk.Msg = &MsgWithdrawPerformanceDeposit{}
+
+func (msg MsgWithdrawPerformanceDeposit) Type() string { return TypeMsgWithdrawPerformanceDeposit }
+
+func (msg MsgWithdrawPerformanceDeposit) Route() string { return RouterKey }
+
+// --------------------------
+// ADJUDICATE DISPUTE
+// --------------------------
+const TypeMsgAdjudicateDispute = "adjudicate_dispute"
+
+var _ sdk.Msg = &MsgAdjudicateDispute{}
+
+func (msg MsgAdjudicateDispute) Type() string { return TypeMsgAdjudicateDispute }
+
+func (msg MsgAdjudicateDispute) GetIidController() iidtypes.DIDFragment {
+	return iidtypes.DIDFragment(msg.AdjudicatorDid)
+}
+
+func (msg MsgAdjudicateDispute) Route() string { return RouterKey }

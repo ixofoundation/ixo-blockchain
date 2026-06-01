@@ -4,75 +4,149 @@ package ixo.liquidstake.v1beta1;
 import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types";
 
-// Params defines the set of params for the liquidstake module.
+// Params defines the legacy single-pool params layout.
+//
+// DEPRECATED: kept only so the v7 upgrade migration can unmarshal pre-upgrade
+// state from the KV store. New code must use ModuleParams (global) and Pool
+// (per-pool). Do not reference this from new application logic.
 message Params {
+  option deprecated = true;
   option (gogoproto.goproto_getters) = false;
   option (gogoproto.goproto_stringer) = false;
 
-  // LiquidBondDenom specifies the denomination of the token receiving after
-  // liquid stake, The value is calculated through NetAmount.
   string liquid_bond_denom = 1;
 
-  // WhitelistedValidators specifies the validators elected to become Active
-  // Liquid Validators.
   repeated WhitelistedValidator whitelisted_validators = 2
       [ (gogoproto.nullable) = false ];
 
-  // UnstakeFeeRate specifies the fee rate when liquid unstake is requested,
-  // unbonded by subtracting it from unbondingAmount
   string unstake_fee_rate = 3 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
-  // MinLiquidStakingAmount specifies the minimum number of coins to be staked
-  // to the active liquid validators on liquid staking to minimize decimal loss
-  // and consider gas efficiency.
   string min_liquid_stake_amount = 4 [
     (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
 
-  // FeeAccountAddress defines the bech32-encoded address of
-  // an account responsible for accumulating protocol fees.
   string fee_account_address = 5
       [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 
-  // AutocompoundFeeRate specifies the fee rate for auto redelegating the stake
-  // rewards. The fee is taken in favour of the fee account (see
-  // FeeAccountAddress).
   string autocompound_fee_rate = 6 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
-  // WhitelistAdminAddress the bech32-encoded address of an admin authority
-  // that is allowed to update whitelisted validators or pause liquidstaking
-  // module entirely. It is also the only address that can update the
-  // weighted_rewards_receivers.
-  // The key is controlled by the ZERO dao.
-  // Pausing of the module can be required during important migrations or
-  // failures.
   string whitelist_admin_address = 7
       [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
 
-  // ModulePaused is a safety toggle that allows to stop main module functions
-  // such as stake/unstake/stake-to-lp and the BeginBlocker logic.
   bool module_paused = 8;
 
-  // weighted_rewards_receivers is the addresses to receive the staking
-  // rewards on autocompounding with weights assigned to each address.
-  // The total of weights in the list in not allowed to be greater than 1.
-  //
-  // Eg. if the list has 1 address with weight 0.2, then on autocompounding
-  // the staking rewards will be split between 0.2 for the weighted receiver
-  // and 0.8 gets auto-compounded to the proxy account.
   repeated WeightedAddress weighted_rewards_receivers = 9 [
+    (gogoproto.moretags) = "yaml:\"impact_rewards_receiver\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// ModuleParams defines global, module-wide parameters that apply across every
+// liquid staking pool.
+message ModuleParams {
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // min_liquid_stake_amount is the minimum amount of native tokens that can
+  // be liquid-staked into any pool, applied across the entire module to
+  // minimise decimal loss and gas waste from dust amounts.
+  string min_liquid_stake_amount = 1 [
+    (cosmos_proto.scalar) = "cosmos.Int",
+    (gogoproto.customtype) = "cosmossdk.io/math.Int",
+    (gogoproto.nullable) = false
+  ];
+
+  // module_paused is a global emergency kill switch. When true, ALL pools
+  // are paused regardless of their per-pool paused flag: liquid_stake,
+  // liquid_unstake, autocompounding, rebalancing, and BeginBlocker logic
+  // are halted module-wide. Used for migrations or critical incidents.
+  bool module_paused = 2;
+}
+
+// Pool defines a single liquid staking instance with its own LST denom,
+// validator whitelist, admin, and fee configuration. Each pool maintains an
+// independent NetAmount/Supply ratio, so two pools' LST tokens are NOT
+// fungible with each other and may diverge in IXO value over time.
+message Pool {
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // pool_id is the unique, immutable identifier for this pool (e.g. "zero",
+  // "qi"). Used in storage keys, message routing, and proxy account
+  // derivation. Set at pool creation; cannot be changed.
+  string pool_id = 1;
+
+  // liquid_bond_denom is the denomination of the LST minted by this pool
+  // (e.g. "uzero"). Must be globally unique across all pools. Immutable.
+  string liquid_bond_denom = 2;
+
+  // proxy_account_address is the bech32-encoded address of the per-pool
+  // delegation proxy account. All delegations, redelegations, unbondings,
+  // and reward withdrawals for this pool flow through this account.
+  // Derived deterministically from pool_id at creation; immutable.
+  // For the legacy "zero" pool migrated from pre-v7 state, this field
+  // holds the original LiquidStakeProxyAcc address so existing
+  // delegations are preserved without state migration.
+  string proxy_account_address = 3
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // whitelisted_validators are the validators eligible for delegation from
+  // this pool's proxy account. Target weights must sum to 10000.
+  repeated WhitelistedValidator whitelisted_validators = 4
+      [ (gogoproto.nullable) = false ];
+
+  // unstake_fee_rate is deducted from the unbonding amount when an unstake
+  // is requested against this pool.
+  string unstake_fee_rate = 5 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // fee_account_address is the bech32-encoded address that accumulates the
+  // autocompound fee for this pool.
+  string fee_account_address = 6
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // autocompound_fee_rate is the fraction of accrued staking rewards taken
+  // by this pool as a protocol fee on each autocompound epoch and sent to
+  // fee_account_address.
+  string autocompound_fee_rate = 7 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+
+  // whitelist_admin_address is the bech32-encoded address authorised to
+  // update this pool's whitelisted_validators, weighted_rewards_receivers,
+  // paused flag, and other mutable pool fields. Governance can also update
+  // these fields. The admin is also the only address allowed to call
+  // LiquidStake against this pool.
+  string whitelist_admin_address = 8
+      [ (cosmos_proto.scalar) = "cosmos.AddressString" ];
+
+  // paused is a per-pool safety toggle. When true, this specific pool's
+  // stake/unstake, autocompounding, and rebalancing are halted; other
+  // pools are unaffected. The global ModuleParams.module_paused flag
+  // overrides this and pauses every pool regardless of its per-pool value.
+  bool paused = 9;
+
+  // weighted_rewards_receivers are the addresses that receive a weighted
+  // share of this pool's autocompound rewards. The sum of weights must
+  // not exceed 1; the remainder is restaked to validators.
+  repeated WeightedAddress weighted_rewards_receivers = 10 [
     (gogoproto.moretags) = "yaml:\"impact_rewards_receiver\"",
     (gogoproto.nullable) = false
   ];
@@ -181,73 +255,80 @@ message LiquidValidatorState {
   ];
 }
 
-// NetAmountState is type for net amount raw data and mint rate, This is a value
-// that depends on the several module state every time, so it is used only for
-// calculation and query and is not stored in kv.
+// NetAmountState holds the raw amounts and exchange rates for a single pool.
+// Computed on the fly from pool state every time (never persisted), and used
+// for unstake-rate calculation and queries. Each pool has its own independent
+// NetAmountState.
 message NetAmountState {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = true;
 
-  // stake_rate is the rate at which the liquid staking module mints stkIXO
+  // stake_rate is the mint rate when staking into this pool.
+  // Always 1.0: 1 native token mints 1 LST regardless of accrued rewards.
   string stake_rate = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
-  // unstake_rate is the rate at which the liquid staking module burns stkIXO
+  // unstake_rate is the burn rate when unstaking from this pool, equal to
+  // net_amount / stkixo_total_supply. Diverges from 1.0 as rewards accrue
+  // or slashing occurs.
   string unstake_rate = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
-  // btoken_total_supply returns the total supply of uzero (stkIXO denom)
+  // stkixo_total_supply is the total supply of this pool's LST denom.
   string stkixo_total_supply = 3 [
     (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
 
-  // net_amount is proxy account's total liquid tokens + total unbonding balance
+  // net_amount is this pool's total liquid tokens + total unbonding balance,
+  // measured at its own proxy account.
   string net_amount = 4 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
-  // total_del_shares define the delegation shares of all liquid validators
+  // total_del_shares is the sum of delegation shares held by this pool's
+  // proxy account across all of its liquid validators.
   string total_del_shares = 5 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
-  // total_liquid_tokens define the token amount worth of delegation shares of
-  // all liquid validator (slashing applied amount)
+  // total_liquid_tokens is the token-equivalent of total_del_shares with
+  // slashing applied, summed across this pool's liquid validators.
   string total_liquid_tokens = 6 [
     (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
 
-  // total_remaining_rewards define the sum of remaining rewards of proxy
-  // account by all liquid validators
+  // total_remaining_rewards is the sum of unwithdrawn staking rewards owed
+  // to this pool's proxy account from all its liquid validators.
   string total_remaining_rewards = 7 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
     (gogoproto.nullable) = false
   ];
 
-  // total_unbonding_balance define the unbonding balance of proxy account by
-  // all liquid validator (slashing applied amount)
+  // total_unbonding_balance is the sum of unbonding amounts (slashing
+  // applied) for this pool's proxy account.
   string total_unbonding_balance = 8 [
     (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",
     (gogoproto.nullable) = false
   ];
 
-  // proxy_acc_balance define the balance of proxy account for the native token
+  // proxy_acc_balance is the spendable native-token balance currently sitting
+  // in this pool's proxy account (rewards withdrawn but not yet redelegated).
   string proxy_acc_balance = 9 [
     (cosmos_proto.scalar) = "cosmos.Int",
     (gogoproto.customtype) = "cosmossdk.io/math.Int",

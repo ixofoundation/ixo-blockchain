@@ -1,0 +1,99 @@
+syntax = "proto3";
+package ixo.names.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/names/types";
+
+// NameStatus represents the lifecycle state of a NameRecord. Names are never
+// hard-deleted; status transitions are used instead so audit history is
+// preserved.
+enum NameStatus {
+  option (gogoproto.goproto_enum_prefix) = false;
+
+  // NAME_STATUS_UNSPECIFIED is the zero value and must not be persisted.
+  NAME_STATUS_UNSPECIFIED = 0;
+  // NAME_STATUS_ACTIVE: the normal resolvable state.
+  NAME_STATUS_ACTIVE = 1;
+  // NAME_STATUS_SUSPENDED: hidden from resolution, can be restored by
+  // registrar.
+  NAME_STATUS_SUSPENDED = 2;
+  // NAME_STATUS_REVOKED: terminally taken down, cannot be re-used by the same
+  // owner.
+  NAME_STATUS_REVOKED = 3;
+  // NAME_STATUS_TOMBSTONED: registrar-level take-down for policy/legal reasons;
+  // the (namespace, normalized_name) tuple is permanently burned.
+  NAME_STATUS_TOMBSTONED = 4;
+}
+
+// Namespace defines a governed bucket of names (e.g. "yoid", "twitter").
+// Created and updated only via governance.
+message Namespace {
+  option (gogoproto.equal) = true;
+
+  // name is the namespace identifier and the uniqueness scope for names
+  // registered under it. Lowercase ASCII recommended.
+  string name = 1;
+  // description is a human-readable summary of the namespace.
+  string description = 2;
+  // registrar_accounts is the list of bech32 account addresses authorised to
+  // register or moderate names in this namespace on behalf of users.
+  repeated string registrar_accounts = 3;
+  // allow_self_register: when true, users can register their own names by
+  // signing MsgRegisterName. When false, only registrars can register.
+  bool allow_self_register = 4;
+  // allow_registrar_override: when true, registrars can update or transfer
+  // names regardless of the current owner (used for moderation or assisted
+  // flows). When false, only the owning DID can transfer/update.
+  bool allow_registrar_override = 5;
+  // min_length is the minimum allowed length of the normalized name.
+  uint32 min_length = 6;
+  // max_length is the maximum allowed length of the normalized name. Must be
+  // greater than zero.
+  uint32 max_length = 7;
+  // regex is an additional ASCII-only character pattern that the normalized
+  // name must match. Empty string means no extra check on top of the default.
+  string regex = 8;
+  // allow_expiry: when true, NameRecords in this namespace may have a non-zero
+  // valid_until. Reserved for a future renewal flow.
+  bool allow_expiry = 9;
+}
+
+// NameRecord is a registered name bound to a DID. The uniqueness key for a
+// NameRecord is (namespace, normalized_name).
+message NameRecord {
+  option (gogoproto.equal) = true;
+
+  // namespace is the Namespace.name this record belongs to.
+  string namespace = 1;
+  // normalized_name is the canonical form used for uniqueness (trimmed,
+  // lowercased ASCII).
+  string normalized_name = 2;
+  // display_name is the original name as supplied by the registrant, preserving
+  // case for presentation.
+  string display_name = 3;
+  // owner_did is the DID that controls this name. Resolution returns this DID.
+  string owner_did = 4;
+  // verified is true if this name was attested to by a registrar/oracle (e.g.
+  // proof of an off-chain identity such as Twitter or KYC).
+  bool verified = 5;
+  // valid_until is a unix timestamp; 0 means no expiry. Reserved for future
+  // renewal flow.
+  int64 valid_until = 6;
+  // status is the lifecycle state of the record. Resolution should treat
+  // anything other than NAME_STATUS_ACTIVE as not-found.
+  NameStatus status = 7;
+  // verified_by is the DID or address of the registrar/oracle that attested
+  // this record, if any.
+  string verified_by = 8;
+  // evidence_hash is an optional content hash of off-chain attestation
+  // evidence (e.g. a signed JWT or VC).
+  string evidence_hash = 9;
+  // source is a free-form tag describing where the verification came from
+  // (e.g. "workos", "ussd", "import", "manual").
+  string source = 10;
+  // created_at is the unix timestamp the record was first written.
+  int64 created_at = 11;
+  // updated_at is the unix timestamp of the last write.
+  int64 updated_at = 12;
+}

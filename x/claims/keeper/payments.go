@@ -9,8 +9,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
 )
 
 // --------------------------
@@ -432,6 +432,8 @@ func updatePaymentStatus(paymentType types.PaymentType, claim *types.Claim, paym
 		claim.PaymentsStatus.Evaluation = paymentStatus
 	case types.PaymentType_submission:
 		claim.PaymentsStatus.Submission = paymentStatus
+	case types.PaymentType_rejection:
+		claim.PaymentsStatus.Rejection = paymentStatus
 	}
 
 	return nil

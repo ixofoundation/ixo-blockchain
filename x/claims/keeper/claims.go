@@ -11,11 +11,11 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	tokenTypes "github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types/contracts/cw20"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/token/types/contracts/ixo1155"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	tokenTypes "github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/token/types/contracts/cw20"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/token/types/contracts/ixo1155"
 )
 
 func (k Keeper) SetCollection(ctx sdk.Context, data types.Collection) {
@@ -49,6 +49,10 @@ func (k Keeper) Marshal(value interface{}) (bytes []byte) {
 	case types.Dispute:
 		bytes = k.cdc.MustMarshal(&value)
 	case types.Intent:
+		bytes = k.cdc.MustMarshal(&value)
+	case types.MemberBudget:
+		bytes = k.cdc.MustMarshal(&value)
+	case types.AgentDepositBalance:
 		bytes = k.cdc.MustMarshal(&value)
 	}
 	return
@@ -622,4 +626,179 @@ func (k Keeper) RouteGrantEntityAccountAuthz(ctx sdk.Context, msg *entitytypes.M
 	}
 
 	return nil
+}
+
+// --------------------------
+// MEMBER BUDGET
+// --------------------------
+
+func (k Keeper) SetMemberBudget(ctx sdk.Context, budget types.MemberBudget) {
+	key := types.MemberBudgetKeyCreate(budget.CollectionId, budget.MemberAddress)
+	k.Set(ctx, key, types.MemberBudgetKey, budget, k.Marshal)
+}
+
+func (k Keeper) GetMemberBudget(ctx sdk.Context, collectionId, memberAddress string) (types.MemberBudget, error) {
+	key := types.MemberBudgetKeyCreate(collectionId, memberAddress)
+	val, found := k.Get(ctx, key, types.MemberBudgetKey, k.UnmarshalMemberBudget)
+	if !found {
+		return types.MemberBudget{}, errorsmod.Wrapf(types.ErrMemberBudgetNotFound, "for collection %s member %s", collectionId, memberAddress)
+	}
+	budget, ok := val.(types.MemberBudget)
+	if !ok {
+		return types.MemberBudget{}, errorsmod.Wrapf(types.ErrMemberBudgetNotFound, "for collection %s member %s", collectionId, memberAddress)
+	}
+	return budget, nil
+}
+
+func (k Keeper) RemoveMemberBudget(ctx sdk.Context, collectionId, memberAddress string) {
+	key := types.MemberBudgetKeyCreate(collectionId, memberAddress)
+	k.Delete(ctx, key, types.MemberBudgetKey)
+}
+
+// SetMemberBudgetAndEmitUpdatedEvent persists a member budget and emits a
+// MemberBudgetUpdatedEvent. Used wherever an existing member budget is mutated
+// (admin update of an existing member, period_spent deduction during intent
+// creation, period_spent restoration on claim rejection / dispute /
+// invalidation / intent expiration, and lazy period reset).
+func (k Keeper) SetMemberBudgetAndEmitUpdatedEvent(ctx sdk.Context, budget types.MemberBudget) error {
+	k.SetMemberBudget(ctx, budget)
+	return ctx.EventManager().EmitTypedEvent(
+		&types.MemberBudgetUpdatedEvent{
+			Budget: &budget,
+		},
+	)
+}
+
+// RemoveMemberBudgetAndEmitEvent removes a member budget and emits a
+// MemberBudgetRemovedEvent carrying the final state at time of removal so the
+// indexer can audit / archive it.
+func (k Keeper) RemoveMemberBudgetAndEmitEvent(ctx sdk.Context, budget types.MemberBudget) error {
+	k.RemoveMemberBudget(ctx, budget.CollectionId, budget.MemberAddress)
+	return ctx.EventManager().EmitTypedEvent(
+		&types.MemberBudgetRemovedEvent{
+			Budget: &budget,
+		},
+	)
+}
+
+func (k Keeper) UnmarshalMemberBudget(value []byte) (interface{}, bool) {
+	data := types.MemberBudget{}
+	ok := k.Unmarshal(value, &data)
+	return data, ok && data.CollectionId != "" && data.MemberAddress != ""
+}
+
+// HasMemberBudgets checks if a collection has any member budgets by doing a prefix scan
+func (k Keeper) HasMemberBudgets(ctx sdk.Context, collectionId string) bool {
+	prefix := []byte(collectionId + "/")
+	iterator := k.GetAll(ctx, append(types.MemberBudgetKey, prefix...))
+	defer iterator.Close()
+	return iterator.Valid()
+}
+
+// GetCollectionMemberBudgets returns all member budgets for a collection
+func (k Keeper) GetCollectionMemberBudgets(ctx sdk.Context, collectionId string) []types.MemberBudget {
+	var budgets []types.MemberBudget
+	prefix := []byte(collectionId + "/")
+	iterator := k.GetAll(ctx, append(types.MemberBudgetKey, prefix...))
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var budget types.MemberBudget
+		k.Unmarshal(iterator.Value(), &budget)
+		budgets = append(budgets, budget)
+	}
+	return budgets
+}
+
+// GetAllMemberBudgets returns all member budgets across all collections (for genesis export)
+func (k Keeper) GetAllMemberBudgets(ctx sdk.Context) []types.MemberBudget {
+	var budgets []types.MemberBudget
+	iterator := k.GetAll(ctx, types.MemberBudgetKey)
+	defer iterator.Close()
+	for ; iterator.Valid(); iterator.Next() {
+		var budget types.MemberBudget
+		k.Unmarshal(iterator.Value(), &budget)
+		budgets = append(budgets, budget)
+	}
+	return budgets
+}
+
+// TryResetMemberBudgetPeriod lazily resets the member budget if the current period has elapsed.
+// Follows the feegrant PeriodicAllowance pattern. Returns true if the period was reset.
+func (k Keeper) TryResetMemberBudgetPeriod(ctx sdk.Context, budget *types.MemberBudget) bool {
+	now := ctx.BlockTime()
+	if budget.PeriodResetAt != nil && !now.Before(*budget.PeriodResetAt) {
+		// Reset spent amounts
+		budget.PeriodSpent = sdk.Coins{}
+		budget.PeriodCw20Spent = nil
+		// Roll forward the reset time, handling multiple missed periods
+		for budget.PeriodResetAt != nil && !now.Before(*budget.PeriodResetAt) {
+			newReset := budget.PeriodResetAt.Add(budget.Period)
+			budget.PeriodResetAt = &newReset
+		}
+		return true
+	}
+	return false
+}
+
+// RestoreMemberBudget restores the spent amount back to the member's budget.
+// Used when a claim is rejected/disputed/invalidated or an intent expires.
+// Gracefully handles the case where the member has been removed (budget not found).
+// Emits a MemberBudgetUpdatedEvent on every state change (period reset and/or
+// restoration).
+//
+// If the budget period has been reset since the original spend, the spend was
+// in a prior period and does NOT carry over — we persist the reset state but
+// do not subtract from the new period's spent amounts.
+//
+// Edge case: if a member is removed and re-added between the original spend and
+// the restore, the restore targets the new (fresh) budget. Subtracting from a
+// fresh period_spent could underflow conceptually; we clamp to zero by filtering
+// non-positive coins after SafeSub. In rare cases this could effectively reduce
+// the new period's tracked spend by the old period's amount, granting the member
+// some "free" budget. Accepted as a v1 trade-off — admins should avoid removing
+// members with active intents in flight.
+func (k Keeper) RestoreMemberBudget(ctx sdk.Context, collectionId, memberAddress string, amount sdk.Coins, cw20Payments []*types.CW20Payment) error {
+	budget, err := k.GetMemberBudget(ctx, collectionId, memberAddress)
+	if err != nil {
+		// Member may have been removed, gracefully skip
+		return nil
+	}
+
+	// Lazy period reset first. If the period was reset, the original spend
+	// was in the prior period — it does not roll over to the new period.
+	// Persist the reset state and return without restoring.
+	if k.TryResetMemberBudgetPeriod(ctx, &budget) {
+		return k.SetMemberBudgetAndEmitUpdatedEvent(ctx, budget)
+	}
+
+	// Restore native coin spend
+	if len(amount) > 0 {
+		budget.PeriodSpent, _ = budget.PeriodSpent.SafeSub(amount...)
+		// Ensure no negative values
+		cleanedSpent := sdk.Coins{}
+		for _, coin := range budget.PeriodSpent {
+			if coin.IsPositive() {
+				cleanedSpent = append(cleanedSpent, coin)
+			}
+		}
+		budget.PeriodSpent = cleanedSpent
+	}
+
+	// Restore CW20 spend
+	if len(cw20Payments) > 0 && len(budget.PeriodCw20Spent) > 0 {
+		for _, payment := range cw20Payments {
+			for i, spent := range budget.PeriodCw20Spent {
+				if spent.Address == payment.Address {
+					if spent.Amount >= payment.Amount {
+						budget.PeriodCw20Spent[i].Amount -= payment.Amount
+					} else {
+						budget.PeriodCw20Spent[i].Amount = 0
+					}
+					break
+				}
+			}
+		}
+	}
+
+	return k.SetMemberBudgetAndEmitUpdatedEvent(ctx, budget)
 }
