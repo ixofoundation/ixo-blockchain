@@ -16,13 +16,21 @@ permissions:
 jobs:
   release:
     name: Create release
-    runs-on: buildjet-4vcpu-ubuntu-2204
+    runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: ${{ github.event.inputs.release_tag }}
+      - name: Free disk space
+        # goreleaser-cross is a large image and we build 4 CGO targets; the
+        # default ubuntu-latest disk is tight, so reclaim space first.
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android \
+            /usr/local/share/boost "$AGENT_TOOLSDIRECTORY" /opt/hostedtoolcache/CodeQL
+          sudo docker image prune -af || true
+          df -h /
       - name: Make release
         run: |
           make release
