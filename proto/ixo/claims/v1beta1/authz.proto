@@ -9,7 +9,7 @@ import "ixo/claims/v1beta1/claims.proto";
 import "google/protobuf/duration.proto";
 import "cosmos/bank/v1beta1/bank.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/claims/types";
 
 message SubmitClaimAuthorization {
   option (cosmos_proto.implements_interface) =
@@ -43,6 +43,12 @@ message SubmitClaimConstraints {
   // claim approval, if empty then no custom amount is allowed, and default
   // payments from Collection payments are used
   repeated CW1155Payment max_cw1155_payment = 6;
+  // member_address is the team member who created this constraint via
+  // MsgCreateClaimAuthorization. Empty for individual (non-team) subscriptions.
+  // Used by Accept() to match the correct member's constraint when multiple
+  // team members authorize the same oracle, and by the intent handler to
+  // validate the oracle was authorized by the claimed member.
+  string member_address = 7;
 }
 
 message EvaluateClaimAuthorization {
@@ -172,4 +178,10 @@ message CreateClaimAuthorizationConstraints {
   // explicitly set to amount to 0 to disallow any cw1155 payment in the created
   // authorizations
   repeated CW1155Payment max_cw1155_payment = 9;
+  // member_address is the team member this constraint is for. Set by the team
+  // admin when granting CreateClaimAuthorizationAuthorization to a member.
+  // Enforced in Accept() to prevent a member from spoofing another member's
+  // address when creating oracle authorizations. Empty for individual
+  // (non-team) subscriptions.
+  string member_address = 10;
 }

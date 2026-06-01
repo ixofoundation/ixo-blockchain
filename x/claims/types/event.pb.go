@@ -579,6 +579,340 @@ func (m *ClaimAuthorizationCreatedEvent) GetAuthType() string {
 	return ""
 }
 
+// MemberBudgetCreatedEvent is an event triggered when a team member budget is
+// added to a collection for the first time.
+type MemberBudgetCreatedEvent struct {
+	Budget *MemberBudget `protobuf:"bytes,1,opt,name=budget,proto3" json:"budget,omitempty"`
+}
+
+func (m *MemberBudgetCreatedEvent) Reset()         { *m = MemberBudgetCreatedEvent{} }
+func (m *MemberBudgetCreatedEvent) String() string { return proto.CompactTextString(m) }
+func (*MemberBudgetCreatedEvent) ProtoMessage()    {}
+func (*MemberBudgetCreatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{11}
+}
+func (m *MemberBudgetCreatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MemberBudgetCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MemberBudgetCreatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MemberBudgetCreatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MemberBudgetCreatedEvent.Merge(m, src)
+}
+func (m *MemberBudgetCreatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *MemberBudgetCreatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_MemberBudgetCreatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MemberBudgetCreatedEvent proto.InternalMessageInfo
+
+func (m *MemberBudgetCreatedEvent) GetBudget() *MemberBudget {
+	if m != nil {
+		return m.Budget
+	}
+	return nil
+}
+
+// MemberBudgetUpdatedEvent is an event triggered on any state change to an
+// existing member budget — admin-driven update via MsgSetCollectionMembers,
+// period_spent deduction during MsgClaimIntent, period_spent restoration on
+// claim rejection / dispute / invalidation / intent expiration, or lazy period
+// reset.
+type MemberBudgetUpdatedEvent struct {
+	Budget *MemberBudget `protobuf:"bytes,1,opt,name=budget,proto3" json:"budget,omitempty"`
+}
+
+func (m *MemberBudgetUpdatedEvent) Reset()         { *m = MemberBudgetUpdatedEvent{} }
+func (m *MemberBudgetUpdatedEvent) String() string { return proto.CompactTextString(m) }
+func (*MemberBudgetUpdatedEvent) ProtoMessage()    {}
+func (*MemberBudgetUpdatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{12}
+}
+func (m *MemberBudgetUpdatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MemberBudgetUpdatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MemberBudgetUpdatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MemberBudgetUpdatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MemberBudgetUpdatedEvent.Merge(m, src)
+}
+func (m *MemberBudgetUpdatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *MemberBudgetUpdatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_MemberBudgetUpdatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MemberBudgetUpdatedEvent proto.InternalMessageInfo
+
+func (m *MemberBudgetUpdatedEvent) GetBudget() *MemberBudget {
+	if m != nil {
+		return m.Budget
+	}
+	return nil
+}
+
+// MemberBudgetRemovedEvent is an event triggered when a team member budget is
+// removed from a collection. Includes the final budget state at the time of
+// removal for indexer audit.
+type MemberBudgetRemovedEvent struct {
+	Budget *MemberBudget `protobuf:"bytes,1,opt,name=budget,proto3" json:"budget,omitempty"`
+}
+
+func (m *MemberBudgetRemovedEvent) Reset()         { *m = MemberBudgetRemovedEvent{} }
+func (m *MemberBudgetRemovedEvent) String() string { return proto.CompactTextString(m) }
+func (*MemberBudgetRemovedEvent) ProtoMessage()    {}
+func (*MemberBudgetRemovedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{13}
+}
+func (m *MemberBudgetRemovedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MemberBudgetRemovedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MemberBudgetRemovedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MemberBudgetRemovedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MemberBudgetRemovedEvent.Merge(m, src)
+}
+func (m *MemberBudgetRemovedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *MemberBudgetRemovedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_MemberBudgetRemovedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MemberBudgetRemovedEvent proto.InternalMessageInfo
+
+func (m *MemberBudgetRemovedEvent) GetBudget() *MemberBudget {
+	if m != nil {
+		return m.Budget
+	}
+	return nil
+}
+
+// AgentDepositBalanceCreatedEvent is emitted when an agent's
+// performance-deposit balance is created for the first time (i.e. the first
+// MsgAddPerformanceDeposit for a given (collection, agent) pair).
+type AgentDepositBalanceCreatedEvent struct {
+	Balance *AgentDepositBalance `protobuf:"bytes,1,opt,name=balance,proto3" json:"balance,omitempty"`
+}
+
+func (m *AgentDepositBalanceCreatedEvent) Reset()         { *m = AgentDepositBalanceCreatedEvent{} }
+func (m *AgentDepositBalanceCreatedEvent) String() string { return proto.CompactTextString(m) }
+func (*AgentDepositBalanceCreatedEvent) ProtoMessage()    {}
+func (*AgentDepositBalanceCreatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{14}
+}
+func (m *AgentDepositBalanceCreatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AgentDepositBalanceCreatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AgentDepositBalanceCreatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AgentDepositBalanceCreatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AgentDepositBalanceCreatedEvent.Merge(m, src)
+}
+func (m *AgentDepositBalanceCreatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *AgentDepositBalanceCreatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_AgentDepositBalanceCreatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AgentDepositBalanceCreatedEvent proto.InternalMessageInfo
+
+func (m *AgentDepositBalanceCreatedEvent) GetBalance() *AgentDepositBalance {
+	if m != nil {
+		return m.Balance
+	}
+	return nil
+}
+
+// AgentDepositBalanceUpdatedEvent is emitted on any state change to an existing
+// agent performance-deposit balance: subsequent top-up, partial withdrawal, or
+// slashing on adjudicated dispute loss. Carries the post-state balance. The
+// indexer can derive the delta by diffing against the previous on-record value;
+// the reason can be inferred from the enclosing tx's Msg type
+// (MsgAddPerformanceDeposit / MsgWithdrawPerformanceDeposit /
+// MsgAdjudicateDispute).
+type AgentDepositBalanceUpdatedEvent struct {
+	Balance *AgentDepositBalance `protobuf:"bytes,1,opt,name=balance,proto3" json:"balance,omitempty"`
+}
+
+func (m *AgentDepositBalanceUpdatedEvent) Reset()         { *m = AgentDepositBalanceUpdatedEvent{} }
+func (m *AgentDepositBalanceUpdatedEvent) String() string { return proto.CompactTextString(m) }
+func (*AgentDepositBalanceUpdatedEvent) ProtoMessage()    {}
+func (*AgentDepositBalanceUpdatedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{15}
+}
+func (m *AgentDepositBalanceUpdatedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AgentDepositBalanceUpdatedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AgentDepositBalanceUpdatedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AgentDepositBalanceUpdatedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AgentDepositBalanceUpdatedEvent.Merge(m, src)
+}
+func (m *AgentDepositBalanceUpdatedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *AgentDepositBalanceUpdatedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_AgentDepositBalanceUpdatedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AgentDepositBalanceUpdatedEvent proto.InternalMessageInfo
+
+func (m *AgentDepositBalanceUpdatedEvent) GetBalance() *AgentDepositBalance {
+	if m != nil {
+		return m.Balance
+	}
+	return nil
+}
+
+// AgentDepositBalanceRemovedEvent is emitted when the agent's balance is fully
+// drained (full withdrawal or full slash brings amount to zero) and the KV
+// entry is deleted. Carries the final balance state (with zero amount) so the
+// indexer can archive the entry. Mirrors MemberBudgetRemovedEvent.
+type AgentDepositBalanceRemovedEvent struct {
+	Balance *AgentDepositBalance `protobuf:"bytes,1,opt,name=balance,proto3" json:"balance,omitempty"`
+}
+
+func (m *AgentDepositBalanceRemovedEvent) Reset()         { *m = AgentDepositBalanceRemovedEvent{} }
+func (m *AgentDepositBalanceRemovedEvent) String() string { return proto.CompactTextString(m) }
+func (*AgentDepositBalanceRemovedEvent) ProtoMessage()    {}
+func (*AgentDepositBalanceRemovedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{16}
+}
+func (m *AgentDepositBalanceRemovedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *AgentDepositBalanceRemovedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_AgentDepositBalanceRemovedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *AgentDepositBalanceRemovedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AgentDepositBalanceRemovedEvent.Merge(m, src)
+}
+func (m *AgentDepositBalanceRemovedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *AgentDepositBalanceRemovedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_AgentDepositBalanceRemovedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_AgentDepositBalanceRemovedEvent proto.InternalMessageInfo
+
+func (m *AgentDepositBalanceRemovedEvent) GetBalance() *AgentDepositBalance {
+	if m != nil {
+		return m.Balance
+	}
+	return nil
+}
+
+// DisputeResolvedEvent is emitted when MsgAdjudicateDispute settles a
+// dispute (AWARDED or DISMISSED).
+type DisputeResolvedEvent struct {
+	Dispute *Dispute `protobuf:"bytes,1,opt,name=dispute,proto3" json:"dispute,omitempty"`
+}
+
+func (m *DisputeResolvedEvent) Reset()         { *m = DisputeResolvedEvent{} }
+func (m *DisputeResolvedEvent) String() string { return proto.CompactTextString(m) }
+func (*DisputeResolvedEvent) ProtoMessage()    {}
+func (*DisputeResolvedEvent) Descriptor() ([]byte, []int) {
+	return fileDescriptor_26b125bce36ddb45, []int{17}
+}
+func (m *DisputeResolvedEvent) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *DisputeResolvedEvent) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_DisputeResolvedEvent.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *DisputeResolvedEvent) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DisputeResolvedEvent.Merge(m, src)
+}
+func (m *DisputeResolvedEvent) XXX_Size() int {
+	return m.Size()
+}
+func (m *DisputeResolvedEvent) XXX_DiscardUnknown() {
+	xxx_messageInfo_DisputeResolvedEvent.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DisputeResolvedEvent proto.InternalMessageInfo
+
+func (m *DisputeResolvedEvent) GetDispute() *Dispute {
+	if m != nil {
+		return m.Dispute
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*CollectionCreatedEvent)(nil), "ixo.claims.v1beta1.CollectionCreatedEvent")
 	proto.RegisterType((*CollectionUpdatedEvent)(nil), "ixo.claims.v1beta1.CollectionUpdatedEvent")
@@ -591,49 +925,62 @@ func init() {
 	proto.RegisterType((*IntentSubmittedEvent)(nil), "ixo.claims.v1beta1.IntentSubmittedEvent")
 	proto.RegisterType((*IntentUpdatedEvent)(nil), "ixo.claims.v1beta1.IntentUpdatedEvent")
 	proto.RegisterType((*ClaimAuthorizationCreatedEvent)(nil), "ixo.claims.v1beta1.ClaimAuthorizationCreatedEvent")
+	proto.RegisterType((*MemberBudgetCreatedEvent)(nil), "ixo.claims.v1beta1.MemberBudgetCreatedEvent")
+	proto.RegisterType((*MemberBudgetUpdatedEvent)(nil), "ixo.claims.v1beta1.MemberBudgetUpdatedEvent")
+	proto.RegisterType((*MemberBudgetRemovedEvent)(nil), "ixo.claims.v1beta1.MemberBudgetRemovedEvent")
+	proto.RegisterType((*AgentDepositBalanceCreatedEvent)(nil), "ixo.claims.v1beta1.AgentDepositBalanceCreatedEvent")
+	proto.RegisterType((*AgentDepositBalanceUpdatedEvent)(nil), "ixo.claims.v1beta1.AgentDepositBalanceUpdatedEvent")
+	proto.RegisterType((*AgentDepositBalanceRemovedEvent)(nil), "ixo.claims.v1beta1.AgentDepositBalanceRemovedEvent")
+	proto.RegisterType((*DisputeResolvedEvent)(nil), "ixo.claims.v1beta1.DisputeResolvedEvent")
 }
 
 func init() { proto.RegisterFile("ixo/claims/v1beta1/event.proto", fileDescriptor_26b125bce36ddb45) }
 
 var fileDescriptor_26b125bce36ddb45 = []byte{
-	// 584 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x94, 0xcd, 0x6e, 0xd3, 0x40,
-	0x10, 0xc7, 0xe3, 0x86, 0xa4, 0xed, 0xa4, 0x80, 0x30, 0x01, 0x99, 0x44, 0x72, 0x2b, 0x73, 0x80,
-	0x0b, 0x76, 0x13, 0x14, 0x24, 0x2e, 0x48, 0x25, 0x09, 0xa2, 0xe5, 0x40, 0xe5, 0x52, 0x15, 0x71,
-	0x89, 0x36, 0xf6, 0x92, 0xac, 0x48, 0x76, 0x2d, 0x7b, 0x9d, 0x8f, 0x3e, 0x05, 0x8f, 0xc5, 0x05,
-	0xa9, 0x47, 0x8e, 0x28, 0x79, 0x09, 0x8e, 0x68, 0x3f, 0x92, 0x34, 0xad, 0x11, 0x02, 0xf5, 0xb6,
-	0x33, 0xf3, 0xff, 0xff, 0x66, 0x46, 0x5e, 0x2f, 0xd8, 0x64, 0xc2, 0xbc, 0x60, 0x80, 0xc8, 0x30,
-	0xf1, 0x46, 0xb5, 0x2e, 0xe6, 0xa8, 0xe6, 0xe1, 0x11, 0xa6, 0xdc, 0x8d, 0x62, 0xc6, 0x99, 0x69,
-	0x92, 0x09, 0x73, 0x55, 0xdd, 0xd5, 0xf5, 0x4a, 0xb9, 0xc7, 0x7a, 0x4c, 0x96, 0x3d, 0x71, 0x52,
-	0xca, 0xca, 0x6e, 0x06, 0x49, 0x1b, 0x95, 0x20, 0xab, 0x15, 0x4a, 0x79, 0xff, 0x5c, 0xd5, 0x9d,
-	0x8f, 0xf0, 0xb0, 0xc9, 0x06, 0x03, 0x1c, 0x70, 0xc2, 0x68, 0x33, 0xc6, 0x88, 0xe3, 0xb0, 0x2d,
-	0x46, 0x31, 0x5f, 0x01, 0x04, 0xcb, 0x8a, 0x65, 0xec, 0x19, 0x4f, 0x4b, 0x75, 0xdb, 0xbd, 0x3e,
-	0x99, 0xbb, 0xf2, 0xfb, 0x97, 0x1c, 0xeb, 0xe4, 0xd3, 0x28, 0xbc, 0x39, 0xf2, 0x1b, 0xb8, 0xdf,
-	0x14, 0xc2, 0x93, 0xb4, 0x3b, 0x24, 0x7c, 0x89, 0xf5, 0xa0, 0x20, 0xfd, 0x9a, 0xf8, 0x28, 0x93,
-	0x28, 0x42, 0x5f, 0xe9, 0x9c, 0x16, 0xdc, 0x93, 0xf1, 0xda, 0x70, 0xff, 0x4c, 0x39, 0xd5, 0xd3,
-	0xb4, 0x47, 0x68, 0x90, 0xae, 0x2d, 0x89, 0x55, 0xe6, 0x2f, 0x4b, 0xb6, 0x97, 0x2a, 0xff, 0x92,
-	0xc3, 0x79, 0x07, 0xa6, 0xc4, 0xb6, 0x48, 0x12, 0xa5, 0x4b, 0x6a, 0x03, 0x36, 0x43, 0x95, 0xd0,
-	0xc8, 0x6a, 0x16, 0x52, 0x7b, 0xfc, 0x85, 0xd6, 0xf9, 0x65, 0xc0, 0x83, 0x63, 0x34, 0x1d, 0x62,
-	0xca, 0xcf, 0x08, 0xef, 0x87, 0x31, 0x1a, 0x53, 0x05, 0x3c, 0x82, 0xad, 0xb1, 0xce, 0x68, 0xa2,
-	0x9b, 0x45, 0x5c, 0xb8, 0x34, 0xa4, 0xc9, 0x68, 0xc2, 0x63, 0x44, 0x28, 0x4f, 0xfc, 0xa5, 0xdf,
-	0x3c, 0x80, 0x9d, 0x60, 0x5c, 0xdf, 0xef, 0xb0, 0x94, 0x47, 0x29, 0x4f, 0xac, 0x8d, 0xbd, 0xfc,
-	0x1f, 0xbf, 0xec, 0x59, 0x7d, 0xff, 0xbd, 0x94, 0xf9, 0x25, 0xe1, 0x51, 0xe7, 0xc4, 0x3c, 0x86,
-	0xbb, 0xc1, 0xb8, 0x56, 0x6b, 0x34, 0x3a, 0x91, 0xea, 0x94, 0x58, 0x79, 0x49, 0x79, 0x92, 0x4d,
-	0x11, 0xd2, 0x43, 0xca, 0x31, 0xe5, 0x7a, 0x32, 0xff, 0x8e, 0xf2, 0xeb, 0x30, 0x71, 0x08, 0x54,
-	0xaf, 0x6c, 0xbe, 0x76, 0xcb, 0x6f, 0x70, 0x7f, 0xe7, 0x08, 0xca, 0x6a, 0x96, 0x2b, 0x17, 0xb3,
-	0x0e, 0x45, 0x22, 0xf3, 0xba, 0x43, 0x25, 0xab, 0x83, 0x72, 0xfa, 0x5a, 0xe9, 0xbc, 0x05, 0x53,
-	0x65, 0xd6, 0x2e, 0xe7, 0xff, 0x90, 0xbe, 0x1b, 0x60, 0xcb, 0x9b, 0x74, 0x90, 0xf2, 0x3e, 0x8b,
-	0xc9, 0x39, 0xba, 0xf6, 0xab, 0x5b, 0xb0, 0x19, 0x88, 0x98, 0xc5, 0x92, 0xbb, 0xed, 0x2f, 0x42,
-	0x73, 0x17, 0x4a, 0xfa, 0xd8, 0x09, 0x49, 0x68, 0x6d, 0xc8, 0x2a, 0xe8, 0x54, 0x8b, 0x84, 0xc2,
-	0xda, 0x8b, 0x11, 0xe5, 0x18, 0x5b, 0x79, 0x65, 0xd5, 0xa1, 0x59, 0x86, 0x02, 0x0a, 0x87, 0x84,
-	0x5a, 0xb7, 0x64, 0x5e, 0x05, 0xe6, 0x63, 0xb8, 0xbd, 0xfa, 0x93, 0x3b, 0x24, 0xb4, 0x0a, 0xb2,
-	0xba, 0xb3, 0x4a, 0x1e, 0x86, 0x66, 0x15, 0xb6, 0xc5, 0x1b, 0xd5, 0xe1, 0xd3, 0x08, 0x5b, 0x45,
-	0x29, 0xd8, 0x12, 0x89, 0x0f, 0xd3, 0x08, 0xbf, 0x3e, 0xf9, 0x36, 0xb3, 0x8d, 0x8b, 0x99, 0x6d,
-	0xfc, 0x9c, 0xd9, 0xc6, 0xd7, 0xb9, 0x9d, 0xbb, 0x98, 0xdb, 0xb9, 0x1f, 0x73, 0x3b, 0xf7, 0xe9,
-	0x65, 0x8f, 0xf0, 0x7e, 0xda, 0x75, 0x03, 0x36, 0xf4, 0xc8, 0x84, 0x7d, 0x66, 0x29, 0x0d, 0xe5,
-	0xb2, 0x22, 0x7a, 0xd6, 0x1d, 0xb0, 0xe0, 0x4b, 0xd0, 0x47, 0x84, 0x7a, 0xa3, 0x17, 0xde, 0x64,
-	0xf1, 0x28, 0x8a, 0x1e, 0x49, 0xb7, 0x28, 0x5f, 0xc3, 0xe7, 0xbf, 0x03, 0x00, 0x00, 0xff, 0xff,
-	0x3a, 0xbe, 0x5a, 0xcc, 0x9a, 0x05, 0x00, 0x00,
+	// 687 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xb4, 0x95, 0x4f, 0x4f, 0xd4, 0x4e,
+	0x18, 0xc7, 0x59, 0xf8, 0xb1, 0xc0, 0x03, 0x3f, 0x8d, 0x75, 0x35, 0x15, 0x92, 0x42, 0xea, 0x41,
+	0x2f, 0xb6, 0xec, 0x1a, 0x8c, 0x5e, 0x4c, 0x96, 0x5d, 0x8c, 0x60, 0x88, 0xa4, 0x40, 0x30, 0x5e,
+	0x36, 0xd3, 0xce, 0xb8, 0x3b, 0xb1, 0x9d, 0x69, 0xda, 0xe9, 0xee, 0xc2, 0xab, 0xf0, 0x65, 0x79,
+	0x31, 0xe1, 0xe8, 0xd1, 0xc0, 0x9b, 0xf0, 0x68, 0x3a, 0x33, 0xbb, 0x50, 0x28, 0x31, 0xca, 0x7a,
+	0x9b, 0xe7, 0xcf, 0xf7, 0xf3, 0x3c, 0xf3, 0x74, 0x66, 0x0a, 0x16, 0x1d, 0x72, 0x37, 0x08, 0x11,
+	0x8d, 0x52, 0xb7, 0x5f, 0xf7, 0x89, 0x40, 0x75, 0x97, 0xf4, 0x09, 0x13, 0x4e, 0x9c, 0x70, 0xc1,
+	0x0d, 0x83, 0x0e, 0xb9, 0xa3, 0xe2, 0x8e, 0x8e, 0x2f, 0xd7, 0xba, 0xbc, 0xcb, 0x65, 0xd8, 0xcd,
+	0x57, 0x2a, 0x73, 0x79, 0xb5, 0x84, 0xa4, 0x85, 0x2a, 0xa1, 0xac, 0x14, 0xca, 0x44, 0xef, 0x44,
+	0xc5, 0xed, 0x0f, 0xf0, 0xb0, 0xc5, 0xc3, 0x90, 0x04, 0x82, 0x72, 0xd6, 0x4a, 0x08, 0x12, 0x04,
+	0x6f, 0xe5, 0xad, 0x18, 0xaf, 0x01, 0x82, 0x71, 0xc4, 0xac, 0xac, 0x55, 0x9e, 0x2e, 0x36, 0x2c,
+	0xe7, 0x7a, 0x67, 0xce, 0x85, 0xde, 0xbb, 0xa4, 0x28, 0x92, 0x0f, 0x63, 0x3c, 0x39, 0xf2, 0x1b,
+	0xb8, 0xdf, 0xca, 0x13, 0xf7, 0x33, 0x3f, 0xa2, 0x62, 0x8c, 0x75, 0x61, 0x56, 0xea, 0x35, 0xf1,
+	0x51, 0x29, 0x31, 0x37, 0x3d, 0x95, 0x67, 0xb7, 0xe1, 0x9e, 0xb4, 0x0b, 0xcd, 0xfd, 0x31, 0xe5,
+	0x50, 0x77, 0xb3, 0xd5, 0x47, 0x61, 0x56, 0xd8, 0x24, 0x51, 0x9e, 0xdf, 0x6c, 0x72, 0x6b, 0x9c,
+	0xe5, 0x5d, 0x52, 0xd8, 0xef, 0xc0, 0x90, 0xd8, 0x36, 0x4d, 0xe3, 0x6c, 0x4c, 0xdd, 0x80, 0x39,
+	0xac, 0x1c, 0x1a, 0xb9, 0x52, 0x86, 0xd4, 0x1a, 0x6f, 0x94, 0x6b, 0xff, 0xac, 0xc0, 0x83, 0x3d,
+	0x74, 0x1c, 0x11, 0x26, 0x8e, 0xa8, 0xe8, 0xe1, 0x04, 0x0d, 0x98, 0x02, 0xee, 0xc0, 0xfc, 0x40,
+	0x7b, 0x34, 0xd1, 0x29, 0x23, 0x8e, 0x54, 0x1a, 0xd2, 0xe2, 0x2c, 0x15, 0x09, 0xa2, 0x4c, 0xa4,
+	0xde, 0x58, 0x6f, 0x34, 0x61, 0x29, 0x18, 0x34, 0xd6, 0x3b, 0x3c, 0x13, 0x71, 0x26, 0x52, 0x73,
+	0x7a, 0x6d, 0xe6, 0xc6, 0x2f, 0x7b, 0xd4, 0x58, 0x7f, 0x2f, 0xd3, 0xbc, 0xc5, 0x5c, 0xa3, 0xd6,
+	0xa9, 0xb1, 0x07, 0x77, 0x83, 0x41, 0xbd, 0xbe, 0xb1, 0xd1, 0x89, 0x55, 0xa5, 0xd4, 0x9c, 0x91,
+	0x94, 0x27, 0xe5, 0x94, 0x3c, 0x75, 0x9b, 0x09, 0xc2, 0x84, 0xee, 0xcc, 0xbb, 0xa3, 0xf4, 0xda,
+	0x4c, 0x6d, 0x0a, 0x2b, 0x57, 0x76, 0x5e, 0x38, 0xe5, 0x13, 0xdc, 0xbf, 0xbd, 0x03, 0x35, 0xd5,
+	0xcb, 0x95, 0x83, 0xd9, 0x80, 0x2a, 0x95, 0x7e, 0x5d, 0x61, 0xb9, 0xac, 0x82, 0x52, 0x7a, 0x3a,
+	0xd3, 0x7e, 0x0b, 0x86, 0xf2, 0x14, 0x0e, 0xe7, 0xdf, 0x90, 0xbe, 0x55, 0xc0, 0x92, 0x27, 0xa9,
+	0x99, 0x89, 0x1e, 0x4f, 0xe8, 0x09, 0xba, 0x76, 0xd5, 0x4d, 0x98, 0x0b, 0x72, 0x9b, 0x27, 0x92,
+	0xbb, 0xe0, 0x8d, 0x4c, 0x63, 0x15, 0x16, 0xf5, 0xb2, 0x83, 0x29, 0x36, 0xa7, 0x65, 0x14, 0xb4,
+	0xab, 0x4d, 0x71, 0x2e, 0xed, 0x26, 0x88, 0x09, 0x42, 0xcc, 0x19, 0x25, 0xd5, 0xa6, 0x51, 0x83,
+	0x59, 0x84, 0x23, 0xca, 0xcc, 0xff, 0xa4, 0x5f, 0x19, 0xc6, 0x63, 0xf8, 0xff, 0xe2, 0x26, 0x77,
+	0x28, 0x36, 0x67, 0x65, 0x74, 0xe9, 0xc2, 0xb9, 0x8d, 0x8d, 0x15, 0x58, 0xc8, 0xdf, 0xa8, 0x8e,
+	0x38, 0x8e, 0x89, 0x59, 0x95, 0x09, 0xf3, 0xb9, 0xe3, 0xe0, 0x38, 0x26, 0xf6, 0x01, 0x98, 0xbb,
+	0x24, 0xf2, 0x49, 0xb2, 0x99, 0xe1, 0x2e, 0x11, 0x85, 0x8d, 0xbc, 0x84, 0xaa, 0x2f, 0xbd, 0x7a,
+	0x3e, 0x6b, 0x65, 0xf3, 0xb9, 0xac, 0xf6, 0x74, 0xfe, 0x55, 0x6a, 0x61, 0xea, 0x13, 0xa3, 0x7a,
+	0x24, 0xe2, 0xfd, 0xdb, 0x53, 0x31, 0xac, 0x36, 0xbb, 0x84, 0x89, 0x36, 0x89, 0x79, 0x4a, 0xc5,
+	0x26, 0x0a, 0x11, 0x0b, 0x48, 0x61, 0x10, 0x4d, 0x98, 0xf3, 0x95, 0x5b, 0xd3, 0x4b, 0xef, 0x4f,
+	0x09, 0xc5, 0x1b, 0xe9, 0x6e, 0xa8, 0x52, 0x18, 0xcc, 0x3f, 0xab, 0x52, 0x18, 0xd4, 0x04, 0xaa,
+	0xec, 0x42, 0x6d, 0xf4, 0x26, 0x92, 0x94, 0x87, 0xfd, 0xdb, 0x3d, 0xa7, 0x9b, 0xfb, 0x5f, 0xcf,
+	0xac, 0xca, 0xe9, 0x99, 0x55, 0xf9, 0x71, 0x66, 0x55, 0xbe, 0x9c, 0x5b, 0x53, 0xa7, 0xe7, 0xd6,
+	0xd4, 0xf7, 0x73, 0x6b, 0xea, 0xe3, 0xab, 0x2e, 0x15, 0xbd, 0xcc, 0x77, 0x02, 0x1e, 0xb9, 0x74,
+	0xc8, 0x3f, 0xf1, 0x8c, 0x61, 0x79, 0xdf, 0x72, 0xeb, 0x99, 0x1f, 0xf2, 0xe0, 0x73, 0xd0, 0x43,
+	0x94, 0xb9, 0xfd, 0x17, 0xee, 0x70, 0xf4, 0x5f, 0xce, 0x8f, 0x79, 0xea, 0x57, 0xe5, 0x0f, 0xf9,
+	0xf9, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0xb5, 0x10, 0xef, 0x3c, 0x1d, 0x08, 0x00, 0x00,
 }
 
 func (m *CollectionCreatedEvent) Marshal() (dAtA []byte, err error) {
@@ -1079,6 +1426,251 @@ func (m *ClaimAuthorizationCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int,
 	return len(dAtA) - i, nil
 }
 
+func (m *MemberBudgetCreatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MemberBudgetCreatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MemberBudgetCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Budget != nil {
+		{
+			size, err := m.Budget.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MemberBudgetUpdatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MemberBudgetUpdatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MemberBudgetUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Budget != nil {
+		{
+			size, err := m.Budget.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MemberBudgetRemovedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MemberBudgetRemovedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MemberBudgetRemovedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Budget != nil {
+		{
+			size, err := m.Budget.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AgentDepositBalanceCreatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AgentDepositBalanceCreatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AgentDepositBalanceCreatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Balance != nil {
+		{
+			size, err := m.Balance.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AgentDepositBalanceUpdatedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AgentDepositBalanceUpdatedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AgentDepositBalanceUpdatedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Balance != nil {
+		{
+			size, err := m.Balance.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *AgentDepositBalanceRemovedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *AgentDepositBalanceRemovedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *AgentDepositBalanceRemovedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Balance != nil {
+		{
+			size, err := m.Balance.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *DisputeResolvedEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *DisputeResolvedEvent) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *DisputeResolvedEvent) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Dispute != nil {
+		{
+			size, err := m.Dispute.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintEvent(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintEvent(dAtA []byte, offset int, v uint64) int {
 	offset -= sovEvent(v)
 	base := offset
@@ -1260,6 +1852,97 @@ func (m *ClaimAuthorizationCreatedEvent) Size() (n int) {
 	}
 	l = len(m.AuthType)
 	if l > 0 {
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *MemberBudgetCreatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Budget != nil {
+		l = m.Budget.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *MemberBudgetUpdatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Budget != nil {
+		l = m.Budget.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *MemberBudgetRemovedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Budget != nil {
+		l = m.Budget.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *AgentDepositBalanceCreatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Balance != nil {
+		l = m.Balance.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *AgentDepositBalanceUpdatedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Balance != nil {
+		l = m.Balance.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *AgentDepositBalanceRemovedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Balance != nil {
+		l = m.Balance.Size()
+		n += 1 + l + sovEvent(uint64(l))
+	}
+	return n
+}
+
+func (m *DisputeResolvedEvent) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.Dispute != nil {
+		l = m.Dispute.Size()
 		n += 1 + l + sovEvent(uint64(l))
 	}
 	return n
@@ -2419,6 +3102,608 @@ func (m *ClaimAuthorizationCreatedEvent) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.AuthType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MemberBudgetCreatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MemberBudgetCreatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MemberBudgetCreatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Budget", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Budget == nil {
+				m.Budget = &MemberBudget{}
+			}
+			if err := m.Budget.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MemberBudgetUpdatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MemberBudgetUpdatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MemberBudgetUpdatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Budget", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Budget == nil {
+				m.Budget = &MemberBudget{}
+			}
+			if err := m.Budget.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MemberBudgetRemovedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MemberBudgetRemovedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MemberBudgetRemovedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Budget", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Budget == nil {
+				m.Budget = &MemberBudget{}
+			}
+			if err := m.Budget.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AgentDepositBalanceCreatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AgentDepositBalanceCreatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AgentDepositBalanceCreatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Balance == nil {
+				m.Balance = &AgentDepositBalance{}
+			}
+			if err := m.Balance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AgentDepositBalanceUpdatedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AgentDepositBalanceUpdatedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AgentDepositBalanceUpdatedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Balance == nil {
+				m.Balance = &AgentDepositBalance{}
+			}
+			if err := m.Balance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *AgentDepositBalanceRemovedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: AgentDepositBalanceRemovedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: AgentDepositBalanceRemovedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Balance", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Balance == nil {
+				m.Balance = &AgentDepositBalance{}
+			}
+			if err := m.Balance.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipEvent(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *DisputeResolvedEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowEvent
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: DisputeResolvedEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: DisputeResolvedEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Dispute", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowEvent
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthEvent
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthEvent
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Dispute == nil {
+				m.Dispute = &Dispute{}
+			}
+			if err := m.Dispute.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

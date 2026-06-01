@@ -5,7 +5,7 @@ import (
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
-	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
 var (

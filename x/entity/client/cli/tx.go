@@ -11,8 +11,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govcli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
 	govtypesv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1beta1"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	"github.com/spf13/cobra"
 )
 
@@ -32,6 +32,13 @@ func NewTxCmd() *cobra.Command {
 		NewCmdTransferEntity(),
 		NewCmdCreateEntityAccount(),
 	)
+	// NewCmdUpdateEntityParamsProposal is intentionally NOT added here.
+	// It's registered as a gov legacy-proposal handler via
+	// `client.ProposalHandler` and is reachable as
+	// `ixod tx gov submit-legacy-proposal update-entity-params ...`.
+	// Adding it directly would cause flag-redefinition because the gov
+	// module's NewTxCmd calls flags.AddTxFlagsToCmd on every legacy
+	// proposal handler (cosmos-sdk@v0.50/x/gov/client/cli/tx.go:64).
 
 	return entityTxCmd
 }
@@ -79,6 +86,10 @@ func NewCmdUpdateEntityParamsProposal() *cobra.Command {
 	// nolint:staticcheck
 	cmd.Flags().String(govcli.FlagDescription, "", "description of proposal")
 	cmd.Flags().String(govcli.FlagDeposit, "", "deposit of proposal")
+	// NB: the gov module's NewTxCmd iterates every legacy proposal
+	// handler and calls flags.AddTxFlagsToCmd on it
+	// (cosmos-sdk/x/gov/client/cli/tx.go:64). Don't call AddTxFlagsToCmd
+	// here or it'll double-register and panic at chain startup.
 
 	return cmd
 }

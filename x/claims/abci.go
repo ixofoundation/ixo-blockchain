@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
 )
 
 // NOTE: if performance becomes an issue, we can consider using a similar approach to cosmos sdk grants queue
@@ -42,6 +42,13 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 			if err != nil {
 				// if this happens then it means there is funds missing in escrow account, should never happen
 				panic(err)
+			}
+
+			// Restore member budget if this intent was on behalf of a team member
+			if intent.MemberAddress != "" {
+				if err := k.RestoreMemberBudget(ctx, intent.CollectionId, intent.MemberAddress, intent.Amount, intent.Cw20Payment); err != nil {
+					panic(err)
+				}
 			}
 
 			// Mark intent as expired

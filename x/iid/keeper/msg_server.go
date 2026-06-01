@@ -5,7 +5,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
 type msgServer struct {
@@ -26,6 +26,11 @@ var _ types.MsgServer = msgServer{}
 func (k msgServer) CreateIidDocument(goCtx context.Context, msg *types.MsgCreateIidDocument,
 ) (*types.MsgCreateIidDocumentResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	// Defense in depth: re-run the DID-form policy at the handler.
+	if err := types.ValidateMsgCreateDIDForm(msg.Id, msg.Signer); err != nil {
+		return nil, err
+	}
 
 	// check that the did is not already taken
 	_, found := k.Keeper.GetDidDocument(ctx, []byte(msg.Id))
@@ -83,8 +88,12 @@ func (k msgServer) UpdateIidDocument(goCtx context.Context, msg *types.MsgUpdate
 			if err != nil {
 				return err
 			}
-			// Keep old iid doc metadata
+			// Keep old iid doc metadata; assign the freshly built doc back
+			// through the pointer so ExecuteOnDidWithRelationships persists
+			// the new fields. Without this assignment the message payload
+			// would be silently dropped (see tests.md bug log).
 			did.Metadata = didDoc.Metadata
+			*didDoc = did
 			return nil
 		}); err != nil {
 		return nil, err
@@ -375,7 +384,7 @@ func (k msgServer) DeactivateIID(goCtx context.Context, msg *types.MsgDeactivate
 		sdk.UnwrapSDKContext(goCtx), &k.Keeper,
 		newConstraints(types.Authentication),
 		msg.Id, msg.Signer, func(didDoc *types.IidDocument) error {
-			return didDoc.Deactivate()
+			return didDoc.Deactivate(msg.State)
 		}); err != nil {
 		return nil, err
 	}

@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
 	flag "github.com/spf13/pflag"
 )
 
@@ -60,6 +60,7 @@ func init() {
 	fsBondCreate.String(FlagBondDid, "", "Bond's DID")
 	fsBondCreate.String(FlagCreatorDid, "", "Bond creator's DID")
 	fsBondCreate.String(FlagControllerDid, "", "Bond controller's DID")
+	fsBondCreate.String(FlagOracleDid, "", "Bond oracle's DID")
 
 	fsBondEdit.String(FlagName, types.DoNotModifyField, "The bond's name")
 	fsBondEdit.String(FlagDescription, types.DoNotModifyField, "The bond's description")

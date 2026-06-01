@@ -7,6 +7,7 @@ import (
 	addresscodec "cosmossdk.io/core/address"
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
@@ -14,6 +15,8 @@ import (
 type BankKeeper interface {
 	SendCoins(ctx context.Context, fromAddr, toAddr sdk.AccAddress, amt sdk.Coins) error
 	GetSupply(ctx context.Context, denom string) sdk.Coin
+	HasDenomMetaData(ctx context.Context, denom string) bool
+	SetDenomMetaData(ctx context.Context, denomMetaData banktypes.Metadata)
 	SendCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr sdk.AccAddress, amt sdk.Coins) error
 	SendCoinsFromAccountToModule(ctx context.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
 	BurnCoins(ctx context.Context, moduleName string, amt sdk.Coins) error

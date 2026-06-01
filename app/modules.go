@@ -56,26 +56,28 @@ import (
 	ibc "github.com/cosmos/ibc-go/v8/modules/core"
 	ibchost "github.com/cosmos/ibc-go/v8/modules/core/exported"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/bonds"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
-	claimsmodule "github.com/ixofoundation/ixo-blockchain/v6/x/claims"
-	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
-	entitymodule "github.com/ixofoundation/ixo-blockchain/v6/x/entity"
-	entityclient "github.com/ixofoundation/ixo-blockchain/v6/x/entity/client"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v6/x/entity/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/epochs"
-	epochstypes "github.com/ixofoundation/ixo-blockchain/v6/x/epochs/types"
-	iidmodule "github.com/ixofoundation/ixo-blockchain/v6/x/iid"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake"
-	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/mint"
-	minttypes "github.com/ixofoundation/ixo-blockchain/v6/x/mint/types"
-	smartaccount "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account"
-	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
-	tokenmodule "github.com/ixofoundation/ixo-blockchain/v6/x/token"
-	tokenclient "github.com/ixofoundation/ixo-blockchain/v6/x/token/client"
-	tokentypes "github.com/ixofoundation/ixo-blockchain/v6/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	claimsmodule "github.com/ixofoundation/ixo-blockchain/v7/x/claims"
+	claimsmoduletypes "github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	entitymodule "github.com/ixofoundation/ixo-blockchain/v7/x/entity"
+	entityclient "github.com/ixofoundation/ixo-blockchain/v7/x/entity/client"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs"
+	epochstypes "github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
+	iidmodule "github.com/ixofoundation/ixo-blockchain/v7/x/iid"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/mint"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v7/x/mint/types"
+	namesmodule "github.com/ixofoundation/ixo-blockchain/v7/x/names"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	smartaccount "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account"
+	smartaccounttypes "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
+	tokenmodule "github.com/ixofoundation/ixo-blockchain/v7/x/token"
+	tokenclient "github.com/ixofoundation/ixo-blockchain/v7/x/token/client"
+	tokentypes "github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
 )
 
 // moduleAccountPermissions defines module account permissions
@@ -138,14 +140,15 @@ func appModules(
 		ibchooks.NewAppModule(app.AccountKeeper),
 
 		// Custom ixo AppModules
-		iidmodule.NewAppModule(app.IidKeeper),
+		iidmodule.NewAppModule(app.IidKeeper, app.AccountKeeper, app.BankKeeper),
 		bonds.NewAppModule(app.BondsKeeper),
 		entitymodule.NewAppModule(app.EntityKeeper),
 		tokenmodule.NewAppModule(app.TokenKeeper),
 		claimsmodule.NewAppModule(app.ClaimsKeeper, app.GetSubspace(claimsmoduletypes.ModuleName)),
-		smartaccount.NewAppModule(*app.SmartAccountKeeper),
+		smartaccount.NewAppModule(*app.SmartAccountKeeper, app.AccountKeeper, app.BankKeeper),
 		epochs.NewAppModule(*app.EpochsKeeper),
 		liquidstake.NewAppModule(app.LiquidStakeKeeper),
+		namesmodule.NewAppModule(app.NamesKeeper, app.AccountKeeper, app.BankKeeper),
 	}
 }
 
@@ -195,6 +198,18 @@ func simulationModules(
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		ibcfee.NewAppModule(app.IBCFeeKeeper),
+		// Custom ixo modules — each implements AppModuleSimulation
+		// (RegisterStoreDecoder + empty WeightedOperations / ProposalContents
+		// / ProposalMsgs). See Phase 3 in tests.md for the design rationale.
+		iidmodule.NewAppModule(app.IidKeeper, app.AccountKeeper, app.BankKeeper),
+		bonds.NewAppModule(app.BondsKeeper),
+		entitymodule.NewAppModule(app.EntityKeeper),
+		tokenmodule.NewAppModule(app.TokenKeeper),
+		claimsmodule.NewAppModule(app.ClaimsKeeper, app.GetSubspace(claimsmoduletypes.ModuleName)),
+		smartaccount.NewAppModule(*app.SmartAccountKeeper, app.AccountKeeper, app.BankKeeper),
+		epochs.NewAppModule(*app.EpochsKeeper),
+		liquidstake.NewAppModule(app.LiquidStakeKeeper),
+		namesmodule.NewAppModule(app.NamesKeeper, app.AccountKeeper, app.BankKeeper),
 	}
 }
 
@@ -247,6 +262,7 @@ func OrderBeginBlockers() []string {
 		tokentypes.ModuleName,
 		claimsmoduletypes.ModuleName,
 		liquidstaketypes.ModuleName,
+		namestypes.ModuleName,
 	}
 }
 
@@ -291,6 +307,7 @@ func OrderEndBlockers() []string {
 		bondstypes.ModuleName,
 		claimsmoduletypes.ModuleName,
 		liquidstaketypes.ModuleName,
+		namestypes.ModuleName,
 	}
 }
 
@@ -341,6 +358,7 @@ func OrderInitGenesis() []string {
 		entitytypes.ModuleName,
 		claimsmoduletypes.ModuleName,
 		liquidstaketypes.ModuleName,
+		namestypes.ModuleName,
 	}
 }
 

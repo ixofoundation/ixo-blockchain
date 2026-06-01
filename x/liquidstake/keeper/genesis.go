@@ -4,46 +4,51 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/liquidstake/types"
+
+	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
 )
 
-// InitGenesis initializes the liquidstake module's state from a given genesis state.
+// InitGenesis applies the multi-pool genesis state: writes ModuleParams,
+// every Pool, and every per-pool LiquidValidator. Validation has already
+// been performed by types.ValidateGenesis (called by the AppModule wrapper).
 func (k Keeper) InitGenesis(ctx sdk.Context, genState types.GenesisState) {
 	if err := types.ValidateGenesis(genState); err != nil {
 		panic(err)
 	}
-
-	// init to prevent nil slice, []types.WhitelistedValidator(nil)
-	if genState.Params.WhitelistedValidators == nil || len(genState.Params.WhitelistedValidators) == 0 {
-		genState.Params.WhitelistedValidators = []types.WhitelistedValidator{}
-	}
-
-	// Initialise params
-	if err := k.SetParams(ctx, genState.Params); err != nil {
+	if err := k.SetModuleParams(ctx, genState.ModuleParams); err != nil {
 		panic(err)
 	}
-
-	// Save liquid validators to the store
-	for _, lv := range genState.LiquidValidators {
-		k.SetLiquidValidator(ctx, lv)
+	for _, p := range genState.Pools {
+		k.SetPool(ctx, p)
+	}
+	for _, group := range genState.PoolLiquidValidators {
+		for _, lv := range group.LiquidValidators {
+			k.SetLiquidValidator(ctx, group.PoolId, lv)
+		}
 	}
 
-	// Ensure that the module account exists
-	moduleAcc := k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
-	if moduleAcc == nil {
+	// Sanity check: the module account must exist (set up via maccPerms).
+	if k.accountKeeper.GetModuleAccount(ctx, types.ModuleName) == nil {
 		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
 }
 
-// ExportGenesis returns the liquidstake module's genesis state.
+// ExportGenesis serialises the full multi-pool state. Per-pool validators
+// are grouped under PoolLiquidValidators so the genesis file remains tidy.
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
-	params := k.GetParams(ctx)
-
-	// init to prevent nil slice, []types.WhitelistedValidator(nil)
-	if params.WhitelistedValidators == nil || len(params.WhitelistedValidators) == 0 {
-		params.WhitelistedValidators = []types.WhitelistedValidator{}
+	pools := k.GetAllPools(ctx)
+	poolValidators := make([]types.PoolLiquidValidators, 0, len(pools))
+	for _, p := range pools {
+		lvs := k.GetAllLiquidValidatorsForPool(ctx, p.PoolId)
+		// Skip empty groups to keep export concise; consumers may always
+		// treat a missing entry as "no liquid validators".
+		if len(lvs) == 0 {
+			continue
+		}
+		poolValidators = append(poolValidators, types.PoolLiquidValidators{
+			PoolId:           p.PoolId,
+			LiquidValidators: lvs,
+		})
 	}
-
-	liquidValidators := k.GetAllLiquidValidators(ctx)
-	return types.NewGenesisState(params, liquidValidators)
+	return types.NewGenesisState(k.GetModuleParams(ctx), pools, poolValidators)
 }

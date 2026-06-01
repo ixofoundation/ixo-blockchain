@@ -46,7 +46,7 @@ The field's descriptions is as follows:
 
 ### ClaimUpdatedEvent
 
-This event is emitted when a [Claim](./02_state.md#claim) is updated, typically when the payment status changes.
+This event is emitted when a [Claim](./02_state.md#claim) is updated, typically when the payment status changes or when the claim is evaluated (including a `flagged` evaluation or a re-evaluation that transitions a flagged claim out of `FLAGGED`). On a re-evaluation the carried `Claim` includes the updated `evaluationHistory` (the prior evaluation appended) and the new `evaluation`.
 
 ```go
 type ClaimUpdatedEvent struct {
@@ -60,7 +60,7 @@ The field's descriptions is as follows:
 
 ### ClaimEvaluatedEvent
 
-This event is emitted when a [Claim](./02_state.md#claim) is Evaluated using the [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim) message.
+This event is emitted when a [Claim](./02_state.md#claim) is Evaluated using the [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim) message. Fires for every successful call to that message — including evaluations with status `flagged` (non-terminal) and re-evaluations that transition a flagged claim to a terminal status. Indexers can distinguish flag events from terminal events by inspecting `evaluation.status`.
 
 ```go
 type ClaimEvaluatedEvent struct {
@@ -74,7 +74,7 @@ The field's descriptions is as follows:
 
 ### ClaimDisputedEvent
 
-This event is emitted when a [Claim](./02_state.md#claim) is disputed using the [MsgDisputeClaim](./03_messages.md#msgdisputeclaim) message.
+This event is emitted when a [Claim](./02_state.md#claim) is disputed using the [MsgDisputeClaim](./03_messages.md#msgdisputeclaim) message. The carried `Dispute` has `status = OPEN` and all extended fields populated (`target_role`, `disputer_address/did`, `dispute_deposit`, `submitted_at`).
 
 ```go
 type ClaimDisputedEvent struct {
@@ -85,6 +85,20 @@ type ClaimDisputedEvent struct {
 The field's descriptions is as follows:
 
 - `dispute` - the full [Dispute](02_state.md#dispute)
+
+### DisputeResolvedEvent
+
+This event is emitted when a dispute is adjudicated (AWARDED or DISMISSED) via [MsgAdjudicateDispute](./03_messages.md#msgadjudicatedispute). The carried `Dispute` is the same record as the prior `ClaimDisputedEvent` but with `status` updated and `resolution` populated (intended vs actual penalty, winner/adjudicator addresses + amounts).
+
+```go
+type DisputeResolvedEvent struct {
+	Dispute *Dispute
+}
+```
+
+The field's descriptions is as follows:
+
+- `dispute` - the full resolved [Dispute](02_state.md#dispute)
 
 ### PaymentWithdrawnEvent
 
@@ -170,3 +184,101 @@ The field's descriptions is as follows:
 - `admin` - a string containing the address of the admin account on the collection from which the authz is given through the meta-authorization
 - `collectionId` - a string containing the id of the collection the authorization applies to
 - `authorizationType` - a [CreateClaimAuthorizationType](./02_state.md#createclaimauthorizationtype) indicating the type of authorization created
+
+## MemberBudgetCreatedEvent
+
+This event is emitted when a [MemberBudget](./02_state.md#memberbudget) is added to a collection for the first time via [MsgSetCollectionMembers](./03_messages.md#msgsetcollectionmembers). Carries the full initial budget state so an indexer can insert a fresh row without re-querying the chain.
+
+```go
+type MemberBudgetCreatedEvent struct {
+	Budget *MemberBudget
+}
+```
+
+The field's descriptions is as follows:
+
+- `budget` - the full [MemberBudget](./02_state.md#memberbudget)
+
+## MemberBudgetUpdatedEvent
+
+This event is emitted on **every state change** to an existing [MemberBudget](./02_state.md#memberbudget). Carries the post-update full budget state so an indexer can `UPDATE` the corresponding row directly.
+
+Triggered by:
+
+- An admin update to an existing member's limits via [MsgSetCollectionMembers](./03_messages.md#msgsetcollectionmembers) (preserving or resetting `periodSpent` per `resetPeriodSpent`).
+- A `periodSpent` deduction during [MsgClaimIntent](./03_messages.md#msgclaimintent) (covers both the lazy period reset and the deduction in one event).
+- A `periodSpent` restoration on claim rejection / dispute / invalidation via [MsgEvaluateClaim](./03_messages.md#msgevaluateclaim). Note: a `flagged` evaluation does **not** restore the budget — the spend stays held until the claim reaches a terminal evaluation status (the budget is restored at that point if the terminal status is non-approved).
+- A `periodSpent` restoration on intent expiration in the EndBlocker.
+- A lazy period reset triggered during a restore operation when the period had elapsed (the restore early-returns after persisting the reset state).
+
+```go
+type MemberBudgetUpdatedEvent struct {
+	Budget *MemberBudget
+}
+```
+
+The field's descriptions is as follows:
+
+- `budget` - the full updated [MemberBudget](./02_state.md#memberbudget)
+
+## MemberBudgetRemovedEvent
+
+This event is emitted when a [MemberBudget](./02_state.md#memberbudget) is removed via [MsgRemoveCollectionMembers](./03_messages.md#msgremovecollectionmembers). Carries the final budget state at time of removal so an indexer can audit / archive the final values before deleting (or marking removed) the row.
+
+```go
+type MemberBudgetRemovedEvent struct {
+	Budget *MemberBudget
+}
+```
+
+The field's descriptions is as follows:
+
+- `budget` - the full [MemberBudget](./02_state.md#memberbudget) state at time of removal
+
+## AgentDepositBalanceCreatedEvent
+
+This event is emitted on the **first** [MsgAddPerformanceDeposit](./03_messages.md#msgaddperformancedeposit) for a given `(collection_id, agent_address)` pair — i.e. when the agent's deposit balance is seeded. Mirrors `MemberBudgetCreatedEvent`. Carries the initial balance state for indexer insertion.
+
+```go
+type AgentDepositBalanceCreatedEvent struct {
+	Balance *AgentDepositBalance
+}
+```
+
+The field's descriptions is as follows:
+
+- `balance` - the full [AgentDepositBalance](02_state.md#agentdepositbalance)
+
+## AgentDepositBalanceUpdatedEvent
+
+This event is emitted on every state change to an existing [AgentDepositBalance](02_state.md#agentdepositbalance) that leaves a non-zero amount:
+
+- Subsequent [MsgAddPerformanceDeposit](./03_messages.md#msgaddperformancedeposit) top-ups.
+- Partial [MsgWithdrawPerformanceDeposit](./03_messages.md#msgwithdrawperformancedeposit) withdrawals.
+- Slashing on AWARDED [MsgAdjudicateDispute](./03_messages.md#msgadjudicatedispute) that does not fully drain the balance.
+
+Carries the post-state balance. Indexer derives the delta by diffing against its prior on-record value, and the reason can be inferred from the enclosing tx's Msg type.
+
+```go
+type AgentDepositBalanceUpdatedEvent struct {
+	Balance *AgentDepositBalance
+}
+```
+
+The field's descriptions is as follows:
+
+- `balance` - the post-update full [AgentDepositBalance](02_state.md#agentdepositbalance)
+
+## AgentDepositBalanceRemovedEvent
+
+This event is emitted when the [AgentDepositBalance](02_state.md#agentdepositbalance) is fully drained (the final withdrawal or slash brings the amount to zero) and the KV entry is deleted. Mirrors `MemberBudgetRemovedEvent`. Carries the final balance state (with zero amount) so the indexer can archive.
+
+```go
+type AgentDepositBalanceRemovedEvent struct {
+	Balance *AgentDepositBalance
+}
+```
+
+The field's descriptions is as follows:
+
+- `balance` - the final [AgentDepositBalance](02_state.md#agentdepositbalance) state at time of removal (amount will be zero coins)

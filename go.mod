@@ -1,4 +1,4 @@
-module github.com/ixofoundation/ixo-blockchain/v6
+module github.com/ixofoundation/ixo-blockchain/v7
 
 go 1.22.11
 
@@ -41,6 +41,7 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/stretchr/testify v1.10.0
 	github.com/tendermint/go-amino v0.16.0
+	go.uber.org/mock v0.5.0
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
 	google.golang.org/genproto/googleapis/api v0.0.0-20241202173237-19429a94021a
 	google.golang.org/grpc v1.70.0

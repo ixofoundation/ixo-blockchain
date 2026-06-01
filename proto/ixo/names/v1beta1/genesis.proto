@@ -1,0 +1,13 @@
+syntax = "proto3";
+package ixo.names.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "ixo/names/v1beta1/names.proto";
+
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/names/types";
+
+// GenesisState defines the names module's genesis state.
+message GenesisState {
+  repeated Namespace namespaces = 1 [ (gogoproto.nullable) = false ];
+  repeated NameRecord names = 2 [ (gogoproto.nullable) = false ];
+}

@@ -6,7 +6,7 @@ import (
 	"cosmossdk.io/store/prefix"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -180,4 +180,113 @@ func (k Keeper) IntentList(c context.Context, req *types.QueryIntentListRequest)
 	}
 
 	return &types.QueryIntentListResponse{Intents: intents, Pagination: pageRes}, nil
+}
+
+func (k Keeper) CollectionMember(c context.Context, req *types.QueryCollectionMemberRequest) (*types.QueryCollectionMemberResponse, error) {
+	if req == nil || req.CollectionId == "" || req.MemberAddress == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+	budget, err := k.GetMemberBudget(ctx, req.CollectionId, req.MemberAddress)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryCollectionMemberResponse{MemberBudget: budget}, nil
+}
+
+func (k Keeper) CollectionMemberList(c context.Context, req *types.QueryCollectionMemberListRequest) (*types.QueryCollectionMemberListResponse, error) {
+	if req == nil || req.CollectionId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+
+	var budgets []types.MemberBudget
+	ctx := sdk.UnwrapSDKContext(c)
+	memberBudgetStore := prefix.NewStore(ctx.KVStore(k.storeKey), append(types.MemberBudgetKey, []byte(req.CollectionId+"/")...))
+
+	pageRes, err := query.Paginate(memberBudgetStore, req.Pagination, func(key []byte, value []byte) error {
+		var budget types.MemberBudget
+		if err := k.cdc.Unmarshal(value, &budget); err != nil {
+			return err
+		}
+		budgets = append(budgets, budget)
+		return nil
+	})
+
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &types.QueryCollectionMemberListResponse{MemberBudgets: budgets, Pagination: pageRes}, nil
+}
+
+// DisputeBySubject returns the dispute for (subject_id, target_role) by
+// chaining the new subject index to the primary store.
+func (k Keeper) DisputeBySubject(c context.Context, req *types.QueryDisputeBySubjectRequest) (*types.QueryDisputeBySubjectResponse, error) {
+	if req == nil || req.SubjectId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	dispute, err := k.GetDisputeBySubject(ctx, req.SubjectId, req.TargetRole)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryDisputeBySubjectResponse{Dispute: dispute}, nil
+}
+
+// DisputeListForSubject returns every dispute (any role) for a subject by
+// looking up each target_role through the subject index. Used by clients
+// to materialise the full dispute history for a claim.
+func (k Keeper) DisputeListForSubject(c context.Context, req *types.QueryDisputeListForSubjectRequest) (*types.QueryDisputeListForSubjectResponse, error) {
+	if req == nil || req.SubjectId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	out := []types.Dispute{}
+	for _, role := range []types.DisputeTargetRole{
+		types.DisputeTargetRole_target_submitter,
+		types.DisputeTargetRole_target_evaluator,
+	} {
+		if d, err := k.GetDisputeBySubject(ctx, req.SubjectId, role); err == nil {
+			out = append(out, d)
+		}
+	}
+	return &types.QueryDisputeListForSubjectResponse{Disputes: out}, nil
+}
+
+// AgentDepositBalance returns the rolling balance for an agent on a
+// collection.
+func (k Keeper) AgentDepositBalance(c context.Context, req *types.QueryAgentDepositBalanceRequest) (*types.QueryAgentDepositBalanceResponse, error) {
+	if req == nil || req.CollectionId == "" || req.AgentAddress == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	balance, err := k.GetAgentDepositBalance(ctx, req.CollectionId, req.AgentAddress)
+	if err != nil {
+		return nil, err
+	}
+	return &types.QueryAgentDepositBalanceResponse{Balance: balance}, nil
+}
+
+// AgentDepositBalanceList paginates every agent balance entry on a collection.
+func (k Keeper) AgentDepositBalanceList(c context.Context, req *types.QueryAgentDepositBalanceListRequest) (*types.QueryAgentDepositBalanceListResponse, error) {
+	if req == nil || req.CollectionId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	store := prefix.NewStore(ctx.KVStore(k.storeKey), append(types.AgentDepositBalanceKey, []byte(req.CollectionId+"/")...))
+	var balances []types.AgentDepositBalance
+	pageRes, err := query.Paginate(store, req.Pagination, func(key []byte, value []byte) error {
+		var b types.AgentDepositBalance
+		if err := k.cdc.Unmarshal(value, &b); err != nil {
+			return err
+		}
+		balances = append(balances, b)
+		return nil
+	})
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return &types.QueryAgentDepositBalanceListResponse{Balances: balances, Pagination: pageRes}, nil
 }

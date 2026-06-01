@@ -3,7 +3,7 @@ package v3
 import (
 	store "cosmossdk.io/store/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v6/app/upgrades"
+	"github.com/ixofoundation/ixo-blockchain/v7/app/upgrades"
 )
 
 // UpgradeName defines the on-chain upgrade name for the Ixo v3 upgrade.

@@ -8,7 +8,7 @@ import (
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
 	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
-	_ "github.com/ixofoundation/ixo-blockchain/v6/x/iid/types"
+	_ "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
 	io "io"
 	math "math"

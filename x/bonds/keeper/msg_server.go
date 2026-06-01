@@ -9,7 +9,7 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
 	"golang.org/x/exp/slices"
 )
 
@@ -108,6 +108,23 @@ func (k msgServer) CreateBond(goCtx context.Context, msg *types.MsgCreateBond) (
 	// Check that bond token not reserved
 	if k.ReservedBondToken(ctx, msg.Token) {
 		return nil, types.ErrReservedBondToken
+	}
+
+	// Refuse a bond token symbol that is already in active use elsewhere in
+	// the bank module — non-zero supply OR registered denom metadata. Without
+	// this guard, a bond minting the same denom as a liquidstake LST pool
+	// (or any other module-managed denom) would either intermingle supply
+	// invisibly OR — if the denom is locked by a MintCoinsRestriction —
+	// halt the chain when the bond's batch processor calls MintCoins from
+	// EndBlock. Symmetric to the equivalent guard in
+	// x/liquidstake/keeper/pool.go::registerPool.
+	if !k.BankKeeper.GetSupply(ctx, msg.Token).Amount.IsZero() {
+		return nil, errorsmod.Wrapf(types.ErrBondTokenAlreadyInUse,
+			"denom %s already has non-zero bank supply", msg.Token)
+	}
+	if k.BankKeeper.HasDenomMetaData(ctx, msg.Token) {
+		return nil, errorsmod.Wrapf(types.ErrBondTokenAlreadyInUse,
+			"denom %s already has bank denom metadata registered", msg.Token)
 	}
 
 	// Set state to open by default (overridden below if augmented function)

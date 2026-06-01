@@ -11,9 +11,11 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v6/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
 	"github.com/spf13/cobra"
 )
 
@@ -88,13 +90,17 @@ func (a AppModuleBasic) GetQueryCmd() *cobra.Command {
 // AppModule implements the AppModule interface that defines the inter-dependent methods that modules need to implement
 type AppModule struct {
 	AppModuleBasic
-	keeper keeper.Keeper
+	keeper        keeper.Keeper
+	accountKeeper simulation.AccountKeeper
+	bankKeeper    simulation.BankKeeper
 }
 
-func NewAppModule(keeper keeper.Keeper) AppModule {
+func NewAppModule(k keeper.Keeper, ak simulation.AccountKeeper, bk simulation.BankKeeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
-		keeper:         keeper,
+		keeper:         k,
+		accountKeeper:  ak,
+		bankKeeper:     bk,
 	}
 }
 
@@ -135,3 +141,29 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 // ConsensusVersion is a sequence number for state-breaking change of the module. It should be incremented on each consensus-breaking change introduced by the module. To avoid wrong/empty versions, the initial version should be set to 1
 func (AppModule) ConsensusVersion() uint64 { return 1 }
+
+// AppModuleSimulation: empty proposal/op hooks + a store decoder for the
+// state-determinism diff. Per-Msg WeightedOperations are deferred to the
+// interchaintest E2E suite where real state evolves under live consensus.
+
+func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent { //nolint:staticcheck
+	return nil
+}
+
+func (AppModule) ProposalMsgs(_ module.SimulationState) []simtypes.WeightedProposalMsg {
+	return nil
+}
+
+func (AppModule) RegisterStoreDecoder(sdr simtypes.StoreDecoderRegistry) {
+	sdr[types.StoreKey] = simulation.NewDecodeStore(nil)
+}
+
+func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
+	return simulation.WeightedOperations(simState.AppParams, simState.Cdc, simState.TxConfig, am.accountKeeper, am.bankKeeper)
+}
+
+// GenerateGenesisState seeds the SimulationState with the module's default
+// genesis.
+func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
+	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(types.DefaultGenesis())
+}

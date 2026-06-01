@@ -7,7 +7,7 @@ var (
 	ErrActiveLiquidValidatorsNotExists              = errors.Register(ModuleName, 1, "active liquid validators not exists")
 	ErrInvalidBondDenom                             = errors.Register(ModuleName, 2, "invalid bond denom")
 	ErrInvalidLiquidBondDenom                       = errors.Register(ModuleName, 3, "invalid liquid bond denom")
-	ErrLessThanMinLiquidStakeAmount                 = errors.Register(ModuleName, 4, "staking amount should be over params.min_liquid_stake_amount")
+	ErrLessThanMinLiquidStakeAmount                 = errors.Register(ModuleName, 4, "staking amount should be over module_params.min_liquid_stake_amount")
 	ErrInvalidStkIXOSupply                          = errors.Register(ModuleName, 5, "invalid liquid bond denom supply")
 	ErrInvalidActiveLiquidValidators                = errors.Register(ModuleName, 6, "invalid active liquid validators")
 	ErrLiquidValidatorsNotExists                    = errors.Register(ModuleName, 7, "liquid validators not exists")
@@ -25,4 +25,13 @@ var (
 	ErrRedelegateFailed                             = errors.Register(ModuleName, 19, "Redelegate failed")
 	ErrRatioMoreThanOne                             = errors.Register(ModuleName, 20, "ratio should be less than or equal to 1")
 	ErrRestrictedToWhitelistedAdminAddress          = errors.Register(ModuleName, 21, "this action is restricted to only the whitelisted admin address")
+
+	// Pool-management errors introduced in v7.
+	ErrInvalidPoolID            = errors.Register(ModuleName, 22, "invalid pool id")
+	ErrPoolNotFound             = errors.Register(ModuleName, 23, "pool not found")
+	ErrDuplicatePoolID          = errors.Register(ModuleName, 24, "pool id already exists")
+	ErrDuplicateLiquidBondDenom = errors.Register(ModuleName, 25, "liquid bond denom already in use by another pool")
+	ErrPoolPaused               = errors.Register(ModuleName, 26, "pool is paused")
+	ErrPoolDenomMismatch        = errors.Register(ModuleName, 27, "coin denom does not match pool's liquid_bond_denom")
+	ErrDenomAlreadyInUse        = errors.Register(ModuleName, 28, "liquid bond denom already in use outside the liquidstake module")
 )

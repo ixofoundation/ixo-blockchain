@@ -7,7 +7,7 @@ import "cosmos/base/v1beta1/coin.proto";
 import "google/protobuf/duration.proto";
 import "cosmos_proto/cosmos.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v6/x/claims/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/claims/types";
 
 message Params {
   uint64 collection_sequence = 1;
@@ -48,6 +48,12 @@ enum EvaluationStatus {
   REJECTED = 2 [ (gogoproto.enumvalue_customname) = "rejected" ];
   DISPUTED = 3 [ (gogoproto.enumvalue_customname) = "disputed" ];
   INVALIDATED = 4 [ (gogoproto.enumvalue_customname) = "invalidated" ];
+  // Flagged: non-terminal "I am declining to make a final call" outcome.
+  // Payment does not fire. The flagger or any other authorized evaluator
+  // can subsequently re-evaluate the claim to a terminal status (APPROVED
+  // / REJECTED / INVALIDATED) when more information is available. FLAGGED
+  // counts against AgentQuota the same as a terminal evaluation.
+  FLAGGED = 5 [ (gogoproto.enumvalue_customname) = "flagged" ];
 }
 
 enum IntentStatus {
@@ -84,6 +90,57 @@ enum PaymentStatus {
   FAILED = 5 [ (gogoproto.enumvalue_customname) = "failed" ];
   // DisputedPayment: Payment disputed
   DISPUTED_PAYMENT = 6 [ (gogoproto.enumvalue_customname) = "disputed" ];
+}
+
+// DisputeTargetRole identifies which party of a claim a dispute is filed
+// against. A dispute targets exactly one role; to dispute both the submitter
+// and the evaluator of the same claim, file two separate disputes.
+enum DisputeTargetRole {
+  DISPUTE_TARGET_ROLE_UNSPECIFIED = 0
+      [ (gogoproto.enumvalue_customname) = "target_unspecified" ];
+  // Submitter: the service agent that submitted the claim
+  DISPUTE_TARGET_ROLE_SUBMITTER = 1
+      [ (gogoproto.enumvalue_customname) = "target_submitter" ];
+  // Evaluator: the evaluation agent that evaluated the claim
+  DISPUTE_TARGET_ROLE_EVALUATOR = 2
+      [ (gogoproto.enumvalue_customname) = "target_evaluator" ];
+}
+
+// DisputeStatus is the lifecycle state of a dispute.
+enum DisputeStatus {
+  // Open: dispute has been filed and is awaiting adjudication. Targeted
+  // agent is blocked from submitting / withdrawing on this collection until
+  // resolved.
+  DISPUTE_STATUS_OPEN = 0 [ (gogoproto.enumvalue_customname) = "dispute_open" ];
+  // Awarded: dispute upheld; the targeted party was found in the wrong.
+  // No further disputes against this (subject_id, target_role) are allowed.
+  DISPUTE_STATUS_AWARDED = 1
+      [ (gogoproto.enumvalue_customname) = "dispute_awarded" ];
+  // Dismissed: dispute rejected; targeted party was vindicated.
+  // Other parties may file new disputes against the same (subject_id,
+  // target_role) with new evidence.
+  DISPUTE_STATUS_DISMISSED = 2
+      [ (gogoproto.enumvalue_customname) = "dispute_dismissed" ];
+}
+
+// AdjudicationDid represents a single adjudicator entry on a Collection's
+// dispute whitelist. Each entry pairs a DID with its own reward percentage —
+// adjudicators self-set their fee, turning adjudication into a competitive
+// market (lower-fee adjudicators may attract more volume, higher-fee may
+// trade on reputation). The chain does not enforce who adjudicates a given
+// dispute; whichever whitelisted DID submits MsgAdjudicateDispute first wins.
+message AdjudicationDid {
+  // did is the adjudicator's DID. Must appear in this list to be allowed
+  // to settle disputes on the collection.
+  string did = 1;
+  // reward_percentage is the share (LegacyDec, range [0, 100]) of each
+  // actual penalty payout that goes to THIS adjudicator when they settle a
+  // dispute. The remainder goes to the dispute winner.
+  string reward_percentage = 2 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
 }
 
 message Collection {
@@ -134,6 +191,71 @@ message Collection {
   // intents is the option for intents for this collection (allow, deny,
   // required)
   CollectionIntentOptions intents = 18;
+  // flagged is the cumulative number of times any claim in this collection
+  // has been flagged by an evaluator. Never decremented — it is an
+  // event-count metric, not a current-state count.
+  uint64 flagged = 19;
+  // flagged_active is the number of claims currently in FLAGGED state
+  // (incremented when a claim becomes FLAGGED, decremented when it
+  // transitions to a terminal evaluation status).
+  uint64 flagged_active = 20;
+  // service_agent_deposit_required is the minimum performance deposit balance
+  // a service agent must hold on this collection to submit claims. Empty /
+  // zero means no deposit gate for service agents.
+  repeated cosmos.base.v1beta1.Coin service_agent_deposit_required = 21 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // evaluator_deposit_required is the minimum performance deposit balance an
+  // evaluator must hold on this collection to submit evaluations. Empty /
+  // zero means no deposit gate for evaluators.
+  repeated cosmos.base.v1beta1.Coin evaluator_deposit_required = 22 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // dispute_deposit_amount is the stake a disputer attaches to MsgDisputeClaim.
+  // Held with the dispute record; refunded on AWARDED; becomes the penalty
+  // pot on DISMISSED. Empty / zero means no disputer stake required.
+  repeated cosmos.base.v1beta1.Coin dispute_deposit_amount = 23 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // penalty_amount_per_dispute is the fixed penalty applied on AWARDED. If
+  // empty / zero, the adjudicator sets the penalty per-resolution (bounded by
+  // the loser's deposit-required amount). At collection-validation time, if
+  // set, must be ≤ each non-empty deposit-required field.
+  repeated cosmos.base.v1beta1.Coin penalty_amount_per_dispute = 24 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // disputes_open is the number of currently-OPEN disputes against any
+  // claim in this collection (internally calculated).
+  uint64 disputes_open = 25;
+  // disputes_awarded is the cumulative number of disputes ever resolved as
+  // AWARDED on this collection (internally calculated, never decremented).
+  uint64 disputes_awarded = 26;
+  // disputes_dismissed is the cumulative number of disputes ever resolved as
+  // DISMISSED on this collection (internally calculated, never decremented).
+  uint64 disputes_dismissed = 27;
+  // min_deposit_period is the minimum duration a performance deposit must
+  // remain locked after the most recent top-up before
+  // MsgWithdrawPerformanceDeposit can be issued. Closes the in-same-tx exploit
+  // where an agent could deposit, submit/evaluate, and withdraw atomically —
+  // leaving zero economic stake at dispute time. Set to zero duration to
+  // disable the lock. Each MsgAddPerformanceDeposit rolls
+  // AgentDepositBalance.withdrawable_at forward to max(current, now +
+  // min_deposit_period); the slash path is not gated by this lock.
+  google.protobuf.Duration min_deposit_period = 28
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // adjudicators is the whitelist of approved adjudicator DIDs paired with
+  // their reward percentages. Each entry carries its own reward_percentage,
+  // letting adjudicators self-set their fees (a competitive market). The
+  // chain does not enforce who adjudicates a given dispute — whichever
+  // whitelisted DID lands MsgAdjudicateDispute first wins; the percentage
+  // applied is that adjudicator's entry. Required to be non-empty if any
+  // deposit-required / dispute_deposit / penalty field is set; clearing
+  // it is blocked while disputes_open > 0.
+  repeated AdjudicationDid adjudicators = 29;
 }
 
 message Payments {
@@ -260,6 +382,17 @@ message Claim {
   // If intent was used, this is the cw20_payment equivalent but with amounts
   // per token_id to transfer the same tokens to and from the escrow account
   repeated CW1155IntentPayment cw1155_intent_payment = 12;
+  // member_address is the team member this claim is on behalf of, if any.
+  // Copied from intent when use_intent is true. Used for budget restoration
+  // on claim rejection/dispute/invalidation.
+  string member_address = 13;
+  // evaluation_history holds prior evaluations for this claim in chronological
+  // order. The most recent evaluation always lives in `evaluation`; only
+  // superseded entries are appended here. Empty for claims that have been
+  // evaluated at most once. Populated when an evaluator FLAGS a claim and a
+  // subsequent evaluation (flag-then-flag chain or terminal finalisation)
+  // moves the prior evaluation into history.
+  repeated Evaluation evaluation_history = 14;
 }
 
 message ClaimPayments {
@@ -320,6 +453,31 @@ message Dispute {
   // type is expressed as an integer, interpreted by the client
   int32 type = 2;
   DisputeData data = 3;
+  // target_role is the party of the claim this dispute is filed against
+  // (submitter or evaluator). Exactly one role per dispute; to dispute both
+  // parties of the same claim, file two disputes. UNSPECIFIED only appears
+  // on legacy disputes migrated from pre-v7 state.
+  DisputeTargetRole target_role = 4;
+  // disputer_address is the account that filed the dispute and locked the
+  // dispute_deposit. Receives the deposit back on AWARDED, or 80% of the
+  // penalty (loser balance) on AWARDED; loses the deposit (split 80/20
+  // with adjudicator) on DISMISSED.
+  string disputer_address = 5;
+  // disputer_did is the DID of the disputer at filing time.
+  string disputer_did = 6;
+  // dispute_deposit is the amount the disputer locked at filing, equal to
+  // collection.dispute_deposit_amount at the time of filing. Held in the
+  // collection escrow account.
+  repeated cosmos.base.v1beta1.Coin dispute_deposit = 7 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // submitted_at is the block time the dispute was filed.
+  google.protobuf.Timestamp submitted_at = 8 [ (gogoproto.stdtime) = true ];
+  // status is the current lifecycle state.
+  DisputeStatus status = 9;
+  // resolution is populated on adjudication (AWARDED or DISMISSED).
+  DisputeResolution resolution = 10;
 }
 
 message DisputeData {
@@ -327,6 +485,86 @@ message DisputeData {
   string type = 2;
   string proof = 3;
   bool encrypted = 4;
+}
+
+// DisputeResolution captures the outcome of MsgAdjudicateDispute. Records
+// the intended penalty (what the adjudicator/collection prescribed) and the
+// actual penalty paid (capped at the loser's available deposit balance —
+// may be less than intended if a prior dispute already drained the balance).
+message DisputeResolution {
+  // adjudicator_did is the DID that adjudicated; must be in the collection's
+  // adjudication_entity_dids whitelist.
+  string adjudicator_did = 1;
+  // adjudicator_address is the signer of MsgAdjudicateDispute. Either an
+  // entity account belonging to adjudicator_did, or a key registered on the
+  // adjudicator_did DID document.
+  string adjudicator_address = 2;
+  // adjudicator_payout_address is where the 20% reward (or 100% if no
+  // winner share) was actually paid out — either the AdjudicatorRevenue
+  // entity account (auto-created) when the DID is an entity DID with module
+  // accounts, or adjudicator_address otherwise.
+  string adjudicator_payout_address = 3;
+  google.protobuf.Timestamp resolved_at = 4 [ (gogoproto.stdtime) = true ];
+  // data is the structured payload the adjudicator attached to the
+  // resolution — same shape as the dispute filing's DisputeData. Lets the
+  // adjudicator pin an opinion document (IPFS/matrix uri + proof/cid), declare
+  // its MIME type, and flag encryption — mirroring how disputers attach
+  // evidence at filing time.
+  DisputeData data = 5;
+  // intended_penalty is the penalty the adjudicator selected (or the
+  // collection's penalty_amount_per_dispute if fixed). May exceed what was
+  // actually paid if the loser's balance was insufficient.
+  repeated cosmos.base.v1beta1.Coin intended_penalty = 6 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // actual_penalty_paid is what was actually slashed from the loser's
+  // balance (or the dispute_deposit, on DISMISSED). Always ≤ intended.
+  repeated cosmos.base.v1beta1.Coin actual_penalty_paid = 7 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // winner_amount is the portion of actual_penalty_paid that went to the
+  // dispute winner (disputer on AWARDED, target agent on DISMISSED).
+  repeated cosmos.base.v1beta1.Coin winner_amount = 8 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // adjudicator_amount is the portion of actual_penalty_paid that went to
+  // the adjudicator (governed by collection.adjudicator_reward_percentage).
+  repeated cosmos.base.v1beta1.Coin adjudicator_amount = 9 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // winner_address is the address that received the winner_amount.
+  string winner_address = 10;
+  // loser_address is the address whose balance / deposit was slashed.
+  string loser_address = 11;
+}
+
+// AgentDepositBalance is an agent's rolling performance-deposit balance for
+// a single collection. Held inside the collection's existing escrow account
+// (no separate escrow). Topped up via MsgAddPerformanceDeposit, drained on
+// adjudicated dispute losses, withdrawable when no active dispute targets
+// this agent on this collection.
+message AgentDepositBalance {
+  // collection_id this balance belongs to.
+  string collection_id = 1;
+  // agent_address is the account this balance is held for.
+  string agent_address = 2;
+  // amount is the current balance in escrow on this agent's behalf.
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // withdrawable_at is the earliest block time at which
+  // MsgWithdrawPerformanceDeposit may be issued against this balance. Rolled
+  // forward to max(current, now + collection.min_deposit_period) on each
+  // top-up so an agent cannot deposit + submit + withdraw atomically and
+  // leave nothing at stake before a dispute can land. Zero on balances
+  // created under a collection with min_deposit_period == 0 (no lock).
+  // The slash path is not gated by this lock; only voluntary withdrawal is.
+  google.protobuf.Timestamp withdrawable_at = 4 [ (gogoproto.stdtime) = true ];
 }
 
 // Intent defines the structure for a service agent's claim intent.
@@ -364,4 +602,40 @@ message Intent {
   // Same as cw1155_payment but with amounts per token_id to transfer
   // the same tokens to and from the escrow account
   repeated CW1155IntentPayment cw1155_intent_payment = 14;
+  // member_address is the team member this intent is on behalf of, if any.
+  // Required if the collection has member budgets. Validated against the
+  // oracle's SubmitClaimConstraints.member_address.
+  string member_address = 15;
+}
+
+// MemberBudget defines a team member's periodic spending budget for a
+// collection. Stored as separate state keyed by collectionId/memberAddress
+// for gas-efficient O(1) reads and writes independent of team size.
+message MemberBudget {
+  // collection_id this budget belongs to
+  string collection_id = 1;
+  // member's blockchain address
+  string member_address = 2;
+  // period duration for budget reset (e.g., 30 days). Must be at least 24 hours
+  // (MinMemberBudgetPeriod). Periods shorter than 24 hours are rejected to
+  // prevent griefing via the lazy-reset loop in the intent handler.
+  google.protobuf.Duration period = 3
+      [ (gogoproto.nullable) = false, (gogoproto.stdduration) = true ];
+  // maximum native coin spend allowed per period
+  repeated cosmos.base.v1beta1.Coin period_spend_limit = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // native coins already spent (intented) in the current period
+  repeated cosmos.base.v1beta1.Coin period_spent = 5 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+  // maximum CW20 spend allowed per period
+  repeated CW20Payment period_cw20_spend_limit = 6;
+  // CW20 amount already spent in the current period
+  repeated CW20Payment period_cw20_spent = 7;
+  // timestamp when current period resets (lazy reset in intent handler,
+  // following the feegrant PeriodicAllowance pattern)
+  google.protobuf.Timestamp period_reset_at = 8 [ (gogoproto.stdtime) = true ];
 }
