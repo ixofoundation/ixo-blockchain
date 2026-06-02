@@ -1,0 +1,48 @@
+{
+  "skill_name": "ixo-blockchain",
+  "evals": [
+    {
+      "id": 0,
+      "name": "cli-retire-credits",
+      "prompt": "I have 500 carbon credits on the ixo blockchain that I need to retire (permanently take them out of circulation as a verified offset). The token id is `abc123` and they're held in the cw1155 contract `ixo1xyzcontractaddress`. I'm retiring them on behalf of an owner in California, USA. Using the ixod CLI, give me the exact command to retire them.",
+      "expected_output": "An `ixod tx token retire-token` command (NOT cancel-token) with a JSON doc containing tokens [{id: abc123, amount: 500}], a jurisdiction reflecting US/California, and a reason, plus standard tx flags (--from, --chain-id, fees/gas).",
+      "files": [],
+      "assertions": [
+        "Uses the command `ixod tx token retire-token` (not `cancel-token`, not a hallucinated command name)",
+        "Includes a jurisdiction value reflecting California/US (retire requires jurisdiction)",
+        "Specifies amount 500 and token id abc123",
+        "Does NOT present cancel-token as the way to retire/offset credits",
+        "Includes standard tx flags including --from and --chain-id"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "ts-sdk-entity-collection",
+      "prompt": "Using the @ixo/impactxclient-sdk TypeScript SDK, write code to (1) create an entity (digital twin) on the ixo blockchain, and then (2) create a claim collection for that entity that pays service agents 1 IXO each time they submit a claim. Show how the messages are constructed and broadcast.",
+      "expected_output": "TS using typeUrls /ixo.entity.v1beta1.MsgCreateEntity and /ixo.claims.v1beta1.MsgCreateCollection, built with ixo.<module>.v1beta1.Msg*.fromPartial({...}); the 1 IXO submission payment expressed as 1000000 uixo in payments.submission; broadcast via signAndBroadcast.",
+      "files": [],
+      "assertions": [
+        "Uses correct typeUrl /ixo.entity.v1beta1.MsgCreateEntity",
+        "Uses correct typeUrl /ixo.claims.v1beta1.MsgCreateCollection",
+        "Uses the ixo.<module>.v1beta1.Msg*.fromPartial({...}) construction pattern",
+        "Expresses 1 IXO as 1000000 uixo (correct micro-denom conversion)",
+        "Places the payment in the collection submission payment slot",
+        "Broadcasts via signAndBroadcast (and/or createSigningClient/getSigningixoClient)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "did-create-and-mint",
+      "prompt": "I'm new to the ixo blockchain. Walk me through how to create a DID document for my account, and then create an impact token and mint some of it to my account. Using the ixod CLI is fine.",
+      "expected_output": "Steps: create account DID with `ixod tx iid create-iid` using did:ixo:<own-address> (must equal signer); then `ixod tx token create` (token_type ixo1155) followed by `ixod tx token mint`. Correct command names and order.",
+      "files": [],
+      "assertions": [
+        "Account DID uses the did:ixo:<account> form matching the user's own address (must equal signer)",
+        "Uses `ixod tx iid create-iid` to create the DID document",
+        "Uses `ixod tx token create` then `ixod tx token mint` in that order with correct command names",
+        "References the ixo1155 / CW1155 token type",
+        "Does not invent a nonexistent ixod subcommand"
+      ]
+    }
+  ]
+}
