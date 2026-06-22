@@ -162,6 +162,14 @@ func (s msgServer) UpdateEntity(goCtx context.Context, msg *types.MsgUpdateEntit
 		return nil, err
 	}
 
+	// Bind the signer to the acting DID in the keeper, so authorization holds on
+	// routes that bypass the IID ante (CosmWasm, ICA host, authz). Without this,
+	// the check below (ControllerDid controls the entity) only proves
+	// DID-controls-DID; it does not prove the caller controls ControllerDid.
+	if err := s.Keeper.VerifyDidSignerAuthentication(ctx, msg.ControllerDid.Did(), msg.ControllerAddress); err != nil {
+		return nil, err
+	}
+
 	if err := iidkeeper.ExecuteOnDidWithRelationships(
 		ctx,
 		s.Keeper.IidKeeper,
@@ -223,6 +231,14 @@ func (s msgServer) TransferEntity(goCtx context.Context, msg *types.MsgTransferE
 
 	nftContractAddress, err := sdk.AccAddressFromBech32(nftContractAddressParam)
 	if err != nil {
+		return nil, err
+	}
+
+	// Bind the signer to the acting (owner) DID in the keeper, so authorization
+	// holds on routes that bypass the IID ante (CosmWasm, ICA host, authz). The
+	// cw721 transfer below is also owner-gated, but the IID-document rewrite
+	// runs independently of it, so it needs its own signer→DID check.
+	if err := s.Keeper.VerifyDidSignerAuthentication(ctx, msg.OwnerDid.Did(), msg.OwnerAddress); err != nil {
 		return nil, err
 	}
 
@@ -309,6 +325,14 @@ func (s msgServer) UpdateEntityVerified(goCtx context.Context, msg *types.MsgUpd
 
 	if msg.RelayerNodeDid.Did() != entity.RelayerNode {
 		return nil, errorsmod.Wrapf(types.ErrUpdateVerifiedFailed, "invalid relayer node did (%s)", msg.RelayerNodeDid.String())
+	}
+
+	// Bind the signer to the relayer-node DID in the keeper, so authorization
+	// holds on routes that bypass the IID ante (CosmWasm, ICA host, authz).
+	// Pinning RelayerNodeDid to entity state alone does not prove the caller
+	// controls that DID.
+	if err := s.Keeper.VerifyDidSignerAuthentication(ctx, msg.RelayerNodeDid.Did(), msg.RelayerNodeAddress); err != nil {
+		return nil, err
 	}
 
 	entity.EntityVerified = msg.EntityVerified

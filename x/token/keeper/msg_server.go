@@ -213,6 +213,10 @@ func (s msgServer) MintToken(goCtx context.Context, msg *types.MsgMintToken) (*t
 func (s msgServer) TransferToken(goCtx context.Context, msg *types.MsgTransferToken) (*types.MsgTransferTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	if _, err := s.Keeper.ValidateTokenBatch(ctx, msg.Tokens); err != nil {
+		return nil, err
+	}
+
 	recipientAddress, err := sdk.AccAddressFromBech32(msg.Recipient)
 	if err != nil {
 		return nil, err
@@ -271,6 +275,10 @@ func (s msgServer) TransferToken(goCtx context.Context, msg *types.MsgTransferTo
 
 func (s msgServer) RetireToken(goCtx context.Context, msg *types.MsgRetireToken) (*types.MsgRetireTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if _, err := s.Keeper.ValidateTokenBatch(ctx, msg.Tokens); err != nil {
+		return nil, err
+	}
 
 	// Get Token for the first token in tokens field
 	_, token, err := s.Keeper.GetTokenById(ctx, msg.Tokens[0].Id)
@@ -340,6 +348,10 @@ func (s msgServer) RetireToken(goCtx context.Context, msg *types.MsgRetireToken)
 
 func (s msgServer) TransferCredit(goCtx context.Context, msg *types.MsgTransferCredit) (*types.MsgTransferCreditResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	if _, err := s.Keeper.ValidateTokenBatch(ctx, msg.Tokens); err != nil {
+		return nil, err
+	}
 
 	// Get Token for the first token in tokens field
 	_, token, err := s.Keeper.GetTokenById(ctx, msg.Tokens[0].Id)
@@ -411,6 +423,10 @@ func (s msgServer) TransferCredit(goCtx context.Context, msg *types.MsgTransferC
 func (s msgServer) CancelToken(goCtx context.Context, msg *types.MsgCancelToken) (*types.MsgCancelTokenResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
+	if _, err := s.Keeper.ValidateTokenBatch(ctx, msg.Tokens); err != nil {
+		return nil, err
+	}
+
 	// Get Token for the first token in tokens field
 	_, token, err := s.Keeper.GetTokenById(ctx, msg.Tokens[0].Id)
 	if err != nil {
@@ -462,6 +478,12 @@ func (s msgServer) CancelToken(goCtx context.Context, msg *types.MsgCancelToken)
 		})
 	}
 
+	// Checked subtraction: math.Uint.Sub panics on underflow, so reject a cancel
+	// that exceeds current supply rather than aborting with a panic.
+	if amount.GT(token.Supply) {
+		return nil, errorsmod.Wrapf(types.ErrTokenAmountIncorrect,
+			"cancel amount %s exceeds current supply %s for token %s", amount, token.Supply, token.Name)
+	}
 	token.Supply = token.Supply.Sub(amount)
 	token.Cancelled = append(token.Cancelled, cancelledTokens...)
 	s.Keeper.SetToken(ctx, *token)

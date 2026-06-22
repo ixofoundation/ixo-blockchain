@@ -6,9 +6,22 @@ import (
 	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
 )
 
+// IidTxMsg subjects a message to the IID ante check "the proto signer must
+// control the GetIidController DID". That contract only holds for claims
+// messages whose proto signer IS the party identified by the DID:
+//   - MsgDisputeClaim   (signer agent_address      ↔ AgentDid)
+//   - MsgAdjudicateDispute (signer adjudicator_address ↔ AdjudicatorDid)
+//
+// MsgSubmitClaim, MsgEvaluateClaim and MsgCreateClaimAuthorization are
+// intentionally NOT IidTxMsg: their proto signer is admin_address (the
+// collection admin / authorizer), while their *_did field points at a DIFFERENT
+// party (the agent / creator) and is attribution only — the admin is never
+// expected to control the agent's DID. Authorization for those is enforced in
+// the keeper via `collection.Admin == admin_address` (+ authz grants for
+// delegated submission), which holds on every route (top-level, authz.MsgExec,
+// ICA, wasm). Subjecting them to the IID ante would wrongly require the admin to
+// control the agent's DID and break delegated claims.
 var (
-	_ iidante.IidTxMsg = &MsgSubmitClaim{}
-	_ iidante.IidTxMsg = &MsgEvaluateClaim{}
 	_ iidante.IidTxMsg = &MsgDisputeClaim{}
 	_ iidante.IidTxMsg = &MsgAdjudicateDispute{}
 )
@@ -31,7 +44,8 @@ const TypeMsgSubmitClaim = "submit_claim"
 
 var _ sdk.Msg = &MsgSubmitClaim{}
 
-func (msg MsgSubmitClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+// NOTE: not IidTxMsg — authorized via collection.Admin in the keeper. AgentDid
+// is attribution only (see the IidTxMsg comment block above).
 
 func (msg MsgSubmitClaim) Type() string { return TypeMsgSubmitClaim }
 
@@ -44,7 +58,8 @@ const TypeMsgEvaluateClaim = "evaluate_claim"
 
 var _ sdk.Msg = &MsgEvaluateClaim{}
 
-func (msg MsgEvaluateClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+// NOTE: not IidTxMsg — authorized via collection.Admin in the keeper. AgentDid
+// is attribution only (see the IidTxMsg comment block above).
 
 func (msg MsgEvaluateClaim) Type() string { return TypeMsgEvaluateClaim }
 
@@ -138,9 +153,10 @@ const TypeMsgCreateClaimAuthorization = "create_claim_authorization"
 
 var _ sdk.Msg = &MsgCreateClaimAuthorization{}
 
-func (msg MsgCreateClaimAuthorization) Type() string { return TypeMsgCreateClaimAuthorization }
+// NOTE: not IidTxMsg — authorized via collection.Admin in the keeper. CreatorDid
+// is attribution only (see the IidTxMsg comment block above).
 
-func (msg MsgCreateClaimAuthorization) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
+func (msg MsgCreateClaimAuthorization) Type() string { return TypeMsgCreateClaimAuthorization }
 
 func (msg MsgCreateClaimAuthorization) Route() string { return RouterKey }
 

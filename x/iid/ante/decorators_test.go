@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	signing "github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authsigning "github.com/cosmos/cosmos-sdk/x/auth/signing"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
@@ -131,6 +132,87 @@ func (s *IIDAnteTestSuite) TestVerifyIidControllers_UnauthorizedSigner() {
 
 	err := iidante.VerifyIidControllersAgainstSignature(tx, s.Ctx, s.App.IidKeeper, s.cdc())
 	s.Require().ErrorContains(err, "not authorized to act on behalf of the did")
+}
+
+// TestVerifyIidControllers_UnauthorizedSignerInsideMsgExec is the core
+// regression test for the 2026-06-20 defence-in-depth gap: an IidTxMsg with an
+// unauthorized signer, hidden inside an authz.MsgExec, must now be rejected.
+// Before the fix the ante iterated top-level messages only and this passed.
+func (s *IIDAnteTestSuite) TestVerifyIidControllers_UnauthorizedSignerInsideMsgExec() {
+	s.SetupTest()
+	owner := apptesting.RandomAccountAddress()
+	stranger := apptesting.RandomAccountAddress()
+	did := s.seedIIDFor(owner)
+
+	inner := &bondstypes.MsgCreateBond{
+		BondDid:                  "did:ixo:bond-exec",
+		CreatorDid:               iidtypes.DIDFragment(did),
+		FeeAddress:               stranger.String(),
+		ReserveWithdrawalAddress: stranger.String(),
+		CreatorAddress:           stranger.String(),
+	}
+	exec := authz.NewMsgExec(stranger, []sdk.Msg{inner})
+	tx := &stubSigTx{msgs: []sdk.Msg{&exec}}
+
+	err := iidante.VerifyIidControllersAgainstSignature(tx, s.Ctx, s.App.IidKeeper, s.cdc())
+	s.Require().ErrorContains(err, "not authorized to act on behalf of the did")
+}
+
+// TestVerifyIidControllers_AuthorizedSignerInsideMsgExec confirms the recursion
+// does not over-reject: a correctly-authorized IidTxMsg nested in a MsgExec
+// still passes.
+func (s *IIDAnteTestSuite) TestVerifyIidControllers_AuthorizedSignerInsideMsgExec() {
+	s.SetupTest()
+	owner := apptesting.RandomAccountAddress()
+	did := s.seedIIDFor(owner)
+
+	inner := &bondstypes.MsgCreateBond{
+		BondDid:                  "did:ixo:bond-exec-ok",
+		CreatorDid:               iidtypes.DIDFragment(did),
+		Token:                    "tok",
+		Name:                     "test",
+		ReserveTokens:            []string{"uixo"},
+		FeeAddress:               owner.String(),
+		ReserveWithdrawalAddress: owner.String(),
+		MaxSupply:                sdk.NewCoin("tok", math.NewInt(1000)),
+		CreatorAddress:           owner.String(),
+	}
+	exec := authz.NewMsgExec(owner, []sdk.Msg{inner})
+	tx := &stubSigTx{msgs: []sdk.Msg{&exec}}
+
+	err := iidante.VerifyIidControllersAgainstSignature(tx, s.Ctx, s.App.IidKeeper, s.cdc())
+	s.Require().NoError(err)
+}
+
+// TestDecorator_RejectsUnauthorizedInsideMsgExec exercises the wired
+// IidResolutionDecorator.AnteHandle end-to-end (the wrapper actually placed in
+// the app ante chain), confirming an unauthorized IidTxMsg hidden in a
+// MsgExec is rejected and next() is never reached.
+func (s *IIDAnteTestSuite) TestDecorator_RejectsUnauthorizedInsideMsgExec() {
+	s.SetupTest()
+	owner := apptesting.RandomAccountAddress()
+	stranger := apptesting.RandomAccountAddress()
+	did := s.seedIIDFor(owner)
+
+	inner := &bondstypes.MsgCreateBond{
+		BondDid:                  "did:ixo:bond-dec",
+		CreatorDid:               iidtypes.DIDFragment(did),
+		FeeAddress:               stranger.String(),
+		ReserveWithdrawalAddress: stranger.String(),
+		CreatorAddress:           stranger.String(),
+	}
+	exec := authz.NewMsgExec(stranger, []sdk.Msg{inner})
+	tx := &stubSigTx{msgs: []sdk.Msg{&exec}}
+
+	dec := iidante.NewIidResolutionDecorator(s.App.IidKeeper, s.cdc())
+	nextCalled := false
+	next := func(ctx sdk.Context, _ sdk.Tx, _ bool) (sdk.Context, error) {
+		nextCalled = true
+		return ctx, nil
+	}
+	_, err := dec.AnteHandle(s.Ctx, tx, false, next)
+	s.Require().Error(err)
+	s.Require().False(nextCalled, "ante must short-circuit before next()")
 }
 
 // TestVerifyIidControllers_NonIidMsgPasses confirms that messages outside
