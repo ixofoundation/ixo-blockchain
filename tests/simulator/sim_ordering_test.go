@@ -10,7 +10,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app"
+	"github.com/ixofoundation/ixo-blockchain/v8/app"
 )
 
 // modulesNeedingBeginBlocker lists custom ixo modules that publish a

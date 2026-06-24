@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/names/types"
 )
 
 // TestGenesis_RoundTrip ensures InitGenesis followed by ExportGenesis returns

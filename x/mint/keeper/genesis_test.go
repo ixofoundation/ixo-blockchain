@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v7/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/mint/types"
 )
 
 func (s *KeeperTestSuite) TestGenesis_RoundTrip() {

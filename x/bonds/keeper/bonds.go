@@ -5,7 +5,7 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
 	"github.com/tendermint/go-amino"
 )
 

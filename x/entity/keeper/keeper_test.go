@@ -7,8 +7,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
 )
 
 // KeeperTestSuite covers x/entity keeper-level CRUD, account creation, and

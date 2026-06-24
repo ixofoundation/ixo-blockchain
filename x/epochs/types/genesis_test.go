@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/epochs/types"
 )
 
 func TestDefaultGenesis_HasDailyHourlyWeekly(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/liquidstake/types"
 )
 
 // Keeper is the persistent state interface for the liquidstake module. The

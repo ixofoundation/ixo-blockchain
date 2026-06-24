@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	bondsante "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/ante"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	bondsante "github.com/ixofoundation/ixo-blockchain/v8/x/bonds/ante"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // stubTx is a minimal sdk.Tx — RejectBondsMsgDecorator only calls GetMsgs().

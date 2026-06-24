@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	claimstypes "github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	claimstypes "github.com/ixofoundation/ixo-blockchain/v8/x/claims/types"
 )
 
 // ClaimsNoAnteTestSuite dispatches claims messages through the app's REAL

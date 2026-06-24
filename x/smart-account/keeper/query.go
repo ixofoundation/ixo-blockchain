@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/smart-account/types"
 )
 
 var _ types.QueryServer = Keeper{}

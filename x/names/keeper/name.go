@@ -6,7 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/names/types"
 )
 
 // SetNameRecord writes a NameRecord and (re)populates the owner reverse

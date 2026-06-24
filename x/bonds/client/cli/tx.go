@@ -12,9 +12,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	bondsclient "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/client"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	bondsclient "github.com/ixofoundation/ixo-blockchain/v8/x/bonds/client"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 func NewTxCmd() *cobra.Command {

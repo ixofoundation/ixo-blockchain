@@ -4,8 +4,8 @@ import (
 	"cosmossdk.io/math"
 	"go.uber.org/mock/gomock"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/token/types"
 )
 
 // seedTokenClass seeds a Token (keyed by name) with a given contract + supply,

@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/liquidstake/types"
 )
 
 // InitGenesis applies the multi-pool genesis state: writes ModuleParams,

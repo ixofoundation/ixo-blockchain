@@ -5,8 +5,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/claims/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v8/x/iid/ante"
 )
 
 // TestClaimsIidTxMsgMembership locks in which claims messages are subject to the

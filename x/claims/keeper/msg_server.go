@@ -9,9 +9,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/claims/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 type msgServer struct {

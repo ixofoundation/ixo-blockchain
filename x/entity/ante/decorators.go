@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v7/x/entity/keeper"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v8/x/entity/keeper"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
 )
 
 // maxMsgExecNestingDepth caps how deep we recurse into nested authz.MsgExec

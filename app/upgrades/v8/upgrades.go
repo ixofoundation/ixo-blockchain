@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/keepers"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/keepers"
 )
 
 // icaHostAllowMessages is the explicit allow-list of message type URLs that an

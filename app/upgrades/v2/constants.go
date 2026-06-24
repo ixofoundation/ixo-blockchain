@@ -1,7 +1,7 @@
 package v2
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v7/app/upgrades"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/upgrades"
 
 	store "cosmossdk.io/store/types"
 	packetforwardtypes "github.com/cosmos/ibc-apps/middleware/packet-forward-middleware/v8/packetforward/types"

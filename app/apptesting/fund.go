@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktestutil "github.com/cosmos/cosmos-sdk/x/bank/testutil"
 
-	minttypes "github.com/ixofoundation/ixo-blockchain/v7/x/mint/types"
+	minttypes "github.com/ixofoundation/ixo-blockchain/v8/x/mint/types"
 )
 
 // FundAcc tops up `acc` with `amounts`, minting fresh coins via the mint

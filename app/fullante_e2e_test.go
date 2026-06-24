@@ -20,10 +20,10 @@ import (
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
-	bondstypes "github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/lib/ixo"
+	bondstypes "github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // This file is the highest-fidelity harness: it signs REAL transactions with a

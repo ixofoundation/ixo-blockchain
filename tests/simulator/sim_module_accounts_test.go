@@ -18,7 +18,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app"
+	"github.com/ixofoundation/ixo-blockchain/v8/app"
 )
 
 // expectedModuleAccounts lists every module that MUST have a registered

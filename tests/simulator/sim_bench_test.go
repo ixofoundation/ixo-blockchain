@@ -16,7 +16,7 @@ import (
 	"cosmossdk.io/log"
 	dbm "github.com/cosmos/cosmos-db"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app"
+	"github.com/ixofoundation/ixo-blockchain/v8/app"
 )
 
 // BenchmarkFullAppSimulation profiles SimulateFromSeed against the IxoApp.

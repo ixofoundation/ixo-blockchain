@@ -8,7 +8,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
 )
 
 // bondsMsgTypePrefix is the proto type-URL prefix shared by every x/bonds

@@ -3,7 +3,7 @@ package v8
 import (
 	store "cosmossdk.io/store/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/upgrades"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/upgrades"
 )
 
 // UpgradeName is the on-chain identifier for the v8 emergency security upgrade

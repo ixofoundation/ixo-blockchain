@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
 )
 
 // disabledMsgServer implements types.MsgServer but rejects every message with

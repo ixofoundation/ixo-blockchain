@@ -7,8 +7,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/cosmos/cosmos-sdk/x/authz"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v7/x/iid/keeper"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v8/x/iid/keeper"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // maxMsgExecNestingDepth caps how deep VerifyIidControllersAgainstSignature

@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/keepers"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/keepers"
 )
 
 // CreateUpgradeHandler builds the v7 upgrade handler.

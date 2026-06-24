@@ -3,8 +3,8 @@ package types
 import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v8/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 const (

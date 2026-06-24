@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/names/types"
 )
 
 // InitGenesis writes namespaces and name records to state. Genesis validation

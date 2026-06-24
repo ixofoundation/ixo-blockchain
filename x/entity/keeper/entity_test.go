@@ -1,7 +1,7 @@
 package keeper_test
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
 )
 
 func (s *KeeperTestSuite) TestSetGetEntity_RoundTrip() {

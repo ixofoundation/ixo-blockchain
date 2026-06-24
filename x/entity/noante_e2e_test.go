@@ -7,9 +7,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // EntityNoAnteTestSuite dispatches entity messages through the app's REAL

@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"cosmossdk.io/math"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/token/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/token/types"
 )
 
 func (s *KeeperTestSuite) TestGenesis_RoundTrip() {

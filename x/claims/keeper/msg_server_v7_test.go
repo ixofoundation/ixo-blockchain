@@ -6,9 +6,9 @@ import (
 	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	claimskeeper "github.com/ixofoundation/ixo-blockchain/v7/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	claimskeeper "github.com/ixofoundation/ixo-blockchain/v8/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/claims/types"
 )
 
 // v7 feature surface that lives off the wasm payment path:

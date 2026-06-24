@@ -6,9 +6,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	liquidstakekeeper "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	liquidstakekeeper "github.com/ixofoundation/ixo-blockchain/v8/x/liquidstake/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/liquidstake/types"
 )
 
 // govAuthority returns the gov module account bech32 address — required as

@@ -6,8 +6,8 @@ import (
 	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	liquidstakekeeper "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/keeper"
-	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	liquidstakekeeper "github.com/ixofoundation/ixo-blockchain/v8/x/liquidstake/keeper"
+	liquidstaketypes "github.com/ixofoundation/ixo-blockchain/v8/x/liquidstake/types"
 )
 
 // migrateLiquidStakeToMultiPool reshapes the pre-v7 single-pool liquidstake

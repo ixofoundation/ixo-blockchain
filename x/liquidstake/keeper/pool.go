@@ -9,7 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/liquidstake/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/liquidstake/types"
 )
 
 // ----------------------------------------------------------------------------

@@ -2,8 +2,8 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v8/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // IidTxMsg subjects a message to the IID ante check "the proto signer must
