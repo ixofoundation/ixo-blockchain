@@ -14,7 +14,7 @@ FROM golang:${GO_VERSION}-alpine3.20 AS builder
 # TODO: maybe extract below args to where called in cicd?
 # git log -1 --format='%H'
 # Override GIT_COMMIT at build time: --build-arg GIT_COMMIT=$(git rev-parse HEAD)
-ARG GIT_VERSION="v7.0.0"
+ARG GIT_VERSION="v8.0.0"
 ARG GIT_COMMIT="0000000000000000000000000000000000000000"
 
 ENV PACKAGES="ca-certificates build-base binutils-gold curl make git libc-dev bash file gcc linux-headers eudev-dev"
