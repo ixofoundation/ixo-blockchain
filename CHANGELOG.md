@@ -5,7 +5,47 @@ All notable changes to the ixo Blockchain are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 The version suffix of the Go module path tracks the major chain-upgrade version
-(e.g. `v7.x.y` → module `github.com/ixofoundation/ixo-blockchain/v8`).
+(e.g. `v8.x.y` → module `github.com/ixofoundation/ixo-blockchain/v8`).
+
+## [v8.0.0] - "Alpha"
+
+On-chain upgrade name: **`Alpha`**. Emergency security release, enacted on mainnet
+via expedited governance proposal #482 at height 17871000. Go module path bumped
+`v7 → v8`.
+
+### Security
+- **x/bonds disabled**: in response to a disclosed vulnerability (advisory
+  `GHSA-w3rp-4cm2-4wgc`), the bonds module is disabled at the ante,
+  message-server and module levels. All bonds messages are rejected; existing
+  bond state is retained but no new state transitions are processed.
+- **iid ante — `authz.MsgExec` recursion**: the IID ante resolves the effective
+  signer through single- and double-nested `authz.MsgExec` delegation, so the
+  "signer must control the message DID" check cannot be bypassed via delegation.
+- **entity authorization**: the entity keeper binds the signing account to the
+  entity's controller DID, and the entity ante decorator handles nested
+  `authz.MsgExec`.
+- **ICA host allow-list**: the Interchain Accounts host `AllowMessages` set is
+  restricted to an ante-safe allow-list.
+
+### Changed
+- **claims — IID-ante scoping**: `MsgSubmitClaim`, `MsgEvaluateClaim`,
+  `MsgCreateClaimAuthorization`, `MsgClaimIntent` and `MsgDisputeClaim` are no
+  longer `IidTxMsg`; their `*_did` field is attribution only and authorization is
+  enforced in the keeper, so delegated and module-account agent flows are not
+  broken. `MsgAdjudicateDispute` remains `IidTxMsg` (the keeper already requires
+  the signer to control the adjudicator DID).
+- **x/token**: batch minting/transfer paths hardened.
+- Go module path `github.com/ixofoundation/ixo-blockchain/v7 → /v8`.
+
+### Migrations
+- Upgrade handler `Alpha`: disables the bonds module and restricts the ICA host
+  `AllowMessages` set to an ante-safe allow-list.
+
+### Tooling
+- Added end-to-end "no-ante" harnesses (`x/iid`, `x/entity`, `x/claims`),
+  `x/token` batch tests, and a claims IID-ante membership regression guard.
+
+[v8.0.0]: https://github.com/ixofoundation/ixo-blockchain/releases/tag/v8.0.0
 
 ## [v7.0.0] - "Opus"
 
