@@ -7,22 +7,24 @@ import (
 )
 
 // IidTxMsg subjects a message to the IID ante check "the proto signer must
-// control the GetIidController DID". That contract only holds for claims
-// messages whose proto signer IS the party identified by the DID:
-//   - MsgDisputeClaim   (signer agent_address      ↔ AgentDid)
-//   - MsgAdjudicateDispute (signer adjudicator_address ↔ AdjudicatorDid)
+// control the GetIidController DID". Among claims messages only
+// MsgAdjudicateDispute is safe to subject to it: its signer is
+// adjudicator_address and the keeper itself already requires the signer to
+// control AdjudicatorDid (AuthorizeAdjudicator), so the two always match.
 //
-// MsgSubmitClaim, MsgEvaluateClaim and MsgCreateClaimAuthorization are
-// intentionally NOT IidTxMsg: their proto signer is admin_address (the
-// collection admin / authorizer), while their *_did field points at a DIFFERENT
-// party (the agent / creator) and is attribution only — the admin is never
-// expected to control the agent's DID. Authorization for those is enforced in
-// the keeper via `collection.Admin == admin_address` (+ authz grants for
-// delegated submission), which holds on every route (top-level, authz.MsgExec,
-// ICA, wasm). Subjecting them to the IID ante would wrongly require the admin to
-// control the agent's DID and break delegated claims.
+// MsgSubmitClaim, MsgEvaluateClaim, MsgCreateClaimAuthorization, MsgClaimIntent
+// and MsgDisputeClaim are intentionally NOT IidTxMsg. Their *_did field
+// (agent_did / creator_did) is attribution only and is legitimately DECOUPLED
+// from the proto signer: submit/evaluate/createauth are signed by admin_address
+// (the collection admin), and intent/dispute are signed by agent_address, which
+// may be a delegated agent or an entity module account (e.g. a "fee" module
+// account that receives the payout) whose address differs from the agent_did on
+// the signed VC. Authorization is enforced in the keeper (collection.Admin /
+// SubmitClaimAuthorization grant / dispute deposit), which holds on every route
+// (top-level, authz.MsgExec, ICA, wasm). Subjecting them to the IID ante would
+// wrongly require the signer to control the agent's DID and break delegated /
+// on-behalf claims (e.g. the SUPA onboarding fee flow's module-account agent).
 var (
-	_ iidante.IidTxMsg = &MsgDisputeClaim{}
 	_ iidante.IidTxMsg = &MsgAdjudicateDispute{}
 )
 
@@ -72,7 +74,9 @@ const TypeMsgDisputeClaim = "dispute_claim"
 
 var _ sdk.Msg = &MsgDisputeClaim{}
 
-func (msg MsgDisputeClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+// NOTE: not IidTxMsg — signer agent_address may be a delegated/module-account
+// agent whose address differs from AgentDid (attribution). Authorized in the
+// keeper via the dispute deposit + collection membership.
 
 func (msg MsgDisputeClaim) Type() string { return TypeMsgDisputeClaim }
 
@@ -140,9 +144,12 @@ const TypeMsgClaimIntent = "claim_intent"
 
 var _ sdk.Msg = &MsgClaimIntent{}
 
-func (msg MsgClaimIntent) Type() string { return TypeMsgClaimIntent }
+// NOTE: not IidTxMsg — signer agent_address may be a delegated/module-account
+// agent (e.g. the SUPA onboarding "fee" module account) whose address differs
+// from AgentDid (attribution). Authorized in the keeper via the agent's
+// SubmitClaimAuthorization grant from collection.Admin.
 
-func (msg MsgClaimIntent) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+func (msg MsgClaimIntent) Type() string { return TypeMsgClaimIntent }
 
 func (msg MsgClaimIntent) Route() string { return RouterKey }
 
