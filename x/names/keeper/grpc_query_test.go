@@ -3,8 +3,8 @@ package keeper_test
 import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/names/types"
 )
 
 // ----------------------------------------------------------------------------

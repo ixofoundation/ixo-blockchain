@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	smartaccountpost "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/post"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	smartaccountpost "github.com/ixofoundation/ixo-blockchain/v8/x/smart-account/post"
 )
 
 // PostHandlerTestSuite covers AuthenticatorPostDecorator's circuit-breaker

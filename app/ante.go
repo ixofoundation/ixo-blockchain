@@ -11,12 +11,13 @@ import (
 	authante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	ibcante "github.com/cosmos/ibc-go/v8/modules/core/ante"
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
-	entityante "github.com/ixofoundation/ixo-blockchain/v7/x/entity/ante"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v7/x/entity/keeper"
-	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
-	iidkeeper "github.com/ixofoundation/ixo-blockchain/v7/x/iid/keeper"
-	smartaccountante "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/ante"
-	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/keeper"
+	bondsante "github.com/ixofoundation/ixo-blockchain/v8/x/bonds/ante"
+	entityante "github.com/ixofoundation/ixo-blockchain/v8/x/entity/ante"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v8/x/entity/keeper"
+	iidante "github.com/ixofoundation/ixo-blockchain/v8/x/iid/ante"
+	iidkeeper "github.com/ixofoundation/ixo-blockchain/v8/x/iid/keeper"
+	smartaccountante "github.com/ixofoundation/ixo-blockchain/v8/x/smart-account/ante"
+	smartaccountkeeper "github.com/ixofoundation/ixo-blockchain/v8/x/smart-account/keeper"
 )
 
 // HandlerOptions are the options required for constructing a default SDK AnteHandler.
@@ -92,6 +93,10 @@ func IxoAnteHandler(options HandlerOptions) (sdk.AnteHandler, error) {
 		authante.NewTxTimeoutHeightDecorator(),
 		authante.NewValidateMemoDecorator(options.AccountKeeper),
 		authante.NewConsumeGasForTxSizeDecorator(options.AccountKeeper),
+
+		// Reject all x/bonds messages (top-level or nested in authz.MsgExec).
+		// The bonds module is disabled (v8 emergency upgrade, 2026-06-20 incident).
+		bondsante.NewRejectBondsMsgDecorator(),
 
 		iidante.NewIidResolutionDecorator(options.IidKeeper, options.appCodec),
 		entityante.NewBlockNftContractTransferForEntityDecorator(options.EntityKeeper),

@@ -2,14 +2,29 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	iidante "github.com/ixofoundation/ixo-blockchain/v7/x/iid/ante"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	iidante "github.com/ixofoundation/ixo-blockchain/v8/x/iid/ante"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
+// IidTxMsg subjects a message to the IID ante check "the proto signer must
+// control the GetIidController DID". Among claims messages only
+// MsgAdjudicateDispute is safe to subject to it: its signer is
+// adjudicator_address and the keeper itself already requires the signer to
+// control AdjudicatorDid (AuthorizeAdjudicator), so the two always match.
+//
+// MsgSubmitClaim, MsgEvaluateClaim, MsgCreateClaimAuthorization, MsgClaimIntent
+// and MsgDisputeClaim are intentionally NOT IidTxMsg. Their *_did field
+// (agent_did / creator_did) is attribution only and is legitimately DECOUPLED
+// from the proto signer: submit/evaluate/createauth are signed by admin_address
+// (the collection admin), and intent/dispute are signed by agent_address, which
+// may be a delegated agent or an entity module account (e.g. a "fee" module
+// account that receives the payout) whose address differs from the agent_did on
+// the signed VC. Authorization is enforced in the keeper (collection.Admin /
+// SubmitClaimAuthorization grant / dispute deposit), which holds on every route
+// (top-level, authz.MsgExec, ICA, wasm). Subjecting them to the IID ante would
+// wrongly require the signer to control the agent's DID and break delegated /
+// on-behalf claims (e.g. the SUPA onboarding fee flow's module-account agent).
 var (
-	_ iidante.IidTxMsg = &MsgSubmitClaim{}
-	_ iidante.IidTxMsg = &MsgEvaluateClaim{}
-	_ iidante.IidTxMsg = &MsgDisputeClaim{}
 	_ iidante.IidTxMsg = &MsgAdjudicateDispute{}
 )
 
@@ -31,7 +46,8 @@ const TypeMsgSubmitClaim = "submit_claim"
 
 var _ sdk.Msg = &MsgSubmitClaim{}
 
-func (msg MsgSubmitClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+// NOTE: not IidTxMsg — authorized via collection.Admin in the keeper. AgentDid
+// is attribution only (see the IidTxMsg comment block above).
 
 func (msg MsgSubmitClaim) Type() string { return TypeMsgSubmitClaim }
 
@@ -44,7 +60,8 @@ const TypeMsgEvaluateClaim = "evaluate_claim"
 
 var _ sdk.Msg = &MsgEvaluateClaim{}
 
-func (msg MsgEvaluateClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+// NOTE: not IidTxMsg — authorized via collection.Admin in the keeper. AgentDid
+// is attribution only (see the IidTxMsg comment block above).
 
 func (msg MsgEvaluateClaim) Type() string { return TypeMsgEvaluateClaim }
 
@@ -57,7 +74,9 @@ const TypeMsgDisputeClaim = "dispute_claim"
 
 var _ sdk.Msg = &MsgDisputeClaim{}
 
-func (msg MsgDisputeClaim) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+// NOTE: not IidTxMsg — signer agent_address may be a delegated/module-account
+// agent whose address differs from AgentDid (attribution). Authorized in the
+// keeper via the dispute deposit + collection membership.
 
 func (msg MsgDisputeClaim) Type() string { return TypeMsgDisputeClaim }
 
@@ -125,9 +144,12 @@ const TypeMsgClaimIntent = "claim_intent"
 
 var _ sdk.Msg = &MsgClaimIntent{}
 
-func (msg MsgClaimIntent) Type() string { return TypeMsgClaimIntent }
+// NOTE: not IidTxMsg — signer agent_address may be a delegated/module-account
+// agent (e.g. the SUPA onboarding "fee" module account) whose address differs
+// from AgentDid (attribution). Authorized in the keeper via the agent's
+// SubmitClaimAuthorization grant from collection.Admin.
 
-func (msg MsgClaimIntent) GetIidController() iidtypes.DIDFragment { return msg.AgentDid }
+func (msg MsgClaimIntent) Type() string { return TypeMsgClaimIntent }
 
 func (msg MsgClaimIntent) Route() string { return RouterKey }
 
@@ -138,9 +160,10 @@ const TypeMsgCreateClaimAuthorization = "create_claim_authorization"
 
 var _ sdk.Msg = &MsgCreateClaimAuthorization{}
 
-func (msg MsgCreateClaimAuthorization) Type() string { return TypeMsgCreateClaimAuthorization }
+// NOTE: not IidTxMsg — authorized via collection.Admin in the keeper. CreatorDid
+// is attribution only (see the IidTxMsg comment block above).
 
-func (msg MsgCreateClaimAuthorization) GetIidController() iidtypes.DIDFragment { return msg.CreatorDid }
+func (msg MsgCreateClaimAuthorization) Type() string { return TypeMsgCreateClaimAuthorization }
 
 func (msg MsgCreateClaimAuthorization) Route() string { return RouterKey }
 

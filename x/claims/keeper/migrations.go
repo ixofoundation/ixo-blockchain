@@ -3,9 +3,9 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
-	v2claims "github.com/ixofoundation/ixo-blockchain/v7/x/claims/migrations/v2"
-	v3claims "github.com/ixofoundation/ixo-blockchain/v7/x/claims/migrations/v3"
-	v4claims "github.com/ixofoundation/ixo-blockchain/v7/x/claims/migrations/v4"
+	v2claims "github.com/ixofoundation/ixo-blockchain/v8/x/claims/migrations/v2"
+	v3claims "github.com/ixofoundation/ixo-blockchain/v8/x/claims/migrations/v3"
+	v4claims "github.com/ixofoundation/ixo-blockchain/v8/x/claims/migrations/v4"
 )
 
 // Migrator is a struct for handling in-place store migrations.

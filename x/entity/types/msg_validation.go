@@ -4,8 +4,8 @@ import (
 	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	ixo "github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	ixo "github.com/ixofoundation/ixo-blockchain/v8/lib/ixo"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // --------------------------

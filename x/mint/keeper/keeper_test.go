@@ -8,9 +8,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v7/lib/ixo"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v8/lib/ixo"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/mint/types"
 )
 
 // KeeperTestSuite covers x/mint keeper, distribution math, params/minter

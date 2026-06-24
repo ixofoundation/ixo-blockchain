@@ -14,10 +14,10 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/claims/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/claims/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/claims/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/claims/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/claims/types"
 	"github.com/spf13/cobra"
 )
 

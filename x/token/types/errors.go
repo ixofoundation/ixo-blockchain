@@ -13,4 +13,6 @@ var (
 	ErrTokenAmountIncorrect    = errorsmod.Register(ModuleName, 1005, "token amount is incorrect")
 	ErrTokenPaused             = errorsmod.Register(ModuleName, 1006, "token is paused")
 	ErrTokenStopped            = errorsmod.Register(ModuleName, 1007, "token is stopped")
+	ErrTokenBatchInvalid       = errorsmod.Register(ModuleName, 1008, "token batch is invalid")
+	ErrTokenContractMismatch   = errorsmod.Register(ModuleName, 1009, "all tokens in a batch must belong to the same contract")
 )

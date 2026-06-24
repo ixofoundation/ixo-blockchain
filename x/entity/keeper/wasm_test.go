@@ -8,11 +8,11 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"go.uber.org/mock/gomock"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	entitykeeper "github.com/ixofoundation/ixo-blockchain/v7/x/entity/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/testutil"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
-	iidtypes "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	entitykeeper "github.com/ixofoundation/ixo-blockchain/v8/x/entity/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/entity/testutil"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
+	iidtypes "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // withMockedWasm builds an entity Keeper with mocked WasmKeeper +
@@ -177,19 +177,23 @@ func (s *KeeperTestSuite) TestMsgUpdateEntity() {
 	s.SetupTest()
 	_, _, ms, _ := s.withMockedEntityWasm()
 
-	// Seed a DID for the entity, listing itself as a controller so
-	// ExecuteOnDidWithRelationships's HasController fallback authorises a
-	// signer of msg.ControllerDid.Did() == entityDID. (HasRelationship
-	// won't match because that compares the BlockchainAccountID — a bech32
-	// — against the DID string passed as signer; here the call site uses
-	// msg.ControllerDid.Did(), which is a DID, so we route through
-	// HasController instead.)
+	// Seed a DID for the entity that (a) lists itself as a controller so
+	// ExecuteOnDidWithRelationships's HasController check authorises
+	// msg.ControllerDid.Did() == entityDID, AND (b) carries an authentication
+	// verification method for the controller's signing address, so the keeper's
+	// signer→DID binding check (VerifyDidSignerAuthentication) passes. Both are
+	// now required: the keeper no longer relies on the ante for the signer half.
 	entityDID := "did:ixo:entity:upd-target"
+	controller := apptesting.RandomAccountAddress()
+	methodID := entityDID + "#key-1"
+	vm := iidtypes.NewVerificationMethod(methodID, iidtypes.DID(entityDID), iidtypes.NewBlockchainAccountID(controller.String()))
 	meta := iidtypes.NewDidMetadata(s.Ctx.TxBytes(), s.Ctx.BlockTime())
 	doc := iidtypes.IidDocument{
-		Id:         entityDID,
-		Controller: []string{entityDID},
-		Metadata:   &meta,
+		Id:                 entityDID,
+		Controller:         []string{entityDID},
+		VerificationMethod: []*iidtypes.VerificationMethod{&vm},
+		Authentication:     []string{methodID},
+		Metadata:           &meta,
 	}
 	s.App.IidKeeper.SetDidDocument(s.Ctx, []byte(entityDID), doc)
 
@@ -206,11 +210,12 @@ func (s *KeeperTestSuite) TestMsgUpdateEntity() {
 
 	end := now.Add(time.Hour)
 	_, err := ms.UpdateEntity(s.Ctx, &types.MsgUpdateEntity{
-		Id:            entityDID,
-		EntityStatus:  2,
-		StartDate:     &now,
-		EndDate:       &end,
-		ControllerDid: iidtypes.DIDFragment(entityDID),
+		Id:                entityDID,
+		EntityStatus:      2,
+		StartDate:         &now,
+		EndDate:           &end,
+		ControllerDid:     iidtypes.DIDFragment(entityDID),
+		ControllerAddress: controller.String(),
 	})
 	s.Require().NoError(err)
 

@@ -21,9 +21,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/mint/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/mint/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/mint/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/mint/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/mint/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/mint/types"
 	"github.com/spf13/cobra"
 )
 

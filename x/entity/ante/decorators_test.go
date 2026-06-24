@@ -6,12 +6,13 @@ import (
 	"cosmossdk.io/math"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/authz"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	entityante "github.com/ixofoundation/ixo-blockchain/v7/x/entity/ante"
-	entitytypes "github.com/ixofoundation/ixo-blockchain/v7/x/entity/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	entityante "github.com/ixofoundation/ixo-blockchain/v8/x/entity/ante"
+	entitytypes "github.com/ixofoundation/ixo-blockchain/v8/x/entity/types"
 )
 
 // EntityAnteTestSuite covers BlockNftContractTransferForEntityDecorator: it
@@ -55,6 +56,37 @@ func (s *EntityAnteTestSuite) TestBlockNftContractTransfer_BlocksTargetContract(
 	_, err := dec.AnteHandle(s.Ctx, tx, false, func(ctx sdk.Context, _ sdk.Tx, _ bool) (sdk.Context, error) { return ctx, nil })
 	s.Require().Error(err)
 	s.Require().Contains(err.Error(), "cannot execute contract set as the entity nft contract address")
+}
+
+// TestBlockNftContractTransfer_BlocksInsideMsgExec is the F3 regression: a
+// MsgExecuteContract against the NFT contract hidden inside an authz.MsgExec
+// must also be blocked (previously the decorator only inspected top-level msgs).
+func (s *EntityAnteTestSuite) TestBlockNftContractTransfer_BlocksInsideMsgExec() {
+	s.SetupTest()
+
+	nftAddr := apptesting.RandomAccountAddress()
+	params := entitytypes.DefaultParams()
+	params.NftContractAddress = nftAddr.String()
+	s.App.EntityKeeper.SetParams(s.Ctx, &params)
+
+	dec := entityante.NewBlockNftContractTransferForEntityDecorator(s.App.EntityKeeper)
+
+	inner := &wasmtypes.MsgExecuteContract{
+		Sender:   apptesting.RandomAccountAddress().String(),
+		Contract: nftAddr.String(),
+		Msg:      []byte(`{"transfer_nft":{}}`),
+	}
+	exec := authz.NewMsgExec(apptesting.RandomAccountAddress(), []sdk.Msg{inner})
+	tx := &minimalTx{msgs: []sdk.Msg{&exec}}
+
+	called := false
+	_, err := dec.AnteHandle(s.Ctx, tx, false, func(ctx sdk.Context, _ sdk.Tx, _ bool) (sdk.Context, error) {
+		called = true
+		return ctx, nil
+	})
+	s.Require().Error(err)
+	s.Require().Contains(err.Error(), "cannot execute contract set as the entity nft contract address")
+	s.Require().False(called)
 }
 
 func (s *EntityAnteTestSuite) TestBlockNftContractTransfer_AllowsOtherContracts() {

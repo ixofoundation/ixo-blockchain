@@ -2,7 +2,7 @@ package client
 
 import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/entity/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/entity/client/cli"
 )
 
 var ProposalHandler = govclient.NewProposalHandler(cli.NewCmdUpdateEntityParamsProposal)

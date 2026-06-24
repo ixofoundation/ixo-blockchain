@@ -13,7 +13,7 @@ import (
 	reflect "reflect"
 
 	types "github.com/cosmos/cosmos-sdk/types"
-	types0 "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	types0 "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 	gomock "go.uber.org/mock/gomock"
 )
 

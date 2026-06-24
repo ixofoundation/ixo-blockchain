@@ -7,9 +7,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/iid/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/iid/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 // KeeperTestSuite covers x/iid: 20 message handlers, queries, genesis,

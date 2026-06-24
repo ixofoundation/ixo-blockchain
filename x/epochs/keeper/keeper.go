@@ -7,7 +7,7 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/epochs/types"
 )
 
 type (

@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
 	flag "github.com/spf13/pflag"
 )
 

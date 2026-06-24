@@ -13,8 +13,8 @@ import (
 	grpc1 "github.com/cosmos/gogoproto/grpc"
 	proto "github.com/cosmos/gogoproto/proto"
 	github_com_cosmos_gogoproto_types "github.com/cosmos/gogoproto/types"
-	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
-	types "github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	github_com_ixofoundation_ixo_blockchain_v6_x_iid_types "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
+	types "github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -62,7 +62,7 @@ type MsgCreateEntity struct {
 	// Content ID or Hash of public Verifiable Credentials associated with the
 	// subject
 	Credentials  []string                                                           `protobuf:"bytes,13,rep,name=credentials,proto3" json:"credentials,omitempty"`
-	OwnerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,14,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
+	OwnerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,14,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v8/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
 	OwnerAddress string                                                             `protobuf:"bytes,15,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
 	Data         encoding_json.RawMessage                                           `protobuf:"bytes,16,opt,name=data,proto3,casttype=encoding/json.RawMessage" json:"data,omitempty"`
 	AlsoKnownAs  string                                                             `protobuf:"bytes,17,opt,name=alsoKnownAs,proto3" json:"alsoKnownAs,omitempty"`
@@ -305,7 +305,7 @@ type MsgUpdateEntity struct {
 	// Content ID or Hash of public Verifiable Credentials associated with the
 	// subject
 	Credentials       []string                                                           `protobuf:"bytes,5,rep,name=credentials,proto3" json:"credentials,omitempty"`
-	ControllerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,6,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
+	ControllerDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,6,opt,name=controller_did,json=controllerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v8/x/iid/types.DIDFragment" json:"controller_did,omitempty"`
 	ControllerAddress string                                                             `protobuf:"bytes,7,opt,name=controller_address,json=controllerAddress,proto3" json:"controller_address,omitempty"`
 }
 
@@ -433,7 +433,7 @@ type MsgUpdateEntityVerified struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether entity is verified or not based on credentials
 	EntityVerified     bool                                                               `protobuf:"varint,2,opt,name=entity_verified,json=entityVerified,proto3" json:"entity_verified,omitempty"`
-	RelayerNodeDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=relayer_node_did,json=relayerNodeDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"relayer_node_did,omitempty"`
+	RelayerNodeDid     github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,3,opt,name=relayer_node_did,json=relayerNodeDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v8/x/iid/types.DIDFragment" json:"relayer_node_did,omitempty"`
 	RelayerNodeAddress string                                                             `protobuf:"bytes,4,opt,name=relayer_node_address,json=relayerNodeAddress,proto3" json:"relayer_node_address,omitempty"`
 }
 
@@ -537,10 +537,10 @@ var xxx_messageInfo_MsgUpdateEntityVerifiedResponse proto.InternalMessageInfo
 type MsgTransferEntity struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The owner_did used to sign this transaction.
-	OwnerDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
+	OwnerDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,2,opt,name=owner_did,json=ownerDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v8/x/iid/types.DIDFragment" json:"owner_did,omitempty"`
 	// The owner_address used to sign this transaction.
 	OwnerAddress string                                                             `protobuf:"bytes,3,opt,name=owner_address,json=ownerAddress,proto3" json:"owner_address,omitempty"`
-	RecipientDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v7/x/iid/types.DIDFragment" json:"recipient_did,omitempty"`
+	RecipientDid github_com_ixofoundation_ixo_blockchain_v6_x_iid_types.DIDFragment `protobuf:"bytes,4,opt,name=recipient_did,json=recipientDid,proto3,casttype=github.com/ixofoundation/ixo-blockchain/v8/x/iid/types.DIDFragment" json:"recipient_did,omitempty"`
 }
 
 func (m *MsgTransferEntity) Reset()         { *m = MsgTransferEntity{} }

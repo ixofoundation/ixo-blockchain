@@ -15,9 +15,9 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/names/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/names/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/names/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/names/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/names/types"
 )
 
 var (

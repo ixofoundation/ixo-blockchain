@@ -3,7 +3,7 @@ package keeper_test
 import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/iid/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/iid/types"
 )
 
 func (s *KeeperTestSuite) TestQueryIidDocument() {

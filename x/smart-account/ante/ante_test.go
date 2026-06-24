@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/protobuf/reflect/protoreflect"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app/apptesting"
-	smartaccountante "github.com/ixofoundation/ixo-blockchain/v7/x/smart-account/ante"
+	"github.com/ixofoundation/ixo-blockchain/v8/app/apptesting"
+	smartaccountante "github.com/ixofoundation/ixo-blockchain/v8/x/smart-account/ante"
 )
 
 // AuthenticatorAnteTestSuite covers the parts of AuthenticatorDecorator that

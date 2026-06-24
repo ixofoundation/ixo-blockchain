@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "cosmos/msg/v1/msg.proto";
 import "ixo/names/v1beta1/names.proto";
 
-option go_package = "github.com/ixofoundation/ixo-blockchain/v7/x/names/types";
+option go_package = "github.com/ixofoundation/ixo-blockchain/v8/x/names/types";
 
 // Msg defines the names module Msg service.
 service Msg {

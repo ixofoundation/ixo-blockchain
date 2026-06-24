@@ -6,16 +6,18 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/x/epochs/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/epochs/types"
 )
 
 func TestDefaultGenesis_HasDailyHourlyWeekly(t *testing.T) {
 	gs := types.DefaultGenesis()
-	require.Len(t, gs.Epochs, 3)
 	idents := map[string]bool{}
 	for _, e := range gs.Epochs {
 		idents[e.Identifier] = true
 	}
+	// Assert the required production epochs are present rather than pinning an
+	// exact count: local/devnet test builds may also enable a "2min" epoch
+	// (see DefaultGenesis), so the count varies but these must always exist.
 	require.True(t, idents["day"])
 	require.True(t, idents["hour"])
 	require.True(t, idents["week"])

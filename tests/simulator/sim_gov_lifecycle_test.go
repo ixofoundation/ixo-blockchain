@@ -22,8 +22,8 @@ import (
 	govv1 "github.com/cosmos/cosmos-sdk/x/gov/types/v1"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ixofoundation/ixo-blockchain/v7/app"
-	namestypes "github.com/ixofoundation/ixo-blockchain/v7/x/names/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/app"
+	namestypes "github.com/ixofoundation/ixo-blockchain/v8/x/names/types"
 )
 
 // TestIxoSim_GovProposalLifecycleInProcess submits a gov v1 proposal

@@ -1,4 +1,4 @@
-module github.com/ixofoundation/ixo-blockchain/v7/tests/interchaintest
+module github.com/ixofoundation/ixo-blockchain/v8/tests/interchaintest
 
 go 1.25.0
 
@@ -288,7 +288,7 @@ replace (
 	github.com/ChainSafe/go-schnorrkel/1 => github.com/ChainSafe/go-schnorrkel v1.0.0
 	github.com/gogo/protobuf => github.com/gogo/protobuf v1.3.2
 	// Always pin parent to the worktree.
-	github.com/ixofoundation/ixo-blockchain/v7 => ../..
+	github.com/ixofoundation/ixo-blockchain/v8 => ../..
 )
 
 replace github.com/docker/docker => github.com/docker/docker v25.0.6+incompatible

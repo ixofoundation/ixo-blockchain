@@ -13,10 +13,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/client/cli"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/keeper"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/simulation"
-	"github.com/ixofoundation/ixo-blockchain/v7/x/bonds/types"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/client/cli"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/keeper"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/simulation"
+	"github.com/ixofoundation/ixo-blockchain/v8/x/bonds/types"
 	"github.com/spf13/cobra"
 )
 
@@ -117,7 +117,15 @@ func (am AppModule) Name() string {
 // RegisterServices registers a GRPC query service to respond to the
 // module-specific GRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	// BONDS MODULE DISABLED (v8 emergency security upgrade, 2026-06-20 incident).
+	// We register a disabled msg server that rejects every bonds message with
+	// types.ErrBondsModuleDisabled, instead of keeper.NewMsgServerImpl. This
+	// neutralises all state-changing routes (top-level, authz.MsgExec, authz
+	// dispatch, CosmWasm stargate, ICA-host) with a single clear error. Queries
+	// remain available. To re-enable, swap back to keeper.NewMsgServerImpl AND
+	// restore the EndBlocker call below — only after fixing the
+	// signer-vs-resolved-address bug in keeper/msg_server.go and keeper/batch.go.
+	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewDisabledMsgServerImpl())
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 }
 
@@ -139,9 +147,14 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // EndBlock returns the end blocker for the bonds module. It returns no validator updates.
+//
+// BONDS MODULE DISABLED (v8 emergency security upgrade): the batch EndBlocker is
+// intentionally a no-op so that pre-existing bonds cannot process orders, move
+// reserves, mint/burn bond tokens, or update alpha. The batch order paths in
+// keeper/batch.go also resolve DID-fragments to addresses and move funds without
+// a signer check, so they must not run while the module is disabled. To
+// re-enable, restore the EndBlocker(ctx, am.keeper) call below.
 func (am AppModule) EndBlock(context context.Context) error {
-	ctx := sdk.UnwrapSDKContext(context)
-	EndBlocker(ctx, am.keeper)
 	return nil
 }
 
