@@ -26,37 +26,43 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 		// Check if the intent is past its expiration date
 		if ctx.BlockTime().After(*intent.ExpireAt) {
+			expireIntent := func() {
+				// Mark intent as expired
+				intent.Status = types.IntentStatus_expired
+				if err := k.RemoveIntentAndEmitEvents(ctx, intent); err != nil {
+					k.Logger(ctx).Error("failed to remove expired intent", "intent_id", intent.Id, "collection_id", intent.CollectionId, "error", err)
+				}
+			}
+
 			// Get account used for APPROVAL payments on collection
 			fromAddress, err := sdk.AccAddressFromBech32(intent.FromAddress)
 			if err != nil {
-				panic(err)
+				k.Logger(ctx).Error("failed to parse expired intent from address", "intent_id", intent.Id, "collection_id", intent.CollectionId, "from_address", intent.FromAddress, "error", err)
+				expireIntent()
+				continue
 			}
 			// Get escrow address
 			escrow, err := sdk.AccAddressFromBech32(intent.EscrowAddress)
 			if err != nil {
-				panic(err)
+				k.Logger(ctx).Error("failed to parse expired intent escrow address", "intent_id", intent.Id, "collection_id", intent.CollectionId, "escrow_address", intent.EscrowAddress, "error", err)
+				expireIntent()
+				continue
 			}
 
 			// Transfer funds back to the original account
 			_, err = k.TransferIntentPayments(ctx, escrow, fromAddress, intent.Amount, intent.Cw20Payment, intent.Cw1155Payment, intent.Cw1155IntentPayment)
 			if err != nil {
-				// if this happens then it means there is funds missing in escrow account, should never happen
-				panic(err)
+				k.Logger(ctx).Error("failed to refund expired intent payments", "intent_id", intent.Id, "collection_id", intent.CollectionId, "error", err)
 			}
 
 			// Restore member budget if this intent was on behalf of a team member
 			if intent.MemberAddress != "" {
 				if err := k.RestoreMemberBudget(ctx, intent.CollectionId, intent.MemberAddress, intent.Amount, intent.Cw20Payment); err != nil {
-					panic(err)
+					k.Logger(ctx).Error("failed to restore member budget for expired intent", "intent_id", intent.Id, "collection_id", intent.CollectionId, "member_address", intent.MemberAddress, "error", err)
 				}
 			}
 
-			// Mark intent as expired
-			intent.Status = types.IntentStatus_expired
-			err = k.RemoveIntentAndEmitEvents(ctx, intent)
-			if err != nil {
-				panic(err)
-			}
+			expireIntent()
 		}
 	}
 }
