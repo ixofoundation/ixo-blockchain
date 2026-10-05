@@ -37,11 +37,18 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 				panic(err)
 			}
 
-			// Transfer funds back to the original account
+			// Transfer funds back to the original account. Refund failures are logged
+			// instead of panicked so one bad escrowed contract cannot halt EndBlocker
+			// forever for the same expired intent.
 			_, err = k.TransferIntentPayments(ctx, escrow, fromAddress, intent.Amount, intent.Cw20Payment, intent.Cw1155Payment, intent.Cw1155IntentPayment)
 			if err != nil {
-				// if this happens then it means there is funds missing in escrow account, should never happen
-				panic(err)
+				ctx.Logger().Error(
+					"failed to refund expired claim intent",
+					"intent_id", intent.Id,
+					"collection_id", intent.CollectionId,
+					"agent_address", intent.AgentAddress,
+					"error", err,
+				)
 			}
 
 			// Restore member budget if this intent was on behalf of a team member
